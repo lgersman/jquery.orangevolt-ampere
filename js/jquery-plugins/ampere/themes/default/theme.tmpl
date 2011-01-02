@@ -1,0 +1,51 @@
+<script id="ampere_theme_default_fragment_transition" type="text/x-jquery-tmpl">
+	{{if !$item.layout || $item.layout=='button'}}
+	<button 
+		class="transition ${options('name')}" 
+		type="button"
+		{{if isEnabled()==false}} 
+		disabled="disabled"
+		{{/if}}
+	>
+		${options( 'title')}
+	</button>
+	{{/if}}
+</script>
+
+<script id="ampere_theme_default_fragment_radio" type="text/x-jquery-tmpl">
+	{{if label!==undefined && label!==null}}
+	<label for="{{id( 'radio')}}">${label}</label>
+	{{/if}}
+	<input 
+		type="radio" 
+		name="${ name}" 
+		id="{{id( 'radio')}}" 
+		value="${value!==null || value!==undefined ? value :  'on'}"
+	/>
+</script>
+
+<script id="ampere_theme_default_view_default" type="text/x-jquery-tmpl">
+	<div>hey !!</div>
+</script>
+
+<script id="ampere_theme_default_layout_default" type="text/x-jquery-tmpl">
+	<form onsubmit="return false" class="state ${state.options( 'name')}">
+		<div class="body">
+			<div class="header ui-widget-header ui-corner-all">
+				${state.module.options( 'title')} - ${state.options( 'title')}
+			</div>
+			<div class="ampere view ${options( 'name')}">
+				{{view}}
+			</div>						
+		</div>
+		<div class="footer ui-widget-header ui-corner-all">
+			<div class="transitions">
+			{{each state.transitions}}
+				{{if $value.options('type')=='primary'}}
+					{{transition( $value)}}
+				{{/if}}
+			{{/each}}			
+			</div>
+		</div>
+	</form>
+</script>

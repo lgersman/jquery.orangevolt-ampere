@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"> 
+	<head>  
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=7" />
+	
+		<link href="js/jquery-ui-1.9m3/themes/base/jquery-ui.css" media="screen" rel="stylesheet" type="text/css" />
+		<link href="js/jquery-plugins/ampere/jquery.ampere.css" media="screen" rel="stylesheet" type="text/css" />
+		
+		<script type="text/javascript" src="js/modernizr-1.6.min.js"></script>
+		<script type="text/javascript" src="js/jquery-ui-1.9m3/jquery-1.4.4.js"></script>
+		<script type="text/javascript" src="js/jquery-ui-1.9m3/ui/jquery-ui.js"></script>
+		<script type="text/javascript" src="js/jquery-ui-1.9m3/ui/i18n/jquery-ui-i18n.js"></script>
+		<script type="text/javascript" src="js/json2.js"></script>
+		<script type="text/javascript" src="js/jquery-plugins/jquery.tmpl.js"></script>
+		
+		<script type="text/javascript" src="js/jquery-plugins/jquery.datalink.js"></script>
+		<script type="text/javascript" src="js/jquery-plugins/jquery.globalization.js"></script>
+		<script type="text/javascript" src="js/jquery-plugins/ampere/jquery.ampere.js"></script>
+				
+		<script type="text/javascript">
+			function loadTheme( theme, callback) {
+					// normalize theme
+				theme.tmpl = typeof( theme.tmpl)=='string' ? [ theme.tmpl] : ($.isArray( theme.tmpl) ? theme.tmpl : []) 
+				theme.css  = typeof( theme.css)=='string' ? [ theme.css] : ($.isArray( theme.css) ? theme.css : [])
+				theme.js   = typeof( theme.js)=='string' ? [ theme.js] : ($.isArray( theme.js) ? theme.js : [])
+				
+				for( var i=0; i<theme.css.length; i++) {
+					$( 'head').append( 
+						$( '<link href="js/jquery-plugins/ampere/themes/default/' + theme.css[i] + '" rel="stylesheet" type="text/css" />')
+					);
+				}
+				
+				var resources = [].concat( theme.tmpl, theme.js);
+				tracker = function( resource) {
+					return function( XMLHttpRequest, textStatus) {
+						resources.splice( $.inArray( resource, 1));
+						console.log( resource + ' loaded');
+						resources.length || callback.call( this); 
+					};
+				};
+				for( var i=0; i<theme.js.length; i++) {
+					$.ajax({
+						url : 'js/jquery-plugins/ampere/themes/default/' + theme.js[i],
+						dataType : 'script', 
+						complete : tracker( theme.js[i]) 
+					});
+				}
+				for( var i=0; i<theme.tmpl.length; i++) {
+					$.ajax({
+						url : 'js/jquery-plugins/ampere/themes/default/' + theme.tmpl[i],
+						dataType : 'html',
+						success  : function(data, textStatus, XMLHttpRequest) {
+							console.log( data);
+						},
+						complete : tracker( theme.tmpl[i]) 
+					});
+				}
+			}
+		
+			$(window).ready( function() {
+				function ampere_ready() {
+					console.log( 'ampere ready');
+				}
+				
+				$.ajax({
+					url   : 'js/jquery-plugins/ampere/themes/default/theme.jsson',
+					dataType : 'json', 
+					error : function( XMLHttpRequest, textStatus, errorThrown) {
+						if( XMLHttpRequest.status==404) {
+							loadTheme( { tmpl : [ 'theme.tmpl'], css : [ 'theme.css'], js : [ 'theme.js']}, ampere_ready);
+						} else {
+							console.error( errorThrown);
+						}
+					},
+					success : function(data, textStatus, XMLHttpRequest) {
+						loadTheme( data, ampere_ready);
+					}
+				});
+				//var container = $( "#testTemplate" ).tmpl( data).appendTo( 'body');
+			});
+		</script>
+    </head>
+    <body>
+    	
+    </body>
+</html>

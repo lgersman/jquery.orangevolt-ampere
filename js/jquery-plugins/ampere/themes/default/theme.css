@@ -1,0 +1,35 @@
+.ampere.module {
+	position  	: relative;
+	min-width 	: 300px;
+	min-height	: 200px;
+	
+	font-size   : 0.8em;
+    /*line-height: 1.25em;*/
+}
+
+* {
+	font-family : Lucida,Lucidux,"Lucida Sans",Verdana,"Geneva",Arial,Helvetica,sans-serif; 
+}
+
+.ampere.module >.state >.body >.view {
+	overflow	   : auto;
+	padding-bottom : 40px;
+}	
+
+.ampere.module >.state >.body >.header {
+	padding		: 4px 4px;
+	overflow	: hidden;
+}
+
+.ampere.module >.state >.footer {
+	position	: absolute;
+	bottom		: 0;
+	right		: 0;
+	left		: 0;
+	padding		: 4px 4px;
+	overflow	: hidden;
+}
+
+.ampere.module >.state >.footer >.transitions {
+	float		: right;
+}
