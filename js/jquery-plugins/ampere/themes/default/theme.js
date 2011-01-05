@@ -22,6 +22,7 @@
 								switch( $(element).attr( 'type')) {
 									case 'radio' 	: {
 										link[ element.name] = $.ampere.link.radio();
+										
 										if( view.state[ element.name]!=undefined && view.state[ element.name]!=null) {
 											link[ element.name].convertBack( view.state[ element.name], view.state, element);
 										}

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"> 
+	<head>  
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=7" />
+	
+		<link href="js/jquery-ui-1.9m3/themes/base/jquery-ui.css" rel="stylesheet" type="text/css" />
+		<link href="js/jquery-plugins/ampere/jquery.ampere.css" rel="stylesheet" type="text/css" />
+		
+		<script type="text/javascript" src="js/modernizr-1.6.min.js"></script>
+		<script type="text/javascript" src="js/jquery-ui-1.9m3/jquery-1.4.4.js"></script>
+		<script type="text/javascript" src="js/jquery-ui-1.9m3/ui/jquery-ui.js"></script>
+		<script type="text/javascript" src="js/jquery-ui-1.9m3/ui/i18n/jquery-ui-i18n.js"></script>
+		<script type="text/javascript" src="js/json2.js"></script>
+		<script type="text/javascript" src="js/jquery-plugins/jquery.tmpl.js"></script>
+		<script type="text/javascript" src="js/jquery-plugins/jquery.tmplPlus.js"></script>
+		
+		<script type="text/javascript" src="js/jquery-plugins/jquery.datalink.js"></script>
+		<script type="text/javascript" src="js/jquery-plugins/jquery.globalization.js"></script>
+		<script type="text/javascript" src="js/jquery-plugins/ampere/jquery.ampere.js"></script>
+		
+		<script id="main" type="text/x-jquery-tmpl">
+			<div>
+				{{tmpl({foo : 'bar'}) r}}
+			</div>
+		</script>
+		<script id="details" type="text/x-jquery-tmpl">
+			<div id="detail">
+				${foo}
+			</div>
+		</script>
+				
+		<script type="text/javascript">
+			$(window).ready( function() {
+				var script = $( '<div>')
+				.append( $( '<div id="detail">huhu !!!</div>'));
+				
+				window.r = $.template( null, script);
+				
+				$( '#main').tmpl( {roo : 'raa'}).appendTo( 'body');
+				console.log( $( '#detail').tmplItem().data);
+			});
+		</script>
+    </head>
+    <body>
+    	
+    </body>
+</html>

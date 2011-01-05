@@ -1,7 +1,13 @@
-/*
-* Additional templating features or support for more advanced/less common scenarios.
-* Requires jquery.tmpl.js 
-*/
+/*!
+ * tmplPlus.js: for jQuery Templates Plugin 1.0.0pre 
+ * Additional templating features or support for more advanced/less common scenarios.
+ * Requires jquery.tmpl.js 
+ * http://github.com/jquery/jquery-tmpl
+ *
+ * Copyright Software Freedom Conservancy, Inc.
+ * Dual licensed under the MIT or GPL Version 2 licenses.
+ * http://jquery.org/license
+ */
 (function (jQuery) {
 	var oldComplete = jQuery.tmpl.complete, oldManip = jQuery.fn.domManip;
 
@@ -22,11 +28,25 @@
 				tmplItem.rendered( tmplItem );
 			}
 		}
-	}
+	};
 
 	jQuery.extend({
 		tmplCmd: function( command, data, tmplItems ) {
 			var retTmplItems = [], before; 
+			function find( data, tmplItems ) {
+				var found = [], tmplItem, ti, tl = tmplItems.length, dataItem, di = 0, dl = data.length;
+				for ( ; di < dl; ) {
+					dataItem = data[di++]; 
+					for ( ti = 0; ti < tl; ) {
+						tmplItem = tmplItems[ti++];
+						if ( tmplItem.data === dataItem ) {
+							found.push( tmplItem );
+						}
+					}
+				}
+				return found;
+			}
+
 			data = jQuery.isArray( data ) ? data : [ data ];
 			switch ( command ) {
 				case "find":
@@ -38,8 +58,7 @@
 				coll = tmplItem.nodes;
 				switch ( command ) {
 					case "update":
-						jQuery.tmpl( null, null, null, tmplItem ).insertBefore( coll[0] );
-						jQuery( coll ).remove();
+						tmplItem.update();
 						break;
 					case "remove":
 						jQuery( coll ).remove();
@@ -55,19 +74,6 @@
 				}
 			});
 			return retTmplItems;
-			function find( data, tmplItems ) {
-				var found = [], tmplItem, ti, tl = tmplItems.length, dataItem, di = 0, dl = data.length;
-				for ( ; di < dl; ) {
-					dataItem = data[di++]; 
-					for ( ti = 0; ti < tl; ) {
-						tmplItem = tmplItems[ti++];
-						if ( tmplItem.data === dataItem ) {
-							found.push( tmplItem );
-						}
-					}
-				}
-				return found;
-			}
 		}
 	});
 
@@ -77,14 +83,14 @@
 			if ( args.length >= 2 && typeof data === "object" && !data.nodeType && !(data instanceof jQuery)) {
 				// args[1] is data, for a template.
 				dmArgs = jQuery.makeArray( arguments );
-				
+
 				// Eval template to obtain fragment to clone and insert
-				dmArgs[0] = [ jQuery.tmpl( jQuery.templates( tmpl ), data, args[2], args[3], true ) ];
-				
+				dmArgs[0] = [ jQuery.tmpl( jQuery.template( tmpl ), data, args[2], args[3] ) ];
+
 				dmArgs[2] = function( fragClone ) {
 					// Handler called by oldManip when rendered template has been inserted into DOM.
 					jQuery.tmpl.afterManip( this, fragClone, callback );
-				}
+				};
 				return oldManip.apply( this, dmArgs );
 			}
 			return oldManip.apply( this, arguments );

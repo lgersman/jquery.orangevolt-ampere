@@ -61,7 +61,7 @@
 		template 	: 'default', 		// default template to apply
 		debug		: false,			// set to true for debugging				
 		base		: undefined			// (required) base url to ampere 
-	}
+	};
 
 		// load resources and callback() when finished
 	function load( options, callback) {
@@ -70,9 +70,9 @@
 		var context = this;
 		
 		// normalize theme
-		options.tmpl = typeof( options.tmpl)=='string' ? [ options.tmpl] : ($.isArray( options.tmpl) ? options.tmpl : []) 
-		options.css  = typeof( options.css)=='string' ? [ options.css] : ($.isArray( options.css) ? options.css : [])
-		options.js   = typeof( options.js)=='string' ? [ options.js] : ($.isArray( options.js) ? options.js : [])
+		options.tmpl = typeof( options.tmpl)=='string' ? [ options.tmpl] : ($.isArray( options.tmpl) ? options.tmpl : []);
+		options.css  = typeof( options.css)=='string' ? [ options.css] : ($.isArray( options.css) ? options.css : []);
+		options.js   = typeof( options.js)=='string' ? [ options.js] : ($.isArray( options.js) ? options.js : []);
 		
 		for( var i=0; i<options.css.length; i++) {
 			$( 'head').append( 
@@ -99,7 +99,7 @@
 					success  : function( data, textStatus, XMLHttpRequest) {
 						var fn = eval( data);
 						fn.call( context);
-					},
+					}
 				});
 			}
 			for( var i=0; i<options.tmpl.length; i++) {
@@ -217,42 +217,31 @@
 			}
 		});
 		
-		this.view    = undefined;
-		this.content = undefined;
-		
 		this.render = function( view, layout) {
-			var _view = this.view;
-			var _content = this.content;
-			try {
-				layout || (layout='default');
-				
-				var template = this.getTemplate( 'layouts', layout);
-				
-				this.preRender( view);
-				
-				this.view = view;
-				this.content = view.render();
-				
-				if( view.options( 'layout')!=false) {
-					view.state.module.element.empty().append( $.tmpl( template, view));
-				} else {
-					view.state.module.element.empty().append( this.content);
-				}
-
-				view.options( 'post').call( view);
-				
-				this.postRender( view);
-			} finally {
-				this.view 	 = _view;
-				this.content = _content;
+			layout || (layout='default');
+			
+			var template = this.getTemplate( 'layouts', layout);
+			
+			this.preRender( view);
+			
+			if( view.options( 'layout')!=false) {
+				view.state.module.element.empty().append( $.tmpl( template, view));
+			} else {
+				view.state.module.element.empty().append( this.render( { data : this}));
 			}
+
+			view.options( 'post').call( view);
+			
+			this.postRender( view);
 		};
 		
 			/* can be overridden by themes */
 		this.preRender  = $.noop;
 		this.postRender = $.noop;
 		
+		/*
 		this.transition = function( transition, layout) {
+			debugger;
 			layout || (layout='transition');
 			
 			var template = $( '#ampere_theme_' + $.ampere.options.theme + '_fragment_' + layout);
@@ -260,7 +249,7 @@
 			
 			return template.tmpl( transition);
 		};
-		
+		*/
 		return this;
 	};
 	
@@ -290,7 +279,6 @@
 			// if $item.id is undefined a new id will be generated using the (optional) prefix  
 		this.id = (function() {
 			var ids = {};
-			
 			var id = function( $item, $1, $2) {
 				if( $item.id) {
 					return $item.id;
@@ -305,33 +293,34 @@
 			};
 			id.reset = function() {
 				ids = {};
-			}
+			};
 			
 			return id;
 		})();
 		
+			/* function is called in template context -> this is a tmplItem */
 		this.render = function() {
+			var view = this/*.data*/;
+				
 				// reset uid generator
-			this.id.reset();
-			this.options( 'pre').call( this);
+			view.id.reset();
+			view.options( 'pre').call( view);
 			
 			var result = undefined;
-			if( typeof( this.options( 'template'))=='string') {
-				var template = $( 'head script' + this.options( 'template'));
-				if( template.length) {
-					result = template.tmpl( this);
-				} else {
-					result = $.tmpl( this.options( 'template').template(), this);
-				}
-			} else if( $.isFunction( this.options('template'))) {
-				result = this.options('template').call( this);
-			} else if( this.options( 'template')===undefined) {
-				result = $.tmpl( $.ampere.theme.templates.views[ 'default'], this);				
+			
+			if( typeof( view.options( 'template'))=='string') {
+				result = document.getElementById( view.options( 'template'));
+				view.ensure( result, 'template with id "', view.options( 'template'), '" doesnt exist in document');
+			} else if( $.isFunction( view.options('template'))) {
+				result = view.options('template').call( view);
+			} else if( view.options( 'template')===undefined) {
+				result = $.tmpl( $.ampere.theme.templates.views[ 'default'], view);				
 			} else {
-				this.ensure( false, 'cannot handle view template ', this.options( 'template'));
+				view.ensure( false, 'cannot handle view template ', view.options( 'template'));
 			}
 			
-			return result;
+			view.ensure( result!==undefined, 'failed to render view');
+			return $.template( null, result);
 		};
 	}
 	
@@ -379,7 +368,7 @@
 				case 2  : return Object.hasOwnProperty( options, key) ? options[ key] : _default;
 				default : return options;
 			}
-		}
+		};
 		
 		this.transitions = {};
 		
@@ -443,7 +432,7 @@
 				}
 			} 
 			
-				// if we sty here no view is availale (yet) -> create a synthetic view 
+				// if we stay here no view is availale (yet) -> create a synthetic view 
 			this.view({ });
 			return this.getView(); 
 		};
@@ -484,7 +473,7 @@
 			this.states[ options.name] = new state();
 			
 			return this;
-		}
+		};
 		
 		var _state = undefined;
 		this.getState = function() {
@@ -663,21 +652,34 @@
 		return this;
 	};
 	
+	$.ampere.getViewTmplItem = function( $item) {
+		while( !($item.data instanceof View)) {
+			$item = $item.parent;
+		}
+		
+		Ensure( 'getViewTmplItem()')( $item.data instanceof View, 'could not evaluate parent tmpl item having data instanceof View');
+		return $item;
+	};
+	
 	$.tmpl.tag.id = {
 		_default : {
 			$2 : 'undefined'
 		},
-		open : '_=_.concat( $.ampere.theme.view.id( $item, $1, $2));'
+		open : '_=_.concat( /*$.ampere.theme.view.id*/$.ampere.getViewTmplItem( $item).data.id( $item, $1, $2));'
 	};
 	
 	$.tmpl.tag.view = {
 		_default : {
-			$2 : 'undefined'
+			
 		},
-		open : $.tmpl.tag.tmpl.open.replace( '$1', 'jQuery( $.ampere.theme.content)')
+		open : $.tmpl.tag.tmpl.open
+			   .replace( '$1', '$data.render()')
+			   .replace( '$2', '$data')
+			//$.tmpl.tag.tmpl.open.replace( '$2', '{ wrapped : $.ampere.theme.content}')
 	};
 	
 		// update state views whenever a change occures 
+	    // TODO : use delegate instaed of live handler
 	$('body').live( 'change', function( event) {
 		var e = $( event.target).closest( '.ampere.module');
 		if( e.length) {
@@ -701,6 +703,7 @@
 	});
 	
 		// react on clicks to transitions
+		// TODO : use delegate instaed of live handler
 	$( 'body .transition').live( 'click', function() {
 		var tmplItem = $.tmplItem( this);
 		if( tmplItem) {
