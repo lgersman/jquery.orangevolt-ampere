@@ -39,17 +39,22 @@
 	
 	function Log( namespace) {
 		var fn = function( /*message, (, message)* */) {
-			if( !$.ampere.options.debug) {
+			if( !$.ampere.options.debug || !window.console) {
 				return;
 			}
-			
+
 			var args = $.makeArray( arguments);
-			for( var i in args) {
-				args[i] = args[i];
+			if( !$.isFunction( console.log)) {
+				for( var i in args) {
+					args[i] = args[i];
+				}
+				args = args.join( '');
+				
+				console && console.log( 'LOG ' + namespace + ' : ' + args);
+			} else {
+				args.unshift( 'LOG ' + namespace + ' : ');
+				jQuery.browser.mozilla ? console.log.apply( this, args) : console.log( args.join( ''));
 			}
-			args = args.join( '');
-			
-			console && console.log( 'LOG ' + namespace + ' : ' + args);
 		};
 		fn.namespace = namespace;
 		
@@ -348,6 +353,7 @@
 		};
 		
 		this.isEnabled = function() {
+			//debugger;
 			var condition = this.options( 'condition', trueFn);
 			var v = condition.call( this);
 			
@@ -458,9 +464,9 @@
 			this.ensure( $.isFunction( fn), 'argument fn expected to be a function');
 			
 			options || (options = {});
-			options.name  || (options.name=fn.name);
-			this.ensure( options.name && options.name.length, 'argument fn expected to be a named function (function foo() { ... }) or option name must be given');
-			options.title || (options.title=ucwords( options.name));  
+			options.name  || (options.name=fn.name) || (options.name=(options.title ? options.title.toLowerCase() : undefined));
+			this.ensure( options.name && options.name.length, 'argument fn expected to be a named function (function foo() { ... }) or option name/title must be given');
+			typeof( options.title)=='string' || (options.title=ucwords( options.name));  
 			
 			this.ensure( !this.states[ options.name], 'state named "', options.name + '" already defined module "', this.options( 'title'), '"');
 			
@@ -522,9 +528,9 @@
 			$.ampere.ensure( $.isFunction( fn), 'argument fn expected to be a function');
 			
 			options || (options = {});
-			options.name  || (options.name=fn.name);
-			$.ampere.ensure( options.name && options.name.length, 'argument fn expected to be a named function (function foo() { ... }) or option name must be given');			
-			options.title || (options.title=ucwords( options.name));  
+			options.name  || (options.name=fn.name) || (options.name=(options.title ? options.title.toLowerCase() : undefined));
+			$.ampere.ensure( options.name && options.name.length, 'argument fn expected to be a named function (function foo() { ... }) or option name/title must be given');
+			typeof( options.title)=='string' || (options.title=ucwords( options.name));  
 			
 			$.ampere.ensure( !$.ampere.modules[ options.name], 'module named "', options.name + '" already defined');
 			
@@ -593,7 +599,9 @@
 						var radios = $.makeArray( source.form[source.name]);
 						for( var i=0; i<radios.length; i++) {
 							if( radios[i].checked) {
+								value = $.tmplItem( radios[i]).data.value;
 								$( target).data(source.name, value);
+								console.log( 'set "', source.name, '"(', typeof( value) ,') in target "', target.options( 'title'), '" to ', value, target);
 								break;
 							} 
 						} 
@@ -601,7 +609,7 @@
 					convertBack : function( value, source, target) {
 						var radios = $.makeArray( target.form[ target.name]);
 						for( var i=0; i<radios.length; i++) {
-							if( radios[ i].value==source[ target.name]) {
+							if( $.tmplItem( radios[i]).data.value==source[ target.name]) {
 								radios[ i].checked = true;
 								break;
 							} 
@@ -652,6 +660,9 @@
 		return this;
 	};
 	
+	/*
+	 * @return the closest TmplItem with the view asociated as data  
+	 */
 	$.ampere.getViewTmplItem = function( $item) {
 		while( !($item.data instanceof View)) {
 			$item = $item.parent;
@@ -665,8 +676,38 @@
 		_default : {
 			$2 : 'undefined'
 		},
-		open : '_=_.concat( /*$.ampere.theme.view.id*/$.ampere.getViewTmplItem( $item).data.id( $item, $1, $2));'
+		open : '_=_.concat( jQuery.ampere.getViewTmplItem( $item).data.id( $item, $1, $2));'
 	};
+	/*
+	$.tmpl.tag.log = {
+		_default : {
+			$2 : 'undefined',
+			$1 : 'undefined'
+		},
+		open : '$.ampere.getViewTmplItem( $item).data.log( $.ampere.getViewTmplItem( $item).data.state.options("title") ,$2);'
+	};
+	*/
+	
+	/*
+	var varFn = function( _, $2, $1) {
+		Ensure( 'tag{{var( name) [value]}}')( $1!==$.tmpl.tag[ 'var'].varFn, 'required parameter name available');
+		
+		if( $2!==$.tmpl.tag[ 'var'].varFn) {
+			this[ $1] = $2;
+		} else if( this[ $1]!==undefined && this[ $1]!==null){
+			_.push( this[ $1]);
+		}
+		// '$item.tag_var=$1; $item.tag_var===$.tmpl.tag[ "var"].UNDEFINED && $item.tag_var!=null && $item.tag_var!==undefined ? (_=_.concat( $item.tag_var)) : ($item[ "".concat( $2)]=$item.tag_var);'	
+	};
+	$.tmpl.tag[ 'var'] = {
+		_default : {
+			$1 : "$.tmpl.tag[ 'var'].varFn",
+			$2 : "$.tmpl.tag[ 'var'].varFn"
+		},
+		open : "jQuery.tmpl.tag[ 'var'].varFn.call( $item, _, $1, $2);"
+	};
+	$.tmpl.tag[ 'var'].varFn = varFn;
+	*/
 	
 	$.tmpl.tag.view = {
 		_default : {
@@ -675,7 +716,6 @@
 		open : $.tmpl.tag.tmpl.open
 			   .replace( '$1', '$data.render()')
 			   .replace( '$2', '$data')
-			//$.tmpl.tag.tmpl.open.replace( '$2', '{ wrapped : $.ampere.theme.content}')
 	};
 	
 		// update state views whenever a change occures 

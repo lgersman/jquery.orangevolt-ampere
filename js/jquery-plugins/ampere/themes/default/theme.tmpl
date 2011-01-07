@@ -9,9 +9,9 @@
 	<button 
 		class="transition ${options('name')}" 
 		type="button"
-		{{if isEnabled()==false}} 
-		disabled="disabled"
-		{{/if}}
+		{{if !$data.isEnabled()}} {{! if !isEnabled() fails right now : see https://github.com/jquery/jquery-tmpl/issues/issue/40/#comment_658509}}
+			disabled="disabled"
+		{{/if}}	
 	>
 		${options( 'title')}
 	</button>
@@ -25,7 +25,7 @@
 	<input 
 		type="radio" 
 		name="${ name}" 
-		id="{{id( 'radio')}}" 
+		id="{{id( 'radio')}}"
 		value="${value!==null || value!==undefined ? value :  'on'}"
 	/>
 </script>
@@ -38,7 +38,7 @@
 	<form onsubmit="return false" class="state ${state.options( 'name')}">
 		<div class="body">
 			<div class="header ui-widget-header ui-corner-all">
-				${state.module.options( 'title')} - ${state.options( 'title')}
+				${state.module.options( 'title')} {{if state.options( 'title')}} - ${state.options( 'title')} {{/if}}
 			</div>
 			<div class="ampere view ${options( 'name')}">
 				{{view}}

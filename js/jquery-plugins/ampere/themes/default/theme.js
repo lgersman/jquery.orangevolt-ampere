@@ -10,6 +10,10 @@
  * the function is then called with the theme instance as "this" context
  */
 (function() {
+	this.preRender = function( view) {
+		view.state.module.element.unlink( view.state);
+	};
+	
 	this.postRender = function( view) {
 			// link form elements to state variables
 		var link = view.options( 'link');
@@ -56,11 +60,12 @@
 				}
 			}
 		}
+		
 		$( view.state.module.element).link( view.state, link);
 			// --
 		
 		$( ':radio, :checkbox, :button', view.state.module.element).button();
-	}
+	};
 	
 		// update state views whenever a change occures 
 	$('body').live( 'change', function( event) {

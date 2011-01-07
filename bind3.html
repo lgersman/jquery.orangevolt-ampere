@@ -27,7 +27,6 @@
 		<script type="text/javascript" src="js/jquery-plugins/ampere/jquery.ampere.js"></script>
 		
 		<script id="main" type="text/x-jquery-tmpl">
-			<div>
 			<table width="100%">
 				<tr>
 					<td colspan="3" align="right">${state.module.value}</td>
@@ -51,15 +50,14 @@
 					</td>
 				</tr>
 			</table>
-			</div>
 		</script>
 		<script id="preview" type="text/x-jquery-tmpl">
 			<div>
 				${state.module.value} 
-				+ 
-				${state.operand} 
+				${options( 'operation')}
+				${state.module.states.main.operand} 
 				= 
-				${state.module.value + state.operand}
+				${options( 'preview')(state.module.value, state.module.states.main.operand)}
 			</div>
 		</script>
 				
@@ -78,21 +76,33 @@
 						this.value = 0;
 						
 						this
-						.state( function main() {
+						.state( function() {
 							this.view({
 								template : 'main',
 								pre 	 : function() {
 									console.log( 'pre render');
-									this.state.operand = undefined;
+									delete this.state.operand;
 								},
 								post 	 : function() {
 									console.log( 'post render');
 								}
 							});
-						})
+						}, { name : 'main', title : ''})
 						
 						.state( function sub() {
+							this.view({
+								template  : 'preview',
+								operation : '-',
+								preview   : function( l, r) {
+									return l-r;
+								}
+							});
 							
+							this.transition( this.module.states.main, {
+								action : function() {
+									this.state.module.value -= this.state.module.states.main.operand;
+								}
+							});
 						})
 						
 						.state( function add() {
@@ -108,46 +118,91 @@
 										+ operand 
 										+ ' = ' + (this.state.module.value + operand) 
 									);
-								}*/ 'preview'
+								}*/ 'preview',
+								operation : '+',
+								preview   : function( l, r) {
+									return l+r;
+								}
 							});
 							
 							this.transition( this.module.states.main, {
+								condition : function() {
+									this.log( 'enabled');
+									return true;
+								},
+								title  : 'whoaaaa !',
 								action : function() {
-									this.state.module.value += parseFloat( this.state.module.states.main.operand);
+									this.state.module.value += this.state.module.states.main.operand;
 								}
 							});
 						})
 						
 						.state( function div() {
+							this.view({
+								template  : 'preview',
+								operation : '/',
+								preview   : function( l, r) {
+									return l/r;
+								}
+							});
 							
+							this.transition( this.module.states.main, {
+								action : function() {
+									this.state.module.value /= this.state.module.states.main.operand;
+								}
+							});
 						})
 						
 						.state( function mul() {
+							this.view({
+								template  : 'preview',
+								operation : '*',
+								preview   : function( l, r) {
+									return l*r;
+								}
+							});
 							
+							this.transition( this.module.states.main, {
+								action : function() {
+									this.state.module.value *= this.state.module.states.main.operand;
+								}
+							});
 						})
 						
 						.state( function cr() {
-							this.module.value = 0;
+							this.transition( this.module.states.main, {
+								type   : 'auto', 
+								action : function() { 
+									this.state.module.value = 0;
+								}
+							}); 							
 						});
 						
 						function enabled() {
-							var success = this.state.operand!==undefined;
-							return success;
+							this.log( 'enabled');
+							var enabled = this.state.operand!==undefined;
+							return enabled;
 						}
 						
 						this.states.main
 						.transition( this.states.add, { 
 							'title' 	: '+',
 							condition 	: enabled,
-							action : function() { this.target.operand = parseFloat( this.state.module.states.main.operand); }
+							action : function() { /*this.target.operand = this.state.module.states.main.operand;*/ }
 						}) 
 						.transition( this.states.sub, { 
 							'title' 	: '-',
-							condition 	: enabled
+							condition 	: function() {
+								return enabled.call( this);
+							}
 						})
 						.transition( this.states.div, { 
 							'title' 	: '/',
-							condition 	: enabled
+							condition 	: function() {
+								this.log( 'enabled');
+								var enabled = this.state.operand && this.state.module.value!=0;
+								return enabled;
+							}
 						})
 						.transition( this.states.mul, { 
 							'title' 	: '*',
@@ -156,17 +211,20 @@
 						.transition( this.states.cr, { 
 								type		: 'secondary',
 								action 		: function() { 
-									this.log( this.log.namespace + 'called')
+									this.state.module.value = 0;
+									this.log( this.log.namespace + 'called');
 								},
 								condition	: function() {
+									this.log( 'enabled');
 									var success = this.state.module.value!=0;
 									return success;
-							}
+								}
 						});
 						
 						return this;
 					}, 
 					{ 
+						title    : 'Calculator',
 						stsate   : 'display:',
 						/*title    : 'Calculator',*/
 						resources: {
