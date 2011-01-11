@@ -22,12 +22,12 @@
 	padding-bottom : 40px;
 }	
 
-.ampere.module >.state >.body >.header {
+.ampere.module >.header {
 	padding		: 4px 4px;
 	overflow	: hidden;
 }
 
-.ampere.module >.state >.footer {
+.ampere.module  >.footer {
 	position	: absolute;
 	bottom		: 0;
 	right		: 0;
@@ -36,6 +36,6 @@
 	overflow	: hidden;
 }
 
-.ampere.module >.state >.footer >.transitions {
+.ampere.module >.footer >.transitions {
 	float		: right;
 }

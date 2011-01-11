@@ -35,23 +35,23 @@
 </script>
 
 <script id="ampere_theme_default_layout_default" type="text/x-jquery-tmpl">
-	<form onsubmit="return false" class="state ${state.options( 'name')}">
+	<div class="header ui-widget-header ui-corner-all">
+			${state.module.options( 'title')} {{if state.options( 'title')}} - ${state.options( 'title')} {{/if}}
+	</div>
+	<form onsubmit="return false" class="state ${state.options( 'name')}">		
 		<div class="body">
-			<div class="header ui-widget-header ui-corner-all">
-				${state.module.options( 'title')} {{if state.options( 'title')}} - ${state.options( 'title')} {{/if}}
-			</div>
 			<div class="ampere view ${options( 'name')}">
 				{{view}}
-			</div>						
-		</div>
-		<div class="footer ui-widget-header ui-corner-all">
-			<div class="transitions">
-			{{each state.transitions}}
-				{{if $value.options('type')=='primary'}}
-					{{transition( $value)}}
-				{{/if}}
-			{{/each}}			
 			</div>
 		</div>
 	</form>
+	<div class="footer ui-widget-header ui-corner-all">
+		<div class="transitions">
+		{{each state.transitions}}
+			{{if $value.options('type')=='primary'}}
+				{{transition( $value)}}
+			{{/if}}
+		{{/each}}			
+		</div>
+	</div>
 </script>

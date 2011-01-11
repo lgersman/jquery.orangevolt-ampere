@@ -61,6 +61,149 @@
 		return fn;
 	}
 	
+		/*
+		 * history implementing undo/redo.
+		 * 
+		 * - create an instance 				: 
+		 * 		var myCommandStack = History();
+		 * 
+		 * - push actions into command stack 	:
+		 * 			// redo with argument adds and executes a new action inside the undo/redo manager
+		 * 		myCommandStack.redo( function() {
+		 *			// do something here
+		 *			return function() {		// return a undo function if your action is undoable
+		 *				// undo something here
+		 *				// return redo function if your undo function is redoable
+		 *			};
+		 *		})
+		 *
+		 * - undo an action 					:
+		 * 		myCommandStack.undo();
+		 * 
+		 * - redo an action						:
+		 * 		myCommandStack.redo();
+		 * 
+		 * - ask undo / redo state		 		: 
+		 * 		myCommandStack.canUndo(); myCommandStack.canRedo()
+		 * 		attention : canUndo/canRedo return the count of undoable/redoable actions or 0 if nothing undoable/redoable instead of a boolean 
+		 *   
+		 * - reset 								:
+		 * 		myCommandStack.reset()
+		 * 
+		 * - rollback all undo actions 			:
+		 * 		myCommandStack.rewind()
+		 *
+		 * - playback all redo actions			:
+		 * 		myCommandStack.playback()
+		 */
+	function History( namespace/*(, undoable-action)* */) {
+		if( !(this instanceof History)) {
+			return new History( namespace);
+		}
+		
+		$.extend( this, {
+			ensure : Ensure( namespace + '::history'),
+			log    : Log   ( namespace + '::history'),
+			
+			/**
+			 * @return 0 (==false) if no undoable action are on stack or count of undoable actions
+			 */
+			canUndo : function() {
+				return this.position;
+			},
+			/**
+			 * @return 0 (==false) if no redoable action are on stack or count of redoable actions
+			 */
+			canRedo : function() {
+				return this.stack.length-this.position;
+			},
+			/**
+			 * @param action the new action to execute and store 
+			 * or undefined (i.e no argument) to redo the last undo action. 
+			 * 
+			 * if multiple action arguments are given, they get combined into an atomic
+			 * action which returns only a undo action if all actions are undoable. 
+			 * 
+			 * if no redo action is available function returns gracefully
+			 * 
+			 * @return the undo instance
+			 */
+			redo    : function() {
+				var action = undefined;
+				if( arguments.length==1) {
+					action = arguments[0];
+				} else if( arguments.length) {
+					var args = $.makeArray( arguments);
+					var history = $.history( args);
+					var undo = function() {
+						history.playback();
+						return history.stack.length==args.length ? action : undefined;
+					};					
+					action = function() {
+						history.rewind();
+						return history.stack.length==args.length ? undo : undefined;
+					};
+				}		
+					
+				var undo = (action || (this.canRedo() ? this.stack[ this.position] : $.noop))();
+				
+				if( undo) { 
+					if( action) {
+						this.stack.splice( this.position); 	// cleanup recent redo actions
+						this.stack.push( undo);
+						this.position = this.stack.length;
+					} else if( this.canRedo()){
+						this.stack[ this.position++] = undo;// point to next redo action
+					}
+				} else {									// cleanup recent undo actions	
+					this.stack.splice( 0, this.position);
+					this.position = this.stack.length; 
+				}
+				
+				return this;
+			},
+			/**
+			 * execute the next undo action. 
+			 * returns gracefully if no redo action is available.
+			 * 
+			 * @return the undo instance
+			 */
+			undo		: function() {
+				if( this.canUndo()) {
+					redo = this.stack[ --this.position]();
+					if( redo) {
+						this.stack[ this.position] = redo;	// replace undo by its returned redo action
+					} else {								// cleanup recent redo actions
+						this.stack.splice( this.position);
+					}
+				}
+				
+				return this;
+			},
+			reset		: function() {
+				this.stack = [];
+				this.position = 0;
+				return this;
+			},
+			rewind		: function() {
+				while( this.canUndo()) {
+					this.undo();
+				}
+				
+				return this;
+			},
+			playback	: function() {
+				while( this.canRedo()) {
+					this.redo();
+				}
+				
+				return this;
+			}
+		});
+	
+		return this.reset();
+	};
+	
 	var DEFAULTS = {
 		theme 	 	: 'default',		// default theme 
 		template 	: 'default', 		// default template to apply
@@ -228,16 +371,39 @@
 			var template = this.getTemplate( 'layouts', layout);
 			
 			this.preRender( view);
-			
-			if( view.options( 'layout')!=false) {
-				view.state.module.element.empty().append( $.tmpl( template, view));
-			} else {
-				view.state.module.element.empty().append( this.render( { data : this}));
-			}
 
-			view.options( 'post').call( view);
+			/*
+			view.state.module.element.find( '.transition').css( 'visibility', 'hidden');
+			var stateElement = view.state.module.element.find( '.state');
+			var f = function() {
+				view.state.module.element.empty(); 
+				if( view.options( 'layout')!=false) {
+					view.state.module.element.append( $.tmpl( template, view));
+				} else {
+					view.state.module.element.append( $.ampere.theme.render( { data : this}));
+				}
+				view.state.module.element.find( '.state')
+				.show('slide', {direction: 'right'});
+				
+				view.options( 'post').call( view);
+				
+				$.ampere.theme.postRender( view);
+			};
 			
-			this.postRender( view);
+			if( stateElement.length) {
+				stateElement.hide('slide', {direction: 'left'}, f);
+			} else {
+				f();
+			}
+			*/
+			
+			view.state.module.element.empty().append(
+				view.options( 'layout')!=false 
+				? $.tmpl( template, view)
+				: $.ampere.theme.render( { data : this})
+			);
+			view.options( 'post').call( view);
+			$.ampere.theme.postRender( view);
 		};
 		
 			/* can be overridden by themes */
@@ -432,6 +598,8 @@
 			if( this.views[ name]) {
 				return this.views[ name]; 
 			} else {
+				this.ensure( !name || !name.length, 'no view "', name, '" available');
+				
 				// if no state is explicitly set - take the first one 
 				for( name in this.views) {
 					return this.views[ name];
@@ -459,6 +627,7 @@
 		};
 
 		this.states = {};
+		this.history = History( this.ensure.namespace);
 		
 		this.state = function( fn, options) {
 			this.ensure( $.isFunction( fn), 'argument fn expected to be a function');
@@ -509,14 +678,32 @@
 		};
 		
 		this.proceed = function( transition) {
+			
 			this.ensure( transition instanceof Transition, 'argument transition of type Transition expected');
 			this.ensure( transition.state.module===this, transition.log.namespace, ' is not part of module ', this.log.namespace);
 
-			transition.log( 'proceed to state ', transition.target.log.namespace);
+			var action;
+			action = function() {
+				transition.log( 'proceed to state ', transition.target.log.namespace);
+				var undoAction = transition.options('action').call( transition);
+
+				transition.state.module.setState( transition.target);
+				
+				if( !undoAction && transition.options('action')===$.noop) {
+					undoAction = $.noop;
+				}
+				if( $.isFunction( undoAction)) {
+					return function() {
+						undoAction.call( transition);
+						transition.state.module.setState( transition.state);
+						return action;
+					};
+				} else {
+					transition.state.module.ensure( !undoAction, 'dont know how to handle undo return value of transition ', transition.log.namespace);
+				}
+			};
 			
-			transition.options('action').call( transition);
-			
-			this.setState( transition.target);
+			this.history.redo( action);
 		};  
 	}
 	
@@ -543,7 +730,7 @@
 					$.extend( { base : options.base || ''}, this.options().resources || {}),
 					function() {
 						this.constructor();
-
+						
 							// set initial state
 						var state = this.options( 'state');
 						var view  = '';

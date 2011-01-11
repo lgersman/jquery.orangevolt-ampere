@@ -71,23 +71,17 @@
 			$.ampere( function() {
 				/* this is the ampere theme instance */	
 				this/*this==$.ampere*/.module( function calc() {
-						this.log( 'hello from module ', this.options( 'title'));
-						
 						this.value = 0;
 						
 						this
-						.state( function() {
+						.state( function main() {
 							this.view({
 								template : 'main',
 								pre 	 : function() {
-									console.log( 'pre render');
 									delete this.state.operand;
-								},
-								post 	 : function() {
-									console.log( 'post render');
 								}
 							});
-						}, { name : 'main', title : ''})
+						})
 						
 						.state( function sub() {
 							this.view({
@@ -106,19 +100,8 @@
 						})
 						
 						.state( function add() {
-							this.log( 'huhu from state ', this.log.namespace,' !!');
-							
 							this.view({
-								template : /*function() {
-									var operand = parseFloat( this.state.module.states.main.operand);
-									return $( '<div>')
-									.text( 
-										this.state.module.value 
-										+ ' + ' 
-										+ operand 
-										+ ' = ' + (this.state.module.value + operand) 
-									);
-								}*/ 'preview',
+								template : 'preview',
 								operation : '+',
 								preview   : function( l, r) {
 									return l+r;
@@ -126,13 +109,15 @@
 							});
 							
 							this.transition( this.module.states.main, {
-								condition : function() {
-									this.log( 'enabled');
-									return true;
-								},
-								title  : 'whoaaaa !',
 								action : function() {
-									this.state.module.value += this.state.module.states.main.operand;
+									var operand = this.state.module.states.main.operand;
+									
+									this.state.module.value += operand;
+									
+									return function() {
+										this.state.module.states.main.operand = operand;
+										this.state.module.value -= operand;
+									};
 								}
 							});
 						})
@@ -179,29 +164,22 @@
 						});
 						
 						function enabled() {
-							this.log( 'enabled');
-							var enabled = this.state.operand!==undefined;
-							return enabled;
+							return this.state.operand!==undefined;
 						}
 						
 						this.states.main
 						.transition( this.states.add, { 
 							'title' 	: '+',
-							condition 	: enabled,
-							action : function() { /*this.target.operand = this.state.module.states.main.operand;*/ }
+							condition 	: enabled
 						}) 
 						.transition( this.states.sub, { 
 							'title' 	: '-',
-							condition 	: function() {
-								return enabled.call( this);
-							}
+							condition 	: enabled
 						})
 						.transition( this.states.div, { 
 							'title' 	: '/',
 							condition 	: function() {
-								this.log( 'enabled');
-								var enabled = this.state.operand && this.state.module.value!=0;
-								return enabled;
+								return this.state.operand && this.state.module.value!=0;
 							}
 						})
 						.transition( this.states.mul, { 
@@ -213,12 +191,9 @@
 								title       : 'CR',
 								action 		: function() { 
 									this.state.module.value = 0;
-									this.log( this.log.namespace + 'called');
 								},
 								condition	: function() {
-									this.log( 'enabled');
-									var success = this.state.module.value!=0;
-									return success;
+									return this.state.module.value!=0;
 								}
 						});
 						
@@ -226,7 +201,7 @@
 					}, 
 					{ 
 						title    : 'Calculator',
-						stsate   : 'display:',
+						state   : 'main:',
 						/*title    : 'Calculator',*/
 						resources: {
 							css  : [ 'calc.css']
