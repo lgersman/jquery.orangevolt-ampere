@@ -1,0 +1,12 @@
+{
+	"tmpl" : [ 
+		"theme.tmpl"
+	],
+	"css"  : [  
+		"theme.css" 
+	], 
+	"js"   : [ 		
+		"theme.js"
+	]
+}
+

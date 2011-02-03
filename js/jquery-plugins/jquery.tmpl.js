@@ -313,57 +313,63 @@
 
 	// Generate a reusable function that will serve to render a template against data
 	function buildTmplFn( markup ) {
-		var s = "var $=jQuery,call,_=[],$data=$item.data;" +
-
-		// Introduce the data as local variables using with(){}
-		"with($data){_.push('" +
-
-		// Convert the template into pure JavaScript
-		jQuery.trim(markup)
-			.replace( /([\\'])/g, "\\$1" )
-			.replace( /[\r\t\n]/g, " " )
-			.replace( /\$\{([^\}]*)\}/g, "{{= $1}}" )
-			.replace( /\{\{(\/?)(\w+|.)(?:\(((?:[^\}]|\}(?!\}))*?)?\))?(?:\s+(.*?)?)?(\(((?:[^\}]|\}(?!\}))*?)\))?\s*\}\}/g,
-			function( all, slash, type, fnargs, target, parens, args ) {
-				var tag = jQuery.tmpl.tag[ type ], def, expr, exprAutoFnDetect;
-				if ( !tag ) {
-					throw "Template command not found: " + type;
-				}
-				def = tag._default || [];
-				if ( parens && !/\w$/.test(target)) {
-					target += parens;
-					parens = "";
-				}
-				if ( target ) {
-					target = unescape( target ); 
-					args = args ? ("," + unescape( args ) + ")") : (parens ? ")" : "");
-					// Support for target being things like a.toLowerCase();
-					// In that case don't call with template item as 'this' pointer. Just evaluate...
-					expr = parens ? (target.indexOf(".") > -1 ? target + unescape( parens ) : ("(" + target + ").call($item" + args)) : target;
-					exprAutoFnDetect = parens ? expr : "(typeof(" + target + ")==='function'?(" + target + ").call($item):(" + target + "))";
-				} else {
-					exprAutoFnDetect = expr = def.$1 || "null";
-				}
-				fnargs = unescape( fnargs );
-				return "');" + 
-					tag[ slash ? "close" : "open" ]
-						.split( "$notnull_1" ).join( target ? "typeof(" + target + ")!=='undefined' && (" + target + ")!=null" : "true" )
-						.split( "$1a" ).join( exprAutoFnDetect )
-						.split( "$1" ).join( expr )
-						.split( "$2" ).join( fnargs ?
-							fnargs.replace( /\s*([^\(]+)\s*(\((.*?)\))?/g, function( all, name, parens, params ) {
-								params = params ? ("," + params + ")") : (parens ? ")" : "");
-								return params ? ("(" + name + ").call($item" + params) : all;
-							})
-							: (def.$2||"")
-						) +
-					"_.push('";
-			}) +
-		"');}return _;";
-		console.log( s);
-		return new Function("jQuery","$item",
-			s
-		);
+		try
+		{ 
+			var s = "var $=jQuery,call,_=[],$data=$item.data;" +
+	
+			// Introduce the data as local variables using with(){}
+			"with($data){_.push('" +
+	
+			// Convert the template into pure JavaScript
+			jQuery.trim(markup)
+				.replace( /([\\'])/g, "\\$1" )
+				.replace( /[\r\t\n]/g, " " )
+				.replace( /\$\{([^\}]*)\}/g, "{{= $1}}" )
+				.replace( /\{\{(\/?)(\w+|.)(?:\(((?:[^\}]|\}(?!\}))*?)?\))?(?:\s+(.*?)?)?(\(((?:[^\}]|\}(?!\}))*?)\))?\s*\}\}/g,
+				function( all, slash, type, fnargs, target, parens, args ) {
+					var tag = jQuery.tmpl.tag[ type ], def, expr, exprAutoFnDetect;
+					if ( !tag ) {
+						throw "Template command not found: " + type;
+					}
+					def = tag._default || [];
+					if ( parens && !/\w$/.test(target)) {
+						target += parens;
+						parens = "";
+					}
+					if ( target ) {
+						target = unescape( target ); 
+						args = args ? ("," + unescape( args ) + ")") : (parens ? ")" : "");
+						// Support for target being things like a.toLowerCase();
+						// In that case don't call with template item as 'this' pointer. Just evaluate...
+						expr = parens ? (target.indexOf(".") > -1 ? target + unescape( parens ) : ("(" + target + ").call($item" + args)) : target;
+						exprAutoFnDetect = parens ? expr : "(typeof(" + target + ")==='function'?(" + target + ").call($item):(" + target + "))";
+					} else {
+						exprAutoFnDetect = expr = def.$1 || "null";
+					}
+					fnargs = unescape( fnargs );
+					return "');" + 
+						tag[ slash ? "close" : "open" ]
+							.split( "$notnull_1" ).join( target ? "typeof(" + target + ")!=='undefined' && (" + target + ")!=null" : "true" )
+							.split( "$1a" ).join( exprAutoFnDetect )
+							.split( "$1" ).join( expr )
+							.split( "$2" ).join( fnargs ?
+								fnargs.replace( /\s*([^\(]+)\s*(\((.*?)\))?/g, function( all, name, parens, params ) {
+									params = params ? ("," + params + ")") : (parens ? ")" : "");
+									return params ? ("(" + name + ").call($item" + params) : all;
+								})
+								: (def.$2||"")
+							) +
+						"_.push('";
+				}) +
+			"');}return _;";
+			console.log( s);
+			return new Function("jQuery","$item",
+				s
+			);
+		} catch( ex) {
+			console.error( ex);
+			debugger;
+		}
 	}
 	function updateWrapped( options, wrapped ) {
 		// Build the wrapped content. 

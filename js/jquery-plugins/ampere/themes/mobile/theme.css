@@ -3,8 +3,20 @@
  * Dual licensed under the MIT (http://www.opensource.org/licenses/mit-license.php)
  * and GPL (http://www.opensource.org/licenses/gpl-license.php) licenses.
  */
+
 .ampere.module {
-	/*font-size   : 0.8em;
-	font-family : Lucida,Lucidux,"Lucida Sans",Verdana,"Geneva",Arial,Helvetica,sans-serif; */
-    /*line-height: 1.25em;*/
+	position  	: relative;
+	min-width 	: 300px;
+	min-height	: 200px;
+	
+	font-size   : 12.8px;
+    line-height : 1.3em;
+}
+
+* {
+	font-family : Lucida,Lucidux,"Lucida Sans",Verdana,"Geneva",Arial,Helvetica,sans-serif; 
+}
+
+.ui-widget {
+	font-size   : 1em;
 }

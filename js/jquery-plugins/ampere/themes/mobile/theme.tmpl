@@ -3,8 +3,8 @@
   Dual licensed under the MIT (http://www.opensource.org/licenses/mit-license.php)
   and GPL (http://www.opensource.org/licenses/gpl-license.php) licenses.
 -->
-<!--
-<script id="ampere_theme_fragment_transition" type="text/x-jquery-tmpl">
+
+<script id="ampere_theme_mobile_fragment_transition" type="text/x-jquery-tmpl">
 	{{if !$item.layout || $item.layout=='button'}}
 	<button 
 		class="transition ${options('name')}" 
@@ -18,48 +18,39 @@
 	</button>
 	{{/if}}
 </script>
--->
-<script id="ampere_theme_fragment_reset" type="text/x-jquery-tmpl">
-	<button 
-		class="reset" 
-		type="button"
-		data-options='{ "icons" : { "primary" : "ui-icon-trash"}, "text" : false}'
-		title="Reset"
-		onclick="$.ampere.getViewTmplItem( $.tmplItem( this)).data.reset( this)"
-		disabled="disabled"
-	>&nbsp;</button>
-</script>
 
-<script id="ampere_theme_fragment_history" type="text/x-jquery-tmpl">
+<script id="ampere_theme_mobile_fragment_history" type="text/x-jquery-tmpl">
 	{{if history}} 
 	<div class="history buttonset">
 		<button 
 			class="undo" 
 			type="button"
-			data-options='{ "icons" : { "primary" : "ui-icon-triangle-1-w"}, "text" : false}'
-			title="Undo"
+			data-options='{ "icons" : { "primary" : "ui-icon-arrowreturnthick-1-w"}}'
 			{{if history.canUndo()}}
 			onclick="$(this).module().history.undo()"
 			{{else}}
 			disabled="disabled"
 			{{/if}}
-		>&nbsp;</button>
+		>
+			Undo
+		</button>
 		<button 
 			class="redo" 
 			type="button"
-			data-options='{ "icons" : { "primary" : "ui-icon-triangle-1-e"}, "text" : false}'
-			title="Redo"
+			data-options='{ "icons" : { "primary" : "ui-icon-arrowreturnthick-1-e"}}'
 			{{if history.canRedo()}}
 			onclick="$(this).module().history.redo()"
 			{{else}}
 			disabled="disabled"
 			{{/if}}			
-		>&nbsp;</button>
+		>
+			Redo
+		</button>
 	</div>
 	{{/if}}
 </script>
-<!--
-<script id="ampere_theme_fragment_radio" type="text/x-jquery-tmpl">
+
+<script id="ampere_theme_mobile_fragment_radio" type="text/x-jquery-tmpl">
 	<label for="{{id( 'radio')}}">
 	${ $data.label || $.ampere.ucwords(($data.value || '&nbsp;'))}
 	</label>
@@ -71,9 +62,8 @@
 		value="${ $data.value || ($data.label || 'on').toLowerCase()}"
 	/>
 </script>
--->
-<!--
-<script id="ampere_theme_fragment_checkbox" type="text/x-jquery-tmpl">
+
+<script id="ampere_theme_mobile_fragment_checkbox" type="text/x-jquery-tmpl">
 	 
 	<label for="{{id( 'checkbox')}}">
 	${ $data.label || '&nbsp;'} 
@@ -82,14 +72,13 @@
 	<input 
 		type="checkbox" 
 		name="${ name}" 
-		id="{{id( 'checkbox')}}"
 		data-options='{ {{if $data.icon===undefined || $data.icon}}"icons" : { "primary" : "${ $data.icon || 'ui-icon-check'}"} {{/if}} {{if !$data.label}}, "text" : false{{/if}} }'
+		id="{{id( 'checkbox')}}"
 		value="${ ($data.value || true).toLowerCase()}"
 	/>
 </script>
--->
-<!--
-<script id="ampere_theme_fragment_select" type="text/x-jquery-tmpl">
+
+<script id="ampere_theme_mobile_fragment_select" type="text/x-jquery-tmpl">
 	{{if $data.label}}
 	<label for="{{id( 'select')}}">
 	${ $data.label} 
@@ -102,28 +91,25 @@
 		<option>Bird</option>
 	</select>
 </script>
--->
-<script id="ampere_theme_view_default" type="text/x-jquery-tmpl">
+
+<script id="ampere_theme_mobile_view_default" type="text/x-jquery-tmpl">
 	<div>
 	</div>
 </script>
 
-<script id="ampere_theme_layout_default" type="text/x-jquery-tmpl">
-	<div class="header ui-widget-header ui-corner-all">
-			<div class="title">
-				${state.module.options( 'title')} {{if state.options( 'title')}} - ${state.options( 'title')} {{/if}}
-			</div>
-			{{history( state.module)}}
-			{{reset( state.module)}}
+<script id="ampere_theme_mobile_layout_default" type="text/x-jquery-tmpl">
+	<div data-role="header" class="header ui-widget-header ui-corner-all">
+			${state.module.options( 'title')} {{if state.options( 'title')}} - ${state.options( 'title')} {{/if}}
 	</div>
-	<form onsubmit="return false" class="state ${state.options( 'name')}">		
+	<form data-role="content" onsubmit="return false" class="state ${state.options( 'name')}">		
 		<div class="body">
 			<div class="ampere view ${options( 'name')}">
 				{{view}}
 			</div>
 		</div>
 	</form>
-	<div class="footer ui-widget-header ui-corner-all">
+	<div data-role="footer" class="footer ui-widget-header ui-corner-all">
+		{{history( state.module)}}
 		<div class="transitions buttonset">
 		{{each state.transitions}}
 			{{if $value.options('type')=='primary'}}

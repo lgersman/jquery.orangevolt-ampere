@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<!--
@@ -21,15 +20,6 @@
 		<script type="text/javascript" src="js/jquery-plugins/jquery.globalization.js"></script>
 		<script type="text/javascript" src="js/jquery-plugins/ampere/jquery.ampere.js"></script>
 		
-		<script type="text/javascript" src="js/jquery-ui-1.9m3/ui/jquery-ui.js"></script>
-		<script type="text/javascript" src="js/jquery-ui-1.9m3/ui/i18n/jquery-ui-i18n.js"></script>
-		<script type="text/javascript" src="js/jquery-plugins/ampere/themes/default/jquery.multiselect.js"></script>
-		<script type="text/javascript" src="js/jquery-plugins/ampere/themes/default/jquery.multiselect.filter.js"></script>
-		
-		<link href="js/jquery-ui-1.9m3/themes/base/jquery-ui.css" media="screen" rel="stylesheet" type="text/css" />
-		<link href="js/jquery-plugins/ampere/themes/default/jquery.multiselect.css" media="screen" rel="stylesheet" type="text/css" />
-		<link href="js/jquery-plugins/ampere/themes/default/jquery.multiselect.filter.css" media="screen" rel="stylesheet" type="text/css" />
-				
 		<script id="main" type="text/x-jquery-tmpl">
 			<table width="100%">
 				<tr>
@@ -59,6 +49,7 @@
 			
 				// configure ampere
 			$.ampere.options.base  = 'js/jquery-plugins/ampere';
+			$.ampere.options.theme = 'mobile';
 			$.ampere.options.debug = true;
 			
 				// construct ampere
@@ -232,7 +223,7 @@
 		</script>
     </head>
     <body>
-    	<div id="app_container" style="width:400px;height:250px">
+    	<div id="app_container" data-role="page"  style="width:400px;height:250px">
     	</div>
     </body>
 </html>

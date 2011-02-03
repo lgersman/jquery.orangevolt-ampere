@@ -6,12 +6,22 @@
 
 (function($) {
 	function ucwords( s) {
-		return s.replace( 
+		return s ? s.replace( 
 			/^(.)|\s(.)/g, 
 			function($1) { 
 				return $1.toUpperCase( ); 
 			}
-		);
+		) : undefined;
+	}
+	
+	function getOwnProperties( obj) {
+		var properties = {};
+		for( var i in obj) { 
+			if( Object.hasOwnProperty.call( obj, i) && typeof(i)=='string' && i.charAt(0)!='_') {
+				properties[i] = obj[i]; 
+			} 
+		}		
+		return properties;
 	}
 	
 	function Ensure( namespace) {
@@ -96,110 +106,123 @@
 		 * - playback all redo actions			:
 		 * 		myCommandStack.playback()
 		 */
-	function History( namespace/*(, undoable-action)* */) {
+	function History( options) {
 		if( !(this instanceof History)) {
-			return new History( namespace);
+			return new History( options);
 		}
 		
-		$.extend( this, {
-			ensure : Ensure( namespace + '::history'),
-			log    : Log   ( namespace + '::history'),
-			
-			/**
-			 * @return 0 (==false) if no undoable action are on stack or count of undoable actions
-			 */
-			canUndo : function() {
-				return this.position;
-			},
-			/**
-			 * @return 0 (==false) if no redoable action are on stack or count of redoable actions
-			 */
-			canRedo : function() {
-				return this.stack.length-this.position;
-			},
-			/**
-			 * @param action the new action to execute and store 
-			 * or undefined (i.e no argument) to redo the last undo action. 
-			 * 
-			 * if multiple action arguments are given, they get combined into an atomic
-			 * action which returns only a undo action if all actions are undoable. 
-			 * 
-			 * if no redo action is available function returns gracefully
-			 * 
-			 * @return the undo instance
-			 */
-			redo    : function() {
-				var action = undefined;
-				if( arguments.length==1) {
-					action = arguments[0];
-				} else if( arguments.length) {
-					var args = $.makeArray( arguments);
-					var history = $.history( args);
-					var undo = function() {
-						history.playback();
-						return history.stack.length==args.length ? action : undefined;
-					};					
-					action = function() {
-						history.rewind();
-						return history.stack.length==args.length ? undo : undefined;
-					};
-				}		
-					
-				var undo = (action || (this.canRedo() ? this.stack[ this.position] : $.noop))();
+		this.options = $.extend( {callback : $.noop}, options);
+		
+		/**
+		 * @return 0 (==false) if no undoable action are on stack or count of undoable actions
+		 */
+		this.canUndo = function() {
+			return this.position;
+		};
+		
+		/**
+		 * @return 0 (==false) if no redoable action are on stack or count of redoable actions
+		 */
+		this.canRedo = function() {
+			return this.stack.length-this.position;
+		};
+		
+		/**
+		 * @param action the new action to execute and store 
+		 * or undefined (i.e no argument) to redo the last undo action. 
+		 * 
+		 * if multiple action arguments are given, they get combined into an atomic
+		 * action which returns only a undo action if all actions are undoable. 
+		 * 
+		 * if no redo action is available function returns gracefully
+		 * 
+		 * @return the undo instance
+		 */
+		this.redo = function( dontCallback) {
+			var action = undefined;
+			if( arguments.length==1) {
+				action = arguments[0];
+			} else if( arguments.length) {
+				var args = $.makeArray( arguments);
+				var history = $.history( args);
+				var undo = function() {
+					history.playback();
+					return history.stack.length==args.length ? action : undefined;
+				};					
+				action = function() {
+					history.rewind();
+					return history.stack.length==args.length ? undo : undefined;
+				};
+			}		
 				
-				if( undo) { 
-					if( action) {
-						this.stack.splice( this.position); 	// cleanup recent redo actions
-						this.stack.push( undo);
-						this.position = this.stack.length;
-					} else if( this.canRedo()){
-						this.stack[ this.position++] = undo;// point to next redo action
-					}
-				} else {									// cleanup recent undo actions	
-					this.stack.splice( 0, this.position);
-					this.position = this.stack.length; 
+			var redo = (action || (this.canRedo() ? this.stack[ this.position] : undefined));
+			var undo = redo ? redo() : undefined;
+							
+			if( undo) { 
+				if( action) {
+					this.stack.splice( this.position); 	// cleanup recent redo actions
+					this.stack.push( undo);
+					this.position = this.stack.length;
+				} else if( this.canRedo()){
+					this.stack[ this.position++] = undo;// point to next redo action
 				}
-				
-				return this;
-			},
-			/**
-			 * execute the next undo action. 
-			 * returns gracefully if no redo action is available.
-			 * 
-			 * @return the undo instance
-			 */
-			undo		: function() {
-				if( this.canUndo()) {
-					redo = this.stack[ --this.position]();
-					if( redo) {
-						this.stack[ this.position] = redo;	// replace undo by its returned redo action
-					} else {								// cleanup recent redo actions
-						this.stack.splice( this.position);
-					}
-				}
-				
-				return this;
-			},
-			reset		: function() {
-				this.stack = [];
-				this.position = 0;
-				return this;
-			},
-			rewind		: function() {
-				while( this.canUndo()) {
-					this.undo();
-				}
-				
-				return this;
-			},
-			playback	: function() {
-				while( this.canRedo()) {
-					this.redo();
-				}
-				
-				return this;
+			} else if( redo) {							// cleanup recent undo actions	
+				this.stack.splice( 0, this.position);
+				this.position = this.stack.length; 
 			}
-		});
+			
+			redo && dontCallback!==false && this.options.callback.call( this, 'redo', redo, undo);
+			
+			return this;
+		};
+		
+		/**
+		 * execute the next undo action. 
+		 * returns gracefully if no redo action is available.
+		 * 
+		 * @return the undo instance
+		 */
+		this.undo = function( dontCallback) {
+			if( this.canUndo()) {
+				var undo = this.stack[ --this.position];
+				var redo = undo();
+				if( redo) {
+					this.stack[ this.position] = redo;	// replace undo by its returned redo action
+				} else {								// cleanup recent redo actions
+					this.stack.splice( this.position);
+				}
+				
+				dontCallback!==false && this.options.callback.call( this, 'undo', undo, redo);
+			}
+			
+			return this;
+		};
+		
+		this.reset = function() {
+			this.stack = [];
+			this.position = 0;
+			
+			this.options.callback.call( this, 'reset');
+			
+			return this;
+		};
+		
+		this.rewind	= function() {
+			while( this.canUndo()) {
+				this.undo( false);
+			}
+			this.options.callback.call( this, 'rewind');
+			
+			return this;
+		};
+		
+		this.playback = function() {
+			while( this.canRedo()) {
+				this.redo( false);
+			}
+			this.options.callback.call( this, 'rewind');
+			return this;
+		};
 	
 		return this.reset();
 	};
@@ -245,8 +268,12 @@
 					cache   : !$.ampere.options.debug,
 					complete: tracker( options.js[i]),
 					success  : function( data, textStatus, XMLHttpRequest) {
-						var fn = eval( data);
-						fn.call( context);
+						try {
+							var fn = eval( data);
+							$.isFunction( fn) && fn.call( context);
+						} catch( ex) {
+							
+						}
 					}
 				});
 			}
@@ -298,11 +325,31 @@
 			return template;
 		};
 		
+		this.setTemplate = function( category, name, template) {
+			$.ampere.theme.ensure( 
+				!$.ampere.theme.templates[ category] || !$.ampere.theme.templates[ category][ name], 
+				'setTemplate( "', category,'", "', name,'") : a theme ', category.substring( 0, category.length-1), ' named "', name, '" is already defined.'
+			);
+			$.ampere.theme.templates[ category][ name] = $.isFunction( template) ? template : $(template).template();
+
+			if( category=='fragments') {
+				this.ensure( !$.tmpl.tag[ name], 'theme fragment "', name, '" : ', ' template tag is already defined');
+				
+				$.tmpl.tag[ name] = $.extend( 
+					{}, 
+					$.tmpl.tag.tmpl, 
+					{ 
+						open : $.tmpl.tag.tmpl.open.replace( '$1', '$.ampere.theme.templates.fragments.' + name)
+					}
+				);	
+			}
+		};
+		
 			// load theme description
 		var proxy = function() {
 
 				// initialize template map
-			var filter = new RegExp( 'ampere_theme_' + $.ampere.options.theme + '_(fragment|view|layout)_(.*)');
+			var filter = new RegExp( 'ampere_theme_(fragment|view|layout)_(.*)');
 			var templates = $( "head script[type=text/x-jquery-tmpl]");
 			
 			for( var i=0; i<templates.length; i++) {
@@ -312,28 +359,10 @@
 				if( matches) {
 					var category = matches[1] + 's';
 					 	
-					$.ampere.theme.ensure( 
-						!$.ampere.theme.templates[ category] || !$.ampere.theme.templates[ category][ matches[2]], 
-						'template( "#', matches[0], '") : a theme "', matches[1], '" named "', matches[2], '" is already defined.'
-					);
-					$.ampere.theme.templates[ category][ matches[2]] = $(template).template();
-					
-						// add fragment as template tag
-					if( category=='fragments') {
-						this.ensure( !$.tmpl.tag[ matches[2]], 'theme fragment "', matches[2], '" : ', ' template tag is already defined');
-						
-						$.tmpl.tag[ matches[2]] = $.extend( 
-							{}, 
-							$.tmpl.tag.tmpl, 
-							{ 
-								open : $.tmpl.tag.tmpl.open.replace( '$1', '$.ampere.theme.templates.fragments.' + matches[2])
-							}
-						);
-					}
-						// --
+					this.setTemplate( category, matches[2], templates[i]);
 				}
 			}
-			
+						
 			callback.call( $.ampere);
 		};
 		var base = $.ampere.options.base + '/themes/' + $.ampere.options.theme + '/';
@@ -491,12 +520,42 @@
 			}
 			
 			view.ensure( result!==undefined, 'failed to render view');
+			
+			this.reset.data = getOwnProperties( this.state);
+			
 			return $.template( null, result);
+		};
+		
+		this.reset = function( element) {
+			for( var i in this.state) { 
+				if( Object.hasOwnProperty.call( this.state, i) && typeof(i)=='string' && i.charAt(0)!='_') {
+					delete( this.state[i]); 
+				} 
+			}	
+			$.extend( this.state, this.reset.data);
+			$.ampere.theme.render( this);
+		};
+		this.reset.update = function( viewElement) {
+			viewElement.removeAttr( 'disabled');
 		};
 	}
 	
 	var trueFn = function() {
 		return true;
+	};
+	
+		/**
+		 * Action wraps transition logic within an object 
+		 * 
+		 * @see State#action
+		 * @see Module#proceed
+		 */
+	function Action( /*function*/logic) {
+		this.logic = logic;
+		
+		if( this.logic.name) {
+			this.name = logic.name;
+		}
 	};
 	
 	function Transition( state, target, options) {
@@ -545,17 +604,21 @@
 		this.transitions = {};
 		
 		this.transition = function( target, options) {
-			options || (options = {});			
+			if( $.isFunction( options)) {
+				options = { action : options};
+			} else {
+				options || (options = {});
+			}
 
 			var action = options.action;
-			if( !$.isFunction( options.action)) {
+			if( !((options.action instanceof Action) || $.isFunction( options.action))) {
 				options.action = typeof( options.action)=='string' ? window[ options.action] : $.noop;
 				this.ensure( 
 					$.isFunction( options.action), 
 					'failed to evaluate transition action : no global function "', action, '" available.' 
 				);
 			} 
-			
+
 			if( !options.name) {
 				if( typeof( action)=='string') {
 					options.name = action;
@@ -566,7 +629,7 @@
 				}
 			}
 			
-			options.title || (options.title=ucwords( options.name));  
+			options.title===false || options.title || (options.title=ucwords( options.name));  
 			options.type || (options.type='primary'); 
 			
 			this.ensure( !this.transitions[ options.name], 'transition named "', options.name + '" already defined state "', this.options( 'title'), '"');
@@ -583,7 +646,11 @@
 		this.views = {};
 		
 		this.view = function( options) {
-			options = options || {};
+			if( typeof( options)=='string' || $.isFunction( options) || options.nodeType || options.jquery) {
+				options = { template : options};
+			} else {
+				options = options || {};
+			}
 			
 			options.name || (options.name = '');
 			$.isFunction( options.pre) || (options.pre = $.noop);
@@ -610,6 +677,12 @@
 			this.view({ });
 			return this.getView(); 
 		};
+		
+		this.action = function( /*function*/ logic) {
+			this.ensure( $.isFunction( logic), 'parameter "logic" expected to be a function');
+			
+			return new Action( logic);
+		};
 	}
 	
 	function Module( callback, options) {
@@ -627,7 +700,16 @@
 		};
 
 		this.states = {};
-		this.history = History( this.ensure.namespace);
+			// create history 
+		this.history = this.options( 'history')===undefined || this.options( 'history')==true ? History({
+			callback : $.proxy( function( command, action, result) {
+				if( command=='undo' || command=='redo') {
+					var view = this.getState().getView();
+					$.ampere.theme.render( view);
+				}
+			}, this)
+		}) : false;
+			// --
 		
 		this.state = function( fn, options) {
 			this.ensure( $.isFunction( fn), 'argument fn expected to be a function');
@@ -654,7 +736,7 @@
 		this.getState = function() {
 			return _state;
 		};
-		
+
 		this.setState = function( state, view) {
 			this.ensure( state instanceof State, 'argument state of type State expected');
 			this.ensure( state.module===this, state.log.namespace, ' is not part of module ', this.log.namespace);
@@ -670,11 +752,14 @@
 			}
 				// --
 			
-				// otherwise proceed setting given state as current one
 			_state = state;
-			view = (view instanceof View) ? view : state.getView( view);
 			
-			$.ampere.theme.render( view);
+			if( view!==false) {
+					// otherwise proceed setting given state as current one				
+				view = (view instanceof View) ? view : state.getView( view);
+				
+				$.ampere.theme.render( view);
+			}
 		};
 		
 		this.proceed = function( transition) {
@@ -682,24 +767,48 @@
 			this.ensure( transition instanceof Transition, 'argument transition of type Transition expected');
 			this.ensure( transition.state.module===this, transition.log.namespace, ' is not part of module ', this.log.namespace);
 
+			var actionOption = transition.options('action');
+			if( actionOption instanceof Action) {
+				actionOption = actionOption.logic.call( transition);
+			}  
+
+			if( !this.history || transition.options( 'type')=='auto') {
+					// reset history in case an auto transition was executed
+				!this.history || this.history.reset(); 
+				actionOption.call( transition);
+				transition.state.module.setState( transition.target);
+				return;
+			}
+			
 			var action;
+			var undoProperties = getOwnProperties( transition.state), properties;
 			action = function() {
 				transition.log( 'proceed to state ', transition.target.log.namespace);
-				var undoAction = transition.options('action').call( transition);
-
-				transition.state.module.setState( transition.target);
 				
-				if( !undoAction && transition.options('action')===$.noop) {
+				if( properties) {
+					$.extend( transition.state, properties);
+				}
+				var undoAction = actionOption.call( transition);
+				if( !properties) {
+					properties = getOwnProperties( transition.state);
+				}
+				
+				transition.state.module.setState( transition.target, false);
+				
+				if( transition.options('action')===$.noop) {
 					undoAction = $.noop;
 				}
 				if( $.isFunction( undoAction)) {
 					return function() {
+						$.extend( transition.state, undoProperties);
+						
 						undoAction.call( transition);
-						transition.state.module.setState( transition.state);
+						transition.state.module.setState( transition.state, false);
 						return action;
 					};
 				} else {
-					transition.state.module.ensure( !undoAction, 'dont know how to handle undo return value of transition ', transition.log.namespace);
+					transition.state.module.history.reset();
+					//transition.state.module.ensure( !undoAction, 'dont know how to handle undo return value of transition ', transition.log.namespace);
 				}
 			};
 			
@@ -710,6 +819,7 @@
 	$.extend( $.ampere, {
 		options : DEFAULTS,
 		theme   : undefined,
+		ucwords : ucwords,
 		modules : {},
 		module  : function( fn, options) {
 			$.ampere.ensure( $.isFunction( fn), 'argument fn expected to be a function');
@@ -769,42 +879,165 @@
 		ensure 		: Ensure( 'ampere'),
 		log    	 	: Log( 'ampere'),
 		link 		: {
-			checkbox2boolean : function() {
+			checkbox : function( equals) {
+				$.isFunction( equals) || (equals = function( l, r) {
+					if( $.ampere.options.debug) {
+						if( $.isPlainObject( l) || $.isFunction( l) || $.isArray( l) ||$.isPlainObject( r) || $.isFunction( r) || $.isArray( r)) {
+							debugger;
+							Log( $.ampere.log.namespace + '.link.checkbox.equals#' + this.id)( 
+							    'warning : parameter left/right is type function, object or array - == comparison may return wrong result'
+							);
+						}
+					}
+					return l==r;
+				});
+				
 				return {
 					convert     : function( value, source, target) {
-						$( target).data( source.name, source.checked);
+						var value = undefined;
+						if( source.checked) {
+							var data = $.tmplItem( source).data;  
+							value = data.value!==undefined ? data.value : true;
+						}
+						
+						$.ampere.getViewTmplItem( $.tmplItem( source)).data.log(
+							'set "', source.name, '"(', typeof( value) ,') in state "', target.options( 'title'), '" to ', value, ' : ', target
+						);
+						$.data( target)[ source.name] = value;
 					},
 					convertBack : function( value, source, target) {
-						target.checked = source[ target.name];
+						var data = $.tmplItem( target).data;  
+						value = data.value!==undefined ? data.value : true;
+
+						if( equals.call( target, source[ target.name], value)) {
+							$.ampere.getViewTmplItem( $.tmplItem( target)).data.log(
+								'set "', target, ' checked'
+							);
+							target.checked=true;
+						}
 					}
 				};
 			},
 			
-			radio : function() {
+			radio : function( equals) {
+				$.isFunction( equals) || (equals = function( l, r) {
+					if( $.ampere.options.debug) {
+						if( $.isPlainObject( l) || $.isFunction( l) || $.isArray( l) ||$.isPlainObject( r) || $.isFunction( r) || $.isArray( r)) {
+							debugger;
+							Log( $.ampere.log.namespace + '.link.radio.equals#' + this.id)( 
+							    'warning : parameter left/right is type function, object or array - == comparison may return wrong result'
+							);
+						}
+					}
+					return l==r;
+				});
+				
 				return {
 					convert     : function( value, source, target) {
 						var radios = $.makeArray( source.form[source.name]);
 						for( var i=0; i<radios.length; i++) {
 							if( radios[i].checked) {
-								value = $.tmplItem( radios[i]).data.value;
-								$( target).data(source.name, value);
-								console.log( 'set "', source.name, '"(', typeof( value) ,') in target "', target.options( 'title'), '" to ', value, target);
-								break;
+								var data = $.tmplItem( radios[i]).data;  
+								value = data.value!==undefined ? data.value : (data.label || 'on').toLowerCase();
+								$.data( target)[ source.name]=value;
+								
+								$.ampere.getViewTmplItem( $.tmplItem( radios[i])).data.log(
+									'set "', source.name, '"(', typeof( value) ,') in state "', target.options( 'title'), '" to ', value, ' : ', target
+								);
+								return;
 							} 
 						} 
 					},
 					convertBack : function( value, source, target) {
 						var radios = $.makeArray( target.form[ target.name]);
 						for( var i=0; i<radios.length; i++) {
-							if( $.tmplItem( radios[i]).data.value==source[ target.name]) {
+							var data = $.tmplItem( radios[i]).data;
+							var value= data.value!==undefined ? data.value : (data.label || 'on').toLowerCase();
+							
+							if( equals.call( target, value, source[ target.name])) {
+								$.ampere.getViewTmplItem( $.tmplItem( radios[i])).data.log(
+									'set "', radios[ i], ' checked'
+								);
 								radios[ i].checked = true;
-								break;
+								return;
 							} 
 						}
 					}
 				};
 			},
 			
+			number : function() {
+				return {
+					convert     : function( value, source, target) {
+						$.data( target)[ source.name]=!isNaN( parseFloat( source.value)) ? parseFloat( source.value) : 0;
+						$.ampere.getViewTmplItem( $.tmplItem( source)).data.log(
+							'set "', source.name, '"(', typeof( target[ source.name]) ,') in state "', target.options( 'title'), '" to ', target[ source.name], ' : ', target
+						);
+					},
+					convertBack : function( value, source, target) {
+						target.value = '' + source[ target.name];
+						$.ampere.getViewTmplItem( $.tmplItem( target)).data.log(
+							'set "', target, ' value to ', target.value, ' (', typeof( target.value) ,')'
+						);
+					}
+				};
+			},
+			
+			select : function( equals) {
+				$.isFunction( equals) || (equals = function( l, r) {
+					if( $.ampere.options.debug) {
+						if( $.isPlainObject( l) || $.isFunction( l) || $.isArray( l) ||$.isPlainObject( r) || $.isFunction( r) || $.isArray( r)) {
+							debugger;
+							Log( $.ampere.log.namespace + '.link.select.equals#' + this.id)( 
+							    'warning : parameter left/right is type function, object or array - == comparison may return wrong result'
+							);
+						}
+					}
+					return l==r;
+				});
+				
+				return {
+					convert     : function( value, source, target) {
+						if( source.multiple) {
+							var value = [];
+							for( var i=0; i<source.options.length; i++) {
+								var option = source.options[i];
+								if( option.selected) {
+									value.push( $( option).data( 'value'));
+								}
+							}
+							$.data( target)[ source.name]=value;
+						} else {
+							var option = source.options[ source.selectedIndex];
+							$.data( target)[ source.name]=$( option).data( 'value');
+						}
+					},
+					convertBack : function( value, source, target) {
+						if( target.multiple) {
+							var values = source[ target.name];
+							for( var i=0; i<target.options.length; i++) {
+								var option = target.options[i];
+								for ( var k = 0; k < values.length; k++) {									
+									if( equals.call( target, $( option).data( 'value'), values[k])) {
+										option.selected = true;
+										break;
+									}
+								}									
+							}
+						} else {
+							var value = source[ target.name];
+							for( var i=0; i<target.options.length; i++) {
+								var option = target.options[i];
+								if( equals.call( target, $( option).data( 'value'), value)) {
+									target.selectedIndex = i;
+									break;
+								}	
+							}
+						}
+					}
+				};
+			}
+			/*
 			multipleSelect2array : function() {
 				return {
 					convert     : function( value, source, target) {
@@ -815,6 +1048,7 @@
 					}
 				};
 			}
+			*/
 		} 
 	});
 	
@@ -839,8 +1073,8 @@
 		} else {
 			$.ampere.ensure( this.length==1, 'single dom element expected');
 			
-			var instance = this.data( 'ampere_module');
-			$.ampere.ensure( instance, 'no module attached to dom element');
+			var instance = this.closest( '.ampere.module').data( 'ampere_module');
+			$.ampere.ensure( instance, 'no module attached to dom element/parents');
 			return instance;
 		}
 		
@@ -865,7 +1099,7 @@
 		},
 		open : '_=_.concat( jQuery.ampere.getViewTmplItem( $item).data.id( $item, $1, $2));'
 	};
-	/*
+	
 	$.tmpl.tag.log = {
 		_default : {
 			$2 : 'undefined',
@@ -873,7 +1107,6 @@
 		},
 		open : '$.ampere.getViewTmplItem( $item).data.log( $.ampere.getViewTmplItem( $item).data.state.options("title") ,$2);'
 	};
-	*/
 	
 	/*
 	var varFn = function( _, $2, $1) {
@@ -907,10 +1140,10 @@
 	
 		// update state views whenever a change occures 
 	    // TODO : use delegate instaed of live handler
-	$('body').live( 'change', function( event) {
+	$( 'input, select, textarea, button').live( 'change input', function( event) {
 		var e = $( event.target).closest( '.ampere.module');
 		if( e.length) {
-			e.module().getState().log( 'i was changed : ', e.module().getState().operand);
+			e.module().getState().log( 'i was changed : ', event.target);
 			for( var name in e.module().getState().transitions) {
 				var transition = e.module().getState().transitions[ name];
 				
@@ -926,15 +1159,18 @@
 					eTransition[ transition.isEnabled() ? 'removeAttr' : 'attr']( 'disabled', 'disabled');
 				}
 			}
+			
+			var viewElement = e.find( '.ampere.view');
+			viewElement.tmplItem().data.reset.update( e.module().element.find( '.reset:first'));
 		}
 	});
 	
 		// react on clicks to transitions
 		// TODO : use delegate instaed of live handler
-	$( 'body .transition').live( 'click', function() {
-		var tmplItem = $.tmplItem( this);
+	$( '.transition').live( 'click', function( event) {
+		var tmplItem = $.tmplItem( event.target);
 		if( tmplItem) {
-			var transition = $.tmplItem( this).data;
+			var transition = tmplItem.data;
 			if( transition instanceof Transition) {
 				transition.log( 'i was clicked');
 				transition.state.module.proceed( transition);

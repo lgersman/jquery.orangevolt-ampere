@@ -9,22 +9,63 @@
 	min-width 	: 300px;
 	min-height	: 200px;
 	
-	font-size   : 0.8em;
-    /*line-height: 1.25em;*/
+	font-size   : 12.8px;
+    line-height : 1.3em;
 }
 
 * {
 	font-family : Lucida,Lucidux,"Lucida Sans",Verdana,"Geneva",Arial,Helvetica,sans-serif; 
 }
 
+.ui-widget {
+	font-size   : 1em;
+}
+
+label {
+	display		: block;
+}
+
+fieldset {
+	border 				 : 2px solid #AAAAAA;
+	-moz-border-radius   : 4px 4px 4px 4px;
+	-webkit-border-radius: 4px; 
+	border-radius		 : 4px;
+}
+
+input[type=text], input[type=password], input[type=number] {
+	padding 			 : 0.4em 0.4em;
+	border  			 : 1px solid #AAAAAA;
+	-moz-border-radius   : 4px 4px 4px 4px;
+	-webkit-border-radius: 4px; 
+	border-radius		 : 4px;
+	font-family		     : monospace;
+	font-size			 : 12.8px;
+}
+
+input.compat.number {
+	border  : 0;
+	padding	: 0;
+}
+
+textarea {
+	padding 			 : 0.4em 0.4em;
+	border  			 : 1px solid #AAAAAA;
+	-moz-border-radius   : 4px 4px 4px 4px;
+	-webkit-border-radius: 4px; 
+	border-radius		 : 4px;
+	font-family		     : monospace;
+	font-size			 : 12.8px;
+}
+
 .ampere.module >.state >.body >.view {
-	overflow	   : auto;
-	padding-bottom : 40px;
+	overflow	    : auto;
+	padding-bottom  : 40px;
 }	
 
 .ampere.module >.header {
 	padding		: 4px 4px;
 	overflow	: hidden;
+	position	: relative;
 }
 
 .ampere.module  >.footer {
@@ -33,7 +74,18 @@
 	right		: 0;
 	left		: 0;
 	padding		: 4px 4px;
-	overflow	: hidden;
+	overflow	: auto;
+}
+
+.ampere.module >.header >.title {
+	float		: left;
+	top			: 50%;
+	margin-top  : -0.7em;
+	position	: absolute;
+}
+
+.ampere.module >.header >* {
+	float		: right;
 }
 
 .ampere.module >.footer >.transitions {
