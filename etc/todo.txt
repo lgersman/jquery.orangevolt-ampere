@@ -1,5 +1,5 @@
 
-* type="number"/spinner : change event needed to be thrown 
+* type="number"/spinner on chrome : change event needed to be thrown 
 
 * datatypes date, url, email
 

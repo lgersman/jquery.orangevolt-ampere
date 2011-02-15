@@ -5,6 +5,68 @@
  */
 
 (function($) {
+	function isDate( obj) {
+		return !!(obj && obj.getTimezoneOffset && obj.setUTCFullYear);
+	}
+	
+	function isNaN( obj) {
+		  // Is the given value `NaN`? `NaN` happens to be the only value in JavaScript
+		  // that does not equal itself.
+		return obj !== obj;
+	}
+	
+	var keys = Object.keys || function(obj) {
+			// Retrieve the names of an object's properties.
+		  	// Delegates to **ECMAScript 5**'s native `Object.keys`
+		var keys = [];
+	    for (var key in obj) { 
+	    	if (hasOwnProperty.call(obj, key)) {
+	    		keys[keys.length] = key;
+	    	}
+	    }
+	    return keys;
+	};
+	
+		// Perform a deep comparison to check if two objects are equal.
+		// see https://github.com/documentcloud/underscore/raw/master/underscore.js
+	function equals( a, b) {
+	    	// Check object identity.
+	    if( a===b) return true;
+	    	// Different types?
+	    var atype = typeof(a), btype = typeof(b);
+	   
+	    if( atype != btype) return false;
+	    	// Basic equality test (watch out for coercions).
+	    if( a==b) return true;
+	    	// One is falsy and the other truthy.
+	    if( (!a && b) || (a && !b)) return false;
+	    	// One of them implements an isEqual()?
+	    if( a.equals) return a.equals( b);
+	    	// Check dates' integer values.
+	    if( isDate(a) && isDate(b)) return a.getTime() === b.getTime();
+	    	// Both are NaN?
+	    if( isNaN(a) && isNaN(b)) return false;
+	    	// Compare regular expressions.
+	    if( jQuery.type(a)=='regexp'  && jQuery.type(b)=='regexp')
+	      return a.source     === b.source &&
+	             a.global     === b.global &&
+	             a.ignoreCase === b.ignoreCase &&
+	             a.multiline  === b.multiline;
+	    	// If a is not an object by this point, we can't handle it.
+	    if( atype !== 'object') return false;
+	    	// Check for different array lengths before comparing contents.
+	    if( a.length && (a.length !== b.length)) return false;
+	    	// Nothing else worked, deep compare the contents.
+	    var aKeys = keys(a), bKeys = keys(b);
+	    	// Different object sizes?
+	    if( aKeys.length != bKeys.length) return false;
+	    	// Recursive comparison of contents.
+	    for( var key in a) {
+	    	if (!(key in b) || !equals(a[key], b[key])) return false;
+	    }
+	    return true;
+	  };
+	
 	function ucwords( s) {
 		return s ? s.replace( 
 			/^(.)|\s(.)/g, 
@@ -536,7 +598,7 @@
 			$.ampere.theme.render( this);
 		};
 		this.reset.update = function( viewElement) {
-			viewElement.removeAttr( 'disabled');
+			viewElement.removeAttr( 'disabled').removeAttr( 'aria-disabled');
 		};
 	}
 	
@@ -1142,6 +1204,7 @@
 	    // TODO : use delegate instaed of live handler
 	$( 'input, select, textarea, button').live( 'change input', function( event) {
 		var e = $( event.target).closest( '.ampere.module');
+
 		if( e.length) {
 			e.module().getState().log( 'i was changed : ', event.target);
 			for( var name in e.module().getState().transitions) {
@@ -1155,7 +1218,7 @@
 				} else {
 					var eTransition = e
 					.find( '.transition.' + transition.options( 'name'));
-									
+
 					eTransition[ transition.isEnabled() ? 'removeAttr' : 'attr']( 'disabled', 'disabled');
 				}
 			}
