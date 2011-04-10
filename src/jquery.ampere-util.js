@@ -211,7 +211,8 @@
 			loadStyles	: loadStyles,
 			ensure 		: ensure,
 			log			: log,
-			getDeferUrl : getDeferUrl
+			getDeferUrl : getDeferUrl,
+			getOwnProperties : getOwnProperties 
 		};
 	}
 ));

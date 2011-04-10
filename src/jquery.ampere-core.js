@@ -7,14 +7,23 @@
 	function( $, options) {
 			// core
 		
-		$.ampere = function( callback, options) {
-			$.ampere.log( 'invoke real ampere');
-			callback.call( $.ampere);
+		$.ampere = function( callback) {
+			$.when( $.ampere.theme).done( function() {
+				callback.call( $.ampere);
+			});
 		};
 		
 		$.ampere.DEFAULTS  = {
 			debug : false,
-			theme : 'default'
+			theme : 'default',
+			module : {
+				history		: true,	
+				icon  		: false,
+				state 		: 'main',
+				transition 	: {
+					icon : 'ui-icon-triangle-1-e' // false
+				}
+			}
 		};
 		
 		$.ampere.modules = {};

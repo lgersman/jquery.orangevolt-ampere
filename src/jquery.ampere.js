@@ -10,12 +10,12 @@
 		
 		$.ampere.util.loadStyles( 'ampere', 'jquery.ampere.css');
 		
-		var css = ($.ampere.options.resources && $.ampere.options.resources.css) ? $.makeArray( $.ampere.options.resources.css) : [];
-		css.unshift( '');
-		css.length==1 || $.ampere.util.loadStyles.apply( this, css);
+		var styles = ($.ampere.options.resources && $.ampere.options.resources.styles) ? $.makeArray( $.ampere.options.resources.styles) : [];
+		styles.unshift( '');
+		styles.length==1 || $.ampere.util.loadStyles.apply( this, styles);
 	},
 	{
-		depends : [ 'ampere_core', 'ampere_util', 'ampere_module', 'ampere_history', 'ampere_state', 'ampere_view', 'ampere_theme'],
+		depends : [ 'ampere_core', 'ampere_util', 'ampere_module', 'ampere_action', 'ampere_history', 'ampere_state', 'ampere_transition', 'ampere_view', 'ampere_theme'],
 		
 		def : {
 			ampere_core : 'jquery.ampere-core.js',
@@ -25,6 +25,10 @@
 			},
 			ampere_history		: {
 				url 	: 'jquery.ampere-history.js',
+				depends : 'ampere_core'
+			}, 
+			ampere_action		: {
+				url 	: 'jquery.ampere-action.js',
 				depends : 'ampere_core'
 			}, 
 			ampere_module		: {
@@ -37,6 +41,10 @@
 			}, 
 			ampere_view		: {
 				url 	: 'jquery.ampere-view.js',
+				depends : 'ampere_core'
+			},
+			ampere_transition		: {
+				url 	: 'jquery.ampere-transition.js',
 				depends : 'ampere_core'
 			},
 			ampere_theme		: {

@@ -8,31 +8,89 @@
 	position  	: relative;
 	min-width 	: 300px;
 	min-height	: 200px;
-	
+	height		: 100%;
 	font-size   : 12.8px;
     line-height : 1.3em;
+    color		: #333333;
 }
 
-* {
+.ampere.module .ui-icon-empty {
+	background-image: none;
+}
+
+.ampere.module a {
+	color : #007BA4;
+}
+
+.ampere.module *, .ui-tooltip {
 	font-family : Lucida,Lucidux,"Lucida Sans",Verdana,"Geneva",Arial,Helvetica,sans-serif; 
 }
 
-.ui-widget {
+.ampere.module .ui-widget, body .ui-tooltip {
 	font-size   : 1em;
 }
 
-label {
-	display		: block;
+body .ui-widget.ui-tooltip {
+	font-size   : 12.8px;
+	max-width   : 640px;
+	line-height : 1.6em;
 }
 
-fieldset {
+.ampere.module .ui-state-default a, .ampere.module .ui-state-active a {
+    color: inherit;
+}
+
+
+.ampere.module pre {
+	font-family : monospace; 
+}
+
+.ampere.module .group {
+	display : inline;
+}
+
+.ampere.module pre {
+	font-family	: monospace; 
+}
+
+.ampere.module .ui-multiselect {
+    padding: 0.4em;
+}
+
+.ampere.module .ui-spinner {
+	min-width			 : 222px;
+}
+
+.ampere.module dd {
+	margin 			: 0px;
+	margin-bottom	: 10px;
+}
+
+.ampere.module dd:last-child {
+	margin-bottom : 0px;
+}
+
+.ampere.module .description {
+	color	: gray;
+	padding : 3px 0px;
+}
+
+.ampere.module dd .description {
+	padding-bottom : 0;
+}
+
+.ampere.module fieldset {
 	border 				 : 2px solid #AAAAAA;
 	-moz-border-radius   : 4px 4px 4px 4px;
 	-webkit-border-radius: 4px; 
 	border-radius		 : 4px;
+	margin				 : 0;
 }
 
-input[type=text], input[type=password], input[type=number] {
+.ampere.module input[type=text], 
+.ampere.module input[type=password], 
+.ampere.module input[type=number], 
+.ampere.module textarea {
 	padding 			 : 0.4em 0.4em;
 	border  			 : 1px solid #AAAAAA;
 	-moz-border-radius   : 4px 4px 4px 4px;
@@ -40,14 +98,29 @@ input[type=text], input[type=password], input[type=number] {
 	border-radius		 : 4px;
 	font-family		     : monospace;
 	font-size			 : 12.8px;
+	min-width			 : 213px;
 }
 
-input.compat.number {
+.ampere.module input[type=number] {
+	min-width			 : 220px;
+}
+
+.ampere.module .ui-spinner >input[type=text] {
+	min-width			 : 193px;
+}
+
+.ampere.module input.compat.number {
 	border  : 0;
 	padding	: 0;
 }
 
-textarea {
+	/* disable browser csss for disabled style */ 
+textarea:disabled, input:disabled {
+	background-color: inherit;
+}
+
+.ampere.module textarea {
+	/*
 	padding 			 : 0.4em 0.4em;
 	border  			 : 1px solid #AAAAAA;
 	-moz-border-radius   : 4px 4px 4px 4px;
@@ -55,39 +128,74 @@ textarea {
 	border-radius		 : 4px;
 	font-family		     : monospace;
 	font-size			 : 12.8px;
+	*/
+	min-height			 : 5em;
+	resize				 : none;
 }
 
-.ampere.module >.state >.body >.view {
+.ampere.module .ampere.module input[type=text]:invalid, 
+.ampere.module textarea:invalid, 
+.ampere.module input[type=password]:invalid {
+	border-color : Crimson;
+}
+
+.ampere.module label.required {
+	font-weight: bold;
+}
+
+.ampere.module >.body {
+	position		: absolute;
+	width			: 100%;
 	overflow	    : auto;
-	padding-bottom  : 40px;
-}	
+	/* top==header.outerHeight() and bottom==header.footerHeight() */
+}
+
+.ampere.module >.body >form {
+	padding 	: 10px;
+}
 
 .ampere.module >.header {
+	position	: relative;		
 	padding		: 4px 4px;
 	overflow	: hidden;
-	position	: relative;
+	/*border-top  : 0;*/
 }
 
 .ampere.module  >.footer {
-	position	: absolute;
-	bottom		: 0;
-	right		: 0;
-	left		: 0;
-	padding		: 4px 4px;
-	overflow	: auto;
+	overflow		: auto;
+	position		: absolute;
+	bottom			: 0;
+	left			: 0;
+	right			: 0;
+	padding			: 4px 4px;
+	/*border-bottom   : 0;*/
 }
 
-.ampere.module >.header >.title {
+.ampere.module  >.footer >.controls, .ampere.module >.header >.controls  {	
+	overflow	: hidden;	
+}
+
+.ampere.module >.footer >.controls >*, .ampere.module >.header >.controls >* {
+	float		: right;
+	margin-right: 4px;
+}
+
+.ampere.module >.footer .about {
+	font-weight	: normal;
+	color       : #333333;
+}
+
+.ampere.module >.footer >.controls +.about {
+	padding-top : 4px;
+}
+
+.ampere.module >.header >.label, .ampere.module >.header >.icon {
 	float		: left;
 	top			: 50%;
 	margin-top  : -0.7em;
 	position	: absolute;
 }
 
-.ampere.module >.header >* {
-	float		: right;
-}
-
-.ampere.module >.footer >.transitions {
-	float		: right;
+.ampere.module >.header >.icon + .label {
+	left : 20px;
 }

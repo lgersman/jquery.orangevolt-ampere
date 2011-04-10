@@ -9,7 +9,7 @@ jQuery.deferDef({
 		url 	: 'jquery.ampere.js',
 		depends : [ 'json', 'tmplplus', 'globalization', 'datalink']
 	},
-	
+		
 	json 			: { 
 		url 	: '../lib/json2.js',
 		bare	: true
@@ -25,7 +25,7 @@ jQuery.deferDef({
 	},
 	
 	globalization 	: {
-		url 	: '../lib/jquery/plugins/jquery.globalization.js',
+		url 	: '../lib/jquery/plugins/jquery.global.js',
 		bare 	: true
 	},
 	
@@ -35,22 +35,22 @@ jQuery.deferDef({
 	}
 });
 
-	// force jquery to delay the ready event
-jQuery.ampere = function( callback, options) {
-	jQuery.readyWait++;
-	console.log( 'fake ampere invoked');
-	$.when( jQuery.defer.ampere( options || {}))
-	.done( function() {
-		$.when( jQuery.ampere.theme())
-		.done( function() { 
-			jQuery.ampere( callback, options);
-			jQuery.ready( true);
+$.ampere = function( callback, options) {
+	window.console && console.log && console.log( 'fake ampere invoked');
+	$.when( jQuery.defer.ampere( options || {})).done( function() {
+		$.when( jQuery.ampere.theme).done( function() { 
+			$.ampere( callback);
 		})
 		.fail( function() {
-			jQuery.ampere.theme.log( 'fail');
+			var args = $.makeArray( arguments);
+			args.unshift( false);
+			jQuery.ampere.ensure.apply( jQuery.ampere.ensure, args);
 		});
 	})
 	.fail( function() {
-		jQuery.ampere.log( 'fail');
+		var ensure = $.ampere.util.ensure( 'ampere');
+		var args = $.makeArray( arguments);
+		args.unshift( false);
+		ensure.apply( ensure, args);
 	});
 };

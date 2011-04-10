@@ -9,16 +9,17 @@
 	<button 
 		class="transition ${options('name')}" 
 		type="button"
-		data-options='{ {{if options('icon')}}"icons" : { "primary" : "${options('icon')}"} {{/if}} {{if !$data.options('title')}}${ options('icon') ? ', ' : ''} "text" : false{{/if}} }'
-		{{if !$data.isEnabled()}} {{! if !isEnabled() fails right now : see https://github.com/jquery/jquery-tmpl/issues/issue/40/#comment_658509}}
+		data-options='{ {{if options('icon')}}"icons" : { "primary" : "${options('icon')}"} {{/if}} {{if !$data.options('label')}}${ options('icon') ? ', ' : ''} "text" : false{{/if}} }'
+		{{if $data.disabled()}} 
 			disabled="disabled"
 		{{/if}}	
 	>
-		${options( 'title')} 
+		${options( 'label')} 
 	</button>
 	{{/if}}
 </script>
 -->
+<!--
 <script id="ampere_theme_fragment_reset" type="text/x-jquery-tmpl">
 	<button 
 		class="reset" 
@@ -29,10 +30,10 @@
 		disabled="disabled"
 	>&nbsp;</button>
 </script>
-
+-->
 <script id="ampere_theme_fragment_history" type="text/x-jquery-tmpl">
 	{{if history}} 
-	<div class="history buttonset">
+	<div class="history group">
 		<button 
 			class="undo" 
 			type="button"
@@ -60,9 +61,12 @@
 </script>
 <!--
 <script id="ampere_theme_fragment_radio" type="text/x-jquery-tmpl">
-	<label for="{{id( 'radio')}}">
-	${ $data.label || $.ampere.ucwords(($data.value || '&nbsp;'))}
-	</label>
+	<dt>	
+		<label for="{{id( 'radio')}}">
+		${ $data.label || $.ampere.ucwords(($data.value || '&nbsp;'))}
+		</label>
+	</dt>
+	<dd>
 	<input 
 		type="radio" 
 		name="${ name}" 
@@ -70,15 +74,17 @@
 		data-options='{ {{if $data.icon}}"icons" : { "primary" : "${ $data.icon}"} {{/if}} {{if !$data.label}}${ $data.icon ? ',' : ''} "text" : false{{/if}} }'
 		value="${ $data.value || ($data.label || 'on').toLowerCase()}"
 	/>
+	</dd>
 </script>
 -->
 <!--
 <script id="ampere_theme_fragment_checkbox" type="text/x-jquery-tmpl">
-	 
-	<label for="{{id( 'checkbox')}}">
-	${ $data.label || '&nbsp;'} 
-	</label>
-	
+	<dt>
+		<label for="{{id( 'checkbox')}}">
+		${ $data.label || '&nbsp;'} 
+		</label>
+	</dt>
+	<dd>
 	<input 
 		type="checkbox" 
 		name="${ name}" 
@@ -86,50 +92,71 @@
 		data-options='{ {{if $data.icon===undefined || $data.icon}}"icons" : { "primary" : "${ $data.icon || 'ui-icon-check'}"} {{/if}} {{if !$data.label}}, "text" : false{{/if}} }'
 		value="${ ($data.value || true).toLowerCase()}"
 	/>
+	</dd>
 </script>
 -->
 <!--
 <script id="ampere_theme_fragment_select" type="text/x-jquery-tmpl">
-	{{if $data.label}}
-	<label for="{{id( 'select')}}">
-	${ $data.label} 
-	</label>
-	{{/if}}
-	
-	<select id="{{id('select')}}">
-		<option>Dog</option>
-		<option>Cat</option>
-		<option>Bird</option>
-	</select>
+	<dt>
+		{{if $data.label}}
+		<label for="{{id( 'select')}}">
+		${ $data.label} 
+		</label>
+		{{/if}}
+	</dt>
+	<dd>	
+		<select id="{{id('select')}}">
+			<option>Dog</option>
+			<option>Cat</option>
+			<option>Bird</option>
+		</select>
+	</dd>
 </script>
 -->
+
 <script id="ampere_theme_view_default" type="text/x-jquery-tmpl">
 	<div>
 	</div>
 </script>
 
 <script id="ampere_theme_layout_default" type="text/x-jquery-tmpl">
-	<div class="header ui-widget-header ui-corner-all">
-			<div class="title">
-				${state.module.options( 'title')} {{if state.options( 'title')}} - ${state.options( 'title')} {{/if}}
-			</div>
-			{{history( state.module)}}
-			{{reset( state.module)}}
-	</div>
-	<form onsubmit="return false" class="state ${state.options( 'name')}">		
-		<div class="body">
-			<div class="ampere view ${options( 'name')}">
-				{{view}}
-			</div>
-		</div>
-	</form>
-	<div class="footer ui-widget-header ui-corner-all">
-		<div class="transitions buttonset">
-		{{each state.transitions}}
-			{{if $value.options('type')=='primary'}}
-				{{transition( $value)}}
+	<div class="header ui-widget-header ui-corner-bottom1">
+			{{if state.module.options( 'icon')}}	
+				<span class="icon ui-icon ${state.module.options( 'icon')}">&nbsp</span>	
 			{{/if}}
-		{{/each}}			
-		</div>
+			<div class="label">
+				${state.module.options( 'label')} {{if state.options( 'label')}} - ${state.options( 'label')} {{/if}}
+			</div>
+			<div class="controls">  
+				{{history( state.module)}}
+				{{button({ icon:'ui-icon-refresh', label:false, disabled:reset.disabled, onclick:reset})}}
+			</div>
 	</div>
+	<div class="body">
+		<form onsubmit="return false" class="state ${state.options( 'name')}"  autocomplete="off">		
+				<div class="ampere view ${options( 'name')}">
+					{{view}}
+				</div>
+		</form>
+	</div>
+	{{if state.hasTransitions( 'primary') || state.module.options( 'about')}}
+	<div class="footer ui-widget-header ui-corner-top1">
+		{{if state.hasTransitions( 'primary')}}
+		<div class="controls">
+			<div class="transitions group">
+			{{each state.transitions}}
+				{{if $value.options('type')=='primary'}}
+					{{transition( $value)}}
+				{{/if}}
+			{{/each}}			
+			</div>
+		</div>
+		{{/if}}
+		{{if state.module.options( 'about')}}
+			<div class="about">
+				{{ready state.module.options( 'about')}}
+			</div>
+		{{/if}}		
+	</div>
+	{{/if}}	
 </script>
