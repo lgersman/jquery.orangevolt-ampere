@@ -140,7 +140,6 @@
 
 		/*'jquery-ui/themes/base/jquery-ui.css',*/
 		/*'//ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/themes/redmond/jquery.ui.all.css',*/	
-		/*'http://lion/dev/guilib/src/css/themes/wsc/_default_jquery/jquery-ui-1.8.4.patched.css',*/
 		var styles = $.makeArray( $.ampere.options['jquery-ui-theme']).slice( 0);
 		styles.push( 
 			'multiselect/jquery.multiselect.css', 

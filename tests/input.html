@@ -162,7 +162,7 @@
 		<script id="number" type="text/x-jquery-tmpl">
 			<dl>
 				<dt><label for="number">Number</label></dt>
-				<dd>{{number({ step : 10, min : -30, max : 50})}}</dd>
+				<dd>{{number({ name: 'number', step : 10, min : -30, max : 50})}}</dd>
 			</dl>
 			{{text}}
 		</script>
@@ -351,7 +351,12 @@
 				$( 'body').module( 'input');
 			});
 		},
-		{ debug : true}
+		{ 
+			debug : true//,
+			/*'jquery-ui/themes/base/jquery-ui.css',*/
+			/*'//ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/themes/redmond/jquery.ui.all.css',*/	
+			//'jquery-ui-theme'	: '//ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/themes/redmond/jquery.ui.all.css'
+		}
 		);
 		</script>
 	</head>
