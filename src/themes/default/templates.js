@@ -1,21 +1,46 @@
 ((window.$deferRun || function( run ){ run( jQuery); }) (
 	function( $, options) {
 			/**
-			 * adds disabled capabilites to rendered control 
+			 * adds a handler to the $items rendered event
 			 */
-		function initDisabled( tmplItem) {
-			tmplItem.rendered = function() {
-				if( $.isFunction( this.data.disabled)) {
-					var data = this.data;
-					var handler = function() {
-						var disabled = data.disabled.call( this);
-						return disabled;
-					};
-					$.data( this.nodes[0], 'notify', handler);
-				} else {
-					$( this.nodes[0]).attr( 'disabled', 'disabled'); 
-				}
+		function onRendered( tmplItem, callback) {
+			if( !$.isFunction( tmplItem.rendered)) {
+				tmplItem.rendered = function() {
+					for( var i=0; i<this.rendered.handlers.length; i++) {
+						this.rendered.handlers[i].call( this);
+					}
+				};
+				tmplItem.rendered.handlers = [ callback];
+			} else {
+				tmplItem.rendered.handlers.push( callback);
+			}
+		}
+
+		function disabledTrait() {
+			if( $.isFunction( this.data.disabled)) {
+				var data = this.data;
+				var handler = function() {
+					var disabled = data.disabled.call( this);
+					return disabled;
+				};
+				$.data( this.nodes[0], 'notify', handler);
+			} else {
+				$( this.nodes[0]).attr( 'disabled', 'disabled'); 
+			}
+		}
+		
+		function linkTrait() {
+			$( this.nodes).data( 'link', this.data.link);
+		}
+		
+		function optionsTrait( options) {
+			return function() {
+				$( this.nodes).data( 'options', options);
 			};
+		}
+		
+		function valueTrait() {
+			$( this.nodes).data( 'value', this.data.value);
 		}
 		
 			// select 
@@ -24,18 +49,11 @@
 
 			var id = jQuery.ampere.getViewTmplItem( $item).data.id( $item, null, 'select');
 			
-			/*
-			var label = $data.label!==false ? $data.label || $.ampere.util.ucwords( $data.name) : false;
-			if( label) {
-				_.push( '<label for="', $.encode( id), '">', label || '&nbsp;', '</label>');
-			}
-			*/
 			_.push( '<select id="', id, '"');
 			!$data.name || (_.push( ' name="', $data.name, '"'));		
 
-			$data.disabled && initDisabled( $item); 
-			
-			!$data.link || (_.push( ' data-link="', $data.link, '"')); 
+			$data.disabled && onRendered( $item, disabledTrait); 
+			$data.link     && onRendered( $item, linkTrait);
 			
 			!$data.multiple || (_.push( ' multiple="multiple"'));
 			_.push( '>');
@@ -57,8 +75,15 @@
 			$.ampere.util.ensure( $.ampere.theme.ensure.namespace + '.fragments.select')( $.isPlainObject( values), 'values expected to be a array, object or function returning array or object');
 	
 			for( var i in values) {
-				_.push( '<option value="', $.encode( values[i]), '" data-value="', $.encode( typeof(values[i])!='string' ? JSON.stringify( values[i]): values[i]), '">', i, '</option>');
+				_.push( '<option value="', $.encode( values[i]), '" >', i, '</option>');
 			}
+			onRendered( $item, function() {
+				var i=0;
+				var options = this.nodes[0].options;
+				for( var k in values) {
+					$.data( options[i++], 'value', values[k]);
+				}
+			});
 			
 			_.push( '</select>');
 			
@@ -77,17 +102,17 @@
 				case 'button' : 
 				default 	  : {
 					//debugger;
-					_.push( '<button class="transition" transition="' + $.encode( $data.options('name')) + '" type="button" data-options="');
+					_.push( '<button class="transition" transition="' + $.encode( $data.options('name')) + '" type="button"');
 					
 					var options = {
 						text : $data.options('label') || false
 					};
 					$data.options('icon') && (options.icons = { primary : $data.options('icon')});
-					_.push( $.encode( JSON.stringify( options)), '"'); 
+					onRendered( $item, optionsTrait( options));
 					
-					$item.rendered = function() {
-						$.data( this.nodes[0], 'notify', $.proxy( $data.disabled, $data));
-					};
+					onRendered( $item, function() {
+						$.data( this.nodes[0], 'notify', $.proxy( this.data.disabled, this.data));
+					});
 					
 					_.push( 'title="', $.encode( $data.options('label') || $data.options('name')), '"');
 					
@@ -103,24 +128,23 @@
 		$.ampere.theme.setTemplate( 'fragments', 'button', function( jQuery, $item, selector) {
 			var $=jQuery, call, _=[], $data=$item.data || {};
 			
-			_.push( '<button type="button" data-options="');
+			_.push( '<button type="button"');
 			
 			var options = {
 				text : $data.label ? $data.label : false
 			};
 			$data.icon && (options.icons = { primary : $data.icon});
-			_.push( $.encode( JSON.stringify( options)), '"'); 
+			onRendered( $item, optionsTrait( options)); 
 			
-			$data.disabled && initDisabled( $item);
+			$data.disabled && onRendered( $item, disabledTrait);
 			
 			if( $.isFunction( $data.onclick)) {
 				var view = jQuery.ampere.getViewTmplItem( $item).data;
 				var onclick = $.proxy( $data.onclick, view.state);
-				var _rendered = $item.rendered;
-				$item.rendered = function() {
-					$.isFunction( _rendered) && _rendered.call( this);
+				
+				onRendered( $item, function() {
 					$( this.nodes[0]).click( onclick);
-				};
+				});
 			} 
 			
 			_.push( '> ');
@@ -139,19 +163,21 @@
 			_.push( '<input type="radio"');
 			!$data.name || (_.push( ' name="', $.encode( $data.name), '"'));
 			
-			$data.disabled && initDisabled( $item);
+			$data.disabled && onRendered( $item, disabledTrait);
+			$data.link     && onRendered( $item, linkTrait);
 			
-			_.push( ' id="', $.encode( id), '" data-options="');
+			_.push( ' id="', $.encode( id), '"');
 			
 			var options = {
 				text : $data.label ? $data.label : false
 			};
 			$data.icon && (options.icons = { primary : $data.icon});
-			_.push( $.encode( JSON.stringify( options)), '" ');
-	
-			!$data.link || (_.push( ' data-link="', $data.link,'"')); 
+			onRendered( $item, optionsTrait( options));			 
 			
-			_.push( 'value="',  $.encode( ('value' in $data) ? $data.value : ($data.label || 'on').toLowerCase()), '"/>');
+			('value' in $data) || ($data.value=($data.label || 'on').toLowerCase()); 
+			onRendered( $item, valueTrait);
+			
+			_.push( 'value="',  $.encode( $data.value), '"/>');
 	
 			return _;
 		});
@@ -165,7 +191,8 @@
 			_.push( '<input type="checkbox"');
 			!$data.name || (_.push( ' name="', $.encode( $data.name), '"'));
 			
-			$data.disabled && initDisabled( $item);
+			$data.disabled && onRendered( $item, disabledTrait);
+			$data.link     && onRendered( $item, linkTrait);
 			
 			_.push( ' id="', $.encode( id), '" data-options="');
 			
@@ -173,11 +200,11 @@
 				text : ($data.label!==false) || false
 			};
 			($data.icon===undefined || $data.icon) && (options.icons = { primary : $data.icon || 'ui-icon-check'});
-			_.push( $.encode( JSON.stringify( options)), '" ');
+			onRendered( $item, optionsTrait( options));
 	
-			!$data.link || (_.push( ' data-link="', $data.link,'"')); 
-			
-			_.push( ' value="',  $.encode( ('' + ($data.value || true)).toLowerCase()), '"/>');
+			('value' in $data) || ($data.value=true);
+			_.push( ' value="',  $.encode( ''+$data.value), '"/>');
+			onRendered( $item, valueTrait);
 	
 			return _;
 		});
@@ -187,32 +214,27 @@
 			var $=jQuery, call, _=[], $data=$item.data;
 
 			var id = jQuery.ampere.getViewTmplItem( $item).data.id( $item, null, $data.multiple ? 'textarea' : 'text');
-			/*
-			var label = $data.label!==false ? $data.label || $.ampere.util.ucwords( $data.name) : false;
-			if( label) {
-				_.push( '<label for="', $.encode( id), '">', label || '&nbsp;', '</label>');
-			}
-			*/
+
 			if( $data.multiple) {
 					// space is needed(!) otherwise tmpl engine doesnt assign tmplitem to element
 				_.push( '<textarea ');
 			} else {
 				_.push( '<input type="text"');
 			}
-			$data.disabled && initDisabled( $item);
+			$data.disabled && onRendered( $item, disabledTrait);
+			$data.link     && onRendered( $item, linkTrait);
 			
 			$data.required && (_.push( ' required="required"'));
 						
 			!$data.name || (_.push( ' name="', $.encode( $data.name), '"'));
-			_.push( ' id="', $.encode( id), '" data-options="');
+			_.push( ' id="', $.encode( id), '"');
 			
 			var options = {
 				required : $data.required,
 				pattern  : $data.pattern
 			};
-			_.push( $.encode( JSON.stringify( options)), '" ');
+			onRendered( $item, optionsTrait( options));
 	
-			!$data.link   || (_.push( ' data-link="', $data.link,'"'));
 			!$data.style  || (_.push( ' style="', $data.style,'"'));
 			
 			if( $data.multiple) {
@@ -230,25 +252,20 @@
 			var $=jQuery, call, _=[], $data=$item.data;
 	
 			var id = jQuery.ampere.getViewTmplItem( $item).data.id( $item, null, 'password');
-			/*
-			var label = $data.label!==false ? $data.label || $.ampere.util.ucwords( $data.name) : false;
-			if( label) {
-				_.push( '<label for="', $.encode( id), '">', label || '&nbsp;', '</label>');
-			}
-			*/
+			
 			_.push( '<input type="password"');
 			!$data.name || (_.push( ' name="', $.encode( $data.name), '"'));
 			
-			$data.disabled && initDisabled( $item);
+			$data.disabled && onRendered( $item, disabledTrait);
+			$data.link     && onRendered( $item, linkTrait);
 			
-			_.push( ' id="', $.encode( id), '" data-options="');
+			_.push( ' id="', $.encode( id), '"');
 			
 			var options = {
 				required : $data.required
 			};
-			_.push( $.encode( JSON.stringify( options)), '" ');
+			onRendered( $item, optionsTrait( options));
 	
-			!$data.link   || (_.push( ' data-link="', $data.link,'"'));
 			!$data.style  || (_.push( ' style="', $data.style,'"'));
 			
 			_.push( ' value="',  $.encode( ('' + ($data.value || '')).toLowerCase()), '"/>');
@@ -261,39 +278,35 @@
 			var $=jQuery, call, _=[], $data=$item.data;
 	
 			var id = jQuery.ampere.getViewTmplItem( $item).data.id( $item, null, 'number');
-			/*
-			var label = $data.label!==false ? $data.label || $.ampere.util.ucwords( $data.name) : false;
-			if( label) {
-				_.push( '<label for="', $.encode( id), '">', label || '&nbsp;', '</label>');
-			}
-			*/
 			_.push( '<input type="', Modernizr.inputtypes.number ? 'number' : 'text', '"');
 			
-			$data.disabled && initDisabled( $item);
+			$data.disabled && onRendered( $item, disabledTrait);
+			$data.link     && onRendered( $item, linkTrait);
 			
 			!$data.name || (_.push( ' name="', $.encode( $data.name), '"'));					
-			_.push( ' id="', $.encode( id), '" data-options="');
+			_.push( ' id="', $.encode( id), '"');
 			
 			var options = {
 				required : $data.required,
 				step     : $data.step || 1
 			};
-			$data.min==undefined || (options.min=$data.min);
-			$data.max==undefined || (options.max=$data.max);
-			_.push( $.encode( JSON.stringify( options)), '" ');
+			('min' in $data) && (options.min=$data.min);
+			('max' in $data) && (options.max=$data.max);
+			onRendered( $item, optionsTrait( options));
 	
-			!$data.link   || (_.push( ' data-link="', $data.link,'"'));
 			!$data.style  || (_.push( ' style="', $data.style,'"'));
 			
 			if( !Modernizr.inputtypes.number) {
 				_.push( ' class="compat number"');
 			} else {
+				debugger
 				_.push( ' step="', options.step, '"');
-				options.min==undefined || _.push( ' min="', options.min, '"');
-				options.max==undefined || _.push( ' max="', options.max, '"');
+				('min' in $data) && _.push( ' min="', options.min, '"');
+				('max' in $data) && _.push( ' max="', options.max, '"');
 			}
 			
-			_.push( ' value="',  $.encode( $data.value || 0), '"/>');
+			('value' in $data) || ($data.value=('min' in options) ? options.min : 0);
+			_.push( ' value="',  $.encode( $data.value), '"/>');
 			return _;
 		});
 		

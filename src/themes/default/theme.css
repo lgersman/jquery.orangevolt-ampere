@@ -41,7 +41,7 @@ body .ui-widget.ui-tooltip {
 }
 
 
-.ampere.module pre {
+.ampere.module pre,.ampere.module code {
 	font-family : monospace; 
 }
 
@@ -196,6 +196,14 @@ textarea:disabled, input:disabled {
 	position	: absolute;
 }
 
+.ampere.module >.header >.icon {
+	margin-left : 6px;
+}
+
+.ampere.module >.header >.label {
+	margin-left : 6px;
+}
+
 .ampere.module >.header >.icon + .label {
-	left : 20px;
+	left : 26px;
 }

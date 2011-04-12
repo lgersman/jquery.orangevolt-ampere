@@ -380,7 +380,7 @@
 		
 			// update state views whenever a change occures 
 		$('body').live( 'change input', function( event) {
-			console.log( '(theme) i was changed : ', event.target);
+			$.ampere.theme.log( 'i was changed : ', event.target);
 			var e = $( event.target).closest( '.ampere.module');
 			if( e.length) {
 				//$( 'button.ui-button', e).button( 'refresh');
