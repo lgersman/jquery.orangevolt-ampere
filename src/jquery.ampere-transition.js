@@ -24,7 +24,9 @@
 			};
 			
 			this.disabled = function() {
-				if( this.target && $.isFunction( this.target.disabled)) {
+				if( !this.target) {
+					return true;	
+				} else if( $.isFunction( this.target.disabled)) {
 					if( this.target.disabled.call( this.target)) {
 						return true;
 					}

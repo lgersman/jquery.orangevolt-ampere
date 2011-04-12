@@ -1,0 +1,8 @@
+
+* type="number"/spinner : change event needed to be thrown 
+
+* datatypes date, url, email
+
+* pattern option for text
+
+* evaluate required attribute  (makes requires sense ... we have conditions?)

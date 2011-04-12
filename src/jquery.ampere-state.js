@@ -22,7 +22,7 @@
 			this.transitions = {};
 			
 			this.transition = function( target, options) {
-				this.ensure( (target instanceof $.ampere.state) || options.target, 'argument target or option target expected');
+				this.ensure( (target instanceof $.ampere.state) || (options && options.target), 'no target state defined - argument target or option target expected');
 				
 				if( $.isFunction( options)) {
 					options = $.extend( {}, this.module.options( 'transition'), { action : options});
@@ -60,7 +60,7 @@
 				//options.label===false || options.label || (options.label=$.ampere.util.ucwords( options.name));
 				if( target && (options.label!==false && !options.label)) {
 					var label = target.options( 'label');
-					if( label!==false) {
+					if( label || label===false) {
 						options.label = label;
 					} else {
 						options.label=$.ampere.util.ucwords( options.name);
@@ -121,7 +121,11 @@
 					this.transitions[ options.name].disabled = function() {
 						var transition = getTransition.call( this);
 						
-						if( transition && !transition.disabled() && $.isFunction( options.disabled)) {
+						if( !transition) {
+							return true;
+						}
+						
+						if( !transition.disabled() && $.isFunction( options.disabled)) {
 							this.target = transition.target;
 							var v = options.disabled.call( this);
 							

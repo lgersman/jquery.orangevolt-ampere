@@ -80,7 +80,7 @@
 					_.push( '<button class="transition" transition="' + $.encode( $data.options('name')) + '" type="button" data-options="');
 					
 					var options = {
-						text : $data.options('label') ? $data.options('label') : false
+						text : $data.options('label') || false
 					};
 					$data.options('icon') && (options.icons = { primary : $data.options('icon')});
 					_.push( $.encode( JSON.stringify( options)), '"'); 
@@ -89,8 +89,10 @@
 						$.data( this.nodes[0], 'notify', $.proxy( $data.disabled, $data));
 					};
 					
+					_.push( 'title="', $.encode( $data.options('label') || $data.options('name')), '"');
+					
 					_.push( '> ');
-					_.push( $.encode( $data.options('label'))); 
+					_.push( $.encode( $data.options('label') || '&nbsp;')); 
 					_.push( '</button>');
 				} 
 			}
@@ -149,7 +151,7 @@
 	
 			!$data.link || (_.push( ' data-link="', $data.link,'"')); 
 			
-			_.push( 'value="',  $.encode( $data.value || ($data.label || 'on').toLowerCase()), '"/>');
+			_.push( 'value="',  $.encode( ('value' in $data) ? $data.value : ($data.label || 'on').toLowerCase()), '"/>');
 	
 			return _;
 		});

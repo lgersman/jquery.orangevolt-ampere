@@ -125,7 +125,11 @@
 				<span class="icon ui-icon ${state.module.options( 'icon')}">&nbsp</span>	
 			{{/if}}
 			<div class="label">
-				${state.module.options( 'label')} {{if state.options( 'label')}} - ${state.options( 'label')} {{/if}}
+				{{if state.module.options( 'label')}} ${state.module.options( 'label')} {{/if}} 
+				{{if state.options( 'label')}} 
+					{{if state.module.options( 'label')}} - {{/if}}
+					${state.options( 'label')} 
+				{{/if}}
 			</div>
 			<div class="controls">  
 				{{history( state.module)}}

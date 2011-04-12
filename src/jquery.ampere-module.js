@@ -7,7 +7,7 @@
 	function( $, options) {
 			// real ampere module constructor
 		function init_ampere_module_instance( element) {
-			var namespace_suffix = element.id ? '#' + element.id : element.tagName + (element.tagName ? '/' + element.name : '');
+			var namespace_suffix = element.id ? '#' + element.id : '<' + element.tagName + '>';
 			
 			this.log    = $.ampere.util.log( this.ensure.namespace + namespace_suffix);
 			this.ensure = $.ampere.util.ensure( this.ensure.namespace + namespace_suffix);
@@ -127,7 +127,7 @@
 				}
 			}
 
-			this.ensure( this.states[ state], 'could not set state "', state, '". no state with this name known.');
+			this.ensure( this.states[ state], 'could not set initial state "', state, '" - state not found');
 			state = this.states[ state];
 			
 			view = state.getView( view);
@@ -141,10 +141,9 @@
 				this.log    = $.ampere.util.log( $.ampere.ensure.namespace + '(' + constructor + ')');
 				this.ensure = $.ampere.util.ensure( $.ampere.ensure.namespace + '(' + constructor + ')');
 
-				this.ensure( options.name===undefined, 'option "name" cannot be redefined when instantiating a module');
-				
-				typeof( options.label)=='string' || (options.label=$.ampere.util.ucwords( options.name));
+				//this.ensure( options.name===undefined, 'option "name" cannot be redefined when instantiating a module');				
 				this._options = $.extend( {}, $.ampere.modules[ constructor].defaults, options);
+				typeof( this._options.label)=='string' || this._options.label===false || (this._options.label=$.ampere.util.ucwords( this._options.name));
 				this.options = function( key, _default) {
 					switch( arguments.length) {
 						case 0  : return this._options;
@@ -161,7 +160,7 @@
 					options || (options = {});
 					options.name  || (options.name=fn.name) || (options.name=(options.label ? options.label.toLowerCase() : undefined));
 					this.ensure( options.name && options.name.length, 'argument fn expected to be a named function (function foo() { ... }) or option name/label must be given');
-					typeof( options.label)=='string' || (options.label=$.ampere.util.ucwords( options.name));  
+					typeof( options.label)=='string' || options.label===false || (options.label=$.ampere.util.ucwords( options.name));  
 					
 					this.ensure( !this.states[ options.name], 'state named "', options.name + '" already defined module "', this.options( 'label'), '"');
 					
@@ -184,12 +183,11 @@
 					for( var i=0; i<styles.length; i++) {
 						$.ampere.util.loadStyles( '', styles[i]);
 					}
-					
 					var scripts = $.makeArray( options.resources.scripts);
 					for( var i=0; i<scripts.length; i++) {
 						if( $.isFunction( scripts[i])) {
 							this.log( 'load script function', scripts[i].name);
-							var result = scripts[i].call( $.ampere.modules[ constructor.name]);
+							var result = scripts[i].call( $.ampere.modules[ constructor]);
 							if( result!==undefined) {
 								deferreds.push( result);
 							} 
@@ -205,7 +203,7 @@
 					for( var i=0; i<templates.length; i++) {
 						if( $.isFunction( templates[i])) {
 							this.log( 'load template function', templates[i].name);
-							var result = templates[i].call( $.ampere.modules[ constructor.name]);
+							var result = templates[i].call( $.ampere.modules[ constructor]);
 							if( result!==undefined) {
 								deferreds.push( result);
 							} 
@@ -315,6 +313,8 @@
 			if( arguments.length) {
 				$.ampere.ensure( $.ampere.modules[ name], 'no ampere model named "', name , '" available');
 	
+				//options = $.extend( {}, $.ampere.modules[ name].defaults, options || {});
+				
 				var prototype =	new $.ampere.module( name, options || {});
 				this.each( function() {
 					$.data( this, 'ampere_module', prototype);
