@@ -86,7 +86,6 @@
 				var action;
 				var undoProperties = $.ampere.util.getOwnProperties( transition.state), properties;
 				action = function() {
-					debugger
 					transition.log( 'proceed to state ', target.ensure.namespace);
 					
 					if( properties) {
@@ -104,7 +103,6 @@
 					}
 					if( $.isFunction( undoAction)) {
 						return function() {
-							debugger;
 							$.extend( transition.state, undoProperties);
 							
 							undoAction.call( transition);
