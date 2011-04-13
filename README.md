@@ -1,5 +1,4 @@
-
-h2. Orangevolt Ampere is a technology do define programs by modeling your application as a state machine.
+## Orangevolt Ampere is a technology do define programs by modeling your application as a state machine.
 
 It's 
 
@@ -11,7 +10,7 @@ jquery.orangevolt-ampere is an Ampere implementation based on jQuery. This proje
 
 jquery.orangevolt-ampere utilizes:
 
-* "jQuery":http://query.com
-* "jQuery JSDefer":https://github.com/BorisMoore/jsdefer
-* "jQuery tmpl":https://github.com/jquery/jquery-tmpl
-* "jQuery datalink":https://github.com/jquery/jquery-datalink
+* [jQuery](http://query.com)
+* [jQuery JSDefer](https://github.com/BorisMoore/jsdefer)
+* [jQuery tmpl]"](https://github.com/jquery/jquery-tmpl)
+* [jQuery datalink](https://github.com/jquery/jquery-datalink)
