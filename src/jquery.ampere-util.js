@@ -151,6 +151,7 @@
 		  };
 		
 		function ucwords( s) {
+			typeof( s)=='string' || (s=''+s);
 			return s ? s.replace( 
 				/^(.)|\s(.)/g, 
 				function($1) { 

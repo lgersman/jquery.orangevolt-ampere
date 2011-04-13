@@ -16,7 +16,7 @@
 						var value = undefined;
 						if( source.checked) {
 							var data = $.tmplItem( source).data;  
-							value = data.value!==undefined ? data.value : true;
+							value = ('value' in data) ? data.value : true;
 						}
 						
 						target[ source.name] = value;
@@ -26,7 +26,7 @@
 					},
 					convertBack : function( value, source, target) {
 						var data = $.tmplItem( target).data;  
-						value = data.value!==undefined ? data.value : true;
+						value = ('value' in data) ? data.value : true;
 
 						if( equals.call( target, source[ target.name], value)) {
 							$.ampere.getViewTmplItem( $.tmplItem( target)).data.log(
@@ -47,8 +47,8 @@
 						for( var i=0; i<radios.length; i++) {
 							if( radios[i].checked) {
 								var data = $.tmplItem( radios[i]).data;  
-								value = data.value!==undefined ? data.value : (data.label || 'on').toLowerCase();
-								$(target).setField( source.name, value);
+								value = ('value' in data) ? data.value : (data.label || 'on').toLowerCase();
+								$.setField( target, source.name, value);
 								
 								$.ampere.getViewTmplItem( $.tmplItem( radios[i])).data.log(
 									'set "', source.name, '"(', typeof( value) ,') in state "', target.options( 'label'), '" to ', value, ' : ', target
@@ -61,7 +61,7 @@
 						var radios = $.makeArray( target.form[ target.name]);
 						for( var i=0; i<radios.length; i++) {
 							var data = $.tmplItem( radios[i]).data;
-							var value= data.value!==undefined ? data.value : (data.label || 'on').toLowerCase();
+							var value= ('value' in data) ? data.value : (data.label || 'on').toLowerCase();
 							
 							if( equals.call( target, value, source[ target.name])) {
 								$.ampere.getViewTmplItem( $.tmplItem( radios[i])).data.log(
@@ -78,7 +78,7 @@
 			number : function() {
 				return {
 					convert     : function( value, source, target) {
-						$(target).setField( source.name, !isNaN( parseFloat( source.value)) ? parseFloat( source.value) : 0);
+						$.setField( target, source.name, !isNaN( parseFloat( source.value)) ? parseFloat( source.value) : 0);
 						$.ampere.getViewTmplItem( $.tmplItem( source)).data.log(
 							'set "', source.name, '"(', typeof( target[ source.name]) ,') in state "', target.options( 'label'), '" to ', target[ source.name], ' : ', target
 						);
@@ -105,10 +105,10 @@
 									value.push( $( option).data( 'value'));
 								}
 							}
-							$( target).setField( source.name, value);
+							$.setField( target, source.name, value);
 						} else {
 							var option = source.options[ source.selectedIndex];
-							$(target).setField( source.name, $( option).data( 'value'));
+							$.setField( target, source.name, $( option).data( 'value'));
 						}
 					},
 					convertBack : function( value, source, target) {
@@ -225,10 +225,9 @@
 									} else if( $.isPlainObject( dataLink)) {
 										link[ element.name] = dataLink;
 									}
-									//debugger
-									if( view.state[ element.name]!=undefined && view.state[ element.name]!=null) {
-										link[ element.name].convertBack( view.state[ element.name], view.state, element);
-									}
+									
+									link[ element.name].convertBack( view.state[ element.name], view.state, element);
+								
 									break;
 								} 
 								case 'INPUT'  : {
@@ -240,8 +239,8 @@
 											} else if( $.isPlainObject( dataLink)) {
 												link[ element.name] = dataLink;
 											}
-											
-											if( view.state[ element.name]!=undefined && view.state[ element.name]!=null) {
+
+											if( element.name && element.name.length) {
 												link[ element.name].convertBack( view.state[ element.name], view.state, element);
 											}
 											break;
@@ -254,9 +253,7 @@
 												link[ element.name] = dataLink;
 											}
 											
-											if( view.state[ element.name]!=undefined && view.state[ element.name]!=null) {
-												link[ element.name].convertBack( view.state[ element.name], view.state, element);
-											}
+											link[ element.name].convertBack( view.state[ element.name], view.state, element);
 											break;
 										}
 										case 'button'  	:
@@ -275,9 +272,7 @@
 												}
 												break;
 											} else {
-												if( view.state.hasOwnProperty( element.name)) {
-													element.value = view.state[ element.name];
-												}
+												(element.name in view.state) && (element.value=view.state[ element.name]);
 											}
 											link[ element.name] = element.name;
 											break;

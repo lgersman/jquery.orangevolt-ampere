@@ -40,28 +40,32 @@
 			<dl>
 				{{field({label:'Choose a transition'})}}
 					{{group}}
-						{{radio({label : 'State One', name : '$transition', value : state.transitions.stateOne})}} 
-						{{radio({label : 'State Two', name : '$transition', value : state.transitions.stateTwo})}}
-						{{radio({label : 'State Three', name : '$transition', value : state.transitions.stateThree})}}
+						{{radio({label : 'None', name : '$transition', value : null})}} 
+						{{radio({label : 'stateOne', name : '$transition', value : state.transitions.stateOne})}} 
+						{{radio({label : 'stateTwo', name : '$transition', value : state.transitions.stateTwo})}}
+						{{radio({label : 'stateThree', name : '$transition', value : state.transitions.stateThree})}}
 					{{/group}}	
 					<div class="description">	
-						Widget sources can be 
+						Select transition to go or <strong>None</strong> for no one<br/>(check what happens to button 'Execute selected transition').
 					</div>
 				{{/field}}
 			</dl>
 		</script>
 		<script id="stateOne" type="text/x-jquery-tmpl">
+			<p>You selected state one.</p>
 		</script>
 		<script id="stateTwo" type="text/x-jquery-tmpl">
+			<p>You selected state two.</p>
 		</script>
 		<script id="stateThree" type="text/x-jquery-tmpl">
+			<p>You selected state three.</p>
 		</script>
 		<script type="text/javascript">
 		$.ampere( function() {
 			$.ampere.module( function $transition() {
 				this
 				.state( function intro()     {},{ label : false})
-				.state( function demo()      { /* this.$transition = 'pageOne'; */})
+				.state( function demo()      { this.$transition = null; })
 				.state( function stateOne()   {})
 				.state( function stateTwo()   {})
 				.state( function stateThree() {});

@@ -40,13 +40,13 @@
 			<dl>
 				{{field({label:'Choose a transition'})}}
 					{{group}}
-						{{radio({label : 'None', name : '$transition', value : undefined})}} 
+						{{radio({label : 'None', name : '$transition', value : null})}} 
 						{{radio({name : '$transition', value : 'stateOne'})}} 
 						{{radio({name : '$transition', value : 'stateTwo'})}}
 						{{radio({name : '$transition', value : 'stateThree'})}}
 					{{/group}}	
 					<div class="description">	
-						Widget sources can be 
+						Select transition to go or <strong>None</strong> for no one<br/>(check what happens to button 'Execute selected transition').
 					</div>
 				{{/field}}
 			</dl>
@@ -65,7 +65,7 @@
 			$.ampere.module( function $transition() {
 				this
 				.state( function intro()     {},{ label : false})
-				.state( function demo()      { /* this.$transition = 'pageOne'; */})
+				.state( function demo()      { this.$transition = null; })
 				.state( function stateOne()   {})
 				.state( function stateTwo()   {})
 				.state( function stateThree() {});

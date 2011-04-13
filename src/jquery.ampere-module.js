@@ -59,8 +59,15 @@
 			this.proceed = function( transition) {
 				this.ensure( transition instanceof $.ampere.transition, 'argument transition of type Transition expected');
 				this.ensure( transition.state.module===this, transition.log.namespace, ' is not part of module ', this.log.namespace);
-	
-				transition.state.$transition = transition.options( 'name');
+				
+					// set $transition only if its not already set
+					// * to the transition instance
+					// * to the transition instance name
+				
+				if( !transition.options('target') 
+					|| (transition.state[ transition.options('target')]!=transition.state.$transition && transition.state[ transition.options('target')].options('name')!==transition.state.$transition.options('name'))) {
+					transition.state.$transition = transition.options( 'name');
+				}
 				
 				var actionOption = transition.options('action');
 				if( actionOption instanceof $.ampere.action) {

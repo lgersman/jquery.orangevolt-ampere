@@ -173,7 +173,6 @@
 			};
 			$data.icon && (options.icons = { primary : $data.icon});
 			onRendered( $item, optionsTrait( options));			 
-			
 			('value' in $data) || ($data.value=($data.label || 'on').toLowerCase()); 
 			onRendered( $item, valueTrait);
 			
@@ -299,13 +298,13 @@
 			if( !Modernizr.inputtypes.number) {
 				_.push( ' class="compat number"');
 			} else {
-				debugger
+				//debugger
 				_.push( ' step="', options.step, '"');
 				('min' in $data) && _.push( ' min="', options.min, '"');
 				('max' in $data) && _.push( ' max="', options.max, '"');
 			}
 			
-			('value' in $data) || ($data.value=('min' in options) ? options.min : 0);
+			('value' in $data) || ($data.value=('min' in options) && options.min>0 ? options.min : 0);
 			_.push( ' value="',  $.encode( $data.value), '"/>');
 			return _;
 		});
@@ -327,9 +326,10 @@
 				if( typeof( __[i])!='string') {
 					var _ = [ '<dt>'];
 					var $data = __[i].data;
+					
 					var label = $item.args.label 
 						? $item.args.label 
-						: $item.args.label!==false && $data.label!==false ? $data.label || $.ampere.util.ucwords( $data.name) : false;
+						: $item.args.label!==false && $data.label!==false ? $data.label || $.ampere.util.ucwords( 'name' in $data ? $data.name : '') : false;
 					if( label) {
 						//var id = __[i].id || '';
 						

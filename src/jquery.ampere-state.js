@@ -85,7 +85,7 @@
 					function getTransition() {
 						var transition = this.state[ options.target];
 						if( transition instanceof $.ampere.transition) {
-							this.ensure( transition.state===this, 'targeted transition ', transition,' not owned by this state');
+							this.ensure( transition.state===this.state, 'targeted transition ', transition,' not owned by this state');
 							
 							return transition;
 						} else if( transition!=undefined) {
