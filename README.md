@@ -12,5 +12,5 @@ jquery.orangevolt-ampere utilizes:
 
 * [jQuery](http://query.com)
 * [jQuery JSDefer](https://github.com/BorisMoore/jsdefer)
-* [jQuery tmpl]"](https://github.com/jquery/jquery-tmpl)
+* [jQuery tmpl](https://github.com/jquery/jquery-tmpl)
 * [jQuery datalink](https://github.com/jquery/jquery-datalink)
