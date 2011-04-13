@@ -80,13 +80,14 @@
 						this.transition( this.module.states.main, {
 							action : this.action( function() {
 								var operand = this.state.module.states.main.operand;
-
+								var value   = this.state.module.value;
+								
 								return function() {
 									this.state.module.value -= operand;
 									delete this.state.module.states.main.operand;
 									
 									return function() {
-										this.state.module.value += operand;
+										this.state.module.value = value;
 										this.state.module.states.main.operand = operand;
 									};
 								};									
@@ -107,13 +108,14 @@
 						this.transition( this.module.states.main, {
 							action : this.action( function() {
 								var operand = this.state.module.states.main.operand;
-
+								var value   = this.state.module.value;
+								
 								return function() {
 									this.state.module.value += operand;
 									delete this.state.module.states.main.operand;
 									
 									return function() {
-										this.state.module.value -= operand;
+										this.state.module.value = value;
 										this.state.module.states.main.operand = operand;
 									};
 								};									
@@ -134,13 +136,14 @@
 						this.transition( this.module.states.main, {
 							action : this.action( function() {
 								var operand = this.state.module.states.main.operand;
-
+								var value   = this.state.module.value;
+								
 								return function() {
 									this.state.module.value /= operand;
 									delete this.state.module.states.main.operand;
 									
 									return function() {
-										this.state.module.value *= operand;
+										this.state.module.value = value;
 										this.state.module.states.main.operand = operand;
 									};
 								};									
@@ -161,13 +164,14 @@
 						this.transition( this.module.states.main, {
 							action : this.action( function() {
 								var operand = this.state.module.states.main.operand;
-
+								var value   = this.state.module.value;
+								
 								return function() {
 									this.state.module.value *= operand;
 									delete this.state.module.states.main.operand;
 									
 									return function() {
-										this.state.module.value /= operand;
+										this.state.module.value = value;
 										this.state.module.states.main.operand = operand;
 									};
 								};									
