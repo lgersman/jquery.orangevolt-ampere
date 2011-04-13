@@ -68,6 +68,7 @@
 					|| (transition.state[ transition.options('target')]!=transition.state.$transition && transition.state[ transition.options('target')].options('name')!==transition.state.$transition.options('name'))) {
 					transition.state.$transition = transition.options( 'name');
 				}
+				var target = transition.target;
 				
 				var actionOption = transition.options('action');
 				if( actionOption instanceof $.ampere.action) {
@@ -78,14 +79,15 @@
 						// reset history in case an auto transition was executed
 					!this.history || this.history.reset(); 
 					actionOption.call( transition);
-					transition.state.module.setState( transition.target);
+					transition.state.module.setState( target);
 					return;
 				}
 				
 				var action;
 				var undoProperties = $.ampere.util.getOwnProperties( transition.state), properties;
 				action = function() {
-					transition.log( 'proceed to state ', transition.target.ensure.namespace);
+					debugger
+					transition.log( 'proceed to state ', target.ensure.namespace);
 					
 					if( properties) {
 						$.extend( transition.state, properties);
@@ -95,13 +97,14 @@
 						properties = $.ampere.util.getOwnProperties( transition.state);
 					}
 					
-					transition.state.module.setState( transition.target, false);
+					transition.state.module.setState( target, false);
 					
 					if( transition.options('action')===$.noop) {
 						undoAction = $.noop;
 					}
 					if( $.isFunction( undoAction)) {
 						return function() {
+							debugger;
 							$.extend( transition.state, undoProperties);
 							
 							undoAction.call( transition);
