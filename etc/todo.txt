@@ -1,3 +1,0 @@
-* undo/redo in transition example : redo is wrong when state was changed in between. 
-
-* 
