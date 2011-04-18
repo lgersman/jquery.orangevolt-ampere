@@ -167,14 +167,35 @@
 			{{text}}
 		</script>
 		<script id="group" type="text/x-jquery-tmpl">
-			<dl>
-				<dt></dt>
-				<dd>
+			<dl>				
+				{{field}}
 					{{group}}
-						<button type="button">foo</button>
-						<button type="button">bar</button>
+						{{button({label:'foo'})}}
+						{{button({label:'bar'})}}
 					{{/group}}
-				</dd>
+				{{/field}}
+				{{field({label:"{orientation:'vertical'} (button)"})}}
+					{{group({orientation:'vertical'})}}
+						{{button({label:'foo'})}}
+						{{button({label:'bar'})}}
+					{{/group}}
+				{{/field}}
+				{{field({label:"{orientation:'vertical'} (radio)"})}}
+					{{group({orientation:'vertical'})}}
+						{{radio({label:'foo', name:'r0'})}}
+						{{radio({label:'bar', name:'r0'})}}
+					{{/group}}
+				{{/field}}
+				{{field({label:"{orientation:'vertical'} (checkbox)"})}}
+					{{group({orientation:'vertical'})}}
+						{{checkbox({label:'foo', name:'c0'})}}
+						{{checkbox({label:'bariton is cool', name:'c1'})}}
+						{{checkbox({label:'Drums also', name:'c2'})}}
+					{{/group}}
+				{{/field}}
+				{{field}}
+					{{text()}}
+				{{/field}}
 			</dl>
 		</script>
 		<script id="field" type="text/x-jquery-tmpl">

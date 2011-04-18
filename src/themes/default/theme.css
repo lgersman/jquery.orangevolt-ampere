@@ -45,8 +45,31 @@ body .ui-widget.ui-tooltip {
 	font-family : monospace; 
 }
 
-.ampere.module .group {
+.ampere.module >.header .group, 
+.ampere.module >.body >.state >.view .group, 
+.ampere.module >.footer .group {
 	display : inline;
+}
+
+.ampere.module >.body >.state >.view .group.horizontal {
+	display		: inline-block;
+	min-width   : 224px;
+}
+
+.ampere.module >.body >.state >.view .group.horizontal >* {
+	float		: left;
+	/*width	: 100%;*/
+}
+
+.ampere.module >.body >.state >.view .group.vertical {
+	position 	: relative;
+	display		: block;
+	min-width   : 224px;
+}
+
+.ampere.module >.body >.state >.view .group.vertical >* {
+	display : block;
+	width	: 100%;
 }
 
 .ampere.module pre {
@@ -85,6 +108,12 @@ body .ui-widget.ui-tooltip {
 	-webkit-border-radius: 4px; 
 	border-radius		 : 4px;
 	margin				 : 0;
+	display				 : inline-block;
+    padding-top			 : 9px;	
+}
+
+.ampere.module fieldset .ui-buttonset {
+	margin-right: 4px;
 }
 
 .ampere.module input[type=text], 

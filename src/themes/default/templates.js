@@ -309,12 +309,19 @@
 			return _;
 		});
 		
-		$.ampere.theme.setTemplate( 'fragments', 'group', $.noop,
-			$.extend( {}, $.tmpl.tag.wrap, {
-				'open'	: '__.push(\'<div class="group">\');',
-				'close' : '__.push(\'</div>\');'
-			})
-		);
+		$.ampere.theme.setTemplate( 'fragments', 'group', function( $item, __) {
+
+			var call=$item.calls();
+
+			__.unshift( '<div class="group ', call.data.orientation=='vertical' ? 'vertical' : 'horizontal','">');
+			__.push( '</div>');
+			
+			return call._.concat( __);
+		}, {
+			_default: { $2: "null" },
+			open: "$item.calls(__,$1,$2||{});__=[];",
+			close: "__ = $.ampere.theme.templates.fragments.group( $item, __);"
+		});
 		
 		$.ampere.theme.setTemplate( 'fragments', 'field', function( $item, __) {
 
@@ -327,9 +334,16 @@
 					var _ = [ '<dt>'];
 					var $data = __[i].data;
 					
+					/*
 					var label = $item.args.label 
 						? $item.args.label 
 						: $item.args.label!==false && $data.label!==false ? $data.label || $.ampere.util.ucwords( 'name' in $data ? $data.name : '') : false;
+					*/
+
+					var label = call.data.label 
+						? call.data.label 
+								: call.data.label!==false && $data.label!==false ? $data.label || $.ampere.util.ucwords( 'name' in $data ? $data.name : '') : false;
+
 					if( label) {
 						//var id = __[i].id || '';
 						
@@ -337,8 +351,8 @@
 					}
 					_.push( '</dt><dd');
 					
-					if( $item.args.tooltip) {
-						_.push( ' title="', $.encode( $item.args.tooltip), '"');
+					if( call.data.tooltip) {
+						_.push( ' title="', $.encode( call.data.tooltip), '"');
 					}
 					_.push( '>');
 					
@@ -348,16 +362,16 @@
 					break;
 				}
 			}
-			
+			/*
 			$item.rendered = function() {
 				//debugger;
 			};
-			
+			*/
 			__=call._.concat( __);
 			return __;
 		}, {
 			_default: { $2: "null" },
-			open: "$item.calls(__,$1,$item.args=$2||{});__=[];",
+			open: "$item.calls(__,$1,$2||{});__=[];",
 			close: "__ = $.ampere.theme.templates.fragments.field( $item, __);"
 		});
 	}

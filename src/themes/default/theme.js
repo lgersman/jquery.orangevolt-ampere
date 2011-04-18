@@ -348,7 +348,26 @@
 				}
 			});
 			
-			$( '.group', view.state.module.element).buttonset();
+			$( '>.header .group, >.body. >.state >.view .group, >.footer .group', view.state.module.element).each( function() {
+				var e = $(this);
+				//
+				e.buttonset();
+				if( e.hasClass( 'vertical')) {
+					$('.ui-button:first', e).removeClass('ui-corner-left').addClass('ui-corner-top');
+					$('.ui-button:last', e).removeClass('ui-corner-right').addClass('ui-corner-bottom');
+					/*
+					  $('*:last', this).removeClass('ui-corner-right').addClass('ui-corner-bottom');
+					  mw = 0; // max witdh
+					  $('*', this).each(function(index){
+					     w = $(this).width();
+					     if (w > mw) mw = w; 
+					  });
+					  $('*', this).each(function(index){
+					    $(this).width(mw);
+					  });
+					 */
+				} 
+			});
 			
 			$( 'dd[title]', view.state.module.element).each( function() {
 				var dd = $(this); 
