@@ -159,7 +159,8 @@
 			var $=jQuery, call, _=[], $data=$item.data;
 	
 			var id = jQuery.ampere.getViewTmplItem( $item).data.id( $item, null, 'radio');
-			_.push( '<label for="', $.encode( id), '">', $data.label!==undefined && $data.label!==null ? $data.label : $.ampere.util.ucwords( $data.value!==undefined && $data.value!==null ? $data.value : '&nbsp;'), '</label>');
+			//_.push( '<label for="', $.encode( id), '">', $data.label!==false ? $data.label||$.ampere.util.ucwords( $data.name) : '&nbsp;', '</label>');
+			_.push( '<label for="', $.encode( id), '">', $data.label!==false && $data.label!==undefined && $data.label!==null ? $data.label : $.ampere.util.ucwords( $data.label!==false && $data.value!==undefined && $data.value!==null ? $data.value : '&nbsp;'), '</label>');
 			_.push( '<input type="radio"');
 			!$data.name || (_.push( ' name="', $.encode( $data.name), '"'));
 			
@@ -169,9 +170,10 @@
 			_.push( ' id="', $.encode( id), '"');
 			
 			var options = {
-				text : $data.label ? $data.label : false
+				text : $data.label!==false ? $data.label : false
 			};
-			$data.icon && (options.icons = { primary : $data.icon});
+			//$data.icon && (options.icons = { primary : $data.icon});
+			($data.icon===undefined || $data.icon) && (options.icons = { primary : $data.icon || 'ui-icon-check'});
 			onRendered( $item, optionsTrait( options));			 
 			('value' in $data) || ($data.value=($data.label || 'on').toLowerCase()); 
 			onRendered( $item, valueTrait);
@@ -222,6 +224,7 @@
 			}
 			$data.disabled && onRendered( $item, disabledTrait);
 			$data.link     && onRendered( $item, linkTrait);
+			$data.value    && onRendered( $item, valueTrait);
 			
 			$data.required && (_.push( ' required="required"'));
 						
@@ -237,9 +240,9 @@
 			!$data.style  || (_.push( ' style="', $data.style,'"'));
 			
 			if( $data.multiple) {
-				_.push( '>', $.encode( ('' + ($data.value || '')).toLowerCase()), '</textarea>');
+				_.push( '>', $.encode( '' + ($data.value || '')), '</textarea>');
 			} else {
-				!$data.value || (_.push( ' value="',  $.encode( $data.value.toLowerCase())));
+				!$data.value || (_.push( ' value="',  $.encode( $data.value || '')));
 				_.push( '"/>');
 			}
 	
@@ -264,10 +267,11 @@
 				required : $data.required
 			};
 			onRendered( $item, optionsTrait( options));
-	
+			$data.value && onRendered( $item, valueTrait);
+			
 			!$data.style  || (_.push( ' style="', $data.style,'"'));
 			
-			_.push( ' value="',  $.encode( ('' + ($data.value || '')).toLowerCase()), '"/>');
+			_.push( ' value="',  $.encode( '' + $data.value || ''), '"/>');
 	
 			return _;
 		});
