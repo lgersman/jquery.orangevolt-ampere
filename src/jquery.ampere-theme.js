@@ -94,9 +94,8 @@
 				console.log( 'on ready');
 				debugger;
 			}*/,
-			render : function( view, layout) {
+			render : function( view, layout, flash) {
 				layout || (layout='default');
-				
 				var template = this.getTemplate( 'layouts', layout);
 
 				view.state.module.element.css( 'visibility', 'hidden');
@@ -135,10 +134,19 @@
 				view.options( 'post').call( view);
 				$.ampere.theme.postRender( view);
 				view.state.module.element.css( 'visibility', 'inherit');
+				
+				if(flash) {
+					this.flash( view, flash.message, flash.options);
+				} else{
+					this.flash( view);
+				}
 			},
 				/* can be overridden by themes */
 			preRender  : $.noop,
-			postRender : $.noop
+			postRender : $.noop,
+			flash	   : $.noop,
+			block	   : $.noop,
+			unblock	   : $.noop
 		};
 			
 		/*
