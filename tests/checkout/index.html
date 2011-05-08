@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<!--
+	  Copyright (c) 2011 Lars Gersmann (lars.gersmann@gmail.com, http://orangevolt.blogspot.com)
+	  Dual licensed under the MIT (http://www.opensource.org/licenses/mit-license.php)
+	  and GPL (http://www.opensource.org/licenses/gpl-license.php) licenses.
+	--> 
+	<head>  
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=7,chrome=1; IE=9" />
+		
+		<title>Shopping cart checkout example</title>
+		
+		<style>
+			html {
+				height 		: 100%;
+			}
+			
+			body {
+				height 		: 100%;
+				margin 		: 0;
+				overflow 	: hidden;
+			}
+		</style>
+		
+		<script type="text/javascript" src="../../lib/jquery-1.5.1.js"></script>
+		<script type="text/javascript" src="../../lib/jquery/plugins/jquery.defer.js"></script>
+		<script type="text/javascript" src="../../src/jquery.ampere-defer.js"></script>
+		
+		<script id="introduction" type="text/x-jquery-tmpl">
+			<div style="padding:10px"> 
+				<p>
+					This application shows a shopping cart checkout scenario implemented using Ampere.
+				</p>
+			</div>
+		</script>
+		<script id="cart" type="text/x-jquery-tmpl">
+			<div style="padding:10px"> 
+				<h2>Cart contents</h2>
+
+				{{if state.data}}
+				<table>
+					<thead>
+						<tr>
+							<td><!-- radio --></td>
+							<td><!-- item --></td>
+							<td><!-- options --></td>
+							<td align="right" style="color:gray">Price</td>
+							<td align="right" style="color:gray">Amount</td>
+							<td align="right" style="color:gray">Subtotal</td>
+						</tr>
+					<thead>
+					<tbody>
+					{{each state.data}}
+					<tr>
+						<td>
+							{{radio({ name:'selected', value:$value, label:false})}}
+						</td>	
+						<td>
+							<a href="${$value.url}" target="_blank">${$value.label}</a>
+						</td>
+						<td style="color:gray">
+							{{each $value.options}}
+								${$index}=${$value}
+							{{/each}}	
+						</td>
+						<td align="right" style="font-family:monospace">${$.global.format( $value.price, "c")}</td>
+						<td align="right" style="font-family:monospace">${$.global.format( $value.amount, "n0")}</td>
+						<td align="right" style="font-family:monospace">${$.global.format( $value.price * $value.amount, "c")}</td>
+					</tr>
+					{{/each}}
+					<tr>
+						<td colspan="2">
+						 	{{group}}
+								{{transition( state.transitions.cart_remove)}}
+								{{transition( state.transitions.cart_edit)}}
+							{{/group}}
+						</td>
+						<td colspan="4">
+						</td>
+					</tr>
+					</tbody>
+					<tfoot>
+					<tr>
+						<td colspan="6">
+							<hr style="margin-top:1px;margin-bottom:1px;border:0;color:gray;height:1px;background-color:gray"/>
+						</td>
+					</tr>
+					<tr>
+						<td colspan="5" align="right" style="color:gray">Total</td>
+						<td align="right" style="font-family:monospace">${$.global.format( 9999.99, "c")}</td>
+					</tr>					
+					</tfoot>					
+				</table>
+				{{else}}
+					<p>Your cart is empty.</p>
+				{{/if}}
+			</div>
+		</script>
+		
+		<script id="cart_remove" type="text/x-jquery-tmpl">
+			<div style="padding:10px"> 
+				<p>
+					Really want to remove ... from cart ?
+				</p>
+			</div>
+		</script>
+		
+		<script id="cart_edit" type="text/x-jquery-tmpl">
+			<div style="padding:10px"> 
+				<p>
+					Really want to remove ... from cart ?
+				</p>
+			</div>
+		</script>
+		
+		<script type="text/javascript">
+	
+		$.ampere( function() {
+				// this is for rendering currency in euro
+			$.global.preferCulture('de-DE');
+			
+			$.ampere.module( function master() {
+				this
+				.state( function introduction() {
+					
+				})
+				.state( function cart() {
+					this.data = this.module.options( 'cart');
+				})
+				.state( function cart_remove() {
+					
+				})
+				.state( function cart_edit() {
+					
+				});
+				
+				this.states.introduction.transition( this.states.cart, {
+					label : 'Demo'
+				});
+				
+				this.states.cart
+				.transition( this.states.cart_remove, {
+					type 	: 'manual',
+					label 	: 'Edit item',
+					icon	: 'ui-icon-pencil',
+					disabled: function() {
+						return !this.state.selected;
+					}
+				})
+				.transition( this.states.cart_edit, {
+					type 	: 'manual',
+					label 	: 'Remove item',
+					icon	: 'ui-icon-close',
+					disabled: function() {
+						return !this.state.selected;
+					}
+				});
+				
+				for( var name in this.states) {
+					var state = this.states[name];
+					if( state!==this.states.introduction) {
+						state.transition( this.states.introduction, {
+							group 	: '$global',
+							icon 	: 'ui-icon-home'
+						});
+					}
+				}
+			}, 
+			{ 
+				label    : $( 'head >title').text(),
+				state 	 : 'introduction',
+				cart	 : [{ 
+					label 	: 'Women extraordinary jeans', 
+					url   	: 'http://www.myshop.url/pants/wejeans',
+					amount  : 1,
+					options	: {
+						size  : 'W27',
+						color : 'red'
+					},
+					price	  : 38
+				}, {
+					label 	: 'Women superb tank-top', 
+					url   	: 'http://www.myshop.url/tops/tanktop',
+					amount  : 4,
+					options	: {
+						size  : 'M',
+						color : 'camouflage'
+					},
+					price	  : 9.99
+				}, {
+					label 	: 'Sunglasses "Glamour"',
+					amount  : 1,
+					url   	: 'http://www.myshop.url/glasses/glamour',
+					price	  : 7.49
+				}]
+			});
+			
+			$.when( $.ampere.theme).done( function() {
+				$( 'body').module( 'master');
+			});
+		},
+		{ 
+            debug : true//,
+            /*'jquery-ui/themes/base/jquery-ui.css',*/
+            /*'//ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/themes/redmond/jquery.ui.all.css',*/  
+            //'jquery-ui-theme'  : '//ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/themes/redmond/jquery.ui.all.css'
+        }
+		);
+		</script>
+	</head>
+	<body>
+	</body>
+</html>

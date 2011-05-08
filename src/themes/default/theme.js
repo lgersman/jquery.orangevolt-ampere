@@ -18,11 +18,17 @@
 							var data = $.tmplItem( source).data;  
 							value = ('value' in data) ? data.value : true;
 						}
-						
 						target[ source.name] = value;
 						$.ampere.getViewTmplItem( $.tmplItem( source)).data.log(
 							'set "', source.name, '"(', typeof( value) ,') in state "', target.options( 'label'), '" to ', value, ' : ', target
-						);						
+						);
+						
+							// THIS IS A HACK : if value is undefined datalink plugin doesnt call setField ...
+						if( value===undefined) {
+							$.setField( target, source.name, value);
+						}
+						
+						return value;
 					},
 					convertBack : function( value, source, target) {
 						var data = $.tmplItem( target).data;  
@@ -33,7 +39,10 @@
 								'set "', target, ' checked'
 							);
 							target.checked=true;
+							return true;
 						}
+						
+						return false;
 					}
 				};
 			},
@@ -148,6 +157,11 @@
 		);
 		styles.unshift( 'templates', 'jquery-ui/themes/base/jquery-ui.css');
 		$.ampere.util.loadStyles.apply( this, styles);
+
+		function changeFieldHandler( event, changed, newvalue) {
+			$.ampere.theme.log( 'changeField event : ', event.target);
+			notify( event.target.module.element);
+		}
 		
 		function notify( container) {
 			var view = container.find( '.body:first').tmplItem().data; 
@@ -186,6 +200,67 @@
 			
 				// TODO : cleanup tooltips. should be not necessary in real life
 			$( 'dd[title]').tooltip( 'destroy');
+			
+			$( view.state).unbind( 'changeField', changeFieldHandler);
+		};
+		
+		$.ampere.theme.block = function( view) {
+			var overlay = view.state.module.element.find( '> .overlay');
+			overlay.removeClass( 'ui-helper-hidden');
+		};
+		
+		$.ampere.theme.unblock = function( view) {
+			var overlay = view.state.module.element.find( '> .overlay');
+			overlay.addClass( 'ui-helper-hidden');
+		};
+		
+		$.ampere.theme.flash = function( view, message, options) {
+			if( message) {
+				$.ampere.util.log( $.ampere.theme.ensure.namespace + '(flash)')(
+					'"' + message + '"', options ? JSON.stringify( options) : ''
+				);
+			}
+			
+			options = options || { };
+			var flash = view.state.module.element.find( '.flash');
+			flash.is( ':visible') && flash.stop(true).fadeOut(0);
+			flash.removeClass( 'ajax');
+			flash.removeClass( 'error');
+			if( message) {
+				$( '.label', flash).text( message);
+				
+				if( options.ajax || options.error) {
+					flash.addClass( options.ajax ? 'ajax' : 'error'); 
+				}
+				
+				var icon = $( '.icon', flash);
+				icon.children().remove();
+				if( options.icon || options.ajax) {
+					var e = $('<span class="ui-icon ' + options.icon + '"></span>');
+					if( options.ajax || options.error) {
+						e.addClass( options.ajax ? 'ajax' : 'error');
+					}
+					
+					icon.append( e); 
+				} 
+
+				view.state.module.element.css( 'cursor', flash.hasClass( 'ajax') ? 'wait' : 'default');			
+				
+				/*
+				flash.stop(true).fadeIn( function() {
+					flash.css( 'opacity', '1.0');
+				});
+				*/
+				flash.show().css( 'opacity', '1.0');
+
+				if( !(options.error || options.ajax)) {
+					setTimeout( function() {
+						flash.stop(true).fadeOut();
+					}, 2000);
+				}
+			} else {
+				view.state.module.element.css( 'cursor', 'default');
+			}
 		};
 		
 		$.ampere.theme.postRender = function( view) {
@@ -272,7 +347,11 @@
 												}
 												break;
 											} else {
-												(element.name in view.state) && (element.value=view.state[ element.name]);
+												if( $.data( element, 'value')!==undefined) {
+													view.state[ element.name]=$.data( element, 'value');	
+												} else if( view.state[ element.name]!==undefined) {
+													element.value = view.state[ element.name];
+												}
 											}
 											link[ element.name] = element.name;
 											break;
@@ -302,6 +381,24 @@
 						
 						e.change( function() {
 							e.button( 'option', 'icons', e.data( this.checked ? 'checkedIcons' : 'uncheckedIcons'));
+						});
+						e.data( 'options').icons = e.data( this.checked ? 'checkedIcons' : 'uncheckedIcons');
+					}
+				} else if( e.is( ':radio')) {
+					e.data( 'checkedIcons', e.data( 'options') && e.data( 'options').icons ? e.data( 'options').icons : { 'primary' : null, 'secondary' : null });
+					
+					if( e.data( 'checkedIcons').primary) {
+						e.data( 'uncheckedIcons', $.extend( {}, e.data( 'checkedIcons')));
+						e.data( 'uncheckedIcons').primary = 'ui-icon-empty';
+						
+						e.change( function() {
+							//e.button( 'option', 'icons', e.data( this.checked ? 'checkedIcons' : 'uncheckedIcons'));
+							$( e[0].form).find( ':radio[name="' + e.attr( 'name') + '"]').each( function() {
+								var widget = $(this); 
+								if( widget.data( 'checkedIcons')) { 
+									widget.button( 'option', 'icons', widget.data( this.checked ? 'checkedIcons' : 'uncheckedIcons'));
+								}
+							});
 						});
 						e.data( 'options').icons = e.data( this.checked ? 'checkedIcons' : 'uncheckedIcons');
 					}
@@ -389,10 +486,14 @@
 			height && view.state.module.element.find( '>.body').css( 'top', height + 'px');
 			height = $( '>.footer:first', view.state.module.element).outerHeight();
 			height && view.state.module.element.find( '>.body').css( 'bottom', height + 'px');
+			
+			$( view.state).bind( 'changeField', changeFieldHandler);
 		};
+				
 		$.ampere.theme.loadTemplates( $.ampere.util.getDeferUrl( 'templates', 'theme.tmpl'));
 		
-			// update state views whenever a change occures 
+		/*
+					// update state views whenever a change occures 
 		$('body').live( 'change input', function( event) {
 			$.ampere.theme.log( 'i was changed : ', event.target);
 			var e = $( event.target).closest( '.ampere.module');
@@ -402,6 +503,7 @@
 				notify( e);
 			}
 		});
+		*/
 	}, {
 		depends : [ 'modernizr', 'jquery_ui_i18n', 'multiselect_filter', 'templates'],
 		

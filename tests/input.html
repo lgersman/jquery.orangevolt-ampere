@@ -12,19 +12,7 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=7,chrome=1; IE=9" />
 		
 		<title>Ampere input example</title>
-		
-		<style>
-			html {
-				height 		: 100%;
-			}
-			
-			body {
-				height 		: 100%;
-				margin 		: 0;
-				overflow 	: hidden;
-			}
-		</style>
-		
+				
 		<script type="text/javascript" src="../lib/jquery-1.5.1.js"></script>
 		<script type="text/javascript" src="../lib/jquery/plugins/jquery.defer.js"></script>
 		<script type="text/javascript" src="../src/jquery.ampere-defer.js"></script>
@@ -40,8 +28,8 @@
 			<dl>
 				<dt><label>Gender</label></dt>
 				<dd>
-					{{radio({ label : 'Female', name : 'gender'})}}
-					{{radio({ label : 'Male', name : 'gender'})}}	
+					{{radio({ label:'Female', icon:false, name:'gender'})}}
+					{{radio({ label:'Male', icon:false, name:'gender'})}}	
 				</dd>
 
 				<dt></dt>
@@ -52,9 +40,9 @@
 							<dt><label>Are you a programmer ?</label></dt>
 							<dd>
 								{{group}}
-									{{radio({ label : 'Yes', name : 'programmer', value : 1})}}
-									{{radio({ label : 'No', name : 'programmer', value : 0})}}
-									{{radio({ label : 'Newbie', name : 'programmer', value : -1})}}	
+									{{radio({ label:'Yes', name:'programmer', value:1})}}
+									{{radio({ label:'No', name:'programmer', value:0})}}
+									{{radio({ label:'Newbie', name:'programmer', value:-1})}}	
 								{{/group}}
 							</dd>
 					</fieldset>	
@@ -68,7 +56,7 @@
 							<dt><label>Favorite food</label></dt>
 							<dd>
 								{{each [ 'meat', 'vegetables', 'bread', 'pizza']}}
-									{{radio({ value : $value, name : 'food'})}}
+									{{radio({ value:$value, icon:false, name:'food'})}}
 								{{/each}}
 							</dd>
 						</dl>
@@ -84,7 +72,7 @@
 							<dd>
 								{{group}}
 									{{each ({ 'Wodka Orange' : 'wodka_o' , 'Cuba Libre' : 'cuba_libre', 'Coke' : 'coke', 'Martini' : 'martini'})}}
-										{{radio({ label : $index, name : 'drink', value : $value})}}
+										{{radio({ label:$index, icon:false, name:'drink', value:$value})}}
 									{{/each}}	
 								{{/group}}
 							</dd>
@@ -93,7 +81,7 @@
 				</dd>
 			
 				<dt><label>Single radio with icon</label></dt>
-				<dd>{{radio({ name : 'single', icon : 'ui-icon-person'})}}</dd>
+				<dd>{{radio({ name : 'single', icon : 'ui-icon-person', label : false})}}</dd>
 			</dl>
 		</script>
 		<script id="checkbox" type="text/x-jquery-tmpl">
@@ -362,9 +350,9 @@
 				.transition( this.states.field)
 				.transition( this.states.disabled);
 			}, 
-			{ 
-				label    : 'Input controls',
-				//history  : false,
+			{
+				label    : $( 'head >title').text(),
+				about    : $('<div><a target="_blank" href="https://github.com/lgersman/jquery.orangevolt-ampere">Ampere</a> - Copyright© 2011 by <a target="_blank" href="http://www.orangevolt.com">Orangevolt</a>.</div>'),
 				state    : 'main',
 				cmpByType2 : cmpByType
 			});

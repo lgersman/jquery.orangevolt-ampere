@@ -11,19 +11,7 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta http-equiv="X-UA-Compatible" content="IE=7,chrome=1; IE=9" />
 		
-		<title>Ampere $transition example</title>
-		
-		<style>
-			html {
-				height 		: 100%;
-			}
-			
-			body {
-				height 		: 100%;
-				margin 		: 0;
-				overflow 	: hidden;
-			}
-		</style>
+		<title>Orangevolt Ampere $transition Feature example 2</title>
 		
 		<script type="text/javascript" src="../lib/jquery-1.5.1.js"></script>
 		<script type="text/javascript" src="../lib/jquery/plugins/jquery.defer.js"></script>
@@ -40,10 +28,10 @@
 			<dl>
 				{{field({label:'Choose a transition'})}}
 					{{group}}
-						{{radio({label : 'None', name : '$transition', value : null})}} 
-						{{radio({label : 'stateOne', name : '$transition', value : state.transitions.stateOne})}} 
-						{{radio({label : 'stateTwo', name : '$transition', value : state.transitions.stateTwo})}}
-						{{radio({label : 'stateThree', name : '$transition', value : state.transitions.stateThree})}}
+						{{radio({icon:false, label:'None', name:'$transition', value:null})}} 
+						{{radio({icon:'ui-icon-triangle-1-e', label:'stateOne', name:'$transition', value:state.transitions.stateOne})}} 
+						{{radio({icon:'ui-icon-triangle-1-e', label:'stateTwo', name:'$transition', value:state.transitions.stateTwo})}}
+						{{radio({icon:'ui-icon-triangle-1-e', label:'stateThree', name:'$transition', value:state.transitions.stateThree})}}
 					{{/group}}	
 					<div class="description">	
 						Select transition to go or <strong>None</strong> for no one<br/>(check what happens to button 'Execute selected transition').
@@ -88,7 +76,7 @@
 			}, 
 			{ 
 				state    : 'intro',
-				label    : 'Orangevolt Ampere $transition Feature'
+				label    :  $( 'head >title').text()
 			});
 			
 			$.when( $.ampere.theme).done( function() {

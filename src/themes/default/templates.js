@@ -130,6 +130,9 @@
 			
 			_.push( '<button type="button"');
 			
+			('id' in $data) && _.push( ' id="', $.encode( $data.id), '"');
+			('name' in $data) && _.push( ' name="', $.encode( $data.name), '"');
+			
 			var options = {
 				text : $data.label ? $data.label : false
 			};
@@ -224,7 +227,7 @@
 			}
 			$data.disabled && onRendered( $item, disabledTrait);
 			$data.link     && onRendered( $item, linkTrait);
-			$data.value    && onRendered( $item, valueTrait);
+			typeof( $data.value)=='string' && onRendered( $item, valueTrait);
 			
 			$data.required && (_.push( ' required="required"'));
 						
@@ -267,7 +270,7 @@
 				required : $data.required
 			};
 			onRendered( $item, optionsTrait( options));
-			$data.value && onRendered( $item, valueTrait);
+			typeof( $data.value)=='string' && onRendered( $item, valueTrait);
 			
 			!$data.style  || (_.push( ' style="', $data.style,'"'));
 			

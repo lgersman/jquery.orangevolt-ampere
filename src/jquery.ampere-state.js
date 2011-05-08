@@ -67,7 +67,9 @@
 					}
 				}
 				
-				options.type || (options.type='primary'); 
+				options.type || (options.type='primary');
+				
+				options.group || (options.group='default'); 
 				
 				this.ensure( !this.transitions[ options.name], 'transition named "', options.name + '" already defined state "', this.options( 'label'), '"');
 				
@@ -178,24 +180,79 @@
 				/**
 				 * declares an action
 				 */
-			this.action = function( /*function*/ logic) {
+			this.action = function( /*function*/ logic, options) {
 				this.ensure( $.isFunction( logic), 'parameter "logic" expected to be a function');
 				
-				return new $.ampere.action( logic);
+				return new $.ampere.action( logic, options);
+			};
+			
+			this.getTransitionGroups = function( type, /*string|regexp*/group) {
+				type = type || 'primary';
+				
+				group = group || /.+/;
+				this.ensure( typeof( group)=='string' || $.isFunction( group.test), 'argument group (', group, ') of type string or regexp expected.');
+				
+				var groups = [];
+				
+				for( var name in this.transitions) {
+					var transition = this.transitions[ name];
+					if( transition.options('type')==type) {
+						var _group = transition.options('group');
+						if( $.inArray( _group, groups)==-1 && ($.isFunction( group.test) ? group.test( _group) : group==_group)) {
+							groups.push( _group);
+						}
+					}
+				}
+				
+				return groups;
 			};
 			
 				/**
-				 * returns 
+				 * returns transitions by type
 				 */
-			this.hasTransitions = function( type) {
+			this.hasTransitions = function( type, /*string|regexp*/group) {
+				type = type || 'primary';
+				
+				group = group || /.+/;
+				this.ensure( typeof( group)=='string' || $.isFunction( group.test), 'argument group (', group, ') of type string or regexp expected.');
+				
 				for( var name in this.transitions) {
 					var transition = this.transitions[ name];
-					if( type===undefined || transition.options('type', 'primary')=='primary') {
-						return true;
+					if( transition.options('type')==type) {
+						if( $.isFunction( group.test) && group.test( transition.options('group'))) {
+							return true;
+						} else if( group==transition.options('group')) {
+							return true; 
+						} 
 					}
 				}
 				
 				return false;
+			};
+			
+				/**
+				 * returns transitions by type
+				 */
+			this.getTransitions = function( type, /*string|regexp*/group) {
+				type = type || 'primary';
+				
+				group = group || /.+/;
+				this.ensure( typeof( group)=='string' || $.isFunction( group.test), 'argument group (', group, ') of type string or regexp expected.');
+				
+				var transitions = [];
+				
+				for( var name in this.transitions) {
+					var transition = this.transitions[ name];
+					if( transition.options('type')==type) {
+						if( $.isFunction( group.test)) {
+							group.test( transition.options('group')) && transitions.push( transition); 
+						} else {
+							group==transition.options('group') && transitions.push( transition); 
+						} 
+					}
+				}
+				
+				return transitions;
 			};
 		};
 	}

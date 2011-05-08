@@ -90,22 +90,29 @@
 				}		
 					
 				var redo = (action || (this.canRedo() ? this.stack[ this.position] : undefined));
-				var undo = redo ? redo() : undefined;
-								
-				if( undo) { 
-					if( action) {
-						this.stack.splice( this.position); 	// cleanup recent redo actions
-						this.stack.push( undo);
-						this.position = this.stack.length;
-					} else if( this.canRedo()){
-						this.stack[ this.position++] = undo;// point to next redo action
-					}
-				} else if( redo) {							// cleanup recent undo actions	
-					this.stack.splice( 0, this.position);
-					this.position = this.stack.length; 
-				}
 				
-				redo && dontCallback!==false && this.options.callback.call( this, 'redo', redo, undo);
+				var deferred = $.Deferred(); 
+				var undo = redo ? redo( deferred) : undefined;
+
+				var history = this;
+				$.when( redo ? deferred : undefined).done( function() {
+					if( undo) { 
+						if( action) {
+							history.stack.splice( history.position); 	// cleanup recent redo actions
+							history.stack.push( undo);
+							history.position = history.stack.length;
+						} else if( history.canRedo()){
+							history.stack[ history.position++] = undo;// point to next redo action
+						}
+					} else if( redo) {							// cleanup recent undo actions	
+						history.stack.splice( 0, history.position);
+						history.position = history.stack.length; 
+					}
+					
+					var flash = arguments.length ? { message : arguments[0] } : undefined;
+					
+					redo && dontCallback!==false && history.options.callback.call( history, 'redo', redo, undo, flash);					
+				});
 				
 				return this;
 			};
@@ -119,14 +126,22 @@
 			this.undo = function( dontCallback) {
 				if( this.canUndo()) {
 					var undo = this.stack[ --this.position];
-					var redo = undo();
-					if( redo) {
-						this.stack[ this.position] = redo;	// replace undo by its returned redo action
-					} else {								// cleanup recent redo actions
-						this.stack.splice( this.position);
-					}
 					
-					dontCallback!==false && this.options.callback.call( this, 'undo', undo, redo);
+					var deferred = $.Deferred(); 
+					var redo = undo( deferred);
+					
+					var history = this;
+					$.when( deferred).done( function() {
+						if( redo) {
+							history.stack[ history.position] = redo;	// replace undo by its returned redo action
+						} else {								// cleanup recent redo actions
+							history.stack.splice( history.position);
+						}
+						
+						var flash = arguments.length ? { message : arguments[0] } : undefined;
+						
+						dontCallback!==false && history.options.callback.call( history, 'undo', undo, redo, flash);
+					});
 				}
 				
 				return this;

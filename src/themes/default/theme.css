@@ -6,12 +6,64 @@
 
 .ampere.module {
 	position  	: relative;
-	min-width 	: 300px;
-	min-height	: 200px;
 	height		: 100%;
 	font-size   : 12.8px;
     line-height : 1.3em;
-    color		: #333333;
+    color		: #333333;    
+    /* bad for draggables 
+      cursor		: default;
+     */
+}
+
+.ampere.module, .ampere.dialog {
+	min-width 	: 300px;
+	min-height	: 200px;
+}
+
+.ampere.module img {
+	vertical-align : middle; 
+}
+
+html.ampere.fullscreen {
+	height 		: 100%;
+}
+
+html.ampere.fullscreen body {
+	height 		: 100%;
+	margin 		: 0;
+	overflow 	: hidden;
+	background-color: white;
+}
+
+/* applied to iframes created by ampere.openDialog */
+iframe.ampere.module {
+	padding : 0;
+	border	: 0;
+	height	: 100%;
+	left	: 0;
+	position: absolute;
+	top		: 0;
+	width	: 100%;
+}
+
+/* 
+	applied to elements wrapping a ampere module in a dialog style fashion.
+	usually this happens if the module is wrapped in a iframe 
+*/
+.ampere.dialog {
+	background-color : white;
+	position		 : absolute;
+	border   		 : 1px solid #AAAAAA;
+	width			 : 80%;
+	height			 : 80%;
+}
+
+.ampere.dialog.ui-resizable {
+	padding  		 : 10px;
+}
+
+.ampere.dialog.ui-draggable >.ampere.module >.header {
+	cursor 			 : move;
 }
 
 .ampere.module .ui-icon-empty {
@@ -45,11 +97,13 @@ body .ui-widget.ui-tooltip {
 	font-family : monospace; 
 }
 
+/*
 .ampere.module >.header .group, 
 .ampere.module >.body >.state >.view .group, 
-.ampere.module >.footer .group {
-	display : inline;
+.ampere.module >.footer >.controls >.group {
+	display 	 : inline;
 }
+*/
 
 .ampere.module >.body >.state >.view .group.horizontal {
 	display		: inline-block;
@@ -109,7 +163,7 @@ body .ui-widget.ui-tooltip {
 	border-radius		 : 4px;
 	margin				 : 0;
 	display				 : inline-block;
-    padding-top			 : 9px;	
+    padding-top			 : 9px;
 }
 
 .ampere.module fieldset .ui-buttonset {
@@ -206,12 +260,66 @@ textarea:disabled, input:disabled {
 
 .ampere.module >.footer >.controls >*, .ampere.module >.header >.controls >* {
 	float		: right;
-	margin-right: 4px;
+	margin-right: 8px;
+}
+
+.ampere.module >.footer >.controls, .ampere.module >.header >.controls {
+	margin-right: -4px;
 }
 
 .ampere.module >.footer .about {
-	font-weight	: normal;
-	color       : #333333;
+	font-weight		: normal;
+	color       	: #333333;
+}
+
+.ampere.module >.footer .about,
+.ampere.module >.footer .about * {
+	white-space 	: nowrap;
+	text-overflow	: ellipsis;	
+	overflow		: hidden;
+	-o-text-overflow: ellipsis;
+}
+
+.ampere.module >.flash {
+	position		: fixed;
+	top				: 0.6em;
+	width			: 50%;
+	margin-left		: 25%;
+	text-align		: center;
+	white-space		: nowrap;
+	text-overflow	: ellipsis;	
+	overflow		: hidden;
+	-o-text-overflow: ellipsis;
+	background-color: #FFF1A8;
+	border			: 5px solid #FFF1A8;	
+}
+
+.ampere.module >.flash.error {
+	background-color: Crimson;
+	border-color    : Crimson;
+	color			: white;
+    font-weight		: bold;
+} 
+
+.ampere.module >.flash.ajax >.controls >.icon >.ui-icon {
+	background: url("images/ajax.gif") no-repeat scroll 50% 60% transparent;
+}
+
+.ampere.module >.flash.ajax {
+	background-color: White;
+	border-color    : White;
+	color			: #333333;
+} 
+
+.ampere.module >.flash >.controls {
+	overflow : hidden;
+}
+
+.ampere.module >.flash >.controls >.icon {
+	display			: inline-block;
+	vertical-align	: top;
+	margin-left		: -4px;
+	margin-right	: 0;
 }
 
 .ampere.module >.footer >.controls +.about {

@@ -13,12 +13,25 @@
 			 * @see State#action
 			 * @see Module#proceed
 			 */
-		$.ampere.action = function action( /*function*/logic) {
-			this.logic = logic;
+		$.ampere.action = function action( /*function*/logic, /*Object*/options) {
+			this.logic 	 = logic;
 			
-			if( this.logic.name) {
-				this.name = logic.name;
+			options || (options={});
+			
+			if( this.logic.name && !options.name) {
+				options.name = logic.name;
 			}
+			
+			options = $.extend( {}, logic, options);
+			
+			this.options = function( key, _default) {
+				switch( arguments.length) {
+					case 0  : return options;
+					case 1  : return options[ key];
+					case 2  : return key in options ? options[ key] : _default;
+					default : return options;
+				}
+			};
 		};
 	}
 ));

@@ -7,7 +7,7 @@
 jQuery.deferDef({
 	ampere 			: {
 		url 	: 'jquery.ampere.js',
-		depends : [ 'json', 'tmplplus', 'globalization', 'datalink']
+		depends : [ 'json', 'tmplplus', 'globalization_data', 'datalink']
 	},
 		
 	json 			: { 
@@ -27,6 +27,12 @@ jQuery.deferDef({
 	globalization 	: {
 		url 	: '../lib/jquery/plugins/jquery.global.js',
 		bare 	: true
+	},
+	
+	globalization_data 	: {
+		url 	: '../lib/jquery/plugins/globalization.all.js',
+		bare 	: true,
+		depends : [ 'globalization']
 	},
 	
 	datalink	 	: {

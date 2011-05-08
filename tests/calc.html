@@ -12,19 +12,7 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=7,chrome=1; IE=9" />
 		
 		<title>Ampere calc example</title>
-		
-		<style>
-			html {
-				height 		: 100%;
-			}
-			
-			body {
-				height 		: 100%;
-				margin 		: 0;
-				overflow 	: hidden;
-			}
-		</style>
-		
+				
 		<script type="text/javascript" src="../lib/jquery-1.5.1.js"></script>
 		<script type="text/javascript" src="../lib/jquery/plugins/jquery.defer.js"></script>
 		<script type="text/javascript" src="../src/jquery.ampere-defer.js"></script>
@@ -38,7 +26,7 @@
 				<tr>
 					{{each( $index, $col) [1,2,3]}}
 						<td>
-							{{radio({ label : $row*3 + $col, name : 'operand', value : $row*3 + $col})}}
+							{{radio({ label:$row*3 + $col, icon:false, name:'operand', value:$row*3 + $col})}}
 						</td>
 					{{/each}}
 				</tr>
@@ -46,7 +34,7 @@
 				<tr>
 					<td></td>
 					<td>
-						{{radio( { label : '0', value : 0, name : 'operand'})}}
+						{{radio( { label:'0', icon:false, value:0, name:'operand'})}}
 					</td>
 					<td>
 						{{transition( state.transitions.main)}}
@@ -225,11 +213,12 @@
 				}, 
 				{ 
 					label    : 'Calculator',
-					state    : 'main:',
 					/*history  : false,*/ 
 					resources: {
 						styles  : [ 'calc.css']
-					}
+					},
+					label    : $('head >title').text(),
+					about    : $('<div><a target="_blank" href="https://github.com/lgersman/jquery.orangevolt-ampere">Ampere</a> - Copyright© 2011 by <a target="_blank" href="http://www.orangevolt.com">Orangevolt</a>.</div>')
 				}
 			);
 			

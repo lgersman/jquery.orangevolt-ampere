@@ -14,13 +14,17 @@
 			this.element = element.jquery ? element : $( element);
 			this.element.addClass( 'ampere module');
 			this.element.data( 'ampere_module', this);
+
+			if( element.tagName=='BODY') {
+				$(window.document.documentElement).addClass('ampere').addClass( 'fullscreen');
+			}
 			
 				// create history 
 			this.history = this.options( 'history')===undefined || this.options( 'history')==true ? $.ampere.history({
-				callback : $.proxy( function( command, action, result) {
+				callback : $.proxy( function( command, action, result, flash) {
 					if( command=='undo' || command=='redo') {
 						var view = this.getState().getView();
-						$.ampere.theme.render( view);
+						$.ampere.theme.render( view, /*layout*/undefined, flash);
 					}
 				}, this)
 			}) : false;
@@ -31,7 +35,7 @@
 				return _state;
 			};
 	
-			this.setState = function( state, view) {
+			this.setState = function( state, view, layout, flash) {
 				this.ensure( state instanceof $.ampere.state, 'argument state of type state expected');
 				this.ensure( state.module===this, state.ensure.namespace, ' is not part of module ', this.ensure.namespace);
 				
@@ -52,8 +56,33 @@
 						// otherwise proceed setting given state as current one				
 					view = (view instanceof $.ampere.view) ? view : state.getView( view);
 					
-					$.ampere.theme.render( view);
+					$.ampere.theme.render( view, layout, flash);					
 				}
+			};
+			
+			this.flash = function( message, options) {
+				var tmplItem = view.state.module.element.find( '.state:first').tmplItem();
+				$.ampere.theme.flash( tmplItem.data, message, options);
+
+				if( options && options.error) {
+					this.block();
+				} 
+				
+				return this;
+			};
+			
+			this.block = function() {
+				var tmplItem = view.state.module.element.find( '.state:first').tmplItem();
+				$.ampere.theme.block( tmplItem.data);
+				
+				return this;
+			};
+			
+			this.unblock = function() {
+				var tmplItem = view.state.module.element.find( '.state:first').tmplItem();
+				$.ampere.theme.unblock( tmplItem.data);
+				
+				return this;
 			};
 			
 			this.proceed = function( transition) {
@@ -69,54 +98,132 @@
 					transition.state.$transition = transition.options( 'name');
 				}
 				var target = transition.target;
+					
+					// switch on user input blocking
+				this.block();
 				
 				var actionOption = transition.options('action');
 				if( actionOption instanceof $.ampere.action) {
 					actionOption = actionOption.logic.call( transition);
-				}  
-	
-				if( !this.history || transition.options( 'type')=='auto') {
-						// reset history in case an auto transition was executed
-					!this.history || this.history.reset(); 
-					actionOption.call( transition);
-					transition.state.module.setState( target);
-					return;
+					actionOption = $.isFunction( actionOption) ? actionOption : $.noop; 
 				}
 				
-				var action;
-				var undoProperties = $.ampere.util.getOwnProperties( transition.state), properties;
-				action = function() {
-					transition.log( 'proceed to state ', target.ensure.namespace);
-					
-					if( properties) {
-						$.extend( transition.state, properties);
-					}
-					var undoAction = actionOption.call( transition);
-					if( !properties) {
-						properties = $.ampere.util.getOwnProperties( transition.state);
-					}
-					
-					transition.state.module.setState( target, false);
-					
-					if( transition.options('action')===$.noop) {
-						undoAction = $.noop;
-					}
-					if( $.isFunction( undoAction)) {
-						return function() {
-							$.extend( transition.state, undoProperties);
-							
-							undoAction.call( transition);
-							transition.state.module.setState( transition.state, false);
-							return action;
-						};
-					} else {
-						transition.state.module.history.reset();
-						//transition.state.module.ensure( !undoAction, 'dont know how to handle undo return value of transition ', transition.log.namespace);
-					}
+				var promise = function( obj) {
+					return (obj && $.isFunction( obj.promise) ? obj : $.when());
 				};
 				
-				this.history.redo( action);
+				var reject = function( delegate) {
+					return function() {
+						args = $.makeArray( arguments).join( '');
+						module.flash( args, { error : true});
+
+						delegate && delegate.reject.apply( delegate, arguments);
+					};
+				};
+				
+				var module = this;
+				promise( actionOption).then( function() {
+					if( !module.history || transition.options( 'type')=='auto') {
+							// reset history in case an auto transition was executed
+						!module.history || module.history.reset();
+						var result = actionOption.call( transition);
+						$.when( result).then( function() {
+							var flash = {};
+							if( arguments.length && !$.isFunction( this.xhr)) {
+								flash.message = arguments[0];
+								flash.options = arguments.length==2 ? arguments[1] : undefined; 
+							}
+							module.setState( target, true, undefined, flash);
+						}, reject());
+						
+						return result;
+					}
+					
+					var action;
+					var undoProperties = $.ampere.util.getOwnProperties( transition.state), properties;
+					action = function( deferred) {
+						module.block();
+						transition.log( 'proceed to state ', target.ensure.namespace);
+						
+						if( properties) {
+							$.extend( transition.state, properties);
+						}
+						var undoAction = actionOption.call( transition);
+						
+						promise( undoAction).then( function() {
+							if( !properties) {
+								properties = $.ampere.util.getOwnProperties( transition.state);
+							}
+							
+							module.setState( target, false);
+							
+							if( transition.options('action')===$.noop) {
+								undoAction = $.noop;
+							}
+							
+							deferred.resolve.apply( deferred, arguments.length && !$.isFunction( this.xhr) ? [$.makeArray( arguments).join( '')] : undefined);
+						}, reject( deferred));
+						
+						if( $.isFunction( undoAction)) {
+							return function( deferred) {
+								module.block();
+								$.extend( transition.state, undoProperties);
+								
+								promise( undoAction.call( transition)).then( function() {
+									module.setState( transition.state, false);
+									
+									deferred.resolve.apply( deferred, arguments.length && !$.isFunction( this.xhr) ? [$.makeArray( arguments).join( '')] : undefined);
+								}, reject( deferred));
+								
+								return action;
+							};
+						} else {
+							module.history.reset();
+							//transition.state.module.ensure( !undoAction, 'dont know how to handle undo return value of transition ', transition.log.namespace);
+						}							
+					};
+					
+					module.history.redo( action);
+				}, reject());
 			};
+			
+			
+			this.openModule = function( url, options) {
+				this.ensure( typeof( url)=='string', 'argument url expected to be a string');
+				
+				url = url + '#'
+				
+				options || (options={ mode : 'dialog', 'resizable':true});
+				switch( options.mode) {
+					case 'dialog' : {
+						url += 'm-d$'
+							
+						if( options.resizable)	
+							url += 'r$'
+							
+						break;
+					}
+					case 'fullscreen' : {
+						break;
+					}
+					default 	  : {
+						this.ensure( false, 'openModule() : option "mode" expected to be "dialog"(default) or "fullscreen"');
+					} 
+				}
+				
+				var iframe = $('<iframe class=".ui-helper-hidden-accessible ampere module" src="' + url + '"></iframe>');
+				iframe.appendTo( 'body');
+				
+				return {
+					show : function() {
+						iframe.removeClass( 'ui-helper-hidden-accessible');
+					},
+					hide : function() {
+						iframe.addClass( 'ui-helper-hidden-accessible');
+					}
+				};
+			}
+
 			
 			// set initial state
 			var state = this.options( 'state');

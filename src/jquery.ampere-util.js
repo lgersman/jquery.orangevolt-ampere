@@ -160,6 +160,17 @@
 			) : undefined;
 		}
 		
+		function getParam( name, _default) {
+			name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+	        var regexS = "[\\?&]"+name+"=([^&#]*)";
+	        var regex = new RegExp( regexS );
+	        var results = regex.exec( window.location.href);
+	        if( results == null )
+	          return arguments.length==1 ? undefined : _default;
+	        else
+	          return results[1];
+	    }
+		
 		function getOwnProperties( obj) {
 			var properties = {};
 			for( var i in obj) { 
@@ -203,17 +214,53 @@
 			}
 		};
 		
+		function getHashParams( _defaults) {
+			var hash = window.location.hash;
+			
+			if( hash) {
+				hash = hash.substring( 1);
+				var tokens = hash.split( '$');
+				
+				var params = {};
+				for( var index in tokens) {
+					var token = tokens[index];
+					if( token.length) {
+						var matches = token.match( /([^\-]+)(-(.+))?/);
+						if( matches) {
+							params[ matches[1]] = matches[3] ? matches[3] : true;  
+						}
+					}
+				}
+				return $.extend( {}, _defaults, params);
+			}
+			
+			return $.extend( {}, _defaults);
+		}
+		
 		$.ampere.util = {
-			isDate  	: isDate,
-			isNaN   	: isNaN,
-			keys    	: keys,
-			equals  	: equals,
-			ucwords 	: ucwords,
-			loadStyles	: loadStyles,
-			ensure 		: ensure,
-			log			: log,
-			getDeferUrl : getDeferUrl,
-			getOwnProperties : getOwnProperties 
+			isDate  		: isDate,
+			isNaN   		: isNaN,
+			keys    		: keys,
+			equals  		: equals,
+			ucwords 		: ucwords,
+			loadStyles		: loadStyles,
+			ensure 			: ensure,
+			log				: log,
+			getDeferUrl 	: getDeferUrl,
+			getOwnProperties: getOwnProperties,
+			getParam 		: getParam,
+			getHashParams	: getHashParams,
+			regexp			: {
+				not : function( regexp) {
+					negotiation = { 
+						test : function( s) {
+							return !regexp.test( s);
+						} 
+					};
+					
+					return negotiation;
+				}
+			}
 		};
 	}
 ));

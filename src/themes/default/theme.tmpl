@@ -3,34 +3,6 @@
   Dual licensed under the MIT (http://www.opensource.org/licenses/mit-license.php)
   and GPL (http://www.opensource.org/licenses/gpl-license.php) licenses.
 -->
-<!--
-<script id="ampere_theme_fragment_transition" type="text/x-jquery-tmpl">
-	{{if !$item.layout || $item.layout=='button'}}
-	<button 
-		class="transition ${options('name')}" 
-		type="button"
-		data-options='{ {{if options('icon')}}"icons" : { "primary" : "${options('icon')}"} {{/if}} {{if !$data.options('label')}}${ options('icon') ? ', ' : ''} "text" : false{{/if}} }'
-		{{if $data.disabled()}} 
-			disabled="disabled"
-		{{/if}}	
-	>
-		${options( 'label')} 
-	</button>
-	{{/if}}
-</script>
--->
-<!--
-<script id="ampere_theme_fragment_reset" type="text/x-jquery-tmpl">
-	<button 
-		class="reset" 
-		type="button"
-		data-options='{ "icons" : { "primary" : "ui-icon-refresh"}, "text" : false}'
-		title="Reset"
-		onclick="$.ampere.getViewTmplItem( $.tmplItem( this)).data.reset( this)"
-		disabled="disabled"
-	>&nbsp;</button>
-</script>
--->
 <script id="ampere_theme_fragment_history" type="text/x-jquery-tmpl">
 	{{if history}} 
 	<div class="history group">
@@ -59,66 +31,10 @@
 	</div>
 	{{/if}}
 </script>
-<!--
-<script id="ampere_theme_fragment_radio" type="text/x-jquery-tmpl">
-	<dt>	
-		<label for="{{id( 'radio')}}">
-		${ $data.label || $.ampere.ucwords(($data.value || '&nbsp;'))}
-		</label>
-	</dt>
-	<dd>
-	<input 
-		type="radio" 
-		name="${ name}" 
-		id="{{id( 'radio')}}"
-		data-options='{ {{if $data.icon}}"icons" : { "primary" : "${ $data.icon}"} {{/if}} {{if !$data.label}}${ $data.icon ? ',' : ''} "text" : false{{/if}} }'
-		value="${ $data.value || ($data.label || 'on').toLowerCase()}"
-	/>
-	</dd>
-</script>
--->
-<!--
-<script id="ampere_theme_fragment_checkbox" type="text/x-jquery-tmpl">
-	<dt>
-		<label for="{{id( 'checkbox')}}">
-		${ $data.label || '&nbsp;'} 
-		</label>
-	</dt>
-	<dd>
-	<input 
-		type="checkbox" 
-		name="${ name}" 
-		id="{{id( 'checkbox')}}"
-		data-options='{ {{if $data.icon===undefined || $data.icon}}"icons" : { "primary" : "${ $data.icon || 'ui-icon-check'}"} {{/if}} {{if !$data.label}}, "text" : false{{/if}} }'
-		value="${ ($data.value || true).toLowerCase()}"
-	/>
-	</dd>
-</script>
--->
-<!--
-<script id="ampere_theme_fragment_select" type="text/x-jquery-tmpl">
-	<dt>
-		{{if $data.label}}
-		<label for="{{id( 'select')}}">
-		${ $data.label} 
-		</label>
-		{{/if}}
-	</dt>
-	<dd>	
-		<select id="{{id('select')}}">
-			<option>Dog</option>
-			<option>Cat</option>
-			<option>Bird</option>
-		</select>
-	</dd>
-</script>
--->
-
 <script id="ampere_theme_view_default" type="text/x-jquery-tmpl">
 	<div>
 	</div>
 </script>
-
 <script id="ampere_theme_layout_default" type="text/x-jquery-tmpl">
 	<div class="header ui-widget-header ui-corner-bottom1">
 			{{if state.module.options( 'icon')}}	
@@ -131,9 +47,18 @@
 					${state.options( 'label')} 
 				{{/if}}
 			</div>
-			<div class="controls">  
+			<div class="controls">
+				{{if state.hasTransitions( 'primary', /^\$global$/)}}
+					{{group}}
+						{{each state.getTransitions( 'primary', /^\$global$/)}}
+							{{transition( $value)}}
+						{{/each}}
+					{{/group}}			
+				{{/if}}
 				{{history( state.module)}}
-				{{button({ icon:'ui-icon-refresh', label:false, disabled:reset.disabled, onclick:reset})}}
+				{{group}}
+					{{button({ icon:'ui-icon-refresh', label:false, disabled:reset.disabled, onclick:reset})}}
+				{{/group}}									
 			</div>
 	</div>
 	<div class="body">
@@ -143,17 +68,17 @@
 				</div>
 		</form>
 	</div>
-	{{if state.hasTransitions( 'primary') || state.module.options( 'about')}}
+	{{if state.hasTransitions( 'primary', $.ampere.util.regexp.not( /^\$global$/)) || state.module.options( 'about')}}
 	<div class="footer ui-widget-header ui-corner-top1">
-		{{if state.hasTransitions( 'primary')}}
+		{{if state.hasTransitions( 'primary', $.ampere.util.regexp.not( /^\$global$/))}}
 		<div class="controls">
-			<div class="transitions group">
-			{{each state.transitions}}
-				{{if $value.options('type')=='primary'}}
+			{{each state.getTransitionGroups( 'primary', $.ampere.util.regexp.not( /^\$global$/)).reverse()}}
+				<div class="transitions group ${value}">
+				{{each state.getTransitions( 'primary', $value)}}
 					{{transition( $value)}}
-				{{/if}}
+				{{/each}}
+				</div>			
 			{{/each}}			
-			</div>
 		</div>
 		{{/if}}
 		{{if state.module.options( 'about')}}
@@ -162,5 +87,12 @@
 			</div>
 		{{/if}}		
 	</div>
-	{{/if}}	
+	{{/if}}
+	<div class="overlay ui-widget-overlay ui-helper-hidden"/>
+	<span class="flash ui-corner-all ui-helper-hidden">
+		<span class="controls">
+			<span class="icon"></span>
+			<span class="label"></span>
+		</span>	
+	</span>	
 </script>
