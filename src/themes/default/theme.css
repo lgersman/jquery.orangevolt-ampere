@@ -184,6 +184,10 @@ body .ui-widget.ui-tooltip {
 	min-width			 : 213px;
 }
 
+.ampere.module button {
+	white-space: nowrap;
+}
+
 .ampere.module input[type=number] {
 	min-width			 : 220px;
 }
