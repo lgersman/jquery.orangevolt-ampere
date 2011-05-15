@@ -209,12 +209,16 @@
 					{{/group}}
 				{{/field}}
 
-				{{field({label:'Interests'})}}
+				{{field({label:'Interests', required : true})}}
 					{{select({ multiple : true, values : ['running', 'swimming', 'walking', 'dancing']})}}
 				{{/field}}
 
 				{{field({label:'Age'})}}
-					{{number({ })}}
+					{{number({ required : true})}}
+				{{/field}}
+
+				{{field({label:'Without control', required : true})}}
+					35
 				{{/field}}
 			</dl>
 		</script>
@@ -351,25 +355,28 @@
 				.transition( this.states.disabled);
 			}, 
 			{
+				icon	 : 'ui-icon-star',
 				label    : $( 'head >title').text(),
 				about    : $('<div><a target="_blank" href="https://github.com/lgersman/jquery.orangevolt-ampere">Ampere</a> - Copyright© 2011 by <a target="_blank" href="http://www.orangevolt.com">Orangevolt</a>.</div>'),
 				state    : 'main',
 				cmpByType2 : cmpByType
 			});
 			
-			$.when( $.ampere.theme).done( function() {
-				$( 'body').module( 'input');
-			});
+			$( 'body').module( 'input');
 		},
 		{ 
-            debug : true//,
+            debug : false,
             /*'jquery-ui/themes/base/jquery-ui.css',*/
-            /*'//ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/themes/redmond/jquery.ui.all.css',*/  
-            //'jquery-ui-theme'  : '//ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/themes/redmond/jquery.ui.all.css'
+           'jquery-ui-theme'  : 'jquery-ui/aristo/css/Aristo/jquery-ui-1.8.7.custom.css'
+            				// '//ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/themes/cupertino/jquery.ui.all.css'
+            				// '//ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/themes/redmond/jquery.ui.all.css'
         }
 		);
 		</script>
 	</head>
-	<body>
+	<body class="portal">
+		<div class="ui-widget-overlay">
+			<div class="ampere placeholder"/>
+		</div>
 	</body>
 </html>

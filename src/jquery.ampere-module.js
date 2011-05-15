@@ -60,16 +60,33 @@
 				}
 			};
 			
-			this.flash = function( message, options) {
-				var tmplItem = view.state.module.element.find( '.state:first').tmplItem();
-				$.ampere.theme.flash( tmplItem.data, message, options);
+			this.flash = (function() {
+				var self = this;
+				var flash = function( message, options) {
+					var tmplItem = view.state.module.element.find( '.state:first').tmplItem();
+					$.ampere.theme.flash( tmplItem.data, message, options);
 
-				if( options && options.error) {
-					this.block();
-				} 
+					return this;
+				};
+
+				flash.wait = function( message, options) {
+					var tmplItem = view.state.module.element.find( '.state:first').tmplItem();
+					$.ampere.theme.flash.wait( tmplItem.data, message, options);
+
+					return flash;
+				};
 				
-				return this;
-			};
+				flash.error = function( message, options) {
+					var tmplItem = view.state.module.element.find( '.state:first').tmplItem();
+					$.ampere.theme.flash.error( tmplItem.data, message, options);
+
+					return flash;
+				};
+				
+				return flash;
+			})();
+			
+			
 			
 			this.block = function() {
 				var tmplItem = view.state.module.element.find( '.state:first').tmplItem();
@@ -129,11 +146,14 @@
 						var result = actionOption.call( transition);
 						$.when( result).then( function() {
 							var flash = {};
-							if( arguments.length && !$.isFunction( this.xhr)) {
+							if( arguments.length && !$.isFunction( this.xhr) && !$.isFunction( arguments[0])) {
 								flash.message = arguments[0];
 								flash.options = arguments.length==2 ? arguments[1] : undefined; 
 							}
+							
 							module.setState( target, true, undefined, flash);
+							
+							transition.flash.consume();
 						}, reject());
 						
 						return result;
@@ -165,7 +185,7 @@
 						}, reject( deferred));
 						
 						if( $.isFunction( undoAction)) {
-							return function( deferred) {
+							var undoWrapper = function( deferred) {
 								module.block();
 								$.extend( transition.state, undoProperties);
 								
@@ -177,11 +197,15 @@
 								
 								return action;
 							};
+							undoWrapper.transition = transition; 
+								
+							return undoWrapper;
 						} else {
 							module.history.reset();
 							//transition.state.module.ensure( !undoAction, 'dont know how to handle undo return value of transition ', transition.log.namespace);
 						}							
 					};
+					action.transition = transition;
 					
 					module.history.redo( action);
 				}, reject());
@@ -191,16 +215,17 @@
 			this.openModule = function( url, options) {
 				this.ensure( typeof( url)=='string', 'argument url expected to be a string');
 				
-				url = url + '#'
+				url = url + '#';
 				
 				options || (options={ mode : 'dialog', 'resizable':true});
 				switch( options.mode) {
 					case 'dialog' : {
-						url += 'm-d$'
+						url += 'm-d$';
 							
-						if( options.resizable)	
-							url += 'r$'
-							
+						if( options.resizable) {	
+							url += 'r$';
+						}
+						
 						break;
 					}
 					case 'fullscreen' : {
@@ -212,15 +237,27 @@
 				}
 				
 				var iframe = $('<iframe class=".ui-helper-hidden-accessible ampere module" src="' + url + '"></iframe>');
+				
+				var callback = $.isFunction( options) ? options : options.load;
+				var module = this;
+				iframe.load( function() {
+					module.unblock();
+					callback && callback.call( module); 
+				});
+				
+				this.block();
 				iframe.appendTo( 'body');
 				
 				return {
-					show : function() {
+					show  : function() {
 						iframe.removeClass( 'ui-helper-hidden-accessible');
 					},
-					hide : function() {
+					hide  : function() {
 						iframe.addClass( 'ui-helper-hidden-accessible');
-					}
+					},
+					remove : function() {
+						iframe.remove();
+					} 
 				};
 			}
 

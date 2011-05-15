@@ -33,6 +33,9 @@
 			<div style="padding:10px"> 
 				<p>
 					This application shows a shopping cart checkout scenario implemented using Ampere.
+					<p>
+						{{transition( state.transitions.cart)}}
+					</p>
 				</p>
 			</div>
 		</script>
@@ -40,7 +43,7 @@
 			<div style="padding:10px"> 
 				<h2>Cart contents</h2>
 
-				{{if state.data}}
+				{{if state.items && state.items.length}}
 				<table>
 					<thead>
 						<tr>
@@ -53,17 +56,17 @@
 						</tr>
 					<thead>
 					<tbody>
-					{{each state.data}}
+					{{each state.items}}
 					<tr>
 						<td>
-							{{radio({ name:'selected', value:$value, label:false})}}
+							{{radio({ name:'selected', value:$index, label:false})}}
 						</td>	
 						<td>
 							<a href="${$value.url}" target="_blank">${$value.label}</a>
 						</td>
 						<td style="color:gray">
 							{{each $value.options}}
-								${$index}=${$value}
+								${$.ampere.util.ucwords( $index)}=${$value}
 							{{/each}}	
 						</td>
 						<td align="right" style="font-family:monospace">${$.global.format( $value.price, "c")}</td>
@@ -74,8 +77,8 @@
 					<tr>
 						<td colspan="2">
 						 	{{group}}
-								{{transition( state.transitions.cart_remove)}}
 								{{transition( state.transitions.cart_edit)}}
+								{{transition( state.transitions.cart_remove)}}								
 							{{/group}}
 						</td>
 						<td colspan="4">
@@ -101,18 +104,56 @@
 		</script>
 		
 		<script id="cart_remove" type="text/x-jquery-tmpl">
-			<div style="padding:10px"> 
-				<p>
-					Really want to remove ... from cart ?
-				</p>
+			<div style="padding:10px">
+				{{with state.module.states.cart.items[ state.module.states.cart.selected]}} 
+					<p>
+						Really want to remove
+						<p>
+							<a href="${$value.url}" target="_blank">
+								${$value.label}
+							</a>
+							{{if $value.options}}
+								<ul>	 
+								{{each $value.options}}
+									<li>${$.ampere.util.ucwords( $index)} : ${$value}</li>
+								{{/each}}
+								</ul>		
+							{{/if}}
+						</p>
+						from your cart ?
+					</p>
+					{{if $value.options}}	
+					<p>
+						<strong>Tip</strong> : Is the item correct but the options does not fit ?<br/> 
+						Click {{transition( state.transitions.cart_edit)}} to adjust the item options to fit your needs.
+					</p>
+					{{/if}}
+				{{/with}}
 			</div>
 		</script>
 		
 		<script id="cart_edit" type="text/x-jquery-tmpl">
-			<div style="padding:10px"> 
+			<div style="padding:10px">
+				{{with state.module.states.cart.items[ state.module.states.cart.selected]}}  
 				<p>
-					Really want to remove ... from cart ?
+					Edit
+					<p>
+						<a href="${$value.url}" target="_blank">
+							${$value.label}
+						</a>
+					</p>	
+					cart options :
 				</p>
+				<p>
+					<dl>	 
+					{{each $value.options}}
+						{{field({label : ucwords( $index)})}}
+							${$value}
+						{{/field}}
+					{{/each}}
+					</dl>		
+				</p>
+				{{/with}}
 			</div>
 		</script>
 		
@@ -128,35 +169,105 @@
 					
 				})
 				.state( function cart() {
-					this.data = this.module.options( 'cart');
+					this.selected = -1;
+					this.items = this.module.options( 'cart');
 				})
 				.state( function cart_remove() {
 					
+				}, {
+					label 	: 'Remove item',
+					disabled: function() {
+						return this.module.states.cart.selected==-1;
+					}
 				})
 				.state( function cart_edit() {
 					
+				}, {
+					label : 'Edit item options',
+					disabled : function() {
+						return this.module.states.cart.selected==-1
+							|| !this.module.states.cart.items[ this.module.states.cart.selected].options;
+					}
 				});
 				
 				this.states.introduction.transition( this.states.cart, {
-					label : 'Demo'
+					label : 'Demo',
+					type  : 'manual' 
 				});
 				
 				this.states.cart
-				.transition( this.states.cart_remove, {
+				.transition( this.states.cart_edit, {
 					type 	: 'manual',
 					label 	: 'Edit item',
-					icon	: 'ui-icon-pencil',
-					disabled: function() {
-						return !this.state.selected;
-					}
+					icon	: 'ui-icon-pencil'
+				})
+				.transition( this.states.cart_remove, {
+					type 	: 'manual',
+					label 	: 'Remove item',
+					icon	: 'ui-icon-close'
+				});
+
+				this.states.cart_edit
+				.transition( this.states.cart, {
+					name    : 'back', 
+					label 	: 'Back',
+					icon	: 'ui-icon ui-icon-triangle-1-w'
+				})
+				.transition( this.states.cart, {
+					label 	: 'Update',
+					icon	: 'ui-icon-close',
+					action  : this.states.cart_edit.action( function() {
+						var selected = this.state.module.states.cart.selected;
+						var item   = this.state.module.states.cart.items[ selected];
+
+						var options = $.extend( {}, item.options);
+						
+						return function() {
+							item.options = { king : 'kong'};
+
+							this.flash( 'Item updated.');
+							
+							return function() {
+								item.options = options;
+								
+								this.flash( 'Undoed item update.');
+							};
+						};	
+					}) 
+				})
+				
+				this.states.cart_remove
+				.transition( this.states.cart, {
+					name    : 'back', 
+					label 	: 'Back',
+					icon	: 'ui-icon ui-icon-triangle-1-w'
+				})
+				.transition( this.states.cart, {
+					label 	: 'Remove',
+					icon	: 'ui-icon-close',
+					action  : this.states.cart_remove.action( function() {
+						var selected = this.state.module.states.cart.selected;
+						var item   = this.state.module.states.cart.items[ selected];
+						
+						return function() {
+							this.state.module.states.cart.items.splice( selected, 1);
+							this.state.module.states.cart.selected = -1;
+							
+							this.flash( 'Item removed.');
+
+							return function() {
+								this.state.module.states.cart.items.splice( selected, 0, item);
+								this.state.module.states.cart.selected = selected;
+								
+								this.flash( 'Undoed item remove.');
+							};
+						};	
+					}) 
 				})
 				.transition( this.states.cart_edit, {
 					type 	: 'manual',
-					label 	: 'Remove item',
-					icon	: 'ui-icon-close',
-					disabled: function() {
-						return !this.state.selected;
-					}
+					label 	: 'Edit item',
+					icon	: 'ui-icon-pencil'
 				});
 				
 				for( var name in this.states) {
@@ -171,6 +282,7 @@
 			}, 
 			{ 
 				label    : $( 'head >title').text(),
+				about    : $('<div><a target="_blank" href="https://github.com/lgersman/jquery.orangevolt-ampere">Ampere</a> - Copyright© 2011 by <a target="_blank" href="http://www.orangevolt.com">Orangevolt</a>.</div>'),
 				state 	 : 'introduction',
 				cart	 : [{ 
 					label 	: 'Women extraordinary jeans', 
@@ -180,6 +292,10 @@
 						size  : 'W27',
 						color : 'red'
 					},
+					variations: { 
+						color : { options : [ "red", "green", "blue"]}, 
+						size  : { required : true, "options" : ["s","m","l","xl"]} 
+					},	
 					price	  : 38
 				}, {
 					label 	: 'Women superb tank-top', 
@@ -188,6 +304,10 @@
 					options	: {
 						size  : 'M',
 						color : 'camouflage'
+					},
+					variations: { 
+						color : { options : [ "black", "camouflage", "yellow", 'dark brown']}, 
+						size  : { required : true, "options" : ["s","m","l","xl"]} 
 					},
 					price	  : 9.99
 				}, {
@@ -198,19 +318,17 @@
 				}]
 			});
 			
-			$.when( $.ampere.theme).done( function() {
-				$( 'body').module( 'master');
-			});
+			$( 'body').module( 'master');
 		},
 		{ 
-            debug : true//,
-            /*'jquery-ui/themes/base/jquery-ui.css',*/
-            /*'//ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/themes/redmond/jquery.ui.all.css',*/  
-            //'jquery-ui-theme'  : '//ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/themes/redmond/jquery.ui.all.css'
+            debug : true,
+            'jquery-ui-theme'  : 'jquery-ui/aristo/css/Aristo/jquery-ui-1.8.7.custom.css'
+            				// '//ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/themes/cupertino/jquery.ui.all.css'
+            				// '//ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/themes/redmond/jquery.ui.all.css'
         }
 		);
 		</script>
 	</head>
-	<body>
+	<body class="portal">
 	</body>
 </html>

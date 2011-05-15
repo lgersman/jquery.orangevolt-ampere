@@ -42,7 +42,7 @@ jQuery.deferDef({
 });
 
 $.ampere = function( callback, options) {
-	window.console && console.log && console.log( 'fake ampere invoked');
+	//window.console && console.log && console.log( 'fake ampere invoked');
 	$.when( jQuery.defer.ampere( options || {})).done( function() {
 		$.when( jQuery.ampere.theme).done( function() { 
 			$.ampere( callback);

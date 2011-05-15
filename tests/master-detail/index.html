@@ -21,6 +21,9 @@
 			<div style="padding:10px"> 
 				<p>
 					This application shows the a master/detail scenario implemented using Ampere.
+					<p>
+					{{transition( state.transitions.master)}}
+					</p>
 				</p>
 			</div>
 		</script>
@@ -89,7 +92,8 @@
 				});
 				
 				this.states.introduction.transition( this.states.master, {
-					label : 'Demo'
+					label : 'Demo',
+					type  : 'manual' 
 				});
 				
 				this.states.master
@@ -135,7 +139,12 @@
 								this.state.module.states.master.selected = selected;
 							};
 						};
-					})
+					}),
+					disabled : function() {
+						return !($.ampere.validation.conditions.isEmail( this.state.email)
+							&&	/^[a-z](.*)$/i.test( this.state.name)
+							&&	/^[a-z](.*)$/i.test( this.state.familyname));
+					}
 				})
 				
 				this.states.detail
@@ -152,9 +161,11 @@
 						
 						var nothingChanged = $.ampere.util.equals( person, { name:this.state.name, familyname:this.state.familyname, email:this.state.email});
 						return nothingChanged 
-							|| $.trim( this.state.name)==''
-							|| $.trim( this.state.familyname)==''
-							|| $.trim( this.state.email)==''
+							|| !(
+								$.ampere.validation.conditions.isEmail( this.state.email)
+								&&	/^[a-z](.*)$/i.test( this.state.name)
+								&&	/^[a-z](.*)$/i.test( this.state.familyname)
+							);
 					},
 					action   : this.states.detail.action( function() {
 						var person   = this.state.module.persons[ this.state.module.states.master.selected];
@@ -190,7 +201,7 @@
 						
 						return function() {
 							this.state.module.persons.splice( selected, 1);
-							this.state.module.states.master.selected = undefined;
+							this.state.module.states.master.selected = -1;
 
 							return function() {
 								this.state.module.persons.splice( selected, 0, person);
@@ -216,22 +227,24 @@
 				about    : $('<div><a target="_blank" href="https://github.com/lgersman/jquery.orangevolt-ampere">Ampere</a> - Copyright© 2011 by <a target="_blank" href="http://www.orangevolt.com">Orangevolt</a>.</div>')
 			});
 			
-			$.when( $.ampere.theme).done( function() {
-				$( 'body').module( 'masterdetail', { persons : [
-					{ name : 'Lars', familyname : 'Gersmann', email : 'lars.gersmann@gmail.com'},
-					{ name : 'Nico', familyname : 'Brehm', 	  email : 'nbrehm@repugraph.de'}
-				]});
-			});
+			$( 'body').module( 'masterdetail', { persons : [
+				{ name : 'Lars', familyname : 'Gersmann', email : 'lars.gersmann@gmail.com'},
+				{ name : 'Nico', familyname : 'Brehm', 	  email : 'nbrehm@repugraph.de'}
+			]});
 		},
 		{ 
-            debug : true//,
+            debug : true,
             /*'jquery-ui/themes/base/jquery-ui.css',*/
-            /*'//ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/themes/redmond/jquery.ui.all.css',*/  
-            //'jquery-ui-theme'  : '//ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/themes/redmond/jquery.ui.all.css'
+            'jquesdfsdfry-ui-theme'  : 
+            	// '//ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/themes/redmond/jquery.ui.all.css'
+				  'http://lion/dev/guilib/src/css/themes/wsc/_default_jquery/jquery-ui-1.8.4.patched.css'
         }
 		);
 		</script>
 	</head>
-	<body>
+	<body class="portal">
+		<div class="ui-widget-overlay">
+			<div class="ampere placeholder"/>
+		</div>
 	</body>
 </html>

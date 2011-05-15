@@ -5,7 +5,18 @@
  */
 ((window.$deferRun || function( run ){ run( jQuery); }) (
 	function( $, options) {
-		// default theme
+		/*'jquery-ui/themes/base/jquery-ui.css',*/
+		/*'//ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/themes/redmond/jquery.ui.all.css',*/	
+		var styles = $.makeArray( $.ampere.options['jquery-ui-theme']).slice( 0);
+		styles.push( 
+			'multiselect/jquery.multiselect.css', 
+			'multiselect/jquery.multiselect.filter.css',
+			'theme.css',
+			'portal.css',
+			'aristo.css'
+		);
+		styles.unshift( 'templates', 'jquery-ui/themes/base/jquery-ui.css');
+		$.ampere.util.loadStyles.apply( this, styles);
 
 		var datalinking = {
 			checkbox : function( equals) {
@@ -147,17 +158,6 @@
 			}
 		};
 
-		/*'jquery-ui/themes/base/jquery-ui.css',*/
-		/*'//ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/themes/redmond/jquery.ui.all.css',*/	
-		var styles = $.makeArray( $.ampere.options['jquery-ui-theme']).slice( 0);
-		styles.push( 
-			'multiselect/jquery.multiselect.css', 
-			'multiselect/jquery.multiselect.filter.css',
-			'theme.css'
-		);
-		styles.unshift( 'templates', 'jquery-ui/themes/base/jquery-ui.css');
-		$.ampere.util.loadStyles.apply( this, styles);
-
 		function changeFieldHandler( event, changed, newvalue) {
 			$.ampere.theme.log( 'changeField event : ', event.target);
 			notify( event.target.module.element);
@@ -214,54 +214,62 @@
 			overlay.addClass( 'ui-helper-hidden');
 		};
 		
-		$.ampere.theme.flash = function( view, message, options) {
-			if( message) {
-				$.ampere.util.log( $.ampere.theme.ensure.namespace + '(flash)')(
-					'"' + message + '"', options ? JSON.stringify( options) : ''
-				);
-			}
-			
-			options = options || { };
-			var flash = view.state.module.element.find( '.flash');
-			flash.is( ':visible') && flash.stop(true).fadeOut(0);
-			flash.removeClass( 'ajax');
-			flash.removeClass( 'error');
-			if( message) {
-				$( '.label', flash).text( message);
-				
-				if( options.ajax || options.error) {
-					flash.addClass( options.ajax ? 'ajax' : 'error'); 
+		$.ampere.theme.flash = (function() {
+			var flash = function( view, message, options) {
+				if( message) {
+					$.ampere.util.log( $.ampere.theme.ensure.namespace + '(flash)')(
+						'"' + message + '"', options ? JSON.stringify( options) : ''
+					);
 				}
 				
-				var icon = $( '.icon', flash);
-				icon.children().remove();
-				if( options.icon || options.ajax) {
-					var e = $('<span class="ui-icon ' + options.icon + '"></span>');
+				options = options || { };
+				var flash = view.state.module.element.find( '.flash');
+				flash.is( ':visible') && flash.stop(true).fadeOut(0);
+				
+				if( options.error) {
+					$.ampere.theme.block( view);
+				} 
+				
+				flash.removeClass( 'ajax');
+				flash.removeClass( 'error');
+				if( message) {
+					$( '.label', flash).text( message);
+					
 					if( options.ajax || options.error) {
-						e.addClass( options.ajax ? 'ajax' : 'error');
+						flash.addClass( options.ajax ? 'ajax' : 'error'); 
 					}
 					
-					icon.append( e); 
-				} 
+					var icon = $( '.icon', flash);
+					icon.children().remove();
+					if( options.icon) {
+						var e = $('<span class="ui-icon"></span>').appendTo( icon);
+						options.icon && e.addClass( options.icon);
+					} 
 
-				view.state.module.element.css( 'cursor', flash.hasClass( 'ajax') ? 'wait' : 'default');			
-				
-				/*
-				flash.stop(true).fadeIn( function() {
-					flash.css( 'opacity', '1.0');
-				});
-				*/
-				flash.show().css( 'opacity', '1.0');
+					view.state.module.element.css( 'cursor', flash.hasClass( 'ajax') ? 'wait' : 'default');			
+					
+					flash.show().css( 'opacity', '1.0');
 
-				if( !(options.error || options.ajax)) {
-					setTimeout( function() {
-						flash.stop(true).fadeOut();
-					}, 2000);
+					if( !(options.error || options.ajax)) {
+						setTimeout( function() {
+							flash.stop(true).fadeOut();
+						}, 2000);
+					}
+				} else {
+					view.state.module.element.css( 'cursor', 'default');
 				}
-			} else {
-				view.state.module.element.css( 'cursor', 'default');
-			}
-		};
+			};
+			
+			flash.wait = function( view, message, options) {
+				flash( view, message || 'Please wait ...', $.extend( { ajax : true, icon : 'ui-icon-ajax'}, options));
+			};
+			
+			flash.error = function( view, message, options) {
+				flash( view, message || 'An error occured.', $.extend( { error : true}, options));
+			};
+			
+			return flash;
+		})();
 		
 		$.ampere.theme.postRender = function( view) {
 				// link form elements to state variables
@@ -445,7 +453,7 @@
 				}
 			});
 			
-			$( '>.header .group, >.body. >.state >.view .group, >.footer .group', view.state.module.element).each( function() {
+			$( '>.header .group, >.body. >.block >.content >.view .group, >.footer .group', view.state.module.element).each( function() {
 				var e = $(this);
 				//
 				e.buttonset();
@@ -481,13 +489,13 @@
 
 			notify( view.state.module.element);
 			
+			$( view.state).bind( 'changeField', changeFieldHandler);
+			
 				// adjust footer position
 			var height = $( '>.header:first', view.state.module.element).outerHeight();
 			height && view.state.module.element.find( '>.body').css( 'top', height + 'px');
 			height = $( '>.footer:first', view.state.module.element).outerHeight();
-			height && view.state.module.element.find( '>.body').css( 'bottom', height + 'px');
-			
-			$( view.state).bind( 'changeField', changeFieldHandler);
+			view.state.module.element.find( '>.body').css( 'bottom', (!$.ampere.util.isNaN( height) ? height : 0) + 'px');			
 		};
 				
 		$.ampere.theme.loadTemplates( $.ampere.util.getDeferUrl( 'templates', 'theme.tmpl'));

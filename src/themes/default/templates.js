@@ -354,7 +354,7 @@
 					if( label) {
 						//var id = __[i].id || '';
 						
-						_.push( '<label for="'/*, id */, '" class="', $data.required ? 'required' : '', '" onclick="$( this).parent().next().children().focus()">', label, '</label>');
+						_.push( '<label for="'/*, id */, '" class="', $data.required || call.data.required ? 'required' : '', '" onclick="$( this).parent().next().children().focus()">', label, '</label>');
 					}
 					_.push( '</dt><dd');
 					
@@ -366,16 +366,26 @@
 					__ = _.concat( __);
 					__.push( '</dd>');
 
-					break;
+					return call._.concat( __);
 				}
 			}
-			/*
-			$item.rendered = function() {
-				//debugger;
-			};
-			*/
-			__=call._.concat( __);
-			return __;
+			
+			var _ = [ '<dt>'];
+			var label = call.data.label ;
+			if( label) {
+				_.push( '<label class="', call.data.required ? 'required' : '', '" onclick="$( this).parent().next().children().focus()">', label, '</label>');
+			}
+			_.push( '</dt><dd');
+			
+			if( call.data.tooltip) {
+				_.push( ' title="', $.encode( call.data.tooltip), '"');
+			}
+			_.push( '>');
+			
+			__ = _.concat( __);
+			__.push( '</dd>');
+			
+			return call._.concat( __);
 		}, {
 			_default: { $2: "null" },
 			open: "$item.calls(__,$1,$2||{});__=[];",

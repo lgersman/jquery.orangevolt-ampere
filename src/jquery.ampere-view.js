@@ -91,6 +91,8 @@
 					// remember : update wil be called also for initial update
 				return view.reset.counter++==0;
 			};
+			
+			this.ucwords = $.ampere.util.ucwords;
 		};
 	}
 ));

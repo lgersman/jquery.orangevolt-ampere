@@ -1,0 +1,3 @@
+[submodule "src/themes/default/jquery-ui/aristo"]
+	path = src/themes/default/jquery-ui/aristo
+	url = git://github.com/taitems/Aristo-jQuery-UI-Theme.git

@@ -3,7 +3,6 @@
  * Dual licensed under the MIT (http://www.opensource.org/licenses/mit-license.php)
  * and GPL (http://www.opensource.org/licenses/gpl-license.php) licenses.
  */
-
 .ampere.module {
 	position  	: relative;
 	height		: 100%;
@@ -66,6 +65,18 @@ iframe.ampere.module {
 	cursor 			 : move;
 }
 
+	/* used to display a presss icon until ampere module is loaded */
+.ampere.placeholder {
+	position	: absolute;
+	top			: 50%;
+	left		: 50%;
+	margin-top	: -8px;
+	margin-left	: -8px;
+	width		: 16px;
+	height		: 16px; 	
+	background	: url("images/ajax.gif") no-repeat scroll 50% 60% transparent;
+}
+
 .ampere.module .ui-icon-empty {
 	background-image: none;
 }
@@ -98,32 +109,40 @@ body .ui-widget.ui-tooltip {
 }
 
 /*
-.ampere.module >.header .group, 
-.ampere.module >.body >.state >.view .group, 
-.ampere.module >.footer >.controls >.group {
+.ampere.module >.header >.block >.content .group, 
+.ampere.module >.body >.block. >.state >.view .group, 
+.ampere.module >.footer >.block >.content >.controls >.group {
 	display 	 : inline;
 }
 */
 
-.ampere.module >.body >.state >.view .group.horizontal {
+.ampere.module >.body >.block >.state >.view .group.horizontal {
 	display		: inline-block;
 	min-width   : 224px;
 }
 
-.ampere.module >.body >.state >.view .group.horizontal >* {
+.ampere.module >.body >.block >.state >.view .group.horizontal >* {
 	float		: left;
 	/*width	: 100%;*/
 }
 
-.ampere.module >.body >.state >.view .group.vertical {
+.ampere.module >.body >.block >.state >.view .group.vertical {
 	position 	: relative;
 	display		: block;
 	min-width   : 224px;
 }
 
-.ampere.module >.body >.state >.view .group.vertical >* {
+.ampere.module >.body >.block >.state >.view .group.vertical >* {
 	display : block;
 	width	: 100%;
+}
+
+.ampere.module >.body >.block >.state >.view .group.vertical >label.ui-button +input +label.ui-button {
+	border-top : 0;
+}
+
+.ampere.module >.body >.block >.state >.view .group.vertical >button.ui-button +button.ui-button {
+	border-top : 0;
 }
 
 .ampere.module pre {
@@ -132,6 +151,10 @@ body .ui-widget.ui-tooltip {
 
 .ampere.module .ui-multiselect {
     padding: 0.4em;
+}
+
+.ui-multiselect-checkboxes li {
+	font-size : inherit;
 }
 
 .ampere.module .ui-spinner {
@@ -237,16 +260,21 @@ textarea:disabled, input:disabled {
 	/* top==header.outerHeight() and bottom==header.footerHeight() */
 }
 
-.ampere.module >.body >form {
+.ampere.module >.body >.block >.content >.view >* {
 	padding 	: 10px;
 }
 
-.ampere.module >.header {
+/*.ampere.module >.header*/ 
+.ampere.module >.header >.block >.content >.view {
 	position	: relative;		
-	padding		: 4px 4px;
+	/*padding		: 4px 4px;*/
 	overflow	: hidden;
 	/*border-top  : 0;*/
 }
+
+.ampere.module >.body >.block >.content >.view {
+	position	: relative;
+} 
 
 .ampere.module  >.footer {
 	overflow		: auto;
@@ -254,21 +282,25 @@ textarea:disabled, input:disabled {
 	bottom			: 0;
 	left			: 0;
 	right			: 0;
+}
+
+.ampere.module  >.footer >.block >.content >.view,
+.ampere.module  >.header >.block >.content >.view {
 	padding			: 4px 4px;
-	/*border-bottom   : 0;*/
 }
 
-.ampere.module  >.footer >.controls, .ampere.module >.header >.controls  {	
-	overflow	: hidden;	
-}
-
-.ampere.module >.footer >.controls >*, .ampere.module >.header >.controls >* {
+/* .ampere.module >.header >.controls >* */
+.ampere.module >.header >.block >.content >.view >.controls >*,
+.ampere.module >.footer >.block >.content >.view >.controls >* {
 	float		: right;
 	margin-right: 8px;
 }
 
-.ampere.module >.footer >.controls, .ampere.module >.header >.controls {
-	margin-right: -4px;
+/* .ampere.module >.header >.controls */
+.ampere.module >.header >.block >.content >.view >.controls, 
+.ampere.module >.footer >.block >.content >.view >.controls {
+	margin-right : -4px;
+	overflow     : hidden;
 }
 
 .ampere.module >.footer .about {
@@ -299,13 +331,14 @@ textarea:disabled, input:disabled {
 }
 
 .ampere.module >.flash.error {
+	background 		: inherit;	
 	background-color: Crimson;
 	border-color    : Crimson;
 	color			: white;
     font-weight		: bold;
 } 
 
-.ampere.module >.flash.ajax >.controls >.icon >.ui-icon {
+.ui-icon-ajax {
 	background: url("images/ajax.gif") no-repeat scroll 50% 60% transparent;
 }
 
@@ -326,25 +359,34 @@ textarea:disabled, input:disabled {
 	margin-right	: 0;
 }
 
-.ampere.module >.footer >.controls +.about {
+.ampere.module >.footer >.block >.content >.view >.controls +.about {
 	padding-top : 4px;
 }
 
-.ampere.module >.header >.label, .ampere.module >.header >.icon {
+/* .ampere.module >.header >.label, */
+.ampere.module >.header >.block >.content >.view >.label,
+.ampere.module >.header >.block >.content >.view >.icon {
 	float		: left;
 	top			: 50%;
 	margin-top  : -0.7em;
 	position	: absolute;
 }
 
-.ampere.module >.header >.icon {
+/* .ampere.module >.header >.icon */
+.ampere.module >.header >.block >.content >.view >.icon {
 	margin-left : 6px;
 }
 
-.ampere.module >.header >.label {
+/* .ampere.module >.header >.label */
+.ampere.module >.header >.block >.content >.view >.label {
 	margin-left : 6px;
 }
 
-.ampere.module >.header >.icon + .label {
+.ampere.module >.header >.block >.content >.view >.icon + .label
+/*.ampere.module >.header >.icon + .label*/ {
 	left : 26px;
+}
+
+.ampere.module >.overlay {
+	cursor : wait;
 }

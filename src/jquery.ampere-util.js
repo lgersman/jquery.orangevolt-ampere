@@ -95,7 +95,7 @@
 		function isNaN( obj) {
 			  // Is the given value `NaN`? `NaN` happens to be the only value in JavaScript
 			  // that does not equal itself.
-			return obj !== obj;
+			return obj===null || obj !== obj;
 		}
 		
 		var keys = Object.keys || function(obj) {

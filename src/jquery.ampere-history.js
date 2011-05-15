@@ -111,7 +111,9 @@
 					
 					var flash = arguments.length ? { message : arguments[0] } : undefined;
 					
-					redo && dontCallback!==false && history.options.callback.call( history, 'redo', redo, undo, flash);					
+					redo && dontCallback!==false && history.options.callback.call( history, 'redo', redo, undo, flash);
+					
+					redo && redo.transition.flash.consume();
 				});
 				
 				return this;
@@ -141,6 +143,8 @@
 						var flash = arguments.length ? { message : arguments[0] } : undefined;
 						
 						dontCallback!==false && history.options.callback.call( history, 'undo', undo, redo, flash);
+						
+						undo.transition.flash.consume();
 					});
 				}
 				

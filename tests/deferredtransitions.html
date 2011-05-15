@@ -71,7 +71,7 @@
 					action  : function() {
 						var state = this.state; 
 						
-						state.module.flash( 'Waiting ' + state.ttw + ' seconds ...', { ajax : true, icon : 'ui-icon-clock'});
+						state.module.flash.wait( 'Waiting ' + state.ttw + ' seconds ...', { icon : 'ui-icon-clock'});
 						var deferred = $.Deferred( function( deferred) {
 				            window.setTimeout(function() {
 				                if( state.ttw) {
@@ -90,16 +90,16 @@
 					name  : 'delayed_action',
 					label : 'Wait 5 seconds until again here',
 					action: this.states.demo.action( function() {
-						state.module.flash( 'Wait 5 seconds ...', { ajax : true, icon : 'ui-icon-clock'});
+						state.module.flash.wait( 'Wait 5 seconds ...', { icon : 'ui-icon-clock'});
 						var deferred = $.Deferred( function( deferred) {
 				            window.setTimeout(function() {
-				            	state.module.flash( 'Wait 4 seconds ...', { ajax : true, icon : 'ui-icon-clock'});	
+				            	state.module.flash.wait( 'Wait 4 seconds ...', { icon : 'ui-icon-clock'});	
 				            	window.setTimeout(function() {
-				            		state.module.flash( 'Wait 3 seconds ...', { ajax : true, icon : 'ui-icon-clock'});	
+				            		state.module.flash.wait( 'Wait 3 seconds ...', { icon : 'ui-icon-clock'});	
 				            		window.setTimeout(function() {
-				            			state.module.flash( 'Wait 2 seconds ...', { ajax : true, icon : 'ui-icon-clock'});	
+				            			state.module.flash.wait( 'Wait 2 seconds ...', { icon : 'ui-icon-clock'});	
 				            			window.setTimeout(function() {
-				            				state.module.flash( 'Wait 1 second ...', { ajax : true, icon : 'ui-icon-clock'});
+				            				state.module.flash.wait( 'Wait 1 second ...', { icon : 'ui-icon-clock'});
 				            				window.setTimeout(function() {
 								                deferred.resolve( 'Waiting 5 seconds successful.');
 								            }, 1000);
@@ -121,7 +121,7 @@
 					action: function() {
 						var message = 'Redo'; 
 						var delay = function() {
-							state.module.flash( message + ' - 4 seconds delay ...', { ajax : true});
+							state.module.flash.wait( message + ' - 4 seconds delay ...');
 							var deferred = $.Deferred( function( deferred) {
 					            window.setTimeout(function() {
 					                deferred.resolve( message + ' delay finished.');
@@ -142,7 +142,7 @@
 					action: this.states.demo.action( function() {
 						var redo = function() { };
 						
-						state.module.flash( 'Wait 3 seconds ...', { ajax : true});
+						state.module.flash.wait( 'Wait 3 seconds ...');
 						var deferred = $.Deferred( function( deferred) {
 				            window.setTimeout(function() {
 				                deferred.reject( 'Forced action construction error. Refresh browser to continue.');
@@ -175,11 +175,17 @@
 			});
 		},
 		{ 
-			debug   : true
+			debug   : true,
+			'jquery-ui-theme'  : 'jquery-ui/aristo/css/Aristo/jquery-ui-1.8.7.custom.css'
+				// '//ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/themes/cupertino/jquery.ui.all.css'
+				// '//ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/themes/redmond/jquery.ui.all.css'
 		}
 		);
 		</script>
 	</head>
-	<body>
+	<body class="portal">
+		<div class="ui-widget-overlay">
+			<div class="ampere placeholder"/>
+		</div>
 	</body>
 </html>

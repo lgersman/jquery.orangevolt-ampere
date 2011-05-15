@@ -15,7 +15,7 @@
 		styles.length==1 || $.ampere.util.loadStyles.apply( this, styles);
 	},
 	{
-		depends : [ 'ampere_core', 'ampere_util', 'ampere_module', 'ampere_action', 'ampere_history', 'ampere_state', 'ampere_transition', 'ampere_view', 'ampere_theme'],
+		depends : [ 'ampere_core', 'ampere_util', 'ampere_module', 'ampere_action', 'ampere_history', 'ampere_state', 'ampere_transition', 'ampere_view', 'ampere_theme', 'ampere_validation'],
 		
 		def : {
 			ampere_core : 'jquery.ampere-core.js',
@@ -50,6 +50,10 @@
 			ampere_theme		: {
 				url 	: 'jquery.ampere-theme.js',
 				depends : [ 'ampere_core', 'ampere_util']
+			},
+			ampere_validation		: {
+				url 	: 'jquery.ampere-validation.js',
+				depends : 'ampere_core'
 			}
 		}
 	}

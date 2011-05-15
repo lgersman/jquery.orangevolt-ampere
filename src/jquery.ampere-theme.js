@@ -125,12 +125,8 @@
 					f();
 				}
 				*/
-				
-				view.state.module.element.empty().append(
-					view.options( 'layout')!=false 
-					? $.tmpl( template, view)
-					: $.ampere.theme.render( { data : this})
-				);
+							
+				view.state.module.element.empty().append( $.tmpl( template, view));
 				view.options( 'post').call( view);
 				$.ampere.theme.postRender( view);
 				view.state.module.element.css( 'visibility', 'inherit');
@@ -148,7 +144,7 @@
 			block	   : $.noop,
 			unblock	   : $.noop
 		};
-			
+		
 		/*
 		 * @return the closest TmplItem with the view asociated as data  
 		 */
@@ -204,6 +200,15 @@
 			open : $.tmpl.tag.tmpl.open
 				   .replace( '$1', '$data.render()')
 				   .replace( '$2', '$data')
+		};
+		
+			// see {{each}} as reference
+		$.tmpl.tag['with'] = {
+			_default : {
+				$2 : '$value'
+			},
+			open  : "if($notnull_1){$.each([$1],function(undefined, $2){with(this){",
+			close : '}});}'
 		};
 		
 		$.tmpl.tag.ready = $.extend( function( $item, $1, $2) {

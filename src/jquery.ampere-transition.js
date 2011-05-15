@@ -26,13 +26,25 @@
 			this.disabled = function() {
 				if( !this.target) {
 					return true;	
-				} else if( $.isFunction( this.target.disabled)) {
-					if( this.target.disabled.call( this.target)) {
+				} else if( $.isFunction( this.target.options( 'disabled'))) {
+					if( this.target.options( 'disabled').call( this.target)) {
 						return true;
 					}
 				}
 				
 				return this.options( 'disabled').call( this);
+			};
+			
+			this.flash = function( message) {
+				this.flash.message = message;
+			};
+			this.flash.consume = function() {
+				if( this.message) {
+					state.module.flash( this.message, this.options);
+				}
+				
+				delete this.message;
+				delete this.options;  
 			};
 		};
 	}
