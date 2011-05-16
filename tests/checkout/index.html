@@ -11,7 +11,7 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta http-equiv="X-UA-Compatible" content="IE=7,chrome=1; IE=9" />
 		
-		<title>Shopping cart checkout example</title>
+		<title>Ampere Shopping cart/Checkout example</title>
 		
 		<style>
 			html {
@@ -66,7 +66,7 @@
 						</td>
 						<td style="color:gray">
 							{{each $value.options}}
-								${$.ampere.util.ucwords( $index)}=${$value}
+								${ucwords( $index)}=${ucwords( $value.value || (typeof( $value)=='string' ? $value : '<Empty>'))}
 							{{/each}}	
 						</td>
 						<td align="right" style="font-family:monospace">${$.global.format( $value.price, "c")}</td>
@@ -88,7 +88,7 @@
 					<tfoot>
 					<tr>
 						<td colspan="6">
-							<hr style="margin-top:1px;margin-bottom:1px;border:0;color:gray;height:1px;background-color:gray"/>
+							<hr style="margin-top:1px;margin-bottom:1px;border:0;color:#aaaaaa;height:1px;background-color:gray"/>
 						</td>
 					</tr>
 					<tr>
@@ -112,13 +112,11 @@
 							<a href="${$value.url}" target="_blank">
 								${$value.label}
 							</a>
-							{{if $value.options}}
-								<ul>	 
-								{{each $value.options}}
-									<li>${$.ampere.util.ucwords( $index)} : ${$value}</li>
-								{{/each}}
-								</ul>		
-							{{/if}}
+							<ul>	 
+							{{each $value.options}}
+								<li>${ucwords( $index)} : ${ucwords( $value.value || (typeof( $value)=='string' ? $value : '<Empty>'))}</li>
+							{{/each}}
+							</ul>		
 						</p>
 						from your cart ?
 					</p>
@@ -146,9 +144,20 @@
 				</p>
 				<p>
 					<dl>	 
-					{{each $value.options}}
-						{{field({label : ucwords( $index)})}}
-							${$value}
+					{{each( name, options) $value.options}}
+						{{field({label : ucwords( name), required : !options.optional})}}
+							{{if options.values}}
+								{{group}}
+									{{if options.optional}}
+										{{radio({ name : name, value : false, icon : 'ui-icon-close', label : 'None', selected : true})}}
+									{{/if}}
+									{{each options.values}}
+										{{radio({ name : name, value : $value, icon : false, selected : $value==options.value})}}
+									{{/each}}
+								{{/group}}
+							{{else}}
+								{{radio({ label : ucwords( options.value || options), icon : false, selected : true})}}
+							{{/if}}
 						{{/field}}
 					{{/each}}
 					</dl>		
@@ -181,7 +190,6 @@
 					}
 				})
 				.state( function cart_edit() {
-					
 				}, {
 					label : 'Edit item options',
 					disabled : function() {
@@ -204,18 +212,18 @@
 				.transition( this.states.cart_remove, {
 					type 	: 'manual',
 					label 	: 'Remove item',
-					icon	: 'ui-icon-close'
+					icon	: 'ui-icon-trash'
 				});
 
 				this.states.cart_edit
 				.transition( this.states.cart, {
 					name    : 'back', 
 					label 	: 'Back',
-					icon	: 'ui-icon ui-icon-triangle-1-w'
+					icon	: 'ui-icon-triangle-1-w'
 				})
 				.transition( this.states.cart, {
 					label 	: 'Update',
-					icon	: 'ui-icon-close',
+					icon	: 'ui-icon-disk',
 					action  : this.states.cart_edit.action( function() {
 						var selected = this.state.module.states.cart.selected;
 						var item   = this.state.module.states.cart.items[ selected];
@@ -223,7 +231,9 @@
 						var options = $.extend( {}, item.options);
 						
 						return function() {
-							item.options = { king : 'kong'};
+							for( var name in item.options) {
+								item.options[name].value = this.state[ name];
+							} 
 
 							this.flash( 'Item updated.');
 							
@@ -240,11 +250,11 @@
 				.transition( this.states.cart, {
 					name    : 'back', 
 					label 	: 'Back',
-					icon	: 'ui-icon ui-icon-triangle-1-w'
+					icon	: 'ui-icon-triangle-1-w'
 				})
 				.transition( this.states.cart, {
 					label 	: 'Remove',
-					icon	: 'ui-icon-close',
+					icon	: 'ui-icon-trash',
 					action  : this.states.cart_remove.action( function() {
 						var selected = this.state.module.states.cart.selected;
 						var item   = this.state.module.states.cart.items[ selected];
@@ -289,32 +299,25 @@
 					url   	: 'http://www.myshop.url/pants/wejeans',
 					amount  : 1,
 					options	: {
-						size  : 'W27',
-						color : 'red'
+						size   : { value : 'm', "values" : ["s","m","l","xl"]},
+						color  : { value : false, optional : true, values  : [ "red", "green", "blue"]}
 					},
-					variations: { 
-						color : { options : [ "red", "green", "blue"]}, 
-						size  : { required : true, "options" : ["s","m","l","xl"]} 
-					},	
-					price	  : 38
+					price	: 38
 				}, {
 					label 	: 'Women superb tank-top', 
 					url   	: 'http://www.myshop.url/tops/tanktop',
 					amount  : 4,
 					options	: {
-						size  : 'M',
-						color : 'camouflage'
+						size   : { value : 's', "values" : ["s","m","l","xl"]}, 
+						color  : { value : 'camouflage', optional : true, values : [ "black", "camouflage", "yellow", 'dark brown']},
+						belt   : 'yes'
 					},
-					variations: { 
-						color : { options : [ "black", "camouflage", "yellow", 'dark brown']}, 
-						size  : { required : true, "options" : ["s","m","l","xl"]} 
-					},
-					price	  : 9.99
+					price	: 9.99
 				}, {
 					label 	: 'Sunglasses "Glamour"',
 					amount  : 1,
 					url   	: 'http://www.myshop.url/glasses/glamour',
-					price	  : 7.49
+					price	: 7.49
 				}]
 			});
 			

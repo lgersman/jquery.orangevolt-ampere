@@ -325,7 +325,7 @@
 
 											if( element.name && element.name.length) {
 												link[ element.name].convertBack( view.state[ element.name], view.state, element);
-											}
+											} 
 											break;
 										}
 										case 'checkbox' : {
@@ -398,18 +398,19 @@
 					if( e.data( 'checkedIcons').primary) {
 						e.data( 'uncheckedIcons', $.extend( {}, e.data( 'checkedIcons')));
 						e.data( 'uncheckedIcons').primary = 'ui-icon-empty';
-						
-						e.change( function() {
-							//e.button( 'option', 'icons', e.data( this.checked ? 'checkedIcons' : 'uncheckedIcons'));
-							$( e[0].form).find( ':radio[name="' + e.attr( 'name') + '"]').each( function() {
-								var widget = $(this); 
-								if( widget.data( 'checkedIcons')) { 
-									widget.button( 'option', 'icons', widget.data( this.checked ? 'checkedIcons' : 'uncheckedIcons'));
-								}
-							});
-						});
+												
 						e.data( 'options').icons = e.data( this.checked ? 'checkedIcons' : 'uncheckedIcons');
 					}
+					
+					var radios = $( e[0].form).find( ':radio[name="' + e.attr( 'name') + '"]'); 
+					e.change( function() {
+						radios.each( function() {
+							var widget = $(this); 
+							if( widget.data( 'checkedIcons')) { 
+								widget.button( 'option', 'icons', widget.data( this.checked ? 'checkedIcons' : 'uncheckedIcons'));
+							}
+						});
+					});
 				}
 				
 				e.button( e.data( 'options'));

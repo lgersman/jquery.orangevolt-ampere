@@ -171,6 +171,9 @@
 			$data.link     && onRendered( $item, linkTrait);
 			
 			_.push( ' id="', $.encode( id), '"');
+			if( $data.selected) {
+				_.push( ' checked="checked"');	
+			}
 			
 			var options = {
 				text : $data.label!==false ? $data.label : false
