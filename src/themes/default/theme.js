@@ -164,7 +164,11 @@
 		}
 		
 		function notify( container) {
-			var view = container.find( '.body:first').tmplItem().data; 
+			var view = container.find( '.ampere.view');
+			view.hasClass( 'ready') && view.addClass( 'dirty');
+			
+			var view = view.tmplItem().data; 
+			
 				// update disabled capability
 			container.find( 'a, button, input, select, textarea').each( function() {
 				var self  = $(this);
@@ -496,7 +500,9 @@
 			var height = $( '>.header:first', view.state.module.element).outerHeight();
 			height && view.state.module.element.find( '>.body').css( 'top', height + 'px');
 			height = $( '>.footer:first', view.state.module.element).outerHeight();
-			view.state.module.element.find( '>.body').css( 'bottom', (!$.ampere.util.isNaN( height) ? height : 0) + 'px');			
+			view.state.module.element.find( '>.body').css( 'bottom', (!$.ampere.util.isNaN( height) ? height : 0) + 'px');
+			
+			view.state.module.element.find( '.ampere.view').addClass( 'ready');
 		};
 				
 		$.ampere.theme.loadTemplates( $.ampere.util.getDeferUrl( 'templates', 'theme.tmpl'));

@@ -53,8 +53,6 @@
 					
 					// reset uid generator
 				view.id.reset();
-					// reset "reset" generator
-				view.reset.counter = 0;
 				
 				var result = undefined;
 				
@@ -87,9 +85,7 @@
 				$.ampere.theme.render( view);
 			};
 			this.reset.disabled = function() {
-				var view = this.module.element.find( '.ampere.view').tmplItem().data;
-					// remember : update wil be called also for initial update
-				return view.reset.counter++==0;
+				return !this.module.element.find( '.ampere.view').hasClass( 'dirty');
 			};
 			
 			this.ucwords = $.ampere.util.ucwords;

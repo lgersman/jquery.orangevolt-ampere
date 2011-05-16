@@ -176,7 +176,11 @@
 				this.view( this.options( 'name'));
 				return this.getView(); 
 			};
-				
+		
+			this.isDirty = function() {
+				return this.module.element.find( '.ampere.view').hasClass( 'dirty');
+			};
+			
 				/**
 				 * declares an action
 				 */

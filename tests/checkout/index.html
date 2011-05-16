@@ -13,17 +13,6 @@
 		
 		<title>Ampere Shopping cart/Checkout example</title>
 		
-		<style>
-			html {
-				height 		: 100%;
-			}
-			
-			body {
-				height 		: 100%;
-				margin 		: 0;
-				overflow 	: hidden;
-			}
-		</style>
 		
 		<script type="text/javascript" src="../../lib/jquery-1.5.1.js"></script>
 		<script type="text/javascript" src="../../lib/jquery/plugins/jquery.defer.js"></script>
@@ -234,6 +223,9 @@
 				.transition( this.states.cart, {
 					label 	: 'Update',
 					icon	: 'ui-icon-pencil',
+					disabled: function() {
+						return !this.state.isDirty();  
+					},
 					action  : this.states.cart_edit.action( function() {
 						var selected = this.state.module.states.cart.selected;
 						var item   = this.state.module.states.cart.items[ selected];
