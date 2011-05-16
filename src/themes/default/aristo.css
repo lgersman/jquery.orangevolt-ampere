@@ -9,3 +9,8 @@
 	font-size: inherit;
     font-weight: inherit;
 }
+
+.ui-accordion .ui-accordion-header a {
+    font-size: inherit;
+    font-weight: inherit;
+}
