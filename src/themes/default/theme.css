@@ -317,7 +317,7 @@ textarea:disabled, input:disabled {
 }
 
 .ampere.module >.flash {
-	position		: fixed;
+	position		: absolute;
 	top				: 0.6em;
 	width			: 50%;
 	margin-left		: 25%;
