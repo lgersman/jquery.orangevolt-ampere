@@ -439,7 +439,7 @@
 			});
 
 				// convert input to change events to be compatible with datalinking plugin
-			$( 'input[type=text]', view.state.module.element).bind( 'input', function() {
+			$( 'input[type=text], input[type=number]', view.state.module.element).bind( 'input', function() {
 				$(this).change();
 				return false;
 			});	
