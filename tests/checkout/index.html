@@ -88,7 +88,7 @@
 					<tfoot>
 					<tr>
 						<td colspan="6">
-							<hr style="margin-top:1px;margin-bottom:1px;border:0;color:#aaaaaa;height:1px;background-color:gray"/>
+							<hr style="margin-top:1px;margin-bottom:1px;border:0;height:1px;background-color:#aaaaaa"/>
 						</td>
 					</tr>
 					<tr>
@@ -140,27 +140,37 @@
 							${$value.label}
 						</a>
 					</p>	
-					cart options :
 				</p>
 				<p>
 					<dl>	 
-					{{each( name, options) $value.options}}
-						{{field({label : ucwords( name), required : !options.optional})}}
-							{{if options.values}}
-								{{group}}
-									{{if options.optional}}
-										{{radio({ name : name, value : false, icon : 'ui-icon-close', label : 'None', selected : true})}}
-									{{/if}}
-									{{each options.values}}
-										{{radio({ name : name, value : $value, icon : false, selected : $value==options.value})}}
-									{{/each}}
-								{{/group}}
-							{{else}}
-								{{radio({ label : ucwords( options.value || options), icon : false, selected : true})}}
-							{{/if}}
+						{{field({required : true})}}
+							{{number({ name : 'amount', value : $value.amount, min : 1})}}
 						{{/field}}
-					{{/each}}
-					</dl>		
+					</dl>
+					
+					{{if $value.options}}
+						<fieldset>
+							<legend>Properties</legend>
+							<dl>
+								{{each( name, options) $value.options}}
+									{{field({label : ucwords( name), required : typeof options!='string' && !options.optional})}}
+										{{if options.values}}
+											{{group}}
+												{{if options.optional}}
+													{{radio({ name : name, value : false, icon : 'ui-icon-close', label : 'None', selected : true})}}
+												{{/if}}
+												{{each options.values}}
+													{{radio({ name : name, value : $value, icon : false, selected : $value==options.value})}}
+												{{/each}}
+											{{/group}}
+										{{else}}
+											{{radio({ label : ucwords( options.value || options), icon : false, selected : true})}}
+										{{/if}}
+									{{/field}}
+								{{/each}}
+							</dl>		
+						</fieldset>
+					{{/if}}
 				</p>
 				{{/with}}
 			</div>
@@ -194,7 +204,7 @@
 					label : 'Edit item options',
 					disabled : function() {
 						return this.module.states.cart.selected==-1
-							|| !this.module.states.cart.items[ this.module.states.cart.selected].options;
+							|| !this.module.states.cart.items[ this.module.states.cart.selected].amount;
 					}
 				});
 				
@@ -223,22 +233,25 @@
 				})
 				.transition( this.states.cart, {
 					label 	: 'Update',
-					icon	: 'ui-icon-disk',
+					icon	: 'ui-icon-pencil',
 					action  : this.states.cart_edit.action( function() {
 						var selected = this.state.module.states.cart.selected;
 						var item   = this.state.module.states.cart.items[ selected];
 
 						var options = $.extend( {}, item.options);
+						var amount  = item.amount; 
 						
 						return function() {
 							for( var name in item.options) {
 								item.options[name].value = this.state[ name];
-							} 
-
+							}
+							item.amount = this.state.amount;
+							
 							this.flash( 'Item updated.');
 							
 							return function() {
 								item.options = options;
+								item.amount  = amount;
 								
 								this.flash( 'Undoed item update.');
 							};
@@ -292,6 +305,7 @@
 			}, 
 			{ 
 				label    : $( 'head >title').text(),
+				icon	 : 'ui-icon-cart',
 				about    : $('<div><a target="_blank" href="https://github.com/lgersman/jquery.orangevolt-ampere">Ampere</a> - Copyright© 2011 by <a target="_blank" href="http://www.orangevolt.com">Orangevolt</a>.</div>'),
 				state 	 : 'introduction',
 				cart	 : [{ 
@@ -325,7 +339,7 @@
 		},
 		{ 
             debug : true,
-            'jquery-ui-theme'  : 'jquery-ui/aristo/css/Aristo/jquery-ui-1.8.7.custom.css'
+            'jquerzy-ui-theme'  : 'jquery-ui/aristo/css/Aristo/jquery-ui-1.8.7.custom.css'
             				// '//ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/themes/cupertino/jquery.ui.all.css'
             				// '//ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/themes/redmond/jquery.ui.all.css'
         }

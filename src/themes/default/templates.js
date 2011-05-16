@@ -114,7 +114,7 @@
 						$.data( this.nodes[0], 'notify', $.proxy( this.data.disabled, this.data));
 					});
 					
-					_.push( 'title="', $.encode( $data.options('label') || $data.options('name')), '"');
+					_.push( 'title="', $.encode( $data.options('tooltip') || $data.options('label') || $data.options('name')), '"');
 					
 					_.push( '> ');
 					_.push( $.encode( $data.options('label') || '&nbsp;')); 
