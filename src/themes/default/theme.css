@@ -145,6 +145,14 @@ body .ui-widget.ui-tooltip {
 	border-top : 0;
 }
 
+.ampere.module >.body >.block >.state >.view label> {
+	overflow : hidden;
+}
+
+.ampere.module >.body >.block >.state >.view label>.ui-icon {
+	float : left;
+}
+
 .ampere.module pre {
 	font-family	: monospace; 
 }
