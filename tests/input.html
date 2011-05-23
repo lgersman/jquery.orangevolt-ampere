@@ -187,6 +187,11 @@
 			</dl>
 		</script>
 		<script id="field" type="text/x-jquery-tmpl">
+			<style>
+				.ui-icon-openid {
+					background-image : url('http://www.google.com/s2/favicons?domain=openid.net');
+				}
+			</style>
 			<dl>
 				{{field({label:'Enter your name', tooltip : 'Your name and familyname'})}}
 					{{text()}}
@@ -199,6 +204,15 @@
 					{{text}}
 					<div class="description">
 						Your email adress were we can reach you daily.
+					</div>
+				{{/field}}
+
+				{{field({label:'OpenID', icon : 'ui-icon-openid', required : true})}}
+					{{text}}
+					<div class="description">
+						Enter your  
+						<img src="http://www.google.com/s2/favicons?domain=openid.net" border="no"/>
+						OpenID account url here.
 					</div>
 				{{/field}}
 
