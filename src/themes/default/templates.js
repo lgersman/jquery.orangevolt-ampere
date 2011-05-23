@@ -354,10 +354,18 @@
 						? call.data.label 
 								: call.data.label!==false && $data.label!==false ? $data.label || $.ampere.util.ucwords( 'name' in $data ? $data.name : '') : false;
 
-					if( label) {
+					var icon = call.data.icon; 			
+								
+					if( label || icon) {
 						//var id = __[i].id || '';
 						
-						_.push( '<label for="'/*, id */, '" class="', $data.required || call.data.required ? 'required' : '', '" onclick="$( this).parent().next().children().focus()">', label, '</label>');
+						_.push( '<label for="'/*, id */, '" class="');
+						_.push( $data.required || call.data.required ? 'required' : '');
+						icon && _.push( ' icon');
+						_.push( '" onclick="$( this).parent().next().children().focus()">');
+						icon && _.push( '<span class="ui-icon ', icon, '"/>'); 
+						label && _.push( label);
+						_.push( '</label>');
 					}
 					_.push( '</dt><dd');
 					
