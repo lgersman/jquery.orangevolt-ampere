@@ -10,7 +10,7 @@ jquery.orangevolt-ampere is an Ampere implementation based on jQuery. This proje
 
 jquery.orangevolt-ampere utilizes:
 
-* [jQuery](http://query.com)
-* [jQuery JSDefer](https://github.com/BorisMoore/jsdefer)
-* [jQuery tmpl](https://github.com/jquery/jquery-tmpl)
-* [jQuery datalink](https://github.com/jquery/jquery-datalink)
+* [AngularJS](http://angularjs.org/)
+* [jQuery](http://jquery.com)
+* [Twitter Bootstrap](http://twitter.github.com/bootstrap/)
+* [Font Awesome](http://fortawesome.github.com/Font-Awesome/)
