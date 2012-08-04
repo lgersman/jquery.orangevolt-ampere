@@ -1,0 +1,13 @@
+<script>
+	var ampere = angular.module('ampere', [])
+	ampere.controller( 'mee', function ($scope) {
+        $scope.salute = "Lars";
+	});
+		
+	$(document).ready( function() {
+		angular.bootstrap( document.getElementById( 'foo'), [ 'ampere']);
+	});
+</script>
+<div id="foo" ng-app="ampere" ng-controller="mee">
+	haha {{salute}} !!
+</div>

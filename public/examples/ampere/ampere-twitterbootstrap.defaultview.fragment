@@ -1,0 +1,10 @@
+<div>	
+	hello {{$root.ampere.view.state()}}
+	<div>
+		huhu {{ampere.module.current().state.name()}}
+		<div>
+			default view generated for state {{ampere.ui.getCaption( ampere.module.current().state)}}
+			(="{{ampere.module.current().state.name()}}")
+		</div>
+	</div>
+</div>
