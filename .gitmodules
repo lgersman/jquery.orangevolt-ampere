@@ -1,3 +1,9 @@
+<<<<<<< HEAD
 [submodule "lib/Font-Awesome"]
 	path = lib/Font-Awesome
 	url = git://github.com/FortAwesome/Font-Awesome.git
+=======
+[submodule "src/themes/default/jquery-ui/aristo"]
+	path = src/themes/default/jquery-ui/aristo
+	url = git://github.com/taitems/Aristo-jQuery-UI-Theme.git
+>>>>>>> e66474584767d906d594364ceeb115073f8ac0e4

@@ -372,7 +372,11 @@
 							if( $.isEmptyObject( state.views)) {
 								state.view( '', null).options({
 									'ampere.ui.caption' : 'default view for state "' + state.name() + '"',
+<<<<<<< HEAD
 									'ampere.ui.description' : "<em>(This view was generated automatically : state has no view applied.)</em>"
+=======
+									'ampere.ui.description' : "<em>(This view was generated automatically -> state has no view applied.)</em>"
+>>>>>>> e66474584767d906d594364ceeb115073f8ac0e4
 								});
 							}
 						}
@@ -480,7 +484,11 @@
 		this.render = function( event) {
 			if( $.isFunction( this['render' + event])) {
 				var args = $.makeArray( arguments);
+<<<<<<< HEAD
 				args.shift();
+=======
+				args.splice( 1,1);
+>>>>>>> e66474584767d906d594364ceeb115073f8ac0e4
 
 				this['render' + event].apply( this, args);
 			} else {
@@ -626,6 +634,7 @@
 		this.ui = this.options( 'ampere.ui') || module.options( 'ampere.ui');
 		_ns.assert( !(this.ui instanceof Ampere.ui), "this.options( 'ui') expected to be a ampere ui constructor function but is an object ", this.ui);
 		this.ui = new this.ui( this, $.extend( {}, module.options(), this.options()));
+<<<<<<< HEAD
 				
 		$.when( this.ui.init(), module).done( function() {
 			module.current( state, view);
@@ -641,6 +650,12 @@
 				
 				controller.ui.render( 'Bootstrap');
 			});
+=======
+		
+		$.when( this.ui.init(), module).done( function() {
+			module.current( state, view);
+			controller.ui.render( 'Bootstrap');
+>>>>>>> e66474584767d906d594364ceeb115073f8ac0e4
 		});			
 		
 			/*
@@ -688,12 +703,18 @@
 					
 					module.current( target, view);
 					
+<<<<<<< HEAD
 					var template = self.ui.getTemplate( view); 
 					template.done( function( data) {
 						self.ui.unblock();
 						template = data.jquery ? data.text() : template.responseText || data;
 						self.ui.render( 'State', view, template);
 					});
+=======
+					self.ui.unblock();
+					
+					self.ui.render( 'State', target, view);
+>>>>>>> e66474584767d906d594364ceeb115073f8ac0e4
 				})
 				.fail( function() {
 					console.error( this, arguments);

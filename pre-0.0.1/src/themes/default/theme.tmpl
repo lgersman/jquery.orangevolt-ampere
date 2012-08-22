@@ -1,0 +1,121 @@
+<!--
+  Copyright (c) 2011 Lars Gersmann (lars.gersmann@gmail.com, http://orangevolt.blogspot.com)
+  Dual licensed under the MIT (http://www.opensource.org/licenses/mit-license.php)
+  and GPL (http://www.opensource.org/licenses/gpl-license.php) licenses.
+-->
+<script id="ampere_theme_fragment_history" type="text/x-jquery-tmpl">
+	{{if history}} 
+	<div class="history group">
+		<button 
+			class="undo" 
+			type="button"
+			data-options='{ "icons" : { "primary" : "ui-icon-triangle-1-w"}, "text" : false}'
+			title="Undo"
+			{{if history.canUndo()}}
+			onclick="$(this).module().history.undo()"
+			{{else}}
+			disabled="disabled"
+			{{/if}}
+		>&nbsp;</button>
+		<button 
+			class="redo" 
+			type="button"
+			data-options='{ "icons" : { "primary" : "ui-icon-triangle-1-e"}, "text" : false}'
+			title="Redo"
+			{{if history.canRedo()}}
+			onclick="$(this).module().history.redo()"
+			{{else}}
+			disabled="disabled"
+			{{/if}}			
+		>&nbsp;</button>
+	</div>
+	{{/if}}
+</script>
+<script id="ampere_theme_view_default" type="text/x-jquery-tmpl">
+	<div>
+	</div>
+</script>
+<script id="ampere_theme_layout_default" type="text/x-jquery-tmpl">
+	<div class="header">
+		<div class="block">
+			<div class="content">
+				<div class="view ui-widget-header {{if state.module.element.hasClass( 'portal')}}ui-corner-top{{/if}}">
+					{{if state.module.options( 'icon')}}	
+						<span class="icon ui-icon ${state.module.options( 'icon')}">
+							&nbspdd
+						</span>	
+					{{/if}}
+					<div class="label">
+						{{if state.module.options( 'label')}} ${state.module.options( 'label')} {{/if}} 
+						{{if state.options( 'label')}} 
+							{{if state.module.options( 'label')}} - {{/if}}
+							${state.options( 'label')} 
+						{{/if}}
+					</div>
+					<div class="controls">
+						{{if state.hasTransitions( 'primary', /^\$global$/)}}
+							{{group}}
+								{{each state.getTransitions( 'primary', /^\$global$/)}}
+									{{transition( $value)}}
+								{{/each}}
+							{{/group}}			
+						{{/if}}
+						{{history( state.module)}}
+						{{group}}
+							{{button({ icon:'ui-icon-refresh', label:false, disabled:reset.disabled, onclick:reset})}}
+						{{/group}}									
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="body">
+		<div class="block">
+			<form onsubmit="return false" class="content state ${state.options( 'name')}"  autocomplete="off">		
+					<div class="ampere view ${options( 'name')}">
+						<div>
+							{{view}}
+						</div>
+					</div>
+			</form>
+		</div>
+	</div>
+	{{if state.hasTransitions( 'primary', $.ampere.util.regexp.not( /^\$global$/)) || state.module.element.hasClass( 'portal') || state.module.options( 'about')}}
+	<div class="footer {{if state.hasTransitions( 'primary', $.ampere.util.regexp.not( /^\$global$/))}}content{{/if}} {{if state.module.options( 'about')}}about{{/if}}">
+		<div class="block">
+			<div class="content">
+				<div class="view ui-widget-header {{if state.module.element.hasClass( 'portal')}}ui-corner-bottom{{/if}}">
+					{{if state.hasTransitions( 'primary', $.ampere.util.regexp.not( /^\$global$/))}}
+					<div class="controls">
+						{{each state.getTransitionGroups( 'primary', $.ampere.util.regexp.not( /^\$global$/)).reverse()}}
+							<div class="transitions group ${value}">
+							{{each state.getTransitions( 'primary', $value)}}
+								{{transition( $value)}}
+							{{/each}}
+							</div>			
+						{{/each}}			
+					</div>
+					{{/if}}
+					{{if state.module.options( 'about') && !state.module.element.hasClass( 'portal')}}
+						<div class="about">
+							{{ready state.module.options( 'about')}}
+						</div>
+					{{/if}}		
+				</div>				
+			</div>
+			{{if state.module.options( 'about') && state.module.element.hasClass( 'portal')}}
+				<div class="about">
+					{{ready state.module.options( 'about')}}
+				</div>
+			{{/if}}
+		</div>
+	</div>
+	{{/if}}
+	<div class="overlay ui-widget-overlay ui-helper-hidden"/>
+	<span class="flash ui-corner-all ui-helper-hidden">
+		<span class="controls">
+			<span class="icon"></span>
+			<span class="label"></span>
+		</span>	
+	</span>	
+</script>

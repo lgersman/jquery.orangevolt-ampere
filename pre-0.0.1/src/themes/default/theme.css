@@ -1,0 +1,400 @@
+/* 
+ * Copyright (c) 2011 Lars Gersmann (lars.gersmann@gmail.com, http://orangevolt.blogspot.com)
+ * Dual licensed under the MIT (http://www.opensource.org/licenses/mit-license.php)
+ * and GPL (http://www.opensource.org/licenses/gpl-license.php) licenses.
+ */
+.ampere.module {
+	position  	: relative;
+	height		: 100%;
+	font-size   : 12.8px;
+    line-height : 1.3em;
+    color		: #333333;    
+    /* bad for draggables 
+      cursor		: default;
+     */
+}
+
+.ampere.module, .ampere.dialog {
+	min-width 	: 300px;
+	min-height	: 200px;
+}
+
+.ampere.module img {
+	vertical-align : middle; 
+}
+
+html.ampere.fullscreen {
+	height 		: 100%;
+}
+
+html.ampere.fullscreen body {
+	height 		: 100%;
+	margin 		: 0;
+	overflow 	: hidden;
+	background-color: white;
+}
+
+/* applied to iframes created by ampere.openDialog */
+iframe.ampere.module {
+	padding : 0;
+	border	: 0;
+	height	: 100%;
+	left	: 0;
+	position: absolute;
+	top		: 0;
+	width	: 100%;
+}
+
+/* 
+	applied to elements wrapping a ampere module in a dialog style fashion.
+	usually this happens if the module is wrapped in a iframe 
+*/
+.ampere.dialog {
+	background-color : white;
+	position		 : absolute;
+	border   		 : 1px solid #AAAAAA;
+	width			 : 80%;
+	height			 : 80%;
+}
+
+.ampere.dialog.ui-resizable {
+	padding  		 : 10px;
+}
+
+.ampere.dialog.ui-draggable >.ampere.module >.header {
+	cursor 			 : move;
+}
+
+	/* used to display a presss icon until ampere module is loaded */
+.ampere.placeholder {
+	position	: absolute;
+	top			: 50%;
+	left		: 50%;
+	margin-top	: -8px;
+	margin-left	: -8px;
+	width		: 16px;
+	height		: 16px; 	
+	background	: url("images/ajax.gif") no-repeat scroll 50% 60% transparent;
+}
+
+.ampere.module .ui-icon-empty {
+	background-image: none;
+}
+
+.ampere.module a {
+	color : #007BA4;
+}
+
+.ampere.module *, .ui-tooltip {
+	font-family : Lucida,Lucidux,"Lucida Sans",Verdana,"Geneva",Arial,Helvetica,sans-serif; 
+}
+
+.ampere.module .ui-widget, body .ui-tooltip {
+	font-size   : 1em;
+}
+
+body .ui-widget.ui-tooltip {
+	font-size   : 12.8px;
+	max-width   : 640px;
+	line-height : 1.6em;
+}
+
+.ampere.module .ui-state-default a, .ampere.module .ui-state-active a {
+    color: inherit;
+}
+
+
+.ampere.module pre,.ampere.module code {
+	font-family : monospace; 
+}
+
+/*
+.ampere.module >.header >.block >.content .group, 
+.ampere.module >.body >.block. >.state >.view .group, 
+.ampere.module >.footer >.block >.content >.controls >.group {
+	display 	 : inline;
+}
+*/
+
+.ampere.module >.body >.block >.state >.view .group.horizontal {
+	display		: inline-block;
+	min-width   : 224px;
+}
+
+.ampere.module >.body >.block >.state >.view .group.horizontal >* {
+	float		: left;
+	/*width	: 100%;*/
+}
+
+.ampere.module >.body >.block >.state >.view .group.vertical {
+	position 	: relative;
+	display		: block;
+	min-width   : 224px;
+}
+
+.ampere.module >.body >.block >.state >.view .group.vertical >* {
+	display : block;
+	width	: 100%;
+}
+
+.ampere.module >.body >.block >.state >.view .group.vertical >label.ui-button +input +label.ui-button {
+	border-top : 0;
+}
+
+.ampere.module >.body >.block >.state >.view .group.vertical >button.ui-button +button.ui-button {
+	border-top : 0;
+}
+
+.ampere.module >.body >.block >.state >.view label> {
+	overflow : hidden;
+}
+
+.ampere.module >.body >.block >.state >.view label>.ui-icon {
+	float : left;
+}
+
+.ampere.module pre {
+	font-family	: monospace; 
+}
+
+.ampere.module .ui-multiselect {
+    padding: 0.4em;
+}
+
+.ui-multiselect-checkboxes li {
+	font-size : inherit;
+}
+
+.ampere.module .ui-spinner {
+	min-width			 : 222px;
+}
+
+.ampere.module dd {
+	margin 			: 0px;
+	margin-bottom	: 10px;
+}
+
+.ampere.module dd:last-child {
+	margin-bottom : 0px;
+}
+
+.ampere.module .description {
+	color	: gray;
+	padding : 3px 0px;
+}
+
+.ampere.module dd .description {
+	padding-bottom : 0;
+}
+
+.ampere.module fieldset {
+	border 				 : 2px solid #AAAAAA;
+	-moz-border-radius   : 4px 4px 4px 4px;
+	-webkit-border-radius: 4px; 
+	border-radius		 : 4px;
+	margin				 : 0;
+	display				 : inline-block;
+    padding-top			 : 9px;
+}
+
+.ampere.module fieldset .ui-buttonset {
+	margin-right: 4px;
+}
+
+.ampere.module input[type=text], 
+.ampere.module input[type=password], 
+.ampere.module input[type=number], 
+.ampere.module textarea {
+	padding 			 : 0.4em 0.4em;
+	border  			 : 1px solid #AAAAAA;
+	-moz-border-radius   : 4px 4px 4px 4px;
+	-webkit-border-radius: 4px; 
+	border-radius		 : 4px;
+	font-family		     : monospace;
+	font-size			 : 12.8px;
+	min-width			 : 213px;
+}
+
+.ampere.module button {
+	white-space: nowrap;
+}
+
+.ampere.module input[type=number] {
+	min-width			 : 220px;
+}
+
+.ampere.module .ui-spinner >input[type=text] {
+	min-width			 : 193px;
+}
+
+.ampere.module input.compat.number {
+	border  : 0;
+	padding	: 0;
+}
+
+	/* disable browser csss for disabled style */ 
+textarea:disabled, input:disabled {
+	background-color: inherit;
+}
+
+.ampere.module textarea {
+	/*
+	padding 			 : 0.4em 0.4em;
+	border  			 : 1px solid #AAAAAA;
+	-moz-border-radius   : 4px 4px 4px 4px;
+	-webkit-border-radius: 4px; 
+	border-radius		 : 4px;
+	font-family		     : monospace;
+	font-size			 : 12.8px;
+	*/
+	min-height			 : 5em;
+	resize				 : none;
+}
+
+.ampere.module .ampere.module input[type=text]:invalid, 
+.ampere.module textarea:invalid, 
+.ampere.module input[type=password]:invalid {
+	border-color : Crimson;
+}
+
+.ampere.module label.required {
+	font-weight: bold;
+}
+
+.ampere.module >.body {
+	position		: absolute;
+	width			: 100%;
+	overflow	    : auto;
+	/* top==header.outerHeight() and bottom==header.footerHeight() */
+}
+
+.ampere.module >.body >.block >.content >.view >* {
+	padding 	: 10px;
+}
+
+/*.ampere.module >.header*/ 
+.ampere.module >.header >.block >.content >.view {
+	position	: relative;		
+	/*padding		: 4px 4px;*/
+	overflow	: hidden;
+	/*border-top  : 0;*/
+}
+
+.ampere.module >.body >.block >.content >.view {
+	position	: relative;
+} 
+
+.ampere.module  >.footer {
+	overflow		: auto;
+	position		: absolute;
+	bottom			: 0;
+	left			: 0;
+	right			: 0;
+}
+
+.ampere.module  >.footer >.block >.content >.view,
+.ampere.module  >.header >.block >.content >.view {
+	padding			: 4px 4px;
+}
+
+/* .ampere.module >.header >.controls >* */
+.ampere.module >.header >.block >.content >.view >.controls >*,
+.ampere.module >.footer >.block >.content >.view >.controls >* {
+	float		: right;
+	margin-right: 8px;
+}
+
+/* .ampere.module >.header >.controls */
+.ampere.module >.header >.block >.content >.view >.controls, 
+.ampere.module >.footer >.block >.content >.view >.controls {
+	margin-right : -4px;
+	overflow     : hidden;
+}
+
+.ampere.module >.footer .about {
+	font-weight		: normal;
+	color       	: #333333;
+}
+
+.ampere.module >.footer .about,
+.ampere.module >.footer .about * {
+	white-space 	: nowrap;
+	text-overflow	: ellipsis;	
+	overflow		: hidden;
+	-o-text-overflow: ellipsis;
+}
+
+.ampere.module >.flash {
+	position		: absolute;
+	top				: 0.6em;
+	width			: 50%;
+	margin-left		: 25%;
+	text-align		: center;
+	white-space		: nowrap;
+	text-overflow	: ellipsis;	
+	overflow		: hidden;
+	-o-text-overflow: ellipsis;
+	background-color: #FFF1A8;
+	border			: 5px solid #FFF1A8;	
+}
+
+.ampere.module >.flash.error {
+	background 		: inherit;	
+	background-color: Crimson;
+	border-color    : Crimson;
+	color			: white;
+    font-weight		: bold;
+} 
+
+.ui-icon-ajax {
+	background: url("images/ajax.gif") no-repeat scroll 50% 60% transparent;
+}
+
+.ampere.module >.flash.ajax {
+	background-color: White;
+	border-color    : White;
+	color			: #333333;
+} 
+
+.ampere.module >.flash >.controls {
+	overflow : hidden;
+}
+
+.ampere.module >.flash >.controls >.icon {
+	display			: inline-block;
+	vertical-align	: top;
+	margin-left		: -4px;
+	margin-right	: 0;
+}
+
+.ampere.module >.footer >.block >.content >.view >.controls +.about {
+	padding-top : 4px;
+}
+
+/* .ampere.module >.header >.label, */
+.ampere.module >.header >.block >.content >.view >.label,
+.ampere.module >.header >.block >.content >.view >.icon {
+	float		: left;
+	top			: 50%;
+	margin-top  : -0.7em;
+	position	: absolute;
+}
+
+/* .ampere.module >.header >.icon */
+.ampere.module >.header >.block >.content >.view >.icon {
+	margin-left : 6px;
+}
+
+/* .ampere.module >.header >.label */
+.ampere.module >.header >.block >.content >.view >.label {
+	margin-left : 6px;
+}
+
+.ampere.module >.header >.block >.content >.view >.icon + .label
+/*.ampere.module >.header >.icon + .label*/ {
+	left : 26px;
+}
+
+.ampere.module >.overlay {
+	cursor : wait;
+}

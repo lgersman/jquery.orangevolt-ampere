@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
+<<<<<<< HEAD
 	<name>bootstrap-angular-template</name>
+=======
+	<name>jquery.orangevolt-ampere</name>
+>>>>>>> e66474584767d906d594364ceeb115073f8ac0e4
 	<comment></comment>
 	<projects>
 	</projects>
@@ -10,6 +14,7 @@
 			<arguments>
 			</arguments>
 		</buildCommand>
+<<<<<<< HEAD
 		<buildCommand>
 			<name>org.eclipse.wst.validation.validationbuilder</name>
 			<arguments>
@@ -23,6 +28,10 @@
 	</buildSpec>
 	<natures>
 		<nature>org.eclipse.php.core.PHPNature</nature>
+=======
+	</buildSpec>
+	<natures>
+>>>>>>> e66474584767d906d594364ceeb115073f8ac0e4
 		<nature>org.eclipse.wst.jsdt.core.jsNature</nature>
 	</natures>
 </projectDescription>

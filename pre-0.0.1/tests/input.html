@@ -1,0 +1,396 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<!--
+	  Copyright (c) 2011 Lars Gersmann (lars.gersmann@gmail.com, http://orangevolt.blogspot.com)
+	  Dual licensed under the MIT (http://www.opensource.org/licenses/mit-license.php)
+	  and GPL (http://www.opensource.org/licenses/gpl-license.php) licenses.
+	--> 
+	<head>  
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=7,chrome=1; IE=9" />
+		
+		<title>Ampere input example</title>
+				
+		<script type="text/javascript" src="../lib/jquery-1.5.1.js"></script>
+		<script type="text/javascript" src="../lib/jquery/plugins/jquery.defer.js"></script>
+		<script type="text/javascript" src="../src/jquery.ampere-defer.js"></script>
+		
+		<script id="main" type="text/x-jquery-tmpl">
+			<div style="padding:10px"> 
+				<p>
+					This application shows the available standard input controls of Ampere.
+				</p>
+			</div>
+		</script>
+		<script id="radio" type="text/x-jquery-tmpl">
+			<dl>
+				<dt><label>Gender</label></dt>
+				<dd>
+					{{radio({ label:'Female', icon:false, name:'gender'})}}
+					{{radio({ label:'Male', icon:false, name:'gender'})}}	
+				</dd>
+
+				<dt></dt>
+				<dd>
+					<fieldset>
+						<legend>as group</legend>
+						<dl>
+							<dt><label>Are you a programmer ?</label></dt>
+							<dd>
+								{{group}}
+									{{radio({ label:'Yes', name:'programmer', value:1})}}
+									{{radio({ label:'No', name:'programmer', value:0})}}
+									{{radio({ label:'Newbie', name:'programmer', value:-1})}}	
+								{{/group}}
+							</dd>
+					</fieldset>	
+				</dd>
+
+				<dt></dt>
+				<dd>
+					<fieldset>
+						<legend>iterated from array</legend>
+						<dl>	
+							<dt><label>Favorite food</label></dt>
+							<dd>
+								{{each [ 'meat', 'vegetables', 'bread', 'pizza']}}
+									{{radio({ value:$value, icon:false, name:'food'})}}
+								{{/each}}
+							</dd>
+						</dl>
+					</fieldset>
+				</dd>
+
+				<dt></dt>
+				<dd>
+					<fieldset>
+						<legend>group iterated from object</legend>
+						<dl>	
+							<dt><label>Favorite drink</label></dt>
+							<dd>
+								{{group}}
+									{{each ({ 'Wodka Orange' : 'wodka_o' , 'Cuba Libre' : 'cuba_libre', 'Coke' : 'coke', 'Martini' : 'martini'})}}
+										{{radio({ label:$index, icon:false, name:'drink', value:$value})}}
+									{{/each}}	
+								{{/group}}
+							</dd>
+						</dl>
+					</fieldset>
+				</dd>
+			
+				<dt><label>Single radio with icon</label></dt>
+				<dd>{{radio({ name : 'single', icon : 'ui-icon-person', label : false})}}</dd>
+			</dl>
+		</script>
+		<script id="checkbox" type="text/x-jquery-tmpl">
+			<dl>
+				<dt></dt>
+				<dd>{{checkbox({ label : 'Accept License', name : 'accepted'})}}</dd>
+				
+				<dt><label>Monthly newsletter</label></dt>
+				<dd>{{checkbox({ name : 'newsletter'})}}</dd>
+				
+				<dt><label>Are you okay ?</label></dt>
+				<dd>{{checkbox({ label : 'Yes', icon : false, value : 1, name : 'okay'})}}</dd>
+				
+				<dt><label>Enable tooltips</label></dt>
+				<dd>{{checkbox({ icon : 'ui-icon-lightbulb', value : 'ja', name : 'help'})}}</dd>
+			</dl>
+		</script>
+		<script id="select" type="text/x-jquery-tmpl">
+			<dl>
+				<dt>Pet</dt>
+				<dd>{{select({ name : 'pet', values : { 'Alpha' : 'a', 'Beta' : [ 0,2,4,8,16], 'Gamma' : 67}, link : cmpByType })}}</dd>
+				<dt>Pets [multiple]</dt>
+				<dd>{{select({ multiple : true, name : 'pets', values : { 'Alpha' : 'a', 'Beta' : [ 0,2,4,8,16], 'Gamma' : 67}, link : 'foo' })}}</dd>
+				<dt>Fruit</dt>
+				<dd>{{select({ name : 'fruit', values : [ 'Apple', 'Peach', 'Orange', 'Banana'] })}}</dd>
+				<dt>Fruits [multiple]</dt>
+				<dd>{{select({ multiple : true, name : 'fruits', values : [ 'Apple', 'Peach', 'Orange', 'Banana'] })}}</dd>
+				<dt>Friend [values by global function]</dt>
+				<dd>{{select({ name : 'friend', values : getFriends })}}</dd>
+				<dt>Colleague [values by state function]</dt>
+				<dd>{{select({ name : 'colleague', values : state.getColleagues })}}</dd>
+			</dl> 
+		</script>
+		<script id="input" type="text/x-jquery-tmpl">
+			<dl>
+				<dt><label for="email">Email</label></dt>
+				<dd>{{text({ name : 'email', value : 'lars.gersmann@gmail.com', style:'width:20em' })}}</dd>
+
+				<dt><label for="notes">Notes</label></dt>
+				<dd>{{text({ multiple : true, name : 'notes', style:'width:99%;height:10em' })}}</dd>
+			</dl>
+		</script>
+		<script id="required" type="text/x-jquery-tmpl">
+			<dl>
+				{{field({label:'Email'})}}
+					{{text({ name:'email',  required:true })}}
+				{{/field}}	
+
+				{{field({label:'Notes'})}}
+					{{text({ name:'notes', multiple : true, name : 'notes', required:true, style:'width:97%;height:10em' })}}
+				{{/field}}	
+			</dl>
+		</script>
+		<script id="password" type="text/x-jquery-tmpl">
+			<dl>
+				<dt><label for="password">Notes</label></dt>
+				<dd>{{password({ name : 'password', style:'width:20em' })}}</dd>
+
+				<dt><label for="password_again">Enter Password again</label></dt>
+				<dd>{{password({ name : 'password_again', style:'width:20em' })}}</dd>
+
+				<dt><label for="password_again2">Third time</label></dt>
+				<dd>{{password({ name : 'password_again2', style:'width:20em' })}}</dd>
+			</dl>
+		</script>
+		<script id="number" type="text/x-jquery-tmpl">
+			<dl>
+				<dt><label for="number">Number</label></dt>
+				<dd>{{number({name:'number', step : 10, min : -30, max : 50})}}</dd>
+			</dl>
+			{{text}}
+		</script>
+		<script id="group" type="text/x-jquery-tmpl">
+			<dl>				
+				{{field}}
+					{{group}}
+						{{button({label:'foo'})}}
+						{{button({label:'bar'})}}
+					{{/group}}
+				{{/field}}
+				{{field({label:"{orientation:'vertical'} (button)"})}}
+					{{group({orientation:'vertical'})}}
+						{{button({label:'foo'})}}
+						{{button({label:'bar'})}}
+					{{/group}}
+				{{/field}}
+				{{field({label:"{orientation:'vertical'} (radio)"})}}
+					{{group({orientation:'vertical'})}}
+						{{radio({label:'foo', name:'r0'})}}
+						{{radio({label:'bar', name:'r0'})}}
+					{{/group}}
+				{{/field}}
+				{{field({label:"{orientation:'vertical'} (checkbox)"})}}
+					{{group({orientation:'vertical'})}}
+						{{checkbox({label:'foo', name:'c0'})}}
+						{{checkbox({label:'bariton is cool', name:'c1'})}}
+						{{checkbox({label:'Drums also', name:'c2'})}}
+					{{/group}}
+				{{/field}}
+				{{field}}
+					{{text()}}
+				{{/field}}
+			</dl>
+		</script>
+		<script id="field" type="text/x-jquery-tmpl">
+			<style>
+				.ui-icon-openid {
+					background-image : url('http://www.google.com/s2/favicons?domain=openid.net');
+				}
+			</style>
+			<dl>
+				{{field({label:'Enter your name', tooltip : 'Your name and familyname'})}}
+					{{text()}}
+					<div class="description">
+						Your name should reflect your real personality.
+					</div>	
+				{{/field}}
+
+				{{field({label:'Email'})}}
+					{{text}}
+					<div class="description">
+						Your email adress were we can reach you daily.
+					</div>
+				{{/field}}
+
+				{{field({label:'OpenID', icon : 'ui-icon-openid', required : true})}}
+					{{text}}
+					<div class="description">
+						Enter your  
+						<img src="http://www.google.com/s2/favicons?domain=openid.net" border="no"/>
+						OpenID account url here.
+					</div>
+				{{/field}}
+
+				{{field({label:'Gender', tooltip : 'Are your male or female ?'})}}
+					{{group}}
+						{{radio({ label : 'Male', name : 'gender'})}}
+						{{radio({ label : 'Female', name : 'gender'})}}	
+					{{/group}}
+				{{/field}}
+
+				{{field({label:'Interests', required : true})}}
+					{{select({ multiple : true, values : ['running', 'swimming', 'walking', 'dancing']})}}
+				{{/field}}
+
+				{{field({label:'Age'})}}
+					{{number({ required : true})}}
+				{{/field}}
+
+				{{field({label:'Without control', required : true})}}
+					35
+				{{/field}}
+			</dl>
+		</script>
+		
+		<script id="disabled" type="text/x-jquery-tmpl">
+			<dl>
+				{{field}}
+					{{text({ disabled:state.checkDisable})}}
+				{{/field}}
+				{{field}}
+					{{text({ multiple:true, disabled:state.checkDisable})}}
+				{{/field}}
+				{{field}}
+					{{button({ label:'A button', disabled:state.checkDisable})}}
+				{{/field}}
+				{{field}}
+					{{select({ disabled:state.checkDisable, values:[ 'Alpha', 'Beta', 'Gamma']})}}	
+				{{/field}}
+				{{field}}
+					{{group}}
+						{{radio({ disabled:state.checkDisable, label:'Yes', name:'programmer', value:1})}}
+						{{radio({ disabled:state.checkDisable, label:'No', name:'programmer', value:0})}}
+						{{radio({ disabled:state.checkDisable, label:'Newbie', name:'programmer', value:-1})}}	
+					{{/group}}
+				{{/field}}
+				{{field}}
+					{{checkbox({ disabled:state.checkDisable, label:'Accept License', name:'accepted'})}}
+				{{/field}}
+				{{field}}
+					{{password({ disabled:state.checkDisable, name : 'password_again' })}}
+				{{/field}}
+				{{field}}	
+					{{number({ disabled:state.checkDisable, step : 10, min : -30, max : 50})}}
+				{{/field}}
+			</dl>
+			{{checkbox({ name : 'disable'})}}
+		</script>
+		<script type="text/javascript">
+			
+		function cmpByType( l, r) { 
+			return typeof( l)==typeof( r);
+		}
+
+		function getFriends() {
+			return [ 'Peter', 'Paul', 'Mary'];
+		}
+
+		window.foo = cmpByType;
+	
+		$.ampere( function() {
+			$.ampere.module( function input() {
+				this
+				.state( function main() {
+				})
+				
+				.state( function radio() {
+					this.programmer = 1;
+					this.gender     = 'male';
+					this.food       = 'pizza';
+					this.drink 		= 'cuba_libre';	
+					
+					this.transition( this.module.states.main);
+				})
+				
+				.state( function checkbox() {
+					this.accepted = true;
+					this.newsletter = false;
+					this.okay = 0;
+					this.help = 'ja';
+					
+					this.transition( this.module.states.main);
+				})
+				
+				.state( function select() {
+					this.fruit  = 'Peach';
+					this.fruits = ['Banana', 'Orange']; 
+					this.pet    = 67;
+					this.pets   = [ 67,'a'];
+					this.friend = 'Paul';
+					this.colleague = 'Cpt. Kirk';
+						
+					this.getColleagues = function() {
+						return [ 'Mr. Spock', 'Cpt. Kirk'];
+					};
+					
+					this.transition( this.module.states.main);
+				})
+				
+				.state( function input() {								
+					this.transition( this.module.states.main);
+				})
+				
+				.state( function required() {	
+					//this.email = 'your@email.com';							
+					this.transition( this.module.states.main);
+				})
+				
+				.state( function password() {								
+					this.transition( this.module.states.main);
+				})
+				
+				.state( function number() {			
+					this.number = 20;
+					this.transition( this.module.states.main);
+				})
+				
+				.state( function group() {			
+					this.transition( this.module.states.main);
+				})
+				
+				.state( function field() {			
+					this.transition( this.module.states.main);
+				})
+				
+				.state( function disabled() {
+					this.disable = true;
+					this.checkDisable = function() {
+						return this.disable;
+					} 
+					
+					this.transition( this.module.states.main);
+				});
+				
+				this.states.main
+				.transition( this.states.radio)
+				.transition( this.states.checkbox)
+				.transition( this.states.select)
+				.transition( this.states.input)
+				.transition( this.states.required)
+				.transition( this.states.password)
+				.transition( this.states.number)
+				.transition( this.states.group)
+				.transition( this.states.field)
+				.transition( this.states.disabled);
+			}, 
+			{
+				icon	 : 'ui-icon-star',
+				label    : $( 'head >title').text(),
+				about    : $('<div><a target="_blank" href="https://github.com/lgersman/jquery.orangevolt-ampere">Ampere</a> - Copyright© 2011 by <a target="_blank" href="http://www.orangevolt.com">Orangevolt</a>.</div>'),
+				state    : 'main',
+				cmpByType2 : cmpByType
+			});
+			
+			$( 'body').module( 'input');
+		},
+		{ 
+            debug : false,
+            /*'jquery-ui/themes/base/jquery-ui.css',*/
+           'jquery-ui-theme'  : 'jquery-ui/aristo/css/Aristo/jquery-ui-1.8.7.custom.css'
+            				// '//ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/themes/cupertino/jquery.ui.all.css'
+            				// '//ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/themes/redmond/jquery.ui.all.css'
+        }
+		);
+		</script>
+	</head>
+	<body class="portal">
+		<div class="ui-widget-overlay">
+			<div class="ampere placeholder"/>
+		</div>
+	</body>
+</html>

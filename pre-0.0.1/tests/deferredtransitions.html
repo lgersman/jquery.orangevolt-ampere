@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<!--
+	  Copyright (c) 2011 Lars Gersmann (lars.gersmann@gmail.com, http://orangevolt.blogspot.com)
+	  Dual licensed under the MIT (http://www.opensource.org/licenses/mit-license.php)
+	  and GPL (http://www.opensource.org/licenses/gpl-license.php) licenses.
+	--> 
+	<head>  
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=7,chrome=1; IE=9" />
+		
+		<title>Orangevolt Ampere deferred transitions example</title>
+		
+		<script type="text/javascript" src="../lib/jquery-1.5.1.js"></script>
+		<script type="text/javascript" src="../lib/jquery/plugins/jquery.defer.js"></script>
+		<script type="text/javascript" src="../src/jquery.ampere-defer.js"></script>
+		
+		<script id="introduction" type="text/x-jquery-tmpl">
+			<div style="padding:10px"> 
+				<p>
+					This application shows how to use deferred transitions.
+				</p>
+				<p class="description">
+					Deferred transitions are transitions starting parallel execution paths like <strong>asyncroneous
+					ajax</strong> calls or timer controlled long term execution paths.
+				</p>
+				<p class="description">
+					A transition can return a <strong>jQuery deferred</strong> instance which is in turn used to track
+					the state of the transition.  
+				</p>
+			</div>
+		</script>
+		<script id="demo" type="text/x-jquery-tmpl">
+			<fieldset>
+				<legend>Wait for completion</legend>
+				<dl>
+					{{field({label:'Seconds to wait before transition ends :'})}}
+						{{number({ name : 'ttw'})}}
+						<div class="description">	
+							Select transition to go or <strong>None</strong> for no one<br/>(check what happens to button 'Execute selected transition').
+							<br/>
+							Enter <strong>0</strong> to simulate an error (indicated by the flash). 
+						</div>
+					{{/field}}
+					{{field({lasbel:'Seconds to wait before transition ends :'})}}
+						{{transition( state.transitions.ttw)}}
+					{{/field}}
+				</dl>
+			</fieldset>
+		</script>
+		<script type="text/javascript">
+		$.ampere( function() {
+			$.ampere.module( function $transition() {
+				this
+				.state( function introduction() {}, { label : false})
+				.state( function demo()	{
+					this.ttw = 3;
+				});
+
+				this.states.introduction.transition( this.states.demo, {
+					label : 'Demo'
+				});	
+				
+				this.states.demo.transition( this.states.demo, {
+					name  : 'ttw',
+					label : 'Start',
+					type  : 'secondary',
+					icon  : 'ui-icon-clock',
+					action  : function() {
+						var state = this.state; 
+						
+						state.module.flash.wait( 'Waiting ' + state.ttw + ' seconds ...', { icon : 'ui-icon-clock'});
+						var deferred = $.Deferred( function( deferred) {
+				            window.setTimeout(function() {
+				                if( state.ttw) {
+				                	deferred.resolve( 'Waiting done.');	
+				                } else {
+				                	deferred.reject( 'Simulated error by entering 0.  Refresh browser to continue.');
+				                };
+				            }, state.ttw*1000);
+				        });
+						
+						return $.extend( function() { return function() { }}, deferred);
+					}
+				});
+				
+				this.states.demo.transition( this.states.demo, {
+					name  : 'delayed_action',
+					label : 'Wait 5 seconds until again here',
+					action: this.states.demo.action( function() {
+						state.module.flash.wait( 'Wait 5 seconds ...', { icon : 'ui-icon-clock'});
+						var deferred = $.Deferred( function( deferred) {
+				            window.setTimeout(function() {
+				            	state.module.flash.wait( 'Wait 4 seconds ...', { icon : 'ui-icon-clock'});	
+				            	window.setTimeout(function() {
+				            		state.module.flash.wait( 'Wait 3 seconds ...', { icon : 'ui-icon-clock'});	
+				            		window.setTimeout(function() {
+				            			state.module.flash.wait( 'Wait 2 seconds ...', { icon : 'ui-icon-clock'});	
+				            			window.setTimeout(function() {
+				            				state.module.flash.wait( 'Wait 1 second ...', { icon : 'ui-icon-clock'});
+				            				window.setTimeout(function() {
+								                deferred.resolve( 'Waiting 5 seconds successful.');
+								            }, 1000);
+							            }, 1000);
+						            }, 1000);
+					            }, 1000);
+				            }, 1000);
+				        });
+
+						var redo = function() { return $.extend( function() {}, deferred); };
+						
+						return $.extend( redo, deferred);
+					})
+				});
+				
+				this.states.demo.transition( this.states.demo, {
+					name  : 'undo_redo_delayed',
+					label : 'Undo/Redo both 4 seconds delayed',
+					action: function() {
+						var message = 'Redo'; 
+						var delay = function() {
+							state.module.flash.wait( message + ' - 4 seconds delay ...');
+							var deferred = $.Deferred( function( deferred) {
+					            window.setTimeout(function() {
+					                deferred.resolve( message + ' delay finished.');
+					                message = message=='Redo' ? 'Undo' : 'Redo';
+					            }, 4000);
+					        });
+							
+							return $.extend( delay, deferred);
+						};
+
+						return delay();
+					}
+				});
+				
+				this.states.demo.transition( this.states.demo, {
+					name  : 'delayed_action_producing_error',
+					label : 'Delayed action producing an error',
+					action: this.states.demo.action( function() {
+						var redo = function() { };
+						
+						state.module.flash.wait( 'Wait 3 seconds ...');
+						var deferred = $.Deferred( function( deferred) {
+				            window.setTimeout(function() {
+				                deferred.reject( 'Forced action construction error. Refresh browser to continue.');
+				            }, 3000);
+				        });
+						
+						return $.extend( redo, deferred);
+					})
+				});
+				
+				for( var name in this.states) {
+					var state = this.states[name];
+					if( state!==this.states.introduction) {
+						state.transition( this.states.introduction, {
+							group 	: '$global',
+							label   : 'Introduction',
+							icon 	: 'ui-icon-home'
+						});
+					}
+				}
+			}, 
+			{ 
+				state    : 'introduction',
+				label    : $('head >title').text(),
+				about    : $('<div><a target="_blank" href="https://github.com/lgersman/jquery.orangevolt-ampere">Ampere</a> - Copyright© 2011 by <a target="_blank" href="http://www.orangevolt.com">Orangevolt</a>.</div>')
+			});
+			
+			$.when( $.ampere.theme).done( function() {
+				$( 'body').module( '$transition');
+			});
+		},
+		{ 
+			debug   : true,
+			'jquery-ui-theme'  : 'jquery-ui/aristo/css/Aristo/jquery-ui-1.8.7.custom.css'
+				// '//ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/themes/cupertino/jquery.ui.all.css'
+				// '//ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/themes/redmond/jquery.ui.all.css'
+		}
+		);
+		</script>
+	</head>
+	<body class="portal">
+		<div class="ui-widget-overlay">
+			<div class="ampere placeholder"/>
+		</div>
+	</body>
+</html>
