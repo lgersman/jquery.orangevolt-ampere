@@ -1,0 +1,26 @@
+.ampere-module {
+	position : relative;
+	
+	.overlay {
+		/*
+		opacity	: 0.8; 
+		filter	: alpha(opacity=80);
+		*/ 
+		position: fixed; 
+		top		: 0; 
+		left	: 0; 
+		bottom	: 0;
+		right	: 0;
+		z-index	: 1040;
+	  	background-color: #000000;
+	  	
+	  	visibility:hidden;
+	  	opacity:0;
+	}
+	
+	.overlay.block {
+		visibility:visible;
+  		opacity:0.7;
+  		transition:opacity 0.8s linear;
+	}
+}
