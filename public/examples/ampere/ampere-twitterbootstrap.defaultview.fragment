@@ -1,9 +1,5 @@
 <div>	
-<<<<<<< HEAD
 	hello {{ampere.view.state().name()}}
-=======
-	hello {{$root.ampere.view.state()}}
->>>>>>> e66474584767d906d594364ceeb115073f8ac0e4
 	<div>
 		huhu {{ampere.module.current().state.name()}}
 		<div>
@@ -11,7 +7,6 @@
 			(="{{ampere.module.current().state.name()}}")
 		</div>
 	</div>
-<<<<<<< HEAD
 	
 	<section>
 		<h3>Data</h3>
@@ -24,6 +19,4 @@
 			<button type="button" ng-ampere-transition="transition" ng-repeat="transition in ampere.ui.getTransitions({ 'ampere.ui.type':undefined})"></button>
 		</div>
 	</section>
-=======
->>>>>>> e66474584767d906d594364ceeb115073f8ac0e4
 </div>

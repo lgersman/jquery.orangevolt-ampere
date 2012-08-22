@@ -156,7 +156,6 @@
 				'ampere.state.view'		: 'about'
 			});
 
-<<<<<<< HEAD
 		
 		this.state( function dummystate( state) {
 			state.transition( module.states.main, 'about')
@@ -168,12 +167,6 @@
 		.transition( this.states.main, 'intro').options({ 'ampere.state.view'	: 'intro'})
 		.state().transition( this.states.main, 'help').options({ 'ampere.state.view'	: 'help'})
 		.state().transition( this.states.main);
-=======
-		this.state( function dummystate() {
-			
-		})
-		.transition( this.states.main);
->>>>>>> e66474584767d906d594364ceeb115073f8ac0e4
 
 		this.states.main.transition( this.states.dummystate)
 		.options( 'ampere.ui.type' , 'global');

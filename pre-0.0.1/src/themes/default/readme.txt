@@ -1,1 +1,0 @@
-http://www.erichynds.com/examples/jquery-ui-multiselect-widget/demos/

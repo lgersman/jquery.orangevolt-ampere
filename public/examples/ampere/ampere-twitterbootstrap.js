@@ -21,7 +21,6 @@
 		
 		var ampereTwitterbootstrapController = function( $scope, $rootElement, $window) {
 			var controller = $rootElement.parent().data( 'ampere.controller');
-<<<<<<< HEAD
 			/* 
 			 * TODO : this is a dirty hack to transport the initial template into
 			 * the ampere structure of angularjs
@@ -34,13 +33,6 @@
 				ui 	   	: controller.ui,
 				template: template, 
 				view   	: controller.module.current().view
-=======
-			
-			$scope.ampere = {
-				module : controller.module,
-				ui 	   : controller.ui,
-				view   : controller.module.current().view
->>>>>>> e66474584767d906d594364ceeb115073f8ac0e4
 			};
 		};
 		ampereTwitterbootstrapController.$inject = ['$scope', '$rootElement', '$window'];
@@ -62,11 +54,7 @@
 					
 					scope.$watch( 'ampere', function() {
 						_ns.debug( 'ampere changed');
-<<<<<<< HEAD
 						
-=======
-							
->>>>>>> e66474584767d906d594364ceeb115073f8ac0e4
 							// remove old scope variables
 						/*
 						debugger
@@ -87,36 +75,12 @@
 							_ns.debug( 'set initial scope.' + properties[i] + '=', $window.$.ov.json.stringify( scope[ properties[i]], $window.$.ov.json.stringify.COMPACT));
 						} 
 						
-<<<<<<< HEAD
 						var template = scope.ampere.template;
 
 						console.log( 'template=' + template);
 						
 						element.html( template);
 						$compile( element.contents())( scope);
-=======
-						
-						var view = scope.ampere.module.current().view;
-						var template = view.template();
-
-						if( template==null) {
-							template = $.get( scope.ampere.ui.options( 'ampere.baseurl') + '/ampere-twitterbootstrap.defaultview.fragment');
-						} else if( $.isFunction( template)) {
-							template = template.call( scope.ampere.module.current().view, scope.ampere.module.current().view);
-						};
-					 	
-						$.ov.namespace( 'ngState').assert( 
-							!$.isFunction( template.promise) || template.promise().state()!='success', 
-							'view fragment is not ready : state=', $.isFunction( template.promise) ? template.promise().state() : ''
-						);
-						$.when( $.isFunction( template.promise) ? template.promise() : template).done( function( data) {
-							console.log( 'data=' + data);								
-							template = data.jquery ? data.text() : data.responseText || data;
-							
-							element.html( template);
-							$compile( element.contents())( scope);
-						});
->>>>>>> e66474584767d906d594364ceeb115073f8ac0e4
 					});
 					
 					scope.$watch( function() {
@@ -300,21 +264,14 @@
 						}
 						*/
 						scope.transition = newValue;
-<<<<<<< HEAD
-=======
-						scope.$enabled = scope.transition.isEnabled();
->>>>>>> e66474584767d906d594364ceeb115073f8ac0e4
 						
 						if( !scope.transition) {
 							 element.replaceWith( '<span style="background-color:crimson; color:white">' + 'attribute "ng-ampere-transition" (="' + attrs.ngAmpereTransition + '") does not resolve to a ampere transition' + '</span>');
 							 return;
 						}
 						
-<<<<<<< HEAD
 						scope.$enabled = scope.transition.isEnabled();
 						
-=======
->>>>>>> e66474584767d906d594364ceeb115073f8ac0e4
 						_ns.assert( 
 							$.type( scope.transition)=='object' && scope.transition.constructor && scope.transition.constructor.name=='Transition', 
 							'attribute "ng-ampere-transition" (="', attrs.ngAmpereTransition, '") does not resolve to a ampere transition'
@@ -387,7 +344,6 @@
 			this.controller.element.find( '.overlay').removeClass( 'block');
 		};
 
-<<<<<<< HEAD
 		this.getTemplate = function( view) {
 			var template = view.template();
 
@@ -405,8 +361,6 @@
 			return $.when( $.isFunction( template.promise) ? template.promise() : template);
 		};
 		
-=======
->>>>>>> e66474584767d906d594364ceeb115073f8ac0e4
 		this.destroy = function( controller) {
 			(this.controller.element[0].tagName=="BODY") && $( document).off( 'scroll', onBodyscroll);
 			
@@ -419,7 +373,6 @@
 			// TODO
 		};
 		
-<<<<<<< HEAD
 		this.renderState = function( view, template) {
 			var scope = angular.element( controller.element.find( '>.ampere-module')).scope();
 			scope.$apply( function() {
@@ -428,15 +381,6 @@
 					ui 	     : controller.ui,
 					view     : view,
 					template : template
-=======
-		this.renderState = function( state, view) {
-			var scope = angular.element( controller.element.find( '>.ampere-module')).scope();
-			scope.$apply( function() {
-				scope.ampere = {
-					module : controller.module,
-					ui 	   : controller.ui,
-					view   : controller.module.current().view
->>>>>>> e66474584767d906d594364ceeb115073f8ac0e4
 				};
 			});
 		};
