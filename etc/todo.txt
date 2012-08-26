@@ -1,19 +1,11 @@
-* undo/redo & 
-
-* deferreds
-
-* module.ready = module.ready + states.ready
-
-* default view 
-** (default options wegmachen und dann sieht man es) : keine beschriftung
-** getTransitions( 'toolbar') wird nicht angezeigt
-** default template wird nicht gerendert
-
-* state/view setzen haut noch nicht richtig hin
+* undo/redo 
 
 * promise in $promise umbenennen 
-
 * ampere in $ampere umbenennen  
+
+* automatic transition support (including undo/redo integration)
+
+* CRUD test app (either via "states imported from module" or "module wrapped as state")
 
 * render engine
 ** http://www.whatwg.org/specs/web-apps/current-work/multipage/timers.html#dom-showmodaldialog

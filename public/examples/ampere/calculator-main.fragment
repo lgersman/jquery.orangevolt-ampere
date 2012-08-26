@@ -29,7 +29,7 @@
 	<div class="span2">&nbsp;</div>
 	<div class="span8">
 		<div class="row">
-			<button type="button" class="span2 btn" ng-click="value=value.concat( 8)">7</button>
+			<button type="button" class="span2 btn" ng-click="value=value.concat( 7)">7</button>
 			<button type="button" class="span2 btn" ng-click="value=value.concat( 8)">8</button>
 			<button type="button" class="span2 btn" ng-click="value=value.concat( 9)">9</button>
 			<button ng-ampere-transition="ampere.view.state().transitions.div" class="span2 btn-primary"></button>

@@ -1,5 +1,6 @@
 .ampere-module {
 	position : relative;
+	font-size:13px;  
 	
 	.overlay {
 		/*
@@ -15,12 +16,51 @@
 	  	background-color: #000000;
 	  	
 	  	visibility:hidden;
-	  	opacity:0;
+	  	opacity	:0;
+	  	-webkit-transition	: opacity 0.6s ease;
+     	-moz-transition		: opacity 0.6s ease;
+       	-o-transition		: opacity 0.6s ease;
+          transition		: opacity 0.6s ease;
 	}
 	
 	.overlay.block {
-		visibility:visible;
-  		opacity:0.7;
-  		transition:opacity 0.8s linear;
+		visibility	: visible;
+  		opacity		: 0.7;
+  		transition	: opacity 0.8s linear;
+  		cursor  	: wait;  
+	}
+	
+	.flash {
+		display : none;
+		position: fixed; 
+		top		: 40px; 
+		left	: 40px; 
+		bottom	: 40px;
+		right	: 40px;
+		z-index	: 1041;
+		cursor 	: wait;
+		-webkit-transition	: opacity 0.6s ease;
+     	-moz-transition		: opacity 0.6s ease;
+       	-o-transition		: opacity 0.6s ease;
+          transition		: opacity 0.6s ease;
+          
+		.message {
+			text-align		: center;
+			padding-bottom  : 8px;
+		}
+		
+		@media (min-width: 768px) and (max-width: 980px) {
+				top		: 20px; 
+				left	: 20px;
+				left	: 20px;
+				right	: 20px;
+		}
+		
+		@media (max-width: 767px) {
+				left	: 10px;
+				right	: 10px;
+				top		: 10px; 
+				bottom	: 10px;
+		}
 	}
 }

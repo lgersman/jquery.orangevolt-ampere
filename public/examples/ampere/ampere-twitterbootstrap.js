@@ -39,8 +39,6 @@
 		ampere.controller( 'amperetwitterbootstrap', ampereTwitterbootstrapController);
 		
 		ampere.directive( 'ngAmpereState', [ '$compile', '$window', function( $compile, $window) {
-			var _ns = $.ov.namespace('ngAmpereTransition');
-			
 			return {
 				restrict   : 'A',
 				scope      : 'isolate',
@@ -53,16 +51,18 @@
 					// var oldChangeset = {};
 					
 					scope.$watch( 'ampere', function() {
+						var _ns = $.ov.namespace('ngAmpereTransition(' + scope.ampere.module.current().state.fullName() + ')');
 						_ns.debug( 'ampere changed');
 						
 							// remove old scope variables
-						/*
-						debugger
 						var properties = Object.keys( scope);
+						
 						for( var i in properties) {
-							delete scope[ properties[i]];
+							if( properties[i]!='ampere' && properties[i]!='this' && properties[i].charAt( 0)!='$') {
+								_ns.debug( 'delete previsouly defined scope.' + properties[i]);
+								delete scope[ properties[i]];
+							}
 						}
-						*/
 							// transport state variables into scope
 						properties = Object.keys( scope.ampere.module.current().state);
 						for( var i in properties) {
@@ -77,13 +77,14 @@
 						
 						var template = scope.ampere.template;
 
-						console.log( 'template=' + template);
+						_ns.debug( 'template=' + template);
 						
 						element.html( template);
 						$compile( element.contents())( scope);
 					});
 					
 					scope.$watch( function() {
+						var _ns = $.ov.namespace('ngAmpereTransition(' + scope.ampere.module.current().state.fullName() + ')');
 						/*
 						 * get current filtered scope variables
 						 */  
@@ -320,6 +321,24 @@
 		event.preventDefault();
 	}
 	
+	function onActionAbort() {
+		console.log( 'action aborted');
+		
+		var controller = $( this).closest( '.ampere-app').ampere();
+		
+		if( confirm( 'Really abort transition ?')) {
+			var flash = controller.element.find( '.flash');
+			
+			var deferred = flash.data( 'ampere.action-deferred');
+			_ns.assert( deferred && $.isFunction( deferred.promise), 'no action deferred registered on flash element');
+
+			flash.hide();
+			
+				// trigger handler
+			deferred.reject( controller);
+		}
+	}
+	
 	function twitterbootstrap( controller, options) {
 		if( !(this instanceof twitterbootstrap)) {
 			return new twitterbootstrap( controller, options);
@@ -333,15 +352,24 @@
 			
 			this.controller.element.on( 'click', '.ampere-transition', onTransitionClicked);
 			
+			this.controller.element.on( 'click', '.flash .alert button.close', onActionAbort); 
+			
 			return this.template;
 		};
+
+		this.destroy = function( controller) {
+			(this.controller.element[0].tagName=="BODY") && $( document).off( 'scroll', onBodyscroll);
+			
+			this.controller.element.off( 'click', '.ampere-transition', onTransitionClicked);
+			this.controller.element.off( 'click', '.flash .alert button.close', onActionAbort);
+		};		
 		
 		this.block = function() {
 			this.controller.element.find( '.overlay').addClass( 'block');
 		};
 		
 		this.unblock = function() {
-			this.controller.element.find( '.overlay').removeClass( 'block');
+			this.controller.element.find( '.overlay').removeClass( 'block');			
 		};
 
 		this.getTemplate = function( view) {
@@ -361,20 +389,51 @@
 			return $.when( $.isFunction( template.promise) ? template.promise() : template);
 		};
 		
-		this.destroy = function( controller) {
-			(this.controller.element[0].tagName=="BODY") && $( document).off( 'scroll', onBodyscroll);
-			
-			this.controller.element.off( 'click', '.ampere-transition', onTransitionClicked);
-		};
-		
 		this.template = $.get( this.options( 'ampere.baseurl') + '/ampere-twitterbootstrap.fragment');
 		
-		this.renderTransition = function( transition) {
-			// TODO
+		this.renderAction = function( deferred) {
+			var flash = this.controller.element.find( '.flash');
+				// reset flash style to default  
+			flash.find( '.alert').removeClass( 'alert-error').addClass( 'alert-info');
+			flash.find('.progress').show()
+			.find( '.bar').css( 'width', '100%');
+			
+			flash.data( 'ampere.action-deferred', deferred);
+			flash.find( '.message').text( 'Transition in progress ...');
+			flash.find( 'button.close').show();
+			flash.show();
+			
+			deferred
+			.progress( function( message, /* example '12%'*/ progressInPercent) {
+				if( arguments.length) {
+					message && flash.find( '.message').text( message);
+				}
+				if( arguments.length==2) {
+					flash.find( '.bar').css( 'width', progressInPercent);
+				}
+			})
+			.then( function() {
+				flash.hide();
+				// dont forget to remove the temporay data after 
+				// finishing 
+				flash.removeData( 'ampere.action-deferred');
+			});
 		};
 		
-		this.renderState = function( view, template) {
+		this.renderError = function( message) {
+			var flash = this.controller.element.find( '.flash');
+				// reset flash style to default  
+			flash.find( '.alert').removeClass( 'alert-info').addClass( 'alert-error');
+			flash.find('.progress').hide();
+			
+			flash.find( '.message').text( 'Error occured : ' + message);
+			flash.find( 'button.close').hide();
+			flash.show();
+		};
+		
+		this.renderState = function( view, template, transitionResult) {
 			var scope = angular.element( controller.element.find( '>.ampere-module')).scope();
+			onBodyscroll();
 			scope.$apply( function() {
 				scope.ampere = {
 					module   : controller.module,
@@ -382,6 +441,25 @@
 					view     : view,
 					template : template
 				};
+			});
+			
+				// compute optional flash message 
+			$.when( transitionResult).done( function() {
+				if( arguments.length==1 && typeof( arguments[0])=='string') {
+					var flash = controller.element.find( '.flash');
+					
+						// reset flash style to default  
+					flash.find( '.alert').removeClass( 'alert-info');
+					flash.find( '.progress').hide();
+					
+					flash.find( '.message').text( arguments[0]);
+					flash.find( 'button.close').hide();
+					flash.show();
+					
+					window.setTimeout( function() {
+						flash.fadeOut( 'slow');
+					}, 2000);
+				} 
 			});
 		};
 		

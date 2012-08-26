@@ -88,16 +88,20 @@
 			})
 		.state()
 			.transition( this.states.main, 'mul')
-			.action( function( transition) {
-				transition.state().result = transition.state().result * parseFloat( transition.state().value);
-				transition.state().value = '';    
+			.action( function action( transition) {
+				return function redo( source, target) {
+					transition.state().result = transition.state().result * parseFloat( transition.state().value);
+					transition.state().value = '';    
+				};
 			}) 
 			.isEnabled( valueIsNumeric)
 		.state()
 			.transition( this.states.main, 'div')
-			.action( function( transition) {
-				transition.state().result = transition.state().result / parseFloat( transition.state().value);
-				transition.state().value = '';    
+			.action( function action( transition) {
+				return function redo( source, target) { 
+					transition.state().result = transition.state().result / parseFloat( transition.state().value);
+					transition.state().value = '';    
+				};
 			})
 			.isEnabled( function() {
 				var value = $.trim( module.states.main.value);
@@ -108,25 +112,34 @@
 			})
 		.state()
 			.transition( this.states.main, 'add')
-			.action( function( transition) {
-				transition.state().result = transition.state().result + parseFloat( transition.state().value);
-				transition.state().value = '';    
+			.action( function action( transition) {
+				return function redo( source, target) {
+					transition.state().result = transition.state().result + parseFloat( transition.state().value);
+					transition.state().value = '';
+				};
 			})
 			.isEnabled( valueIsNumeric)
 		.state()
 			.transition( this.states.main, 'sub')
-			.action( function( transition) {
-				transition.state().result = transition.state().result - parseFloat( transition.state().value);
-				transition.state().value = '';    
+			.action( function action( transition) {
+				return function redo( source, target) {
+					transition.state().result = transition.state().result - parseFloat( transition.state().value);
+					transition.state().value = '';
+				};    
 			})
 			.isEnabled( valueIsNumeric)
 		.state()
 			.transition( this.states.main, 'ac')
-			.action( function() {
-				this.state().result = 0;
-				this.state().value = '';
+			.action( function action( transition) {
+				return function redo( source, target) {
+					transition.state().result = 0;
+					transition.state().value = '';
+				};
 			})
-			.options( { foo : 'bar', 'ampere.ui.type' : 'toolbar'})
+			.isEnabled( function() {
+				return module.states.main.result && module.current().view===module.states.main.views.main;
+			}) 
+			.options( { foo : 'bar', 'ampere.ui.type' : 'primary'})
 		;
 
 		function isNotCurrentView( view) {
@@ -160,15 +173,60 @@
 		this.state( function dummystate( state) {
 			state.transition( module.states.main, 'about')
 			.options({ 
-				'ampere.ui.type'    : 'toolbar',
+				'ampere.ui.type'    : 'secondary',
 				'ampere.state.view'	: 'about'
 			});
 		})
 		.transition( this.states.main, 'intro').options({ 'ampere.state.view'	: 'intro'})
 		.state().transition( this.states.main, 'help').options({ 'ampere.state.view'	: 'help'})
 		.state().transition( this.states.main);
-
+		
 		this.states.main.transition( this.states.dummystate)
+		.options( 'ampere.ui.type' , 'secondary');
+
+		this.state( function deferredstate( state) {
+			state.transition( module.states.main)
+			.action( function action( transition) {
+				return function redo( source, target) {
+					window.action = $.Deferred();
+					window.action.notify( 'Enter "window.action.resolve(), window.action.reject( [message]) or window.action.notify( [message], [progressInPercent]) in console"');
+					return window.action;
+				};
+			})
+			.options({ 
+				'ampere.state.view'	: 'intro'
+			});
+		});
+		this.transition( this.states.deferredstate)
+		.action( function action( transition) {
+			return function redo( source, target) {
+					// simulate progress of something
+				return $.Deferred( function() {
+					var deferred = this;
+					
+					function timeout( counter) {
+						deferred.notify( 'Step ' + counter + ' ... ', counter*10 + '%');
+						window.setTimeout( function() {
+							if( counter<10) {
+								timeout( counter+1);
+							} else {
+								deferred.resolve( 'Computation done.');
+							} 
+						}, 500);
+					}
+
+					timeout( 1);
+				});
+			};
+		})
+		.options( 'ampere.ui.type' , 'secondary');
+
+		this.transition( this.states.main, 'exception_spiced_transition_action')
+		.action( function action( transition) {
+			return function redo( source, target) {
+				throw 'a problem occured'; 
+			};
+		})
 		.options( 'ampere.ui.type' , 'global');
 		 
 		//this.deferred = $.Deferred();

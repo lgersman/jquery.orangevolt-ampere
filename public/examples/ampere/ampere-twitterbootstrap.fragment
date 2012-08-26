@@ -1,5 +1,5 @@
 <div class="ng-cloak ampere-module" ng-app="window.ov.ampere.ui.twitterbootstrap" ng-controller="amperetwitterbootstrap">
-	<div class="navbar navbar-fixed-top">
+	<div class="navbar navbar-inverse navbar-fixed-top">
     	<div class="navbar-inner">
        		<div class="container">
          		<a 
@@ -17,7 +17,8 @@
        		 	<div class="nav-collapse">
 	           		<ul class="nav">
 	           			<li 
-	           				sng-class="ampere.view==ampere.module.states.main.views[transition.name()] && 'active'" 
+	           				ng-class="{disabled : !transition.isEnabled()}"
+	           				sng-class="ampere.view==transition.target().views[ ampere.view.name()] && 'active'" 
 	           				ng-repeat="transition in ampere.ui.getTransitions({ 'ampere.ui.type':'global'})">
 	           				<a ng-ampere-transition="transition"></a>
 	           			</li>
@@ -27,15 +28,29 @@
 		</div>
 	</div>
 	<div class="container">
-		<header ng-show="ampere.ui.getDescription( ampere.module) || ampere.ui.getCaption( ampere.module) || ampere.ui.getTransitions({ 'ampere.ui.type':'toolbar'}).length">
+		<header ng-show="ampere.ui.getDescription( ampere.module) || ampere.ui.getCaption( ampere.module) || ampere.ui.getTransitions({ 'ampere.ui.type':'primary'}).length || ampere.ui.getTransitions({ 'ampere.ui.type':'secondary'}).length">
 			<h1>{{ampere.ui.getCaption( ampere.module)}}</h1>
 			<p class="lead" ng-bind-html-unsafe="ampere.ui.getDescription( ampere.module)"></p>
-			<div class="subnav" ddata-top="40" ng-show="ampere.ui.getTransitions({ 'ampere.ui.type':'toolbar'}).length">
-	          <ul class="nav nav-pills">
-	          	<li ng-repeat="transition in ampere.ui.getTransitions({ 'ampere.ui.type':'toolbar'})">
-	          		<a ng-ampere-transition="transition"></a> 
-	          	</li>
-	          </ul>
+			
+			<div class="navbar subnav" ddata-top="40" ng-show="ampere.ui.getTransitions({ 'ampere.ui.type':'primary'}).length">
+				<div class="navbar-inner">
+			          <ul class="nav nav-pills">
+			          	<li ng-repeat="transition in ampere.ui.getTransitions({ 'ampere.ui.type':'primary'})" ng-class="{disabled : !transition.isEnabled()}">
+			          		<a ng-ampere-transition="transition"></a> 
+			          	</li>
+			          	<li class="dropdown" ng-show="ampere.ui.getTransitions({ 'ampere.ui.type':'secondary'}).length">
+						    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+						      {{ampere.ui.getCaption( ampere.view.state())}}
+						      <b class="caret"></b>
+						    </a>
+						    <ul class="dropdown-menu">
+						    	<li ng-repeat="transition in ampere.ui.getTransitions({ 'ampere.ui.type':'secondary'})" ng-class="{disabled : !transition.isEnabled()}">
+					          		<a ng-ampere-transition="transition"></a> 
+					          	</li> 
+						    </ul>
+						  </li>
+			          </ul>
+			    </div>
 	        </div>
 		</header>
 		<section class="ampere-state name-{{ampere.view.state().name()}}">
@@ -51,4 +66,13 @@
 		</footer>	
 	</div>
 	<div class="overlay"></div>
+	<div class="flash">
+		<div class="alert alert-info alert-block fade in">
+			<button type="button" class="close">×</button>
+			<div class="message"></div>
+			<div class="progress progress-striped active">
+				<div class="bar" style="width: 100%;"></div>
+			</div>
+		</div>
+	</div>
 </div>

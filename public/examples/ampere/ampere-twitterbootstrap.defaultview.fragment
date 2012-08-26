@@ -1,22 +1,14 @@
-<div>	
-	hello {{ampere.view.state().name()}}
-	<div>
-		huhu {{ampere.module.current().state.name()}}
-		<div>
-			default view generated for state {{ampere.ui.getCaption( ampere.module.current().state)}}
-			(="{{ampere.module.current().state.name()}}")
-		</div>
+<section>
+	<em>(This view was generated automatically : state "{{ampere.view.state().fullName()}}" has no view applied.)</em>
+</section>
+<section>
+	<h3>Data</h3>
+	<pre>{{ampere.view.state() | json}}</pre>
+</section>
+<hr/>	
+<section>
+	<h3>Transitions</h3>
+	<div class="btn-group">
+		<button type="button" ng-ampere-transition="transition" ng-repeat="transition in ampere.ui.getTransitions({ 'ampere.ui.type':undefined})"></button>
 	</div>
-	
-	<section>
-		<h3>Data</h3>
-		<pre>{{ampere.view.state() | json}}</pre>
-	</section>
-	<hr/>	
-	<section>
-		<h3>Transitions</h3>
-		<div class="btn-group">
-			<button type="button" ng-ampere-transition="transition" ng-repeat="transition in ampere.ui.getTransitions({ 'ampere.ui.type':undefined})"></button>
-		</div>
-	</section>
-</div>
+</section>

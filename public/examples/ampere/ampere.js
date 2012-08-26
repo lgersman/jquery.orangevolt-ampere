@@ -30,6 +30,166 @@
 			return _;
 		};
 	}
+
+		/**
+		 * history implementing undo/redo.
+		 * 
+		 * - create an instance 				: 
+		 * 		var myCommandStack = History();
+		 * 
+		 * - push actions into command stack 	:
+		 * 			// redo with argument adds and executes a new action inside the undo/redo manager
+		 * 		myCommandStack.redo( function() {
+		 *			// do something here
+		 *			return function() {		// return a undo function if your action is undoable
+		 *				// undo something here
+		 *				// return redo function if your undo function is redoable
+		 *			};
+		 *		})
+		 *
+		 * - undo an action 					:
+		 * 		myCommandStack.undo();
+		 * 
+		 * - redo an action						:
+		 * 		myCommandStack.redo();
+		 * 
+		 * - ask undo / redo state		 		: 
+		 * 		myCommandStack.canUndo(); myCommandStack.canRedo()
+		 * 		attention : canUndo/canRedo return the count of undoable/redoable actions or 0 if nothing undoable/redoable instead of a boolean 
+		 *   
+		 * - reset 								:
+		 * 		myCommandStack.reset()
+		 * 
+		 * - rollback all undo actions 			:
+		 * 		myCommandStack.rewind()
+		 *
+		 * - playback all redo actions			:
+		 * 		myCommandStack.playback()
+		 */
+	function History( module, /* provide undefined for infinite size */size) {
+		if( !this instanceof History) {
+			return new History( module, size!=undefined ? size : 0);
+		} 
+		
+		/**
+		 * @return 0 (==false) if no undoable action are on stack or count of undoable actions
+		 */
+		this.canUndo = function() {
+			return this.position;
+		};
+		
+		/**
+		 * @return 0 (==false) if no redoable action are on stack or count of redoable actions
+		 */
+		this.canRedo = function() {
+			return this.stack.length-this.position;
+		};
+		
+		/**
+		 * @param action the new action to execute and store 
+		 * or undefined (i.e no argument) to redo the last undo action. 
+		 * 
+		 * if no redo action is available function returns gracefully
+		 * 
+		 * @return the undo instance
+		 */
+		this.redo = function( /*parameter stucture  is { command : ..., source : ..., target : ..., view : ..., [ ui : ...]?}*/) {
+			var action = undefined;
+			if( arguments.length) {
+				var arg = arguments[0];
+					// remember old view
+				var view = module.current().view;
+				
+				action = function RedoCommand() {
+					var undo = module._transit( arg.command, arg.source, arg.target, arg.view, arg.ui);
+					
+					if( $.isFunction( undo)) {
+						return function UndoCommand() {
+							return module._transit( undo, arg.target, arg.source, view, arg.ui);
+						}; 
+					} else {
+						return undo;
+					}
+				};
+			} 
+				
+			var redo = (action || (this.canRedo() && this.stack[ this.position]));
+			var undo = $.isFunction( redo) && redo();
+
+			if( size!=0) {
+				if( undo) { 
+					if( action) {
+						this.stack.splice( this.position); 	// cleanup recent redo actions
+						this.stack.push( undo);
+						this.position = this.stack.length;
+					} else if( this.canRedo()){
+						this.stack[ this.position++] = undo;// point to next redo action
+					}
+				} else if( redo) {							// cleanup recent undo actions	
+					this.stack.splice( 0, this.position);
+					this.position = this.stack.length; 
+				}
+				
+				if( this.stack.length>size) {
+					this.stack.shift();
+					this.position = this.stack.length;
+				}
+			} 
+			
+			return redo;
+		};
+		
+		/**
+		 * execute the next undo action. 
+		 * returns gracefully if no redo action is available.
+		 * 
+		 * @return the undo instance
+		 */
+		this.undo = function() {
+			if( this.canUndo()) {
+				var undo = this.stack[ --this.position];
+				
+				var deferred = $.Deferred(); 
+				var redo = undo( deferred);
+				
+				var history = this;
+				$.when( deferred).done( function() {
+					if( redo) {
+						history.stack[ history.position] = redo;	// replace undo by its returned redo action
+					} else {								// cleanup recent redo actions
+						history.stack.splice( history.position);
+					}
+				});
+			}
+			
+			return this;
+		};
+		
+		this.reset = function() {
+			this.stack = [];
+			this.position = 0;
+			
+			return this;
+		};
+		
+		this.rewind	= function() {
+			while( this.canUndo()) {
+				this.undo( false);
+			}
+			return this;
+		};
+		
+		this.playback = function() {
+			while( this.canRedo()) {
+				this.redo( false);
+			}
+			return this;
+		};
+		
+		this.reset();
+		
+		return this;
+	}
 	
 	function Transition( state, targetState, transitionName, module) {
 		if( !(this instanceof Transition)) {
@@ -194,7 +354,11 @@
 			return this.views[ viewName] = new View( this, viewName, template);
 		};
 		this.view.load = function( name , url) {
-			return state.view( name || url, $.get( url)); 
+			if( arguments.length==1) {
+				return state.view( 'main', $.get( url));
+			} else {
+				return state.view( name || 'main', $.get( url));
+			}			
 		};
 	}
 	
@@ -305,6 +469,57 @@
 				
 				return this.transitions[ transitionName];
 			};
+			
+			this._transit = function( command, source, target, view, /* optional argument */ui) {
+				ui && ui.block();
+				var result = undefined;
+				if( command) {
+					try {
+							// call action
+						var result = command.call( command, source, target);
+					} catch( ex) {
+						result = $.Deferred();
+						result.reject( ex);
+					}
+				}
+				
+					// render "transaction in progress" overlay
+				if( result && $.isFunction( result.promise) && result.promise().state()=='pending') {
+					ui && ui.render( 'Action', result);
+				}
+				
+				var self = this; 
+				
+				$.when( result)
+				.done( function() {
+					module.current( target, view);
+					
+					var template = ui && ui.getTemplate( view); 
+					template.done( function( data) {
+						template = data.jquery ? data.text() : template.responseText || data;
+						ui && ui.render( 'State', view, template, result);
+						ui && ui.unblock();
+					});
+				})
+				.fail( function() {
+					if( arguments.length==1 && arguments[0]==self) {
+						/* 
+						 * deferred failed controlled by user 
+						 * (ui rejects with controller instance as argument to indentify this case)
+						 * so the only thing to do is unblock the view 
+						 */ 
+						
+						ui && ui.unblock();
+					} else {
+						/*
+						 * the action failed for some unknown reason
+						 */
+						ui && ui.render( 'Error', arguments.length==1 && typeof( arguments[0])=='string' ? arguments[0] : $.ov.json.stringify( arguments, $.ov.json.stringify.COMPACT));
+					}
+				});
+				
+				return result;
+			};
 		};
 	};
 	
@@ -349,6 +564,8 @@
 					this._super();
 					this.options( $.extend( {}, this.ampere().options(), _defaults, options));
 
+					this.history = History( this, this.options( 'ampere.history.limit'));
+					
 					// module function may return a deferred
 					var deferred = fn.call( this, this);
 					_ns.assert( !$.isEmptyObject( this.states), 'cannot instantiate module without any states');
@@ -371,8 +588,12 @@
 							var state = module.states[name];
 							if( $.isEmptyObject( state.views)) {
 								state.view( '', null).options({
-									'ampere.ui.caption' : 'default view for state "' + state.name() + '"',
-									'ampere.ui.description' : "<em>(This view was generated automatically : state has no view applied.)</em>"
+									'ampere.ui.caption' : function( view, ui) {
+										return ui.getCaption( view.state());
+									},
+									'ampere.ui.description' : function(view, ui) {
+										return ui.getDescription( view.state());
+									}
 								});
 							}
 						}
@@ -535,7 +756,7 @@
 				} 
 			};
 			
-			return $.isFunction( value) ? value.call( object, object) : value;
+			return $.isFunction( value) ? value.call( object, object, this) : value;
 		};
 		
 		this.getCaption = function( object) {
@@ -587,9 +808,8 @@
 		this.element = element;
 		
 			/*
-			 * initialize module
+			 * initialize 
 			 */ 
-		
 		this.element.addClass( 'ampere-app');
 		
 			// (1) state
@@ -605,7 +825,10 @@
 				break;
 			}
 		}
-		_ns.assert( state instanceof State, 'could not evaluate initial state');
+		/*
+		 * no more needed - its already ensured in module initializer    
+		 * _ns.assert( state instanceof State, 'could not evaluate initial state');
+		*/
 		
 			// (2) view
 		var view = this.options( 'ampere.view') || this.module.current().view || module.options( 'ampere.view');
@@ -620,7 +843,10 @@
 				break;
 			}
 		}
-		_ns.assert( view instanceof View, 'no default view "', view, '" not found in ', state.fullName(), '.views');
+		/*
+		 * no more needed - its already ensured in module initializer
+		 * _ns.assert( view instanceof View, 'no default view "', view, '" not found in ', state.fullName(), '.views');
+		 */
 		
 			// (3) ui
 		this.ui = this.options( 'ampere.ui') || module.options( 'ampere.ui');
@@ -642,7 +868,6 @@
 				controller.ui.render( 'Bootstrap');
 			});
 		});			
-		
 			/*
 			 * --
 			 */
@@ -651,54 +876,36 @@
 				// if transistion is enabled und target state defined
 			var target; 
 			if( transition.isEnabled() && (target=transition.target())) {
-				this.ui.block();
+					// get action factory
 				var action = transition.action();
 				
-				try {
-					var result = action.call( transition, transition);
-				} catch( ex) {
-					result = $.Deferred();
-					result.fail( ex);
-				}
-				
-					// render "transaction in progress" overlay
-				if( result && $.isFunction( result.promise) && result.promise().state()!='pending') {
-					this.ui.render( 'Transition', transition, result);
-				}
-				
-				var self = this; 
-				
-				$.when( result)
-				.done( function() {
+					// create a new action
+				var command = action.call( transition, transition);
+
+				// compute target view
+				var view = transition.options( 'ampere.state.view') || target.options( 'ampere.state.view');
+				if( typeof( view)=='string') {
+					var _view = target.views[ view];
+					_ns.assert( _view instanceof View, 'target view "', view, '" not found in ', target.fullName(), '.views');
 					
-						// compute target view
-					var view = transition.options( 'ampere.state.view') || target.options( 'ampere.state.view');
-					if( typeof( view)=='string') {
-						var _view = target.views[ view];
-						_ns.assert( _view instanceof View, 'target view "', view, '" not found in ', target.fullName(), '.views');
-						
-						view = _view;
-					} else if( !view) {
-						for( var key in target.views) {
-							view = target.views[ key];
-							break;
-						}
+					view = _view;
+				} else if( !view) {
+					for( var key in target.views) {
+						view = target.views[ key];
+						break;
 					}
-					_ns.assert( view instanceof View, 'no default view "', view, '" found in ', target.fullName(), '.views');
-					
-					module.current( target, view);
-					
-					var template = self.ui.getTemplate( view); 
-					template.done( function( data) {
-						self.ui.unblock();
-						template = data.jquery ? data.text() : template.responseText || data;
-						self.ui.render( 'State', view, template);
-					});
-				})
-				.fail( function() {
-					console.error( this, arguments);
-					alert( arguments);
-					self.ui.unblock();
+				}
+				/*
+				 *  // this cannot happen anymore
+				 *  _ns.assert( view instanceof View, 'no default view "', view, '" found in ', target.fullName(), '.views'); 
+				 */
+				
+				return this.module.history.redo({
+					command  : command, 
+					source   : transition.state(), 
+					target   : transition.target(), 
+					view 	 : view, 
+					ui 		 : this.ui
 				});
 			}
 		};
