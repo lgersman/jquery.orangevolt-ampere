@@ -1,0 +1,29 @@
+<form>
+	<dl>
+		<dt>
+			Name
+		</dt>
+		<dd>
+			<input autofocus ng-model="entry.name" type="text" required/>
+		</dd>
+		<dt>
+			Familyname
+		</dt>
+		<dd>
+			<input ng-model="entry.familyname" type="text" required/>
+		</dd>
+		<dt>
+			Email
+		</dt>
+		<dd>
+			<input ng-model="entry.email" type="email" required/>
+		</dd>
+		<dt>
+			<button type="button" ng-ampere-transition="$ampere.view.state().transitions.reset">Reset</button>
+			<button type="reset" ng-ampere-transition="$ampere.view.state().transitions.cancel"></button>
+			<button ng-ampere-hotkey="Ctrl+S" type="submit" ng-ampere-transition="$ampere.view.state().transitions.save || $ampere.view.state().transitions.create"></button>
+		</dt>
+		<dd>
+		</dd>
+	</dl>
+</form>

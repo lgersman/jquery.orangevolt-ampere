@@ -1,6 +1,52 @@
 .ampere-module {
 	position : relative;
 	font-size:13px;  
+
+	.alert-block {
+		padding-bottom: 7px;
+	}
+	
+	section.ampere-state {
+		padding-top: 0;
+	}
+	
+	section {
+		padding-top: 10px;
+	}
+	
+	.ampere-state {
+		.page-header {
+			a.icon-question-sign, .ampere-help a {
+				font-size 		: small;
+				text-decoration : none; 
+			}
+
+			a.disabled {
+				color : #555555;
+			}
+			
+			.ampere-help {
+				display : none;
+				
+				ul.hotkeys {
+					list-style-type : none;
+					
+					li.disabled >* {
+						color : #999999
+					}
+					
+					li >.description {
+						margin-left : 13px; 
+					}
+				}
+			}
+		}
+	}
+	
+	/* gray out disabled anchors in navbars */
+	.navbar-inverse .nav > li.disabled > a {
+		color: #555555;
+	}
 	
 	.overlay {
 		/*
@@ -33,10 +79,10 @@
 	.flash {
 		display : none;
 		position: fixed; 
-		top		: 40px; 
-		left	: 40px; 
+		top		: 20px; 
+		left	: 47px; 
 		bottom	: 40px;
-		right	: 40px;
+		right	: 47px;
 		z-index	: 1041;
 		cursor 	: wait;
 		-webkit-transition	: opacity 0.6s ease;

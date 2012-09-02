@@ -1,0 +1,15 @@
+== twitterboostrap renderer ==
+
+* focus : first form element ([autofocus] || [tabIndex!="-1"]):visible in rendered templated will be focused  
+
+* ng-ampere-transition : attribute ng-ampere-hotkey is taken in account for applying hotkeys
+
+* attribute ng-ampere-hotkey : Alt+Shift+N works whereas Shift+Alt+N  
+
+available rootScope services : 
+$scope.$window = $window;
+$scope.$http = $http;
+$scope.$timeout = $timeout;
+$scope.$log = $log;
+$scope.$resource = $resource;
+$scope.$cookies = $cookies;

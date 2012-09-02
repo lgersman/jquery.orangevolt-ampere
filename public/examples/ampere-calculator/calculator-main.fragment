@@ -32,25 +32,25 @@
 			<button type="button" class="span2 btn" ng-click="value=value.concat( 7)">7</button>
 			<button type="button" class="span2 btn" ng-click="value=value.concat( 8)">8</button>
 			<button type="button" class="span2 btn" ng-click="value=value.concat( 9)">9</button>
-			<button ng-ampere-transition="ampere.view.state().transitions.div" class="span2 btn-primary"></button>
+			<button ng-ampere-transition="$ampere.view.state().transitions.div" class="span2 btn-primary"></button>
 		</div>
 		<div class="row">
 			<button type="button" class="span2 btn" ng-click="value=value.concat( 4)">4</button>	
 			<button type="button" class="span2 btn" ng-click="value=value.concat( 5)">5</button>
 			<button type="button" class="span2 btn" ng-click="value=value.concat( 6)">6</button>
-			<button ng-ampere-transition="ampere.view.state().transitions.mul" class="span2 btn-primary"></button>
+			<button ng-ampere-transition="$ampere.view.state().transitions.mul" class="span2 btn-primary"></button>
 		</div>
 		<div class="row">
 			<button type="button" class="span2 btn" ng-click="value=value.concat( 1)">1</button>	
 			<button type="button" class="span2 btn" ng-click="value=value.concat( 2)">2</button>
 			<button type="button" class="span2 btn" ng-click="value=value.concat( 3)">3</button>
-			<button ng-ampere-transition="ampere.view.state().transitions.sub" class="span2 btn-primary"></button>
+			<button ng-ampere-transition="$ampere.view.state().transitions.sub" class="span2 btn-primary"></button>
 		</div>
 		<div class="row">
 			<button type="button" class="span2 btn" ng-click="value=value.concat( 0)">0</button>	
 			<button type="button" class="span2 btn" ng-disabled="!value.length || value.indexOf( '.')!=-1" ng-click="value=value.concat( '.')">.</button>
 			<button type="button" class="span2 btn" ng-disabled="isPlusMinusDisabled()" ng-click="value=onPlusMinus()">{{value<0 && '+' || '-'}}</button>
-			<button ng-ampere-transition="ampere.view.state().transitions.add" class="span2 btn-primary"></button>
+			<button ng-ampere-transition="$ampere.view.state().transitions.add" class="span2 btn-primary"></button>
 		</div>
   	</div>
 	<div class="span2">&nbsp;</div>

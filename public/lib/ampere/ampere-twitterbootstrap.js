@@ -9,7 +9,7 @@
 		 * for angular 
 		 */
 	(function() {
-		var ampere = angular.module('window.ov.ampere.ui.twitterbootstrap', []).run( function( $rootScope, $window) {
+		var ampere = angular.module('window.ov.ampere.ui.twitterbootstrap', [ 'ngResource', 'ngCookies']).run( function(/* $rootScope, $window, $http*/) {
 			/*
 			$rootScope.ov = {
 				ampere : {
@@ -19,7 +19,7 @@
 			*/
 		});
 		
-		var ampereTwitterbootstrapController = function( $scope, $rootElement, $window) {
+		var ampereTwitterbootstrapController = function( $scope, $rootElement, $window, $http, $timeout,  $log, $resource, $cookies) {
 			var controller = $rootElement.parent().data( 'ampere.controller');
 			/* 
 			 * TODO : this is a dirty hack to transport the initial template into
@@ -28,54 +28,69 @@
 			var template = controller._initial_template;
 			controller._initial_template = undefined;
 			
-			$scope.ampere = {
+				// copy services to root scope
+			$scope.$window = $window;
+			$scope.$http = $http;
+			$scope.$timeout = $timeout;
+			$scope.$log = $log;
+			$scope.$resource = $resource;
+			$scope.$cookies = $cookies;
+			
+			$scope.$ampere = {
 				module 	: controller.module,
 				ui 	   	: controller.ui,
 				template: template, 
 				view   	: controller.module.current().view
 			};
 		};
-		ampereTwitterbootstrapController.$inject = ['$scope', '$rootElement', '$window'];
+		ampereTwitterbootstrapController.$inject = ['$scope', '$rootElement', '$window', '$http', '$timeout',  '$log', '$resource', '$cookies'];
+		
 		ampere.controller( 'amperetwitterbootstrap', ampereTwitterbootstrapController);
 		
 		ampere.directive( 'ngAmpereState', [ '$compile', '$window', function( $compile, $window) {
 			return {
 				restrict   : 'A',
 				scope      : 'isolate',
-				link: function(scope, element, attrs) {
+				link: function( scope, element, attrs) {
 					/*
 					var controller = element.parents().filter( function( obj) { return $.data( this, 'ampere.controller'); })
 					.data( 'ampere.controller');
 					 */
 
 					// var oldChangeset = {};
-					
-					scope.$watch( 'ampere', function() {
-						var _ns = $.ov.namespace('ngAmpereTransition(' + scope.ampere.module.current().state.fullName() + ')');
+					scope.$watch( '$ampere', function() {
+							// destroy all child scopes (->transitions)
+						while( scope.$$childHead) {
+							scope.$$childHead.$destroy();
+						}
+						
+						var _ns = $.ov.namespace('ngAmpereTransition(' + scope.$ampere.module.current().state.fullName() + ')');
 						_ns.debug( 'ampere changed');
 						
 							// remove old scope variables
 						var properties = Object.keys( scope);
 						
 						for( var i in properties) {
-							if( properties[i]!='ampere' && properties[i]!='this' && properties[i].charAt( 0)!='$') {
+							if( /*properties[i]!='ampere' &&*/ properties[i]!='this' && properties[i].charAt( 0)!='$') {
 								_ns.debug( 'delete previsouly defined scope.' + properties[i]);
 								delete scope[ properties[i]];
 							}
 						}
 							// transport state variables into scope
-						properties = Object.keys( scope.ampere.module.current().state);
+						properties = Object.keys( scope.$ampere.module.current().state);
 						for( var i in properties) {
 							$.ov.namespace( 'ngState')
-							.assert( properties[i]!='ampere', 'state variable named "ampere" is forbidden')
-							.assert( properties[i]!='this', 'state variable named "this" is forbidden')
-							.assert( properties[i].charAt( 0)!='$', 'state variable starting with $ (="', properties[i], '")is forbidden');
+							//.assert( properties[i]!='ampere', 'state variable named "ampere" is forbidden')
+							.assert( properties[i]!='this', 'state property named "this" is forbidden')
+							.assert( properties[i].charAt( 0)!='$', 'state property starting with $ (="', properties[i], '") is forbidden');
 							
-							scope[ properties[i]] = scope.ampere.module.current().state[ properties[i]];
-							_ns.debug( 'set initial scope.' + properties[i] + '=', $window.$.ov.json.stringify( scope[ properties[i]], $window.$.ov.json.stringify.COMPACT));
+							if( properties[i]!='promise') {
+								scope[ properties[i]] = scope.$ampere.module.current().state[ properties[i]];
+								_ns.debug( 'set initial scope.' + properties[i] + '=', $window.$.ov.json.stringify( scope[ properties[i]], $window.$.ov.json.stringify.COMPACT));
+							}
 						} 
 						
-						var template = scope.ampere.template;
+						var template = scope.$ampere.template;
 
 						_ns.debug( 'template=' + template);
 						
@@ -84,63 +99,65 @@
 					});
 					
 					scope.$watch( function() {
-						var _ns = $.ov.namespace('ngAmpereTransition(' + scope.ampere.module.current().state.fullName() + ')');
-						/*
-						 * get current filtered scope variables
-						 */  
-					var changeset = {}; 	
-					var keys = Object.keys( scope);
-					for( var i in keys) {
-						if( keys[i]!='ampere' && keys[i]!='this' && keys[i].charAt( 0)!='$') {
-							changeset[ keys[i]] = scope[ keys[i]];
+						var _ns = $.ov.namespace('ngAmpereTransition(' + scope.$ampere.module.current().state.fullName() + ')');
+							/*
+							 * get current filtered scope variables
+							 */  
+						var changeset = {}; 	
+						var keys = Object.keys( scope);
+						for( var i in keys) {
+							if( /*keys[i]!='ampere' &&*/ keys[i]!='promise' && keys[i]!='this' && keys[i].charAt( 0)!='$') {
+								changeset[ keys[i]] = scope[ keys[i]];
+							}
 						}
-					}
-					
-						/*
-						 * detect changes
-						 */ 
-					keys = Object.keys( changeset);
-						// remove duplicate keys
-					$window.jQuery.each( Object.keys( scope.ampere.module.current().state), function( index, item) {
-						$.inArray( item, keys)!=-1 || keys.push( item);
+						
+							/*
+							 * detect changes
+							 */ 
+						keys = Object.keys( changeset);
+							// remove duplicate keys
+						$window.jQuery.each( Object.keys( scope.$ampere.module.current().state), function( index, item) {
+							$.inArray( item, keys)!=-1 || keys.push( item);
+						});
+						
+							/*
+							 * filter out equal values
+							 */ 
+						var toDelete = [];
+						var toSet = [];						
+						for( var i in keys) {
+							var key = keys[i];
+							if( key!='promise') {
+								if( !Object.hasOwnProperty.call( changeset, key)) {
+									toDelete.push( key);
+								} else if( angular.equals( changeset[ key], scope.$ampere.module.current().state[ key])) {
+									delete changeset[ key];
+								} else {
+									toSet.push( key);
+								}
+							}
+						}
+	
+							/*
+							 * if changes occured 
+							 */ 
+						if( toSet.length || toDelete.length) {
+								// set modified properties
+							for( var i in toSet) {
+								scope.$ampere.module.current().state[ toSet[i]] = changeset[ toSet[i]];
+								_ns.debug( scope.$ampere.module.current().state.fullName(), '.', toSet[i], '=', changeset[ toSet[i]]);
+							}
+							
+								// remove deleted properties
+							for( var i in toDelete) {
+								delete scope.$ampere.module.current().state[ toDelete[i]];
+								_ns.debug( 'delete ', scope.$ampere.module.current().state.fullName(), '.', toDelete[i]);
+							}
+							
+							_ns.debug( 'broadcast ampere-model-changed ( ', changeset, ', ', toDelete, ')');
+							scope.$root.$broadcast( 'ampere-model-changed', changeset, toDelete);
+						}
 					});
-					
-						/*
-						 * filter out equal values
-						 */ 
-					var toDelete = [];
-					var toSet = [];						
-					for( var i in keys) {
-						var key = keys[i];
-						if( !Object.hasOwnProperty.call( changeset, key)) {
-							toDelete.push( key);
-						} else if( angular.equals( changeset[ key], scope.ampere.module.current().state[ key])) {
-							delete changeset[ key];
-						} else {
-							toSet.push( key);
-						}
-					}
-
-						/*
-						 * if changes occured 
-						 */ 
-					if( toSet.length || toDelete.length) {
-							// set modified properties
-						for( var i in toSet) {
-							scope.ampere.module.current().state[ toSet[i]] = changeset[ toSet[i]];
-							_ns.debug( scope.ampere.module.current().state.fullName(), '.', toSet[i], '=', changeset[ toSet[i]]);
-						}
-						
-							// remove deleted properties
-						for( var i in toDelete) {
-							delete scope.ampere.module.current().state[ toDelete[i]];
-							_ns.debug( 'delete ', scope.ampere.module.current().state.fullName(), '.', toDelete[i]);
-						}
-						
-						_ns.debug( 'broadcast ampere-model-changed ( ', changeset, ', ', toDelete, ')');
-						scope.$root.$broadcast( 'ampere-model-changed', changeset, toDelete);
-					}
-				});
 					
 					//scope.$watch( 'controller.module.current().view', function() {
 					/*
@@ -203,20 +220,40 @@
 		ampere.directive( 'ngAmpereTransition', [ '$compile', '$parse', '$window', function( $compile, $parse, $window) {
 			var templates = {
 				'a' 	: '<a href="javascript:void(0)"'
-					+ 'class="ampere-transition {{attrs.class}}"'
-   					+ 'ng-class="{disabled : !transition.isEnabled()}"'
+					+ 'class="ampere-transition {{attrs.class}} {{hotkey && \'ampere-hotkey\'}}"'
+   					+ 'ng-class="{disabled : !transition.enabled()}"'
+   					+ 'accesskey="{{attrs.accesskey}}"'
    					+ 'style="{{attrs.style}}"'
-       				+ 'title="{{attrs.title || ampere.ui.getDescription( transition)}}">'
-       				+ '<i ng-class="ampere.ui.getIcon( transition)"></i>'
-       				+ '{{$.trim( element.text()) || ampere.ui.getCaption( transition)}}'
+       				+ 'title="{{attrs.title || $ampere.ui.getDescription( transition)}}{{hotkey}}">'
+       				+ '<i ng-class="$ampere.ui.getIcon( transition)"></i>'
+       				+ '{{$.trim( element.text()) || $ampere.ui.getCaption( transition)}}'
        				+ '</a>',
        			'button' : '<button type="button"'
-   					+ 'ng-disabled="!transition.isEnabled()"'
-   					+ 'class="ampere-transition name-{{transition.name()}} btn {{attrs.class}}"'
+   					+ 'ng-disabled="!transition.enabled()"'
+   					+ 'class="ampere-transition name-{{transition.name()}} btn {{attrs.class}} {{hotkey && \'ampere-hotkey\'}}"'
+   					+ 'accesskey="{{attrs.accesskey}}"'
    					+ 'style="{{attrs.style}}"'
-       				+ 'title="{{attrs.title || ampere.ui.getDescription( transition)}}">'
-       				+ '<i ng-class="ampere.ui.getIcon( transition)"></i>'
-					+ '{{$.trim( element.text()) || ampere.ui.getCaption( transition)}}'
+       				+ 'title="{{attrs.title || $ampere.ui.getDescription( transition)}}{{hotkey}}">'
+       				+ '<i ng-class="$ampere.ui.getIcon( transition)"></i>'
+					+ '{{$.trim( element.text()) || $ampere.ui.getCaption( transition)}}'
+					+ '</button>',
+				'submit' : '<button type="submit"'
+   					+ 'ng-disabled="!transition.enabled()"'
+   					+ 'class="ampere-transition name-{{transition.name()}} btn {{attrs.class}} {{hotkey && \'ampere-hotkey\'}}"'
+   					+ 'accesskey="{{attrs.accesskey}}"'
+   					+ 'style="{{attrs.style}}"'
+       				+ 'title="{{attrs.title || $ampere.ui.getDescription( transition)}}{{hotkey}}">'
+       				+ '<i ng-class="$ampere.ui.getIcon( transition)"></i>'
+					+ '{{$.trim( element.text()) || $ampere.ui.getCaption( transition)}}'
+					+ '</button>',
+				'reset' : '<button type="reset"'
+   					+ 'ng-disabled="!transition.enabled()"'
+   					+ 'class="ampere-transition name-{{transition.name()}} btn {{attrs.class}} {{((attrs.ngAmpereHotkey || $ampere.ui.getHotkey( transition)) && \'ampere-hotkey\')}}"'
+   					+ 'accesskey="{{attrs.accesskey}}"'
+   					+ 'style="{{attrs.style}}"'
+       				+ 'title="{{attrs.title || $ampere.ui.getDescription( transition)}}{{(attrs.ngAmpereHotkey || $ampere.ui.getHotkey( transition)) && (\'(\' + (attrs.ngAmpereHotkey || $ampere.ui.getHotkey( transition)) + \')\')}}">'
+       				+ '<i ng-class="$ampere.ui.getIcon( transition)"></i>'
+					+ '{{$.trim( element.text()) || $ampere.ui.getCaption( transition)}}'
 					+ '</button>'
 			};
 			/*
@@ -234,52 +271,65 @@
 				restrict   : 'A',
 				scope 	   : 'isolate',
 				link: function(scope, element, attrs) {
-					
+					/*
 					var controller = element.parents().filter( function( obj) { return $.data( this, 'ampere.controller'); })
 					.data( 'ampere.controller');
-					
+					*/
 					scope.element = element;
 					scope.attrs = attrs;
 					scope.$ = $window.jQuery;
 					
 					scope.$on( 'ampere-model-changed' ,function( /*object*/changeset, /*array<string>*/deleted) {
-						//_ns.debug( scope.transition.fullName(),' ampere-model-changed (', changeset, ', ', deleted, ')');
-						scope.$enabled = scope.transition.isEnabled();
+						// _ns.debug( scope.transition.fullName(),' ampere-model-changed (', changeset, ', ', deleted, ')');
+						if( scope.transition){
+							scope.$enabled = scope.transition.enabled();
+						} 
 					});
 					
 					scope.$watch( attrs.ngAmpereTransition, function( oldValue, newValue) {
-						//_ns.log( 'transition changed ', newValue.constructor && newValue.constructor.name=='Transition' ? newValue.name() : '"' + attrs.ngAmpereTransition + '"');
-											
-						var type = attrs.type || ($.inArray( element[0].tagName.toLowerCase(), Object.keys( templates))!=-1 ? element[0].tagName.toLowerCase() : 'button');
-						
-							// TODO : invest time to go into this issue
-							// if a transition is called from within a included template
-							// scope.transition is not automatically resolved
-							// ... its probably a bug in angularjs 1.0.1
-						/*
 						if( !newValue) {
-							var transition = $parse( attrs.ngAmpereTransition)( scope);
-							scope.transition = transition;
-						} else {
-							scope.transition = newValue;
-						}
-						*/
-						scope.transition = newValue;
-						
-						if( !scope.transition) {
 							 element.replaceWith( '<span style="background-color:crimson; color:white">' + 'attribute "ng-ampere-transition" (="' + attrs.ngAmpereTransition + '") does not resolve to a ampere transition' + '</span>');
 							 return;
 						}
 						
-						scope.$enabled = scope.transition.isEnabled();
+						_ns = $.ov.namespace('ngAmpereTransition(' + newValue.fullName() + ')');
+
+						var type = attrs.type || ($.inArray( element[0].tagName.toLowerCase(), Object.keys( templates))!=-1 ? element[0].tagName.toLowerCase() : 'button');
+						
+						scope.transition = newValue;
+						
+						scope.$enabled = scope.transition.enabled();
 						
 						_ns.assert( 
 							$.type( scope.transition)=='object' && scope.transition.constructor && scope.transition.constructor.name=='Transition', 
 							'attribute "ng-ampere-transition" (="', attrs.ngAmpereTransition, '") does not resolve to a ampere transition'
 						);
+						
 						if( templates[ type]) {
 							var f = $compile( templates[ type]);
-							element = element.replaceWith( f( scope));
+							var replacement = f( scope);
+							element.replaceWith( replacement);
+							
+							var hotkey = attrs.ngAmpereHotkey || scope.$ampere.ui.getHotkey( scope.transition);
+
+							if( hotkey) {
+								_ns.debug( 'bind hotkey ', hotkey);
+								
+								var _hotkey = hotkey.replace(/\+/g, '_'); 								
+								scope.hotkey = ' (' + window.ov.ampere.util.ucwords( hotkey) + ')';
+								
+								function onHotKey( event) {
+									_ns.debug( 'hotkey activated');
+									event.preventDefault();
+									onTransitionClicked.call( replacement, event);
+								};
+								$( 'body').on( 'keydown.' + _hotkey, onHotKey);
+								
+								scope.$on( '$destroy' ,function() {
+									_ns.debug( 'unbind hotkey ', hotkey);
+									$( 'body').off( 'keydown.' + _hotkey, onHotKey);
+								});
+							}
 						} else {
 							_ns.raise( 'type "', type, '" is unknown');
 						}
@@ -317,8 +367,22 @@
 		var transition = angular.element( this).scope().transition;
 		var controller = $( this).closest( '.ampere-app').ampere();
 		
-		controller.proceed( transition);
+		!controller.ui.isBlocked() && controller.proceed( transition);
+	
 		event.preventDefault();
+			// prevent any other hotkey handler to be invoked
+		event.stopImmediatePropagation();
+	}
+
+	/**
+	 * focuses first form element in computed template 
+	 */
+	function focus( /*jquery*/root) {
+		//var formControls = root.find( '.ampere-state .ampere-view :input:not(input[type=button],input[type=submit],button),select,textarea').filter( '[tabIndex!="-1"]:visible');
+		var formControls = root.find( '.ampere-state .ampere-view input,select,textarea,button').filter( '[tabIndex!="-1"]:visible:enabled');
+		if( !formControls.filter( '*[autofocus]').focus().length) {
+			formControls.first().focus();
+		}
 	}
 	
 	function onActionAbort() {
@@ -364,6 +428,10 @@
 			this.controller.element.off( 'click', '.flash .alert button.close', onActionAbort);
 		};		
 		
+		this.isBlocked = function() {
+			return this.controller.element.find( '.overlay').hasClass( 'block');
+		}
+		
 		this.block = function() {
 			this.controller.element.find( '.overlay').addClass( 'block');
 		};
@@ -378,7 +446,7 @@
 			if( template==null) {
 				template = $.get( this.options( 'ampere.baseurl') + '/ampere-twitterbootstrap.defaultview.fragment');
 			} else if( $.isFunction( template)) {
-				template = template.call( scope.ampere.module.current().view, scope.ampere.module.current().view);
+				template = template.call( scope.$ampere.module.current().view, scope.$ampere.module.current().view);
 			};
 		 	
 			$.ov.namespace( 'ngState').assert( 
@@ -432,19 +500,40 @@
 		};
 		
 		this.renderState = function( view, template, transitionResult) {
+				// remember scroll position
+			var scrollX = window.scrollX;
+			var scrollY = window.scrollY;
+			
 			var scope = angular.element( controller.element.find( '>.ampere-module')).scope();
-			onBodyscroll();
+			
 			scope.$apply( function() {
-				scope.ampere = {
-					module   : controller.module,
-					ui 	     : controller.ui,
-					view     : view,
-					template : template
-				};
+					/*
+					 * if no view was given - just rerender the current view
+					 * this case happens for history.reset
+					 */ 
+				if( view) {
+					scope.$ampere = {
+						module   : controller.module,
+						ui 	     : controller.ui,
+						view     : view,	
+							/*
+							 * module.current.reset is calling this
+							 * function without providing a template
+							 * so we take the already used one as fallback  
+							 */  
+						template : template || scope.$ampere.template 
+					};
+				} 
 			});
 			
 				// compute optional flash message 
 			$.when( transitionResult).done( function() {
+				focus( controller.element);
+				
+				window.scrollTo( scrollX, scrollY);
+				//window.scrollTo( 0, 0);
+				//onBodyscroll();
+				
 				if( arguments.length==1 && typeof( arguments[0])=='string') {
 					var flash = controller.element.find( '.flash');
 					
@@ -458,9 +547,13 @@
 					
 					window.setTimeout( function() {
 						flash.fadeOut( 'slow');
-					}, 2000);
+					}, 500);
 				} 
 			});
+		};
+		
+		this.toggleHelp = function() {
+			controller.element.find( '.page-header >.ampere-help').toggle( 'slow');
 		};
 		
 		this.renderBootstrap = function() {
@@ -502,6 +595,7 @@
 					['window.ov.ampere.ui.twitterbootstrap']
 				);
 				
+				focus( controller.element);
 			});
 			
 			return deferred;

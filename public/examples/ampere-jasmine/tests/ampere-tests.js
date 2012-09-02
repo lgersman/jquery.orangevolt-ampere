@@ -41,17 +41,16 @@ describe( 'Ampere', function() {
 				});
 				
 				m = new m();
-				
-				expect( m.transitions[0].options( 'foo')).toEqual( 'bar');
-				expect( m.transitions[0].options()).toEqual( { foo:'bar', rum:'kugel'});
+				expect( m.transitions.main.options( 'foo')).toEqual( 'bar');
+				expect( m.transitions.main.options()).toEqual( { foo:'bar', rum:'kugel', 'ampere.ui.type' : 'global'});
 			});
 			
-			it( 'should take a isDisabled function', function() {
+			it( 'should take a enabled function', function() {
 				var m = window.ov.ampere().module( function m() {
 					this.state( 'main');
 					
 					this.transition( this.states.main)
-						.isDisabled( function() { return 'i am disabled'; })
+						.enabled( function() { return 'I am enabled'; })
 						.options( 'foo', 'bar')
 						.options( { 'rum' : 'kugel'})
 					;
@@ -59,14 +58,14 @@ describe( 'Ampere', function() {
 				
 				m = new m();
 				
-				expect( m.transitions[0].isDisabled()).toEqual( 'i am disabled');
+				expect( m.transitions.main.enabled()).toEqual( 'I am enabled');
 				
 				expect( function() {
-					m.transitions[0].isDisabled( "rumps");
+					m.transitions.main.enabled( "rumps");
 				}).toThrow();
 				
-				m.transitions[0].isDisabled( function() { return "hey!"; });
-				expect( m.transitions[0].isDisabled()).toEqual( 'hey!');
+				m.transitions.main.enabled( function() { return "hey!"; });
+				expect( m.transitions.main.enabled()).toEqual( 'hey!');
 			});
 		});
 	});
@@ -97,15 +96,15 @@ describe( 'Ampere', function() {
 			
 			m = new m();
 			
-			expect( m.states.main.transitions[0].options( 'foo')).toEqual( 'bar');
-			expect( m.states.main.transitions[0].options()).toEqual( { foo:'bar', rum:'kugel'});
+			expect( m.states.main.transitions.main.options( 'foo')).toEqual( 'bar');
+			expect( m.states.main.transitions.main.options()).toEqual( { foo:'bar', rum:'kugel'});
 		});
 		
 		it( 'should take a isDisabled function', function() {
 			var m = window.ov.ampere().module( function m() {
 				this.state( 'main')
 					.transition( this.states.main)
-					.isDisabled( function() { return 'i am disabled'; })
+					.enabled( function() { return 'i am enabled'; })
 					.options( 'foo', 'bar')
 					.options( { 'rum' : 'kugel'})
 				;
@@ -113,34 +112,36 @@ describe( 'Ampere', function() {
 			
 			m = new m();
 			
-			expect( m.states.main.transitions[0].isDisabled()).toEqual( 'i am disabled');
+			expect( m.states.main.transitions.main.enabled()).toEqual( 'i am enabled');
 			
 			expect( function() {
-				m.states.main.transitions[0].isDisabled( "rumps");
+				m.states.main.transitions.main.enabled( "rumps");
 			}).toThrow();
 			
-			m.states.main.transitions[0].isDisabled( function() { return "hey!"; });
-			expect( m.states.main.transitions[0].isDisabled()).toEqual( 'hey!');
+			m.states.main.transitions.main.enabled( function() { return "hey!"; });
+			expect( m.states.main.transitions.main.enabled()).toEqual( 'hey!');
 		});
 		
 		it( 'should take a action function', function() {
+			function myaction() { };
+			
 			var m = window.ov.ampere().module( function m() {
 				this.state( 'main')
 					.transition( this.states.main)
-					.action( function() { return 'foo';})
+					.action( myaction)
 				;
 			});
 			
 			m = new m();
 			
-			expect( m.states.main.transitions[0].action()).toEqual( 'foo');
+			expect( m.states.main.transitions.main.action()).toEqual( myaction);
 			
 			expect( function() {
-				m.states.main.transitions[0].isDisabled( "rumps");
+				m.states.main.transitions.main.enabled( "rumps");
 			}).toThrow();
 			
-			m.states.main.transitions[0].isDisabled( function() { return "hey!"; });
-			expect( m.states.main.transitions[0].isDisabled()).toEqual( 'hey!');
+			m.states.main.transitions.main.enabled( function() { return "hey!"; });
+			expect( m.states.main.transitions.main.enabled()).toEqual( 'hey!');
 		});
 	});
 	
@@ -148,7 +149,7 @@ describe( 'Ampere', function() {
 		it( 'should be accessible', function() {
 			var m = window.ov.ampere().module( function m() {
 				this.state( 'main')
-					.view( function() {
+					.view( 'main', function() {
 						return $('<div>').text( 'hello world !');
 					}).options( { mee : 'too'})
 				.state()
@@ -162,9 +163,9 @@ describe( 'Ampere', function() {
 				;
 			});	
 			m = new m();
-			expect( Object.keys( m.states.main.views)).toEqual( [ '', 'intro', 'quit']);
+			expect( Object.keys( m.states.main.views)).toEqual( [ 'main', 'intro', 'quit']);
 			
-			expect( m.states.main.views[''].options('mee')).toEqual( 'too');
+			expect( m.states.main.views.main.options('mee')).toEqual( 'too');
 		});
 	});
 	
@@ -176,13 +177,15 @@ describe( 'Ampere', function() {
 			m = new m();
 			
 			var div = $( '<div>').ampere( m);
-			expect( div.ampere().getState()).toEqual( m.states.main);
+			expect( div.ampere().module.current().state).toEqual( m.states.main);
+			
+			div.remove();
 		});
 		
 		it( 'state configured as string', function() {	
 				// default state configured at ampere instance
 			var m = window.ov.ampere()
-			.options( { state:'b' })
+			.options( { 'ampere.state':'b' })
 			.module( function m() {
 				this.state( 'a');
 				this.state( 'b');
@@ -191,20 +194,19 @@ describe( 'Ampere', function() {
 				this.state( 'e');
 			});	
 			var div = $( '<div>').ampere( new m());
-			expect( div.ampere().getState()).toEqual( div.ampere().states.b);
-				
-				// default state configured at module instance
-			m.defaults( {
-				state : 'c'
-			});
-			var div = $( '<div>').ampere( new m());
-			expect( div.ampere().getState()).toEqual( div.ampere().states.c);
+			expect( div.ampere().module.current().state).toEqual( div.ampere().module.states.b);
 			
-			var div = $( '<div>').ampere( new m( { state : 'd'}));
-			expect( div.ampere().getState()).toEqual( div.ampere().states.d);
+			m.defaults({ 'ampere.state' : 'c'});
+			
+			var div = $( '<div>').ampere( new m());
+			
+			expect( div.ampere().module.current().state).toEqual( div.ampere().module.states.c);
+			
+			var div = $( '<div>').ampere( new m( { 'ampere.state' : 'd'}));
+			expect( div.ampere().module.current().state).toEqual( div.ampere().module.states.d);
 			
 			expect( function() {
-				var div = $( '<div>').ampere( new m( { state : 'k'}));
+				var div = $( '<div>').ampere( new m( { 'ampere.state' : 'k'}));
 			}).toThrow();
 		});
 		
@@ -216,8 +218,8 @@ describe( 'Ampere', function() {
 			});	
 
 			var _m = new m();
-			var div = $( '<div>').ampere( _m, { state : _m.states.b});
-			expect( div.ampere().getState()).toEqual( div.ampere().states.b);
+			var div = $( '<div>').ampere( _m, { 'ampere.state' : _m.states.b});
+			expect( div.ampere().module.current().state).toEqual( _m.states.b);
 		});
 	});
 });

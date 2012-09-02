@@ -1,12 +1,4 @@
 <?php
-	$JS[] 	= '/examples/' . basename( __DIR__) . '/compat.js';
-	$JS[] 	= '/examples/' . basename( __DIR__) . '/json.js';
-	$JS[] 	= '/examples/' . basename( __DIR__) . '/namespace.js';
-	$JS[] 	= '/examples/' . basename( __DIR__) . '/ampere.js';
-	$JS[] 	= '/examples/' . basename( __DIR__) . '/ampere-util.js';
-	$JS[] 	= '/examples/' . basename( __DIR__) . '/ampere-twitterbootstrap.js';
-	$CSS[] 	= '/examples/' . basename( __DIR__) . '/ampere-twitterbootstrap.css';
-	$LESS[] = '/examples/' . basename( __DIR__) . '/ampere-twitterbootstrap.less';
 	$LESS[] = '/examples/' . basename( __DIR__) . '/calculator.less';
 ?>
 
@@ -20,7 +12,7 @@
 	<center>
 		<button 
 			class="btn-primary btn-large " 
-			ng-ampere-transition="ampere.view.state().transitions.main" 
+			ng-ampere-transition="$ampere.view.state().transitions.main" 
 			xtitle="Click to start">
 			Start
 		</button>
@@ -52,8 +44,8 @@
 				return !$.isNumeric( state.value) || state.value==0;
 			};
 
-			//this.deferred = $.Deferred();
-			//return this.deferred;
+			//window.deferred = $.Deferred();
+			//return window.deferred;
 		})
 		.options( {
 			'ampere.ui.description' : 'description of main state',
@@ -87,23 +79,23 @@
 				'ampere.ui.description' : 'Start application'
 			})
 		.state()
-			.transition( this.states.main, 'mul')
+			.transition( 'mul', this.states.main)
 			.action( function action( transition) {
 				return function redo( source, target) {
 					transition.state().result = transition.state().result * parseFloat( transition.state().value);
 					transition.state().value = '';    
 				};
 			}) 
-			.isEnabled( valueIsNumeric)
+			.enabled( valueIsNumeric)
 		.state()
-			.transition( this.states.main, 'div')
+			.transition( 'div', this.states.main)
 			.action( function action( transition) {
 				return function redo( source, target) { 
 					transition.state().result = transition.state().result / parseFloat( transition.state().value);
 					transition.state().value = '';    
 				};
 			})
-			.isEnabled( function() {
+			.enabled( function() {
 				var value = $.trim( module.states.main.value);
 				return $.isNumeric( value) && value!=0; 
 			})
@@ -111,32 +103,40 @@
 				return parseFloat( this.state().value)==0 ? 'Division by zero is forbidden' : undefined;
 			})
 		.state()
-			.transition( this.states.main, 'add')
+			.transition( 'add', this.states.main)
 			.action( function action( transition) {
+				var result = transition.state().result;
+				var value = transition.state().value;
+				
 				return function redo( source, target) {
-					transition.state().result = transition.state().result + parseFloat( transition.state().value);
-					transition.state().value = '';
+					target.result = source.result + parseFloat( source.value);
+					target.value = '';
+
+					return function undo() {
+						source.result = result;
+						source.value = value;
+					};
 				};
 			})
-			.isEnabled( valueIsNumeric)
+			.enabled( valueIsNumeric)
 		.state()
-			.transition( this.states.main, 'sub')
+			.transition( 'sub', this.states.main)
 			.action( function action( transition) {
 				return function redo( source, target) {
 					transition.state().result = transition.state().result - parseFloat( transition.state().value);
 					transition.state().value = '';
 				};    
 			})
-			.isEnabled( valueIsNumeric)
+			.enabled( valueIsNumeric)
 		.state()
-			.transition( this.states.main, 'ac')
+			.transition( 'ac', this.states.main)
 			.action( function action( transition) {
 				return function redo( source, target) {
 					transition.state().result = 0;
 					transition.state().value = '';
 				};
 			})
-			.isEnabled( function() {
+			.enabled( function() {
 				return module.states.main.result && module.current().view===module.states.main.views.main;
 			}) 
 			.options( { foo : 'bar', 'ampere.ui.type' : 'primary'})
@@ -149,36 +149,36 @@
 		}
 		
 		this
-			.transition( this.states.main, 'intro')
-			.isEnabled( isNotCurrentView( module.states.main.views.intro))
+			.transition( 'intro', this.states.main)
+			.enabled( isNotCurrentView( module.states.main.views.intro))
 			.options({
 				'ampere.ui.description' : 'bla bla',
 				'ampere.ui.icon'		: 'icon-info-sign',
 				'ampere.state.view'		: 'intro'
 			});
 		this
-			.transition( this.states.main, 'help')
-			.isEnabled( isNotCurrentView( module.states.main.views.help))
+			.transition( 'help', this.states.main)
+			.enabled( isNotCurrentView( module.states.main.views.help))
 			.options({
 				'ampere.ui.icon'		: 'icon-question-sign',
 				'ampere.state.view'		: 'help'
 			});
-		this.transition( this.states.main, 'about')
-			.isEnabled( isNotCurrentView( module.states.main.views.about))
+		this.transition( 'about', this.states.main)
+			.enabled( isNotCurrentView( module.states.main.views.about))
 			.options({
 				'ampere.state.view'		: 'about'
 			});
 
 		
 		this.state( function dummystate( state) {
-			state.transition( module.states.main, 'about')
+			state.transition( 'about', module.states.main)
 			.options({ 
 				'ampere.ui.type'    : 'secondary',
 				'ampere.state.view'	: 'about'
 			});
 		})
-		.transition( this.states.main, 'intro').options({ 'ampere.state.view'	: 'intro'})
-		.state().transition( this.states.main, 'help').options({ 'ampere.state.view'	: 'help'})
+		.transition( 'intro', this.states.main).options({ 'ampere.state.view'	: 'intro'})
+		.state().transition( 'help', this.states.main).options({ 'ampere.state.view'	: 'help'})
 		.state().transition( this.states.main);
 		
 		this.states.main.transition( this.states.dummystate)
@@ -221,57 +221,28 @@
 		})
 		.options( 'ampere.ui.type' , 'secondary');
 
-		this.transition( this.states.main, 'exception_spiced_transition_action')
+		this.transition( 'exception_spiced_transition_action', this.states.main)
 		.action( function action( transition) {
 			return function redo( source, target) {
 				throw 'a problem occured'; 
 			};
 		})
 		.options( 'ampere.ui.type' , 'global');
+
+		
 		 
 		//this.deferred = $.Deferred();
 		//return this.deferred;
 	}).defaults( {
-		'ampere.baseurl' 		: '/examples/<?php echo basename( __DIR__)?>',
+		'ampere.baseurl' 		: '/lib/ampere',
 		'ampere.ui.description' : 'This is a simple <em>calculator</em> app.',
 		'ampere.ui.about' 		: $('<div>This is a sample <a href="#ampere">Ampere</a> application.</div>'),
 		'ampere.state'	  		: 'main',
 		'ampere.view'	  		: 'intro',
-		'aampere.ui.caption'		: null,
-		'aampere.ui.description' : null
+		'aampere.ui.caption'	: null,
+		'aampere.ui.description': null/*,
+		'ampere.history.limit'	: Number.MAX_VALUE */
 	});
 	
 	$( 'body').ampere( new calculator());
-</script>
-
-<script type="text/javascript" src="/examples/<?php echo basename( __DIR__)?>/tests/ampere-tests.js"></script>
-<script type="text/javascript">
-	/*
-    (function() {
-      var jasmineEnv = jasmine.getEnv();
-      jasmineEnv.updateInterval = 1000;
-
-      var trivialReporter = new jasmine.TrivialReporter();
-
-      jasmineEnv.addReporter(trivialReporter);
-
-      jasmineEnv.specFilter = function(spec) {
-        return trivialReporter.specFilter(spec);
-      };
-
-      var currentWindowOnload = window.onload;
-
-      window.onload = function() {
-        if (currentWindowOnload) {
-          currentWindowOnload();
-        }
-        execJasmine();
-      };
-
-      function execJasmine() {
-        jasmineEnv.execute();
-      }
-
-    });
-    */
 </script>
