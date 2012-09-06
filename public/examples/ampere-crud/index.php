@@ -1,5 +1,5 @@
 <script>
-crud = ov.ampere().module( function CRUD( module) {
+var crud = ov.ampere().module( function CRUD( module) {
 	module.state( function list( state) {
 		this.view.load( '/examples/ampere-crud/list.fragment');
 
@@ -62,6 +62,49 @@ crud = ov.ampere().module( function CRUD( module) {
 		'ampere.ui.hotkey'  : 'del'
 	});
 	
+	module.states.list.transition( 'wizard', module.states.list)
+	.action( function( transition, ui) {
+		var selection = transition.state().entry;
+		var entry = undefined;
+		var wizard;
+		
+		return function redo( create, list, view) {
+			if( !wizard) {
+				wizard = ui.popup( '/index.php/ampere-wizard', function( deferred) {
+					function onMessage( event) {
+						if( $.isPlainObject( event.originalEvent.data)) {
+							entry = event.originalEvent.data;
+						} 
+						deferred.resolve( entry && 'Entry created');
+					}
+						// register message event handler fo exactly one
+					$( window).one( 'message', onMessage);
+				}); 
+			}
+
+			wizard.done( function() { 
+				entry && list.entries.push( list.entry = entry);
+			});
+				
+			function undo( list, create, view) {
+				if( entry) {
+					list.entries.pop();
+					list.entry = selection;
+
+					return $.Deferred().resolve( 'Entry create undoed.').promise( redo);
+				} else {
+					return $.Deferred().resolve().promise( redo);
+				}
+			};
+			return wizard.promise( undo);
+		};		 
+	})
+	.options({
+		'ampere.ui.type' 		: 'primary',
+		'ampere.ui.icon' 		: 'icon-magic',
+		'ampere.ui.caption'	: 'External Create wizard'
+	});
+	
 	module.states.list.transition( module.states.create)
 	.action( function( transition) {
 		return function redo( state, target, view) {
@@ -86,16 +129,17 @@ crud = ov.ampere().module( function CRUD( module) {
 		&& $('form')[0].checkValidity();
 	})
 	.action( function( transition) {
-		var orig  = angular.copy( transition.target().entry);
 		var entry = angular.copy( transition.state().entry);
 		
+		var selection = transition.target().entry;
+		var index = $.inArray( selection, transition.target().entries);
+		
 		return function redo( edit, list, view) {
-			angular.extend( list.entry, entry);
+			list.entries.splice( index, 1, list.entry = entry);
 
 			function undo( list, edit, view) {
-				angular.extend( list.entry, orig);
-				edit.entry = entry;
-				
+				list.entries.splice( index, 1, list.entry = selection);
+								
 				return $.Deferred().resolve( 'Entry update undoed.').promise( redo);
 			};
 			return $.Deferred().resolve( 'Entry updated.').promise( undo);
@@ -118,7 +162,7 @@ crud = ov.ampere().module( function CRUD( module) {
 		&& $('form')[0].checkValidity();
 	})
 	.action( function( transition) {
-		var orig  = transition.target().entry;
+		var selection  = transition.target().entry;
 		var entry = angular.copy( transition.state().entry);
 		
 		return function redo( create, list, view) {
@@ -126,13 +170,15 @@ crud = ov.ampere().module( function CRUD( module) {
 				
 			function undo( list, create, view) {
 				list.entries.pop();
-				list.entry = orig;
+				list.entry = selection;
 					
 				return $.Deferred().resolve( 'Entry create undoed.').promise( redo);
 			};
 			return $.Deferred().resolve( 'Entry created.').promise( undo);
 		};		 
-	});	
+	});
+
+		
 	module.states.create.transition( 'reset', module.states.create)
 	.enabled( function( transition) {
 		return !angular.equals( transition.target().module().states.list.entry, transition.state().entry);
@@ -142,9 +188,10 @@ crud = ov.ampere().module( function CRUD( module) {
 	module.states.remove.transition( 'cancel', module.states.list).options( {'ampere.ui.hotkey' : 'esc'});
 	module.states.remove.transition( 'remove', module.states.list)
 	.action( function( transition) {
+		var selection  = transition.target().entry;
+		
 		var entry = transition.target().entry;
-		var index = $.inArray( entry, transition.target().entries);
-		var orig  = transition.target().entry; 
+		var index = $.inArray( entry, transition.target().entries);		 
 			
 		return function redo( remove, list, view) {
 			list.entries.splice( index, 1); 
@@ -152,7 +199,7 @@ crud = ov.ampere().module( function CRUD( module) {
 				
 			return function undo( list, remove, view) {
 				list.entries.splice( index, 0, entry);
-				list.entry = orig;
+				list.entry = selection;
 				
 				return redo;
 			};
@@ -187,5 +234,11 @@ crud = ov.ampere().module( function CRUD( module) {
 	});	
 });  
 
-$( 'body').ampere( crud, { 'ampere.baseurl' : '/lib/ampere', 'ampere.state' : 'list', 'ampere.history.limit' : Number.MAX_VALUE});
+$( 'body').ampere( crud, { 
+	'ampere.baseurl' : '/lib/ampere', 
+	'ampere.state' : 'list', 
+	'ampere.history.limit' : Number.MAX_VALUE,
+	'ampere.ui.about' 	   : $('<div>This is a sample <a href="#ampere">Ampere</a> application.</div>'),
+	'ampere.ui.about.url'  : 'http://www.orangevolt.com'
+});
 </script>

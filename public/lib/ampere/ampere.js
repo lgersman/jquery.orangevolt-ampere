@@ -21,7 +21,7 @@
 			} else if( arguments.length==1) {
 				var arg = arguments[0];
 				if( $.isPlainObject( arg)) {
-					$.extend( _, arg);
+					angular.extend( _, arg);
 					return this;
 				} else {
 					return _[ arg];
@@ -239,9 +239,7 @@
 		var transition = this;
 		
 		this.options = Options();
-			// automagically add type:'global' for this transaction if its an module transaction
-		!state && this.options( 'ampere.ui.type')==undefined && this.options( 'ampere.ui.type','global'); 
-		
+				
 		this.state = function () {
 			return state;
 		};
@@ -615,15 +613,15 @@
 					module.current( target, view);
 					var template = ui && ui.getTemplate( view); 
 					template.done( function( data) {
+						if( data instanceof Element) {
+							data = $( data);
+						} 
 						template = data.jquery ? data.text() : template.responseText || data;
 						ui && ui.render( 'State', view, template, result);
 						ui && ui.unblock();
 					});
 				})
 				.fail( function() {
-					$.when( result).fail( function() {
-												
-					});
 					if( arguments.length==1 && arguments[0]==self) {
 						/* 
 						 * deferred failed controlled by user 
@@ -662,7 +660,7 @@
 		}
 		
 		var ampere = this;
-		this.options = Options( $.extend( {}, Ampere.defaults, options));
+		this.options = Options( angular.extend( {}, Ampere.defaults, options));
 		this.modules = {};
 		/**
 		 * window.ov.ampere( 'foo') 
@@ -692,7 +690,7 @@
 			this.modules[ name] = function( options) {
 				if( this instanceof Module) {
 					this._super();
-					this.options( $.extend( {}, this.ampere().options(), _defaults, options));
+					this.options( angular.extend( {}, this.ampere().options(), _defaults, options));
 
 					var history = History( this, this.options( 'ampere.history.limit'));
 					this.history = function() {
@@ -776,7 +774,7 @@
 		}
 		
 		this._super = function( controller, options) {
-			this.options = Options( $.extend( {}, Ampere.defaults.ui, options));
+			this.options = Options( angular.extend( {}, Ampere.defaults.ui, options));
 			this.controller = controller;
 			this._ns = $.ov.namespace( controller.module.fullName() + '::UI');
 		};
@@ -804,6 +802,14 @@
 			 * unblock user input
 			 */
 		this.unblock = function() {};
+
+			/**
+			 * open an popup  
+			 * 
+			 * @param url
+			 * @param initializer
+			 */
+		this.popup = function( url, /* function */ initializer) {};
 		
 			/**
 			 * filter may be an object (filter by example, like { type : 'global'}) or function argument
@@ -851,7 +857,7 @@
 				var args = $.makeArray( arguments);
 				args.shift();
 
-				this['render' + event].apply( this, args);
+				return this['render' + event].apply( this, args);
 			} else {
 				$.ov.namespace( 'ampere.ui').debug( 'skip rendering event "' + event + '" for module "' + this.controller.module.fullName() + '" - no matching function "render' + event + '" defined in renderer');
 			}
@@ -915,9 +921,9 @@
 		this.getCaption = function( object) {
 			var caption = this._get( 'ampere.ui.caption', object, ['transition', 'view', 'target', 'state', 'module']);
 			if( caption===undefined) {
-				if( object instanceof View) {
+				if( object instanceof Transition) {
 					caption = window.ov.ampere.util.ucwords( object.name());
-				} else if( object instanceof Transition) {
+				} else if( object instanceof View) {
 					caption = window.ov.ampere.util.ucwords( object.name());
 				} else if( object instanceof State) {
 					caption = window.ov.ampere.util.ucwords( object.name());
@@ -1001,7 +1007,7 @@
 				// (3) ui
 			controller.ui = controller.options( 'ampere.ui') || module.options( 'ampere.ui');
 			_ns.assert( !(controller.ui instanceof Ampere.ui), "controller.options( 'ui') expected to be a ampere ui constructor function but is an object ", controller.ui);
-			controller.ui = new controller.ui( controller, $.extend( {}, module.options(), controller.options()));
+			controller.ui = new controller.ui( controller, angular.extend( {}, module.options(), controller.options()));
 
 			/*
 			 * no more needed - its already ensured in module initializer
@@ -1010,19 +1016,7 @@
 
 			module.current( state, view);
 			
-			$.when( controller.ui.init(), module).done( function() {
-				var template = controller.ui.getTemplate( view); 
-				template.done( function( data) {
-					template = data.jquery ? data.text() : template.responseText || data;
-						/* 
-						 * TODO : this is a dirty hack to transport the initial template into
-						 * the ampere structure of angularjs
-						 */ 
-					controller._initial_template = template;
-					
-					controller.ui.render( 'Bootstrap');
-				});
-			});			
+			controller.ui.render( 'Bootstrap');
 		});
 		
 			/*
@@ -1050,7 +1044,7 @@
 					this.ui.render( 'State', this.module.current().view);
 				} else {
 						// create a new action 
-					var command = action.call( transition, transition);
+					var command = action.call( transition, transition, this.ui);
 	
 					// compute target view
 					var view = transition.options( 'ampere.state.view') || target.options( 'ampere.state.view');

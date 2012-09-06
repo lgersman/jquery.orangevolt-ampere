@@ -13,3 +13,6 @@ $scope.$timeout = $timeout;
 $scope.$log = $log;
 $scope.$resource = $resource;
 $scope.$cookies = $cookies;
+
+"batteries included"
+"AngularJS on stereoids"

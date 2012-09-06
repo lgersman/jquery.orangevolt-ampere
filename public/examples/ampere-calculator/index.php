@@ -237,6 +237,7 @@
 		'ampere.baseurl' 		: '/lib/ampere',
 		'ampere.ui.description' : 'This is a simple <em>calculator</em> app.',
 		'ampere.ui.about' 		: $('<div>This is a sample <a href="#ampere">Ampere</a> application.</div>'),
+		'ampere.ui.about.url'	: 'http://www.orangevolt.com',
 		'ampere.state'	  		: 'main',
 		'ampere.view'	  		: 'intro',
 		'aampere.ui.caption'	: null,

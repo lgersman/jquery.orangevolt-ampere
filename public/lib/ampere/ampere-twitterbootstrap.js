@@ -366,7 +366,7 @@
 	function onTransitionClicked( event) {
 		var transition = angular.element( this).scope().transition;
 		var controller = $( this).closest( '.ampere-app').ampere();
-		
+
 		!controller.ui.isBlocked() && controller.proceed( transition);
 	
 		event.preventDefault();
@@ -409,7 +409,20 @@
 		}
 		var self = this;
 		
-		this._super( controller, $.extend( {}, twitterbootstrap.defaults, options || {}));
+		this._super( controller, angular.extend( {}, twitterbootstrap.defaults, options || {}));
+		
+		
+		/*
+		 * automagically add 'ampere.ui.type':'global' for module transactions 
+		 */
+		for( var name in controller.module.transitions) {
+			var transition = controller.module.transitions[ name];
+			// doesnt work if value is undefined : 
+			//if( !Object.hasOwnProperty( transition.options(), 'ampere.ui.type')) {
+			if( !('ampere.ui.type' in transition.options())) {
+				transition.options( 'ampere.ui.type','global');
+			}
+		}
 		
 		this.init = function() {
 			(this.controller.element[0].tagName=="BODY") && $( document).on( 'scroll', onBodyscroll);
@@ -418,7 +431,7 @@
 			
 			this.controller.element.on( 'click', '.flash .alert button.close', onActionAbort); 
 			
-			return this.template;
+			focus( controller.element);
 		};
 
 		this.destroy = function( controller) {
@@ -430,7 +443,7 @@
 		
 		this.isBlocked = function() {
 			return this.controller.element.find( '.overlay').hasClass( 'block');
-		}
+		};
 		
 		this.block = function() {
 			this.controller.element.find( '.overlay').addClass( 'block');
@@ -545,11 +558,30 @@
 					flash.find( 'button.close').hide();
 					flash.show();
 					
-					window.setTimeout( function() {
-						flash.fadeOut( 'slow');
-					}, 500);
+					flash.fadeOut( 'slow');
 				} 
 			});
+		};
+		
+			// see Ampere.Ui
+		this.popup = function( url, /* function */ initializer) {
+			var popup = $( '<div class="popup"><iframe width="100%" height="100%" border="no" src="' + url + '"></iframe></div>');
+			this.controller.element.addClass( 'popup').find( '.ampere-module').append( popup);
+
+			popup.find( 'iframe').focus();
+			
+			var deferred = $.Deferred();
+			initializer.call( deferred, deferred);		
+
+			var self = this;
+			
+				// remove popup when deferred is done/rejected 
+			deferred.always( function() {
+				self.controller.element.removeClass( 'popup');
+				popup.remove();
+			}); 
+			
+			return deferred;
 		};
 		
 		this.toggleHelp = function() {
@@ -559,15 +591,18 @@
 		this.renderBootstrap = function() {
 			var controller = this.controller;
 			
+			var eProgress = $('<div class="progress progress-striped active"><div class="bar" style="width: 100%;"></div></div>'); 
+			
 			controller.element
-			.empty()
-			.append( '<div class="progress progress-striped active"><div class="bar" style="width: 0%;"></div></div>')
+			.append( eProgress)
 			.css( 'cursor', 'wait');
 			
 			var bar = controller.element.find( '.bar');
 			bar.text( 'Bootstrapping ' + controller.module.name() + ' ...');			
 			
-			var deferred = $.when( this.controller.module.current().view, (this.controller.module.current().view||{}).template, this.template, controller.module)
+			var deferred = $.Deferred();
+			
+			$.when( controller.module.current().view, controller.module.current().view.template, this.template, controller.module)
 			.progress( function() {
 				_ns.debug( 'progress', this, arguments);
 			})
@@ -585,17 +620,32 @@
 				);
 				$( '.progress', controller.element).addClass( 'progress-danger');
 			}).done( function() {
+				eProgress.remove();
+				
 				controller.element
-				.empty()
 				.append( self.template.responseText);
 				
-				angular.bootstrap( 
-					controller.element.find( '>.ampere-module')
-					.addClass( 'name-' + controller.module.name()), 
-					['window.ov.ampere.ui.twitterbootstrap']
-				);
-				
-				focus( controller.element);
+				var template = self.getTemplate( controller.module.current().view); 
+				template.done( function( data) {
+					if( data instanceof Element) {
+						data = $( data);
+					}
+					template = data.jquery ? data.text() : template.responseText || data;
+						/* 
+						 * TODO : this is a dirty hack to transport the initial template into
+						 * the ampere structure of angularjs
+						 */ 
+					controller._initial_template = template;
+					
+					angular.bootstrap( 
+						controller.element.find( '>.ampere-module')
+						.addClass( 'name-' + controller.module.name()), 
+						['window.ov.ampere.ui.twitterbootstrap']
+					);
+					
+					self.init();
+					deferred.resolve();
+				});
 			});
 			
 			return deferred;
@@ -606,5 +656,9 @@
 		'ampere.ui.twitterbootstrap.theme' : 'default'
 	};	
 	
-	window.ov.ampere.defaults['ampere.ui'] = window.ov.ampere.ui.twitterbootstrap = twitterbootstrap; 
+	window.ov.ampere.defaults['ampere.ui'] = window.ov.ampere.ui.twitterbootstrap = twitterbootstrap;
+
+		// add css class "iframe" to root node if loaded in iframe
+		// this css flag can be used to provide different css rules for iframed ampere app modules 
+	window.top!==window.self && $('html').addClass( 'iframe');
 })( jQuery);
