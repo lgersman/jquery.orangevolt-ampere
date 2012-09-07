@@ -116,6 +116,7 @@
 			z-index	: 1042;
 			cursor 	: auto;
 			background-color : transparent;
+			
 			-webkit-transition	: opacity 0.6s ease;
 	     	-moz-transition		: opacity 0.6s ease;
 	       	-o-transition		: opacity 0.6s ease;
@@ -164,11 +165,12 @@
 			right	: 47px;
 			z-index	: 1041;
 			cursor 	: wait;
+			
 			-webkit-transition	: opacity 0.6s ease;
 	     	-moz-transition		: opacity 0.6s ease;
 	       	-o-transition		: opacity 0.6s ease;
 	          transition		: opacity 0.6s ease;
-	          
+
 			.message {
 				text-align		: center;
 				padding-bottom  : 8px;
@@ -226,7 +228,45 @@
 	}
 }
 
+/* class overlay is applied if an popup is currently overlaying it */
+.ampere-app.overlay {
+	>.ampere-module {
+		>.navbar-fixed-top, >.navbar-fixed-bottom, >.container {
+			-webkit-filter	: blur(1px);
+			-moz-filter		: blur(1px);
+			-ms-filter		: blur(1px);
+			-o-filter		: blur(1px);
+			filter			: blur(1px);
+		}
+		
+		-webkit-transition	: all 0.3s ease;
+	   	-moz-transition		: all 0.3s ease;
+	    -o-transition		: all 0.3s ease;
+	    transition			: all 0.3s ease; 
+	}
+}
+
 /* class popup is applied if an popup is currently overlaying it */
 .ampere-app.popup {
-	overflow : hidden;
+	overflow 		: hidden;
+	
+	>.ampere-module {
+		>.overlay {
+			-webkit-filter	: blur(1px);
+			-moz-filter		: blur(1px);
+			-ms-filter		: blur(1px);
+			-o-filter		: blur(1px);
+			filter			: blur(1px);
+			
+			-webkit-transition	: all 0.3s ease;
+		   	-moz-transition		: all 0.3s ease;
+		    -o-transition		: all 0.3s ease;
+		    transition			: all 0.3s ease;
+		} 
+	}
+	
+	-webkit-transition	: opacity 0.3s ease;
+   	-moz-transition		: opacity 0.3s ease;
+    -o-transition		: opacity 0.3s ease;
+    transition			: opacity 0.3s ease;
 }

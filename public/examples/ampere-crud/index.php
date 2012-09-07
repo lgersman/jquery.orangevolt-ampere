@@ -77,7 +77,7 @@ var crud = ov.ampere().module( function CRUD( module) {
 						} 
 						deferred.resolve( entry && 'Entry created');
 					}
-						// register message event handler fo exactly one
+						// register message event handler fo exactly one message event (via window.postMessage API)
 					$( window).one( 'message', onMessage);
 				}); 
 			}
@@ -237,8 +237,10 @@ var crud = ov.ampere().module( function CRUD( module) {
 $( 'body').ampere( crud, { 
 	'ampere.baseurl' : '/lib/ampere', 
 	'ampere.state' : 'list', 
-	'ampere.history.limit' : Number.MAX_VALUE,
-	'ampere.ui.about' 	   : $('<div>This is a sample <a href="#ampere">Ampere</a> application.</div>'),
-	'ampere.ui.about.url'  : 'http://www.orangevolt.com'
+	'ampere.history.limit' 	: Number.MAX_VALUE,
+	'ampere.ui.about' 	   	: $('<div>This is a sample <a href="#ampere">Ampere</a> application.</div>'),
+	'ampere.ui.about.url'  	: 'http://www.orangevolt.com' /*,
+	'ampere.ui.layout'	   	: undefined,
+	'ampere.ui.view'		: 'barrrrr'	*/
 });
 </script>

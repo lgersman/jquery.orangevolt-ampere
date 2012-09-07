@@ -919,7 +919,7 @@
 		};
 		
 		this.getCaption = function( object) {
-			var caption = this._get( 'ampere.ui.caption', object, ['transition', 'view', 'target', 'state', 'module']);
+			var caption = this._get( 'ampere.ui.caption', object, ['transition', 'view', 'target', 'state']);
 			if( caption===undefined) {
 				if( object instanceof Transition) {
 					caption = window.ov.ampere.util.ucwords( object.name());

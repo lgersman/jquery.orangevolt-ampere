@@ -411,6 +411,16 @@
 		
 		this._super( controller, angular.extend( {}, twitterbootstrap.defaults, options || {}));
 		
+		if( Object.hasOwnProperty.call( this.options(), 'ampere.ui.layout')) {
+			var layout = this.options( 'ampere.ui.layout');
+			this.template = layout
+				? $.get( layout)
+				: $.get( this.options( 'ampere.baseurl') + '/ampere-twitterbootstrap.nolayout.tmpl')
+			;
+		} else {
+			this.template = $.get( this.options( 'ampere.baseurl') + '/ampere-twitterbootstrap.layout.tmpl');
+		}
+			
 		
 		/*
 		 * automagically add 'ampere.ui.type':'global' for module transactions 
@@ -446,18 +456,23 @@
 		};
 		
 		this.block = function() {
-			this.controller.element.find( '.overlay').addClass( 'block');
+			this.controller.element.addClass( 'overlay').find( '.overlay').addClass( 'block');
 		};
 		
 		this.unblock = function() {
-			this.controller.element.find( '.overlay').removeClass( 'block');			
+			this.controller.element.removeClass( 'overlay').find( '.overlay').removeClass( 'block');			
 		};
 
 		this.getTemplate = function( view) {
 			var template = view.template();
 
-			if( template==null) {
-				template = $.get( this.options( 'ampere.baseurl') + '/ampere-twitterbootstrap.defaultview.fragment');
+			if( !template) {
+				if( this.options( 'ampere.ui.view')) {
+					var view = this.options( 'ampere.ui.view');
+					template = $.get( view);
+				} else {
+					template = $.get( this.options( 'ampere.baseurl') + '/ampere-twitterbootstrap.view.tmpl');
+				}
 			} else if( $.isFunction( template)) {
 				template = template.call( scope.$ampere.module.current().view, scope.$ampere.module.current().view);
 			};
@@ -469,9 +484,7 @@
 			
 			return $.when( $.isFunction( template.promise) ? template.promise() : template);
 		};
-		
-		this.template = $.get( this.options( 'ampere.baseurl') + '/ampere-twitterbootstrap.fragment');
-		
+				
 		this.renderAction = function( deferred) {
 			var flash = this.controller.element.find( '.flash');
 				// reset flash style to default  

@@ -6,6 +6,9 @@
 
 * attribute ng-ampere-hotkey : Alt+Shift+N works whereas Shift+Alt+N  
 
+'ampere.ui.layout' : url to layout template or null/false/undefined for no layout. if not set default layout will be used
+'ampere.ui.view'   : url to default view template. if not set default view will be used
+
 available rootScope services : 
 $scope.$window = $window;
 $scope.$http = $http;
