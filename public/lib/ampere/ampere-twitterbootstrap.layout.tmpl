@@ -30,9 +30,16 @@
 	<div class="container">
 		<header ng-show="$ampere.ui.getDescription( $ampere.module) || $ampere.ui.getCaption( $ampere.module) || $ampere.ui.getTransitions({ 'ampere.ui.type':'primary'}).length || $ampere.ui.getTransitions({ 'ampere.ui.type':'secondary'}).length">
 			<h1>{{$ampere.ui.getCaption( $ampere.module)}}</h1>
-			<p class="lead" ng-bind-html-unsafe="$ampere.ui.getDescription( $ampere.module)"></p>
+			<div class="lead" ng-bind-html-unsafe="$ampere.ui.getDescription( $ampere.module)"></div>
+
+			<ul class="breadcrumb" ng-show="$ampere.ui.getTransitions({ 'ampere.ui.type':'breadcrumb'}).length">
+				<li ng-repeat="transition in $ampere.ui.getTransitions({ 'ampere.ui.type':'breadcrumb'})" ng-class="{disabled : !transition.enabled()}">
+		          	<a ng-ampere-transition="transition"></a>
+		          	<span ng-show="!$last" class="divider">/</span> 
+		        </li>
+			</ul>
 			
-			<div class="navbar subnav" ddata-top="40" ng-show="$ampere.ui.getTransitions({ 'ampere.ui.type':'primary'}).length || $ampere.ui.getTransitions({ 'ampere.ui.type':'secondary'}).length">
+			<div class="navbar subnav" ddata-top="80" ng-show="$ampere.ui.getTransitions({ 'ampere.ui.type':'primary'}).length || $ampere.ui.getTransitions({ 'ampere.ui.type':'secondary'}).length">
 				<div class="navbar-inner">
 			          <ul class="nav nav-pills">
 			          	<li ng-repeat="transition in $ampere.ui.getTransitions({ 'ampere.ui.type':'primary'})" ng-class="{disabled : !transition.enabled()}">

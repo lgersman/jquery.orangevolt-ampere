@@ -1,4 +1,6 @@
 * automatic transition support (including undo/redo integration)
 
 * CRUD test app (either via "states imported from module" or "module wrapped as state")
-* generic back/cancel button (-> shortcut for undo)
+
+* provide an option to make transition results "invisible" from history ui interface point of view
+* 'brand' should be configurable to point to a transition (main by default ?) 

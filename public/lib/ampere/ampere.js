@@ -241,7 +241,8 @@
 		this.options = Options();
 				
 		this.state = function () {
-			return state;
+				// return state or (in case this is a module transition) current state
+			return state || module.current().state;
 		};
 		
 		//this.transitionName = transitionName;
@@ -283,20 +284,28 @@
 		})();
 		
 		this.enabled = (function() {
-			var delegate = $.noop;
+			var delegate = function() {
+				return true;
+			};
 			
 			return function enabled() {
 				if( arguments.length) {
+					var fn = arguments[0];
+					if( !$.isFunction( fn)) {
+						var value = arguments[0];
+						fn = function() {
+							return value;
+						};
+					}
 					$.ov.namespace(	this.fullName() + '.enabled()').assert( 
-						arguments.length==1 && $.isFunction( arguments[0]), 
-						'function expected as argument'
+						arguments.length==1,  
+						'single argument expected'
 					);
-					delegate = arguments[0];
+					delegate = fn;
 					return this;
 				} else {
 					var enabled = delegate.call( this, this);
-						// return true for undefined, otherwise return enabled as is
-					return enabled===undefined || enabled;
+					return enabled;
 				}
 			};
 		})();
@@ -387,8 +396,10 @@
 			}
 
 			_ns
-			.assert( targetState instanceof State, 'argument targetState expected to be a state, but it is ', targetState)
-			.assert( $.inArray( targetState, object_values( module.states))!=-1, 'argument targetState expected to be a state of same module')
+			//.assert( targetState instanceof State, 'argument targetState expected to be a state, but it is ', targetState)
+			//.assert( $.inArray( targetState, object_values( module.states))!=-1, 'argument targetState expected to be a state of same module')
+			.assert( $.isFunction( targetState) || targetState instanceof State, 'argument targetState expected to be a state or function returning a state, but it is ', targetState)
+			.assert( $.isFunction( targetState) || $.inArray( targetState, object_values( module.states))!=-1, 'argument targetState expected to be a state of same module')
 			.assert( !this.transitions[ transitionName], 'transition "', transitionName, '" already exists');
 			
 			this.transitions[ transitionName] = Transition( this, targetState, transitionName);
@@ -579,7 +590,7 @@
 				} 
 
 				_ns
-				.assert( $.isFunction( targetState) || targetState instanceof State, 'argument targetState expected to be a state, but it is ', targetState)
+				.assert( $.isFunction( targetState) || targetState instanceof State, 'argument targetState expected to be a state or function returning a state, but it is ', targetState)
 				.assert( $.isFunction( targetState) || $.inArray( targetState, object_values( module.states))!=-1, 'argument targetState expected to be a state of same module')
 				.assert( !this.transitions[ transitionName], 'transition "', transitionName, '" already exists');
 				
@@ -589,6 +600,14 @@
 			};
 			
 			this._transit = function( command, source, target, view, /* optional argument */ui, /* optional argument */historyReady) {
+				var retryArgs = {
+					command  : command, 
+					source   : source, 
+					target   : target, 
+					view 	 : view,
+					ui 		 : ui	
+				};
+				
 				ui && ui.block();
 				var result = undefined;
 				if( command) {
@@ -631,16 +650,20 @@
 						
 						ui && ui.unblock();
 					} else if( ui) {
+						function onRetry() {
+							module.history().redo( retryArgs);
+						}
+						
 						/*
 						 * the action failed for some unknown reason
 						 */
 						if( arguments.length==1 && typeof( arguments[0])=='string') {
-							ui.render( 'Error', arguments[0]);
+							ui.render( 'Error', arguments[0], onRetry);
 						} else if( arguments.length==1 && (arguments[0] instanceof Error)) {
-							ui.render( 'Error', arguments[0]);
+							ui.render( 'Error', arguments[0], onRetry);
 							throw arguments[0];
 						} else {
-							ui.render( 'Error', $.ov.json.stringify( arguments, $.ov.json.stringify.COMPACT));
+							ui.render( 'Error', $.ov.json.stringify( arguments, $.ov.json.stringify.COMPACT), onRetry);
 						}
 					}
 				});
@@ -946,7 +969,7 @@
 		};
 		
 		this.getIcon = function( object) {
-			return this._get( 'ampere.ui.icon', object, ['transition', 'view', 'module']);
+			return this._get( 'ampere.ui.icon', object, ['transition', 'view', 'target', 'module']);
 		};
 	}; 
 	

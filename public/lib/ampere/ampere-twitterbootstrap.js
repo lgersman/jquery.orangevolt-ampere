@@ -514,13 +514,21 @@
 			});
 		};
 		
-		this.renderError = function( message) {
+		this.renderError = function( message, onRetry) {
 			var flash = this.controller.element.find( '.flash');
 				// reset flash style to default  
 			flash.find( '.alert').removeClass( 'alert-info').addClass( 'alert-error');
 			flash.find('.progress').hide();
 			
 			flash.find( '.message').text( 'Error occured : ' + message);
+			if( onRetry) {
+				var retry = $('<button class="btn retry"><i class="icon-refresh"></i>Retry</button>');
+				retry.click( function() {
+					flash.hide();
+					onRetry();
+				});
+				flash.find( '.message').append( retry);
+			}
 			flash.find( 'button.close').hide();
 			flash.show();
 		};

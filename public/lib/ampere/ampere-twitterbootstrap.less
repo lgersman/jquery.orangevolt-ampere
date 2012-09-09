@@ -4,10 +4,30 @@
 	.ampere-module {
 		position  : relative;
 		overflow  : auto;
+		
+		/* crunch bootstrap default space */
+		header .breadcrumb, header .navbar {
+			margin-bottom: 0;
+		} 
+		
+		header {
+			.breadcrumb + .navbar {
+				margin-top: 20px;
+			}
+			
+			.breadcrumb + .navbar.subnav-fixed {
+				margin-top: 0;
+			}
+		}
 		 
 		.nav > li.disabled > a {
 			color: #999999;
 		}
+		
+		 .breadcrumb > li.disabled > a {
+		 	text-decoration : none;
+			cursor : default;
+		 }
 		
 		> .navbar-inverse { 
 			.brand {
@@ -174,6 +194,10 @@
 			.message {
 				text-align		: center;
 				padding-bottom  : 8px;
+				
+				.retry {
+					margin-left : 20px;
+				}
 			}
 			
 			@media (min-width: 768px) and (max-width: 980px) {
@@ -231,6 +255,7 @@
 /* class overlay is applied if an popup is currently overlaying it */
 .ampere-app.overlay {
 	>.ampere-module {
+		/*
 		>.navbar-fixed-top, >.navbar-fixed-bottom, >.container {
 			-webkit-filter	: blur(1px);
 			-moz-filter		: blur(1px);
@@ -238,6 +263,7 @@
 			-o-filter		: blur(1px);
 			filter			: blur(1px);
 		}
+		*/
 		
 		-webkit-transition	: all 0.3s ease;
 	   	-moz-transition		: all 0.3s ease;
@@ -251,6 +277,14 @@
 	overflow 		: hidden;
 	
 	>.ampere-module {
+		>.navbar-fixed-top, >.navbar-fixed-bottom, >.container {
+			-webkit-filter	: blur(1px);
+			-moz-filter		: blur(1px);
+			-ms-filter		: blur(1px);
+			-o-filter		: blur(1px);
+			filter			: blur(1px);
+		}
+		
 		>.overlay {
 			-webkit-filter	: blur(1px);
 			-moz-filter		: blur(1px);
@@ -269,4 +303,12 @@
    	-moz-transition		: opacity 0.3s ease;
     -o-transition		: opacity 0.3s ease;
     transition			: opacity 0.3s ease;
+}
+
+/* fixes bootstrap-responsive.css */
+@media (max-width: 767px) {
+  body.ampere-app {
+    padding-right: 0;
+    padding-left: 0;
+  }
 }

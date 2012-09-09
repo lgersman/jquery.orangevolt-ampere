@@ -223,8 +223,17 @@
 
 		this.transition( 'exception_spiced_transition_action', this.states.main)
 		.action( function action( transition) {
+			var firstTime = true
+			
 			return function redo( source, target) {
-				throw 'a problem occured'; 
+				if( firstTime) {
+					firstTime = false;
+					throw 'a problem occured';
+				} else {
+					return function undo() {
+						return redo;
+					}
+				} 
 			};
 		})
 		.options( 'ampere.ui.type' , 'global');

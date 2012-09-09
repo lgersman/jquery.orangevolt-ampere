@@ -19,3 +19,6 @@ $scope.$cookies = $cookies;
 
 "batteries included"
 "AngularJS on stereoids"
+
+'ampere.ui.type' = 'global' || 'breadcrumb' || 'primary' || 'secondary' || undefined
+transition.enabled( value || function)
