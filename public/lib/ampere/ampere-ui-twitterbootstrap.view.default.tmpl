@@ -1,0 +1,16 @@
+<section>
+	<h3>View {{$ampere.ui.getCaption( $ampere.view)}}</h3>
+	<em>(This view/template was generated automatically : state "{{$ampere.view.state().fullName()}}" has no view applied.)</em>
+</section>
+<section>
+	<h4>Transitions</h4>
+	<div class="btn-group">
+		<button type="button" ng-ampere-transition="transition" ng-repeat="transition in $ampere.ui.getTransitions({ 'ampere.ui.type':undefined})"></button>
+	</div>
+</section>
+<hr/>
+<section>
+	<h4>Data</h4>
+	<pre>{{$ampere.view.state() | json}}</pre>
+</section>
+

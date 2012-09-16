@@ -137,7 +137,6 @@
 			} 
 			
  			var historyReady = $.Deferred(); 
-			
 			var redo = redoCommand || (this.canRedo() && this.stack[ this.position]);
 			var undo = $.isFunction( redo) && redo( historyReady);
 
@@ -380,9 +379,14 @@
 					if( typeof( arguments[0])=='string') {
 						targetState = this;
 						transitionName = arguments[0];
-					} else {
+					} else if( arguments[0] instanceof State) {
 						targetState = arguments[0];
 						transitionName = targetState.name();
+					} else if( $.isFunction( arguments[0])) {
+						targetState = arguments[0];
+						transitionName = targetState.name!='' ? targetState.name : 'main';
+					} else {
+						_ns.raise( 'dont know how to handle arguments ', arguments);
 					}
 				} else if( arguments.length==2) {
 					transitionName = arguments[0];
@@ -525,35 +529,71 @@
 			this.states = {};
 			/**
 			 * <module>.state( 'foo') 
-			 * 	registers a new state foo
+			 * 	registers a new state foo and returns it
 			 * <module>.state( function foo() { ...}) 
-			 * 	registers function as new state 'foo'
+			 * 	registers function as new state 'foo' and returns it
 			 * <module>.state( 'foo', function() { ...}) 
-			 * 	registers function as new state foo
+			 * 	registers function as new state foo and returns it
+			 * <module>.state( ['first', function second( state) { ...}, 'third']) 
+			 * 	registers 3 states first, second, third at once. 
+			 *  second will be initialized using its function name (this and arguments[0] provides the state)
+			 *  returns nodule 
+			 * <module>.state( { first : function( state) {}, second : function( state) {}, 'third' : function( state) {}}) 
+			 * 	registers 3 states first, second, third at once. 
+			 *  key is taken as state name and function will be called as initializer (this and arguments[0] provides the state)
+			 *  returns nodule  
 			 */
 			this.state = function() {
 				var _ns = $.ov.namespace( this.fullName() + '.state()').assert( arguments.length, 'no arguments given');
-				var args = $.makeArray( arguments);
-				var name = args.shift();
 				
-				var fn   = $.isFunction( name) ? name : args.shift() || $.noop;
-				var name = typeof( name)=='string' ? name : name.name;
-				_ns.assert( !this.states[ name], 'state "' + name + '" already exists');
-				
-				function state() {
-						/*
-						 * make state a deferred
-						 */
-					var dependencies = []; 
+				if( arguments.length==1 && $.isArray( arguments[0])) {
+					var arr = arguments[0];
+						// create states
+					for( var i=0; i<arr.length; i++) {
+						_ns.assert( $.isFunction( arr[i]) || typeof( arr[i])=='string', 'array item type "function" or "string" expected');
+						this.state( $.isFunction( arr[i]) ? arr[i].name : arr[i]);
+					}
+						// initialize states
+					for( var i=0; i<arr.length; i++) {
+						$.isFunction( arr[i]) && arr[i].call( this.states[ arr[i].name], this.states[ arr[i].name]); 
+					}
+					return this;
+				} else if( arguments.length==1 && $.isPlainObject( arguments[0])) {
+					var obj = arguments[0];
+						// create states
+					for( var name in obj) {
+						this.state( name);
+					}
 					
-					$.isFunction( this.promise) && dependencies.push( this.promise());
-					dependencies.push( fn.call( this, this));
-					this.promise = $.when.apply( $.when, dependencies).promise;					
-				};
-				state.prototype = State( this, name);
-				this.states[name] = new state();
-				
-				return this.states[ name];
+						// intialize states
+					for( var name in obj) {
+						_ns.assert( $.isFunction( obj[name]), 'initializer function expected as value of state "' , name + '"');
+						obj[name].call( this.states[ name], this.states[ name]);
+					}
+					return this;
+				} else {
+					var args = $.makeArray( arguments);
+					var name = args.shift();
+					
+					var fn   = $.isFunction( name) ? name : args.shift() || $.noop;
+					var name = typeof( name)=='string' ? name : name.name;
+					_ns.assert( !this.states[ name], 'state "' + name + '" already exists');
+					
+					function state() {
+							/*
+							 * make state a deferred
+							 */
+						var dependencies = []; 
+						
+						$.isFunction( this.promise) && dependencies.push( this.promise());
+						dependencies.push( fn.call( this, this));
+						this.promise = $.when.apply( $.when, dependencies).promise;					
+					};
+					state.prototype = State( this, name);
+					this.states[name] = new state();
+					
+					return this.states[ name];
+				}
 			};
 			
 			this.transitions = {};
@@ -800,6 +840,128 @@
 			this.options = Options( angular.extend( {}, Ampere.defaults.ui, options));
 			this.controller = controller;
 			this._ns = $.ov.namespace( controller.module.fullName() + '::UI');
+			
+			var self = this;
+			
+			this.onHotKey = function onHotkey( event) {
+				if( !self.isBlocked()) {
+					var matchingHotkeys = window.ov.ampere.ui.hotkey.computeMatchingHotkeys( event);
+					var module = self.controller.module;
+
+					function proceedTransitionHotkey( transition, ngAmpereHotkey) {
+						var hotkey = ngAmpereHotkey || transition.options( 'ampere.ui.hotkey');
+						
+						if( transition.enabled() && hotkey) {
+							var _hotkey = hotkey.replace(/\+/g, '_').toLowerCase();
+							if( $.inArray( _hotkey, matchingHotkeys)!=-1) {
+								self._ns.debug( 'hotkey ' + hotkey + ' matched');
+								
+								event.preventDefault();
+									// prevent any other hotkey handler to be invoked
+								event.stopImmediatePropagation();
+								
+								self.controller.proceed( transition);
+								
+								return true;
+							}
+						}
+					}
+
+						// inspect ng-ampere-hotkey attributed elements (i.e. not transitions)
+					var elements = $( '*[ng-ampere-hotkey]').get();
+					for( var i in elements) {
+						var element = $( elements[i]);
+						var hotkeys = element.data( 'ampereHotkey');
+						
+						for( var hotkey in hotkeys) {
+							var _hotkey = hotkey.replace(/\+/g, '_').toLowerCase();
+							if( $.inArray( _hotkey, matchingHotkeys)!=-1) {
+								self._ns.debug( 'hotkey ' + hotkey + ' matched');
+								
+								event.preventDefault();
+									// prevent any other hotkey handler to be invoked
+								event.stopImmediatePropagation();
+
+								var value = hotkeys[ hotkey];
+								if( value instanceof Transition) {
+									self.controller.proceed( value);
+								} else {
+									var scope = angular.element( element).scope();
+									scope.$apply( value);
+								}
+								
+								return;
+							}	
+						}
+						/*
+						var fn = elements[i].data( 'ampere.hotkey-directive') || $.noop();
+						var o = fn() || {};
+						for( var i in o) {
+							var _hotkey = hotkey.replace(/\+/g, '_').toLowerCase();
+							if( $.inArray( _hotkey, matchingHotkeys)!=-1) {
+								self._ns.debug( 'hotkey ' + controller + ' activated');
+								
+								event.preventDefault();
+									// prevent any other hotkey handler to be invoked
+								event.stopImmediatePropagation();
+								
+								if( o[i] instanceof transition) {
+									self.controller.proceed( transition);
+								}
+								
+								return true;
+							}
+						}
+						*/
+					}
+			
+						// inspect transitions with an ampere hotkey provided as ng-ampere-hotkey attribute
+					var elements = $( '.ampere-transition[data-ampere-hotkey!=""]').get();
+					for( var i in elements) {
+						var element = $( elements[i]);
+						if( element.hasClass( 'ampere-transition')) {
+							var transition = element.data( 'ampereTransition');
+							if( transition && proceedTransitionHotkey( transition, element.data( 'ampere-hotkey'))) {
+								return;
+							}
+						}
+						/*
+						var fn = elements[i].data( 'ampere.hotkey-directive') || $.noop();
+						var o = fn() || {};
+						for( var i in o) {
+							var _hotkey = hotkey.replace(/\+/g, '_').toLowerCase();
+							if( $.inArray( _hotkey, matchingHotkeys)!=-1) {
+								self._ns.debug( 'hotkey ' + controller + ' activated');
+								
+								event.preventDefault();
+									// prevent any other hotkey handler to be invoked
+								event.stopImmediatePropagation();
+								
+								if( o[i] instanceof transition) {
+									self.controller.proceed( transition);
+								}
+								
+								return true;
+							}
+						}
+						*/
+					}
+					
+						// inspect current state's transitions
+					for( var i in module.current().state.transitions) {
+						if( proceedTransitionHotkey( module.current().state.transitions[i])) {
+							return;
+						} 
+					}
+					
+						// inspect module transitions
+					for( var i in module.transitions) {
+						if( proceedTransitionHotkey( module.transitions[i])) {
+							return;
+						} 
+					}
+				}
+			};
 		};
 
 			/**
@@ -807,14 +969,18 @@
 			 *  
 			 * * install event handlers
 			 */ 
-		this.init = function() {};
+		this.init = function() {
+			$( this.controller.element).on( 'keydown', this.onHotKey);
+		};
 		
 			/**
 			 * destroy should be overridden by implementations to  
 			 *  
 			 * * uninstall event handlers
 			 */ 
-		this.destroy = function() {};
+		this.destroy = function() {
+			$( this.controller.element).off( 'keydown', this.onHotKey);
+		};
 		
 			/**
 			 * block user input
@@ -826,6 +992,11 @@
 			 */
 		this.unblock = function() {};
 
+			/**
+			 * @return true if ui  is blocked
+			 */
+		this.isBlocked = function() {};
+		
 			/**
 			 * open an popup  
 			 * 
@@ -988,6 +1159,10 @@
 		this.options = Options( options);		
 		this.module = module;
 		this.element = element;
+			
+			// reset history to potentially remove 
+			// undo entries from previous usage
+		module.history().reset();
 		
 			/*
 			 * initialize 
@@ -1095,6 +1270,9 @@
 						ui 		 : this.ui
 					});
 				}
+				return true;
+			} else {
+				return false;
 			}
 		};
 		

@@ -1,4 +1,4 @@
-(jQuery.ov && jQuery.ov.json) || (function( $) {
+;(jQuery.ov && jQuery.ov.json) || (function( $) {
 
 	/**
 	 * implement JSON.stringify serialization with configurable second parameter

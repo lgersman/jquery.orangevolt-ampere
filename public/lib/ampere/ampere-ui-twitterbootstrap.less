@@ -1,5 +1,6 @@
 .ampere-app {
-	overflow : auto;
+	overflow-x : auto;
+	overflow-y : scroll;
 
 	.ampere-module {
 		position  : relative;
@@ -19,10 +20,21 @@
 				margin-top: 0;
 			}
 		}
-		 
+		
 		input:invalid, textarea:invalid, select:invalid {
 			border-color: #e9322d;
-		} 
+		}
+		
+		/* css for input[file] declared with ng-ampere-transition */
+		.ampere-transition + input[type="file"].ampere-transition-companion {
+			visibility	: hidden;
+			position	: absolute;
+			top			: -50px;
+			right		: 0;
+			opacity		: 0;
+			filter		: alpha(opacity=0);
+			font-size	: 100px;
+		}
 		 
 		.nav > li.disabled > a {
 			color: #999999;
@@ -252,6 +264,25 @@
 		  .subnav-fixed >.navbar-inner {
 		  	border-width: 0 0 1px; /* drop the border on the fixed edges */
 		  }
+		}
+	}
+}
+
+/* 
+ * wizard template specific 
+ */
+.ampere-app.layout-name-wizard {
+	padding-bottom: 40px;
+	
+		// hide disabled left oriented transitions
+		// (typically the back button)  
+	.navbar.navbar-fixed-bottom {
+		.navbar-inner {
+			.nav:not( .pull-right) {
+				li.disabled {
+					display : none;
+				}
+			}
 		}
 	}
 }

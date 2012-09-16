@@ -10,6 +10,7 @@
 'ampere.ui.view'   : url to default view template. if not set default view will be used
 
 available rootScope services : 
+$scope.$ = jQuery
 $scope.$window = $window;
 $scope.$http = $http;
 $scope.$timeout = $timeout;
@@ -22,3 +23,5 @@ $scope.$cookies = $cookies;
 
 'ampere.ui.type' = 'global' || 'breadcrumb' || 'primary' || 'secondary' || undefined
 transition.enabled( value || function)
+
+

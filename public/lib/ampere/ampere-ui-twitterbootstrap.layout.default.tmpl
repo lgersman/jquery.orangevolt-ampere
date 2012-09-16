@@ -39,7 +39,7 @@
 		        </li>
 			</ul>
 			
-			<div class="navbar subnav" ddata-top="80" ng-show="$ampere.ui.getTransitions({ 'ampere.ui.type':'primary'}).length || $ampere.ui.getTransitions({ 'ampere.ui.type':'secondary'}).length">
+			<div class="navbar subnav" ddata-top="40" ng-show="$ampere.ui.getTransitions({ 'ampere.ui.type':'primary'}).length || $ampere.ui.getTransitions({ 'ampere.ui.type':'secondary'}).length">
 				<div class="navbar-inner">
 			          <ul class="nav nav-pills">
 			          	<li ng-repeat="transition in $ampere.ui.getTransitions({ 'ampere.ui.type':'primary'})" ng-class="{disabled : !transition.enabled()}">

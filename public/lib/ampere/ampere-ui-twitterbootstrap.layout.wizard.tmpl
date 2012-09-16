@@ -82,6 +82,26 @@
 		    	<div ng-bind-html-unsafe="$ampere.ui.getDescription( $ampere.view)"></div>
 		  	</div>
 		  	<div ng-ampere-state="" class="ampere-view name-{{$ampere.view.name()}}"></div>
+		  	<div class="navbar navbar-fixed-bottom">
+			  	<div class="navbar-inner">
+			    	<ul class="nav">
+						<li
+							ng-repeat="transition in $ampere.ui.getTransitions({ 'ampere.ui.type':'wizard-left'})"
+			    			ng-class="{disabled : !transition.enabled()}" 
+						>
+							<a ng-ampere-transition="transition"></a>
+						</li>
+					</ul>
+					<ul class="nav pull-right">
+			    		<li
+			    			ng-repeat="transition in $ampere.ui.getTransitions({ 'ampere.ui.type':'wizard-right'})"
+			    			ng-class="{disabled : !transition.enabled()}"
+			    		>
+							<a ng-ampere-transition="transition"></a>
+						</li>
+			    	</ul>
+			  	</div>
+			</div>		  	
 		</section>
 		<footer ng-show="$ampere.ui.getAbout( $ampere.module)">
 			<hr>

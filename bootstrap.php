@@ -18,7 +18,7 @@ $JS = array(
 	'/lib/coffeescript-1.3.3.js',
 	'/lib/modernizr-2.6.0.js',
 	'/lib/lesscss-1.3.0.js',
-	'/lib/jquery-1.7.2.min.js',
+	'/lib/jquery-1.8.0.js',
 	'/lib/bootstrap-2.1.0/js/bootstrap.js',
 	'/lib/jquery.sortable.js',
 	'/lib/datepicker/js/bootstrap-datepicker.js',

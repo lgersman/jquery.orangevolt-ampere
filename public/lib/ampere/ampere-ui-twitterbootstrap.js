@@ -23,6 +23,27 @@
 		        return window.ov.ampere.util.ucwords( input);
 		    };
 		});
+		ampere.filter( 'replace', function() {
+		    return function( input, regexp, replace) {
+		    	debugger
+		    	var lastSlashIndex = regexp.lastIndexOf( '/');
+		    	var re = new RegExp( regexp.substr( 1, lastSlashIndex-1), regexp.substr( lastSlashIndex+1));
+		    	return input.replace( re, replace);
+		    };
+		});
+		
+		ampere.filter( 'next', function() {
+		    return function( items, current) {
+				var pos = $.inArray( current, items);
+		        return pos<items.length-1 ? items[ pos+1] : current;
+		    };
+		});
+		ampere.filter( 'prev', function() {
+		    return function( items, current) {
+				var pos = $.inArray( current, items);
+		        return pos>0 ? items[ pos-1] : current;
+		    };
+		});
 		
 		var ampereTwitterbootstrapController = function( $scope, $rootElement, $window, $http, $timeout,  $log, $resource, $cookies) {
 			var controller = $rootElement.parent().data( 'ampere.controller');
@@ -163,103 +184,78 @@
 							scope.$root.$broadcast( 'ampere-model-changed', changeset, toDelete);
 						}
 					});
-					
-					//scope.$watch( 'controller.module.current().view', function() {
-					/*
-						var view = controller.module.current().view;
-						var template = view.template();
-						
-						if( $.isFunction( template.promise)) {
-							$.ov.namespace( 'ngState').assert( template.promise().state()!='success', 'view fragment is not ready : state=', template.promise().state());
-							template.promise().done( function( data) {
-								template = data.jquery ? data.text() : data;
-							});
-						}
-						
-			            element.html( template);
-		                $compile(element.contents())( scope);
-		                */
-					//});								
 				}
-				/*
-				compile    : function( element, attr) {
-					var controller = element.parents().filter( function( obj) { return $.data( this, 'ampere.controller'); })
-					.data( 'ampere.controller');
-					
-					return function( scope, element) {
-						var childScope;
-						
-						//
-						// function() {
-						// 	return controller.module.current().state;
-						// } 
-						// 
-						// should also be working 
-						//
-						scope.$watch( 'module().current().state', function(src) {
-							if( childScope) {
-								childScope.$destroy();
-							}
-				            
-							var view = controller.current().view;
-							var template = view.template();
-							
-							if( $.isFunction( template.promise)) {
-								$.ov.namespace( 'ngState').assert( template.promise().state()!='success', 'view fragment is not ready : state=', template.promise().state());
-								template.promise().done( function( data) {
-									template = data.jquery ? data.text() : data;
-								});
-							}
-							
-							childScope = scope.$new();
-							
-				            element.html( template);
-			                $compile(element.contents())(childScope);
-			               // scope.$eval('module().current().state');
-						});
-					};
-				}*/
 			};
 		}]);
 		
 		ampere.directive( 'ngAmpereTransition', [ '$compile', '$parse', '$window', function( $compile, $parse, $window) {
 			var templates = {
 				'a' 	: '<a href="javascript:void(0)"'
-					+ 'class="ampere-transition {{attrs.class}} {{hotkey && \'ampere-hotkey\'}}"'
-   					+ 'ng-class="{disabled : !transition.enabled()}"'
-   					+ 'accesskey="{{attrs.accesskey}}"'
-   					+ 'id="{{attrs.id}}"'
-   					+ 'style="{{attrs.style}}"'
-       				+ 'title="{{attrs.title || $ampere.ui.getDescription( transition)}}{{hotkey}}">'
+					+ ' class="ampere-transition name-{{transition.name()}} {{attrs.class}}"'
+   					+ ' ng-class="{disabled : !transition.enabled(), \'ampere-hotkey\' : hotkey}"'
+   					+ ' accesskey="{{attrs.accesskey}}"'
+   					+ ' id="{{attrs.id}}"'
+   					+ ' style="{{attrs.style}}"'
+   					+ ' data-ampere-hotkey="{{attrs.ngAmpereHotkey}}"'
+       				+ ' title="{{attrs.title || $ampere.ui.getDescription( transition)}}{{hotkey && \' \' + hotkey}}">'
        				+ '<i ng-class="$ampere.ui.getIcon( transition)"></i>'
        				+ '{{$.trim( element.text()) || $ampere.ui.getCaption( transition)}}'
        				+ '</a>',
        			'button' : '<button type="button"'
-   					+ 'ng-disabled="!transition.enabled()"'
-   					+ 'class="ampere-transition name-{{transition.name()}} btn {{attrs.class}} {{hotkey && \'ampere-hotkey\'}}"'
-   					+ 'id="{{attrs.id}}"'
-   					+ 'accesskey="{{attrs.accesskey}}"'
-   					+ 'style="{{attrs.style}}"'
-       				+ 'title="{{attrs.title || $ampere.ui.getDescription( transition)}}{{hotkey}}">'
+   					+ ' ng-disabled="!transition.enabled()"'
+   					+ ' class="ampere-transition name-{{transition.name()}} btn {{attrs.class}}"'
+   					+ ' ng-class="{\'ampere-hotkey\' : hotkey}"'
+   					+ ' ng-disabled="!transition.enabled()"'
+   					+ ' id="{{attrs.id}}"'
+   					+ ' accesskey="{{attrs.accesskey}}"'
+   					+ ' style="{{attrs.style}}"'
+   					+ ' data-ampere-hotkey="{{attrs.ngAmpereHotkey}}"'
+       				+ ' title="{{attrs.title || $ampere.ui.getDescription( transition)}}{{hotkey && \' \' + hotkey}}">'
        				+ '<i ng-class="$ampere.ui.getIcon( transition)"></i>'
 					+ '{{$.trim( element.text()) || $ampere.ui.getCaption( transition)}}'
 					+ '</button>',
+				'file' : '<button type="button"'
+					+ ' onclick="$( this).next().click()"'
+					+ ' ng-disabled="!transition.enabled()"'
+					+ ' class="ampere-transition name-{{transition.name()}} btn ampere-transition-companion {{attrs.class}}"'
+					+ ' ng-class="{\'ampere-hotkey\' : hotkey}"'
+					+ ' ng-disabled="!transition.enabled()"'
+					+ ' accesskey="{{attrs.accesskey}}"'
+					+ ' style="{{attrs.style}}"'
+					+ ' data-ampere-hotkey="{{attrs.ngAmpereHotkey}}"'
+	   				+ ' title="{{attrs.title || $ampere.ui.getDescription( transition)}}{{hotkey && \' \' + hotkey}}">'
+	   				+ '<i ng-class="$ampere.ui.getIcon( transition)"></i>'
+					+ '{{$.trim( element.text()) || $ampere.ui.getCaption( transition)}}'
+					+ '</button>'
+					+ '<input' 
+					+ ' id="{{attrs.id || attrs.name}}"'
+					+ ' name="{{attrs.name || attrs.id}}"'
+					+ ' class="ampere-transition-companion"'
+					+ ' type="file"' 
+					+ ' ng-ampere-change="transition"'
+					+ '>',
 				'submit' : '<button type="submit"'
-   					+ 'ng-disabled="!transition.enabled()"'
-   					+ 'class="ampere-transition name-{{transition.name()}} btn {{attrs.class}} {{hotkey && \'ampere-hotkey\'}}"'
-   					+ 'id="{{attrs.id}}"'
-   					+ 'accesskey="{{attrs.accesskey}}"'
-   					+ 'style="{{attrs.style}}"'
-       				+ 'title="{{attrs.title || $ampere.ui.getDescription( transition)}}{{hotkey}}">'
+   					+ ' ng-disabled="!transition.enabled()"'
+   					+ ' class="ampere-transition name-{{transition.name()}} btn {{attrs.class}}"'
+   					+ ' ng-class="{\'ampere-hotkey\' : hotkey}"'
+   					+ ' ng-disabled="!transition.enabled()"'
+   					+ ' id="{{attrs.id}}"'
+   					+ ' accesskey="{{attrs.accesskey}}"'
+   					+ ' style="{{attrs.style}}"'
+   					+ ' data:ampere-hotkey="{{attrs.ngAmpereHotkey}}"'
+       				+ ' title="{{attrs.title || $ampere.ui.getDescription( transition)}}{{hotkey && \' \' + hotkey}}">'
        				+ '<i ng-class="$ampere.ui.getIcon( transition)"></i>'
 					+ '{{$.trim( element.text()) || $ampere.ui.getCaption( transition)}}'
 					+ '</button>',
 				'reset' : '<button type="reset"'
-   					+ 'ng-disabled="!transition.enabled()"'
-   					+ 'class="ampere-transition name-{{transition.name()}} btn {{attrs.class}} {{((attrs.ngAmpereHotkey || $ampere.ui.getHotkey( transition)) && \'ampere-hotkey\')}}"'
-   					+ 'accesskey="{{attrs.accesskey}}"'
-   					+ 'style="{{attrs.style}}"'
-       				+ 'title="{{attrs.title || $ampere.ui.getDescription( transition)}}{{(attrs.ngAmpereHotkey || $ampere.ui.getHotkey( transition)) && (\'(\' + (attrs.ngAmpereHotkey || $ampere.ui.getHotkey( transition)) + \')\')}}">'
+   					+ ' ng-disabled="!transition.enabled()"'
+   					+ ' class="ampere-transition name-{{transition.name()}} btn {{attrs.class}}"'
+   					+ ' ng-class="{\'ampere-hotkey\' : hotkey}"'
+   					+ ' ng-disabled="!transition.enabled()"'
+   					+ ' accesskey="{{attrs.accesskey}}"'
+   					+ ' style="{{attrs.style}}"'
+   					+ ' data-ampere-hotkey="{{attrs.ngAmpereHotkey}}"'
+       				+ ' title="{{attrs.title || $ampere.ui.getDescription( transition)}}{{hotkey && \' \' + hotkey}}">'
        				+ '<i ng-class="$ampere.ui.getIcon( transition)"></i>'
 					+ '{{$.trim( element.text()) || $ampere.ui.getCaption( transition)}}'
 					+ '</button>'
@@ -301,7 +297,7 @@
 						}
 						
 						_ns = $.ov.namespace('ngAmpereTransition(' + newValue.fullName() + ')');
-
+						
 						var type = attrs.type || ($.inArray( element[0].tagName.toLowerCase(), Object.keys( templates))!=-1 ? element[0].tagName.toLowerCase() : 'button');
 						
 						scope.transition = newValue;
@@ -316,28 +312,15 @@
 						if( templates[ type]) {
 							var f = $compile( templates[ type]);
 							var replacement = f( scope);
+							
 							element.replaceWith( replacement);
 							
 							var hotkey = attrs.ngAmpereHotkey || scope.$ampere.ui.getHotkey( scope.transition);
-
+								
 							if( hotkey) {
-								_ns.debug( 'bind hotkey ', hotkey);
-								
-								var _hotkey = hotkey.replace(/\+/g, '_'); 								
 								scope.hotkey = ' (' + window.ov.ampere.util.ucwords( hotkey) + ')';
-								
-								function onHotKey( event) {
-									_ns.debug( 'hotkey activated');
-									event.preventDefault();
-									onTransitionClicked.call( replacement, event);
-								};
-								$( 'body').on( 'keydown.' + _hotkey, onHotKey);
-								
-								scope.$on( '$destroy' ,function() {
-									_ns.debug( 'unbind hotkey ', hotkey);
-									$( 'body').off( 'keydown.' + _hotkey, onHotKey);
-								});
 							}
+							replacement.data( 'ampereTransition', newValue);
 						} else {
 							_ns.raise( 'type "', type, '" is unknown');
 						}
@@ -345,6 +328,65 @@
 				}
 			};
 		}]);
+		
+		function eventDirective( eventName) {
+			var directive = 'ngAmpere' + window.ov.ampere.util.ucwords( eventName); 
+				
+			ampere.directive( directive, [ function() {
+				var _ns = $.ov.namespace( directive);
+				
+				return {
+					restrict   : 'A',
+					link: function( scope, element, attrs) {
+						// doesnt work with input event :-)
+						//var event = Modernizr.hasEvent( 'input', element[0]) ? 'input' : 'change';
+
+						$( element).on( eventName, function( event) {
+							var transition = scope.$eval( attrs[ directive]);
+
+							if( transition) {
+								var ui = scope.$ampere.ui;
+								var controller = ui.controller;
+
+								!ui.isBlocked() && controller.proceed( transition);
+							
+								event.preventDefault();
+									// prevent any other hotkey handler to be invoked
+								event.stopPropagation();
+								event.stopImmediatePropagation();
+							} else {
+								_ns.debug( 'attribute "ng-ampere-' + eventName + '" (=' +  attrs[ directive] + ') doesnt resolve to an ampere transition');
+							}
+						});
+					}
+				};
+			}]);
+		}
+		eventDirective( 'change');
+		eventDirective( 'click');
+		eventDirective( 'dblclick');
+		
+		ampere.directive( 'ngAmpereHotkey', [ function() {
+			var _ns = $.ov.namespace( 'ngAmpereHotkey');
+			
+			return {
+				restrict   : 'A',
+				link: function( scope, element, attrs) {
+					
+						/*
+						 * it the ng-ampere-hotkey attribute is not
+						 * used in combination with ng-ampere-transition
+						 */ 
+					if( !attrs.ngAmpereTransition) {
+						var hotkeys = scope.$eval( attrs.ngAmpereHotkey);
+						_ns.assert( $.isPlainObject( hotkeys), 'attribute "ng-ampere-hotkey"(="' + attrs.ngAmpereHotkey + '") expected to evaluate to an object');
+						
+						element.data( 'ampereHotkey', hotkeys);
+					}
+				}
+			};
+		}]);
+		
 	})();
 	
 		/**
@@ -362,7 +404,7 @@
 	        $('.subnav').attr('data-top', offset.top);
 	    }
 
-	    if( $('.subnav').attr('data-top') - $('.subnav').outerHeight() <= $(this).scrollTop())
+	    if( $(this).scrollTop() && $('.subnav').attr('data-top') - $('.subnav').outerHeight() <= $(this).scrollTop())
 	        $('.subnav').addClass('subnav-fixed');
 	    else
 	        $('.subnav').removeClass('subnav-fixed');
@@ -379,6 +421,7 @@
 	
 		event.preventDefault();
 			// prevent any other hotkey handler to be invoked
+		event.stopPropagation();
 		event.stopImmediatePropagation();
 	}
 
@@ -394,7 +437,7 @@
 	}
 	
 	function onActionAbort() {
-		console.log( 'action aborted');
+		$.ov.namespace('twitterboostrap::onActionAbort()').debug( 'action aborted');
 		
 		var controller = $( this).closest( '.ampere-app').ampere();
 		
@@ -419,15 +462,18 @@
 		
 		this._super( controller, angular.extend( {}, twitterbootstrap.defaults, options || {}));
 		
+		layout = 'default';
 		if( Object.hasOwnProperty.call( this.options(), 'ampere.ui.layout')) {
 			var layout = this.options( 'ampere.ui.layout');
-			this.template = layout
-				? $.get( layout)
-				: $.get( this.options( 'ampere.baseurl') + '/ampere-twitterbootstrap.nolayout.tmpl')
-			;
-		} else {
-			this.template = $.get( this.options( 'ampere.baseurl') + '/ampere-twitterbootstrap.layout.tmpl');
+				// set "nolayout" template when layout option was false
+			layout || (layout='nolayout'); 
 		}
+		
+		if( $.inArray( layout, [ 'default', 'nolayout', 'wizard'])!=-1) {
+			controller.element.addClass( 'layout-name-' + layout)
+			layout = this.options( 'ampere.baseurl') + '/ampere-ui-twitterbootstrap.layout.' + layout + '.tmpl';
+		}
+		this.template = $.get( layout);
 			
 		
 		/*
@@ -442,17 +488,26 @@
 			}
 		}
 		
+		var _init = this.init;
 		this.init = function() {
+			_init.call( this);
+			
+			(this.controller.element[0].tagName=="BODY") && $( window).on( 'resize', onBodyscroll);
 			(this.controller.element[0].tagName=="BODY") && $( document).on( 'scroll', onBodyscroll);
 			
-			this.controller.element.on( 'click', '.ampere-transition', onTransitionClicked);
-			
+				// react on click only on standalone ampere transition representants
+				// but not companions (like the representant of input[file] wit ng-ampere-transition) 
+			this.controller.element.on( 'click', '.ampere-transition:not( .ampere-transition-companion)', onTransitionClicked);
+				
 			this.controller.element.on( 'click', '.flash .alert button.close', onActionAbort); 
 			
 			focus( controller.element);
 		};
 
-		this.destroy = function( controller) {
+		var _destroy = this.destroy;
+		this.destroy = function() {
+			_destroy.call( this);
+			(this.controller.element[0].tagName=="BODY") && $( window).off( 'resize', onBodyscroll);
 			(this.controller.element[0].tagName=="BODY") && $( document).off( 'scroll', onBodyscroll);
 			
 			this.controller.element.off( 'click', '.ampere-transition', onTransitionClicked);
@@ -468,7 +523,7 @@
 		};
 		
 		this.unblock = function() {
-			this.controller.element.removeClass( 'overlay').find( '.overlay').removeClass( 'block');			
+			this.controller.element.removeClass( 'overlay').find( '.overlay').removeClass( 'block');
 		};
 
 		this.getTemplate = function( view) {
@@ -479,7 +534,7 @@
 					var view = this.options( 'ampere.ui.view');
 					template = $.get( view);
 				} else {
-					template = $.get( this.options( 'ampere.baseurl') + '/ampere-twitterbootstrap.view.tmpl');
+					template = $.get( this.options( 'ampere.baseurl') + '/ampere-ui-twitterbootstrap.view.default.tmpl');
 				}
 			} else if( $.isFunction( template)) {
 				template = template.call( scope.$ampere.module.current().view, scope.$ampere.module.current().view);
@@ -590,7 +645,7 @@
 					flash.find( 'button.close').hide();
 					flash.show();
 					
-					flash.fadeOut( 'slow');
+					flash.fadeOut( 1000);
 				} 
 			});
 		};
