@@ -1,5 +1,15 @@
+/*!
+ * Orangevolt Ampere Framework 
+ *
+ * http://github.com/lgersman
+ * http://www.orangevolt.com
+ *
+ * Copyright 2012, Lars Gersmann <lars.gersmann@gmail.com>
+ * Dual licensed under the MIT or GPL Version 2 licenses.
+ */
+
 /**
- * twitter bootstrap ampere ui
+ * Twitter Bootstrap / AngularJS Renderer
  */
 ;(window.ov && window.ov.ampere && window.ov.ampere.ui.twitterbootstrap) || (function( $) {
 	var _ns = $.ov.namespace( 'window.ov.ampere.ui.twitterbootstrap'); 
@@ -42,6 +52,11 @@
 		    return function( items, current) {
 				var pos = $.inArray( current, items);
 		        return pos>0 ? items[ pos-1] : current;
+		    };
+		});
+		ampere.filter( 'type', function() {
+		    return function( input) {
+				return $.type( input);
 		    };
 		});
 		
@@ -471,7 +486,7 @@
 		
 		if( $.inArray( layout, [ 'default', 'nolayout', 'wizard'])!=-1) {
 			controller.element.addClass( 'layout-name-' + layout)
-			layout = this.options( 'ampere.baseurl') + '/ampere-ui-twitterbootstrap.layout.' + layout + '.tmpl';
+			layout = this.options( 'ampere.baseurl') + 'ampere/ampere-ui-twitterbootstrap.layout.' + layout + '.tmpl';
 		}
 		this.template = $.get( layout);
 			
@@ -534,7 +549,7 @@
 					var view = this.options( 'ampere.ui.view');
 					template = $.get( view);
 				} else {
-					template = $.get( this.options( 'ampere.baseurl') + '/ampere-ui-twitterbootstrap.view.default.tmpl');
+					template = $.get( this.options( 'ampere.baseurl') + 'ampere/ampere-ui-twitterbootstrap.view.default.tmpl');
 				}
 			} else if( $.isFunction( template)) {
 				template = template.call( scope.$ampere.module.current().view, scope.$ampere.module.current().view);
@@ -701,8 +716,8 @@
 				bar
 				.text( 'Bootstrapping ' + controller.module.name() + ' failed ! ')
 				.append( 
-					$('<a href="#">Details</a>').on( 'click', function() {
-						controller.element.append( '<div class="alert">' + (self.template.isRejected() ? self.template.statusText + ' : ampere-twitterbootstrap.fragment' : $.ov.json.stringify( args, $.ov.json.stringify.COMPACT)) + '</div>');
+					$('<a href="#">Details</a>').one( 'click', function() {
+						controller.element.append( '<div class="alert">' + (self.template.isRejected() ? self.template.statusText + ' : ' + layout : $.ov.json.stringify( args, $.ov.json.stringify.COMPACT)) + '</div>');
 					}) 
 				);
 				$( '.progress', controller.element).addClass( 'progress-danger');

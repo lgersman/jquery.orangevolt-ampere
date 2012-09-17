@@ -10,21 +10,48 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link rel="icon" href="favicon.ico" type="image/x-icon">
 		<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+
+		<script type="text/javascript" src="../../lib/oval.js"></script>
 		
-		<script type="text/javascript" src="lib/oval.js"></script>
+		<script type="text/coffeescript">
+ex = ov.ampere().module 'ex', (module) ->
+	@state
+		main	: () ->
+			@transition( module.states.one)
+			.options 'ampere.ui.type': 'primary'
+
+			@transition( module.states.two)
+			.options 'ampere.ui.type': 'primary'
+
+			@transition( module.states.three)
+			.options 'ampere.ui.type': 'primary'
+		one   	: () ->
+			@transition module.states.two
+			@transition module.states.three
+			@transition module.states.main
+
+			@view '''
+				<p>Hello world !!</p>
+			'''
+
+		two   	: () ->
+			@transition module.states.three
+			@transition module.states.main
+			@transition module.states.one
+		
+		three 	: () -> 
+			@transition module.states.main
+			@transition module.states.one
+			@transition module.states.two
+
+	@transition( module.states.main)
+
+$( window).ready -> $( 'body').ampere ex
+		</script>
  	</head>
  	<body>
   		<!-- Prompt IE 6 users to install Chrome Frame. Remove this if you support IE 6.
        		chromium.org/developers/how-tos/chrome-frame-getting-started -->
   		<!--[if lt IE 7]><p class=chromeframe>Your browser is <em>ancient!</em> <a href="http://browsehappy.com/">Upgrade to a different browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to experience this site.</p><![endif]-->
-  		
-  		<?php 
-			$iterator = new DirectoryIterator( __DIR__ . '/examples');
-		    foreach( $iterator as $fi) {
-		        if( $fi->isDir() && !$fi->isDot()) {
-		            echo "<div><a target=\"_blank\" href=\"examples/{$fi->getFilename()}\">{$fi->getFilename()}</a></div>" . PHP_EOL;
-		        }
-		    }
-  		?>
 	</body>
 </html>

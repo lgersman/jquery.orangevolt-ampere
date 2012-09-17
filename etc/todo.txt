@@ -3,24 +3,21 @@
 * CRUD test app (either via "states imported from module" or "module wrapped as state")
 
 * provide an option to make transition results "invisible" from history ui interface point of view
-* 'brand' should be configurable to point to a transition (main by default ?) 
 
 * ng-ampere-change example (select to choose targetstate, file upload)
 * ng-ampere-click example 
 * ng-ampere-dblclick example
 * ng-ampere-hotkey standalone example (table up/down?)
 * filter next/prev example (also table up/down?)  
-
-* convert examples into php less examples (document.write based loader) 
+* adressbook example (picture upload etc)
 
 * ng-ampere-transition + input[file] example supporting example loading / uploading via jquery.upload.js 
 * jquery.upload dokumentieren
 
-* module options : move "ampere.ui.about.url" "ampere.ui.link"
+* module options : move "ampere.ui.about.url" to "ampere.ui.link" (value might be a state(/view)? object)
+* 'brand' should be configurable to point to a transition (main by default ?)
 
 * ng-drag/ng-drop directive 
 * pushstate history api anbinden
 * drag/drop directive
-* replace Ampere.ui.regex with a "match"/"test" or "regex" filter  
-
-* convert wizard example to use wizard template 
+* replace Ampere.ui.regex with a "match"/"test" or "regex" filter

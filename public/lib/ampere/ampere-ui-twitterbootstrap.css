@@ -1,6 +1,33 @@
 /* Add additional stylesheets below
 -------------------------------------------------- */
 
+@IMPORT url("http://fonts.googleapis.com/css?family=Cousine");
+
+input:not( [type="button"]):not( [type="reset"]):not( [type="submit"]):not( .search-query), textarea {
+	font-family : Cousine, Monospace;
+}
+
+input:not( [type="button"]):not( [type="reset"]):not( [type="submit"]):-moz-placeholder, textarea:-moz-placeholder {
+	font-family : Cousine, Monospace;
+}
+
+:not( .search-query)::-webkit-input-placeholder {
+	font-family : Cousine, Monospace;
+}
+
+/*
+	Cousine
+	Inconsolata
+
+	Varela
+	Pontano+Sans
+	Chivo
+	Allerta
+	
+	Arimo
+	Actor
+*/
+
 /*
   Bootstrap's documentation styles
   Special styles for presenting Bootstrap's documentation and examples

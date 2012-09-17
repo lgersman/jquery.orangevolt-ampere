@@ -1,0 +1,96 @@
+<html>
+	<head>
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.js"></script>
+		<script type="text/javascript" src="http://bootstrap-angular-template.lgersman/lib/ampere/jquery.upload.js"></script>
+		
+		<script type="text/javascript">
+				// helper function rendering progress
+			function dumpProgress( progressEvent, upload) {
+				if( progressEvent.lengthComputable) {
+	        		var percent = Math.round( progressEvent.loaded * 100 / progressEvent.total) + '%';
+	        		$( '#console').append(
+	        			'<span>' +
+	        			(upload ? '[UPLOAD  ]' : '[DOWNLOAD]') + ' : ' + percent + '\n' +
+	        			'</span>'
+	        		);
+	            } else {
+	            	$( '#console').append(
+	            		'<span>' + 	
+		            	(upload ? '[UPLOAD  ]' : '[DOWNLOAD]') + ' : Unable to compute progress\n' + 
+		            	'</span>'
+		            );
+	            }
+			}
+		
+				/**
+				* most common use case
+				*/
+			function ajaxUpload( form) {
+				$( '#console').empty().append( '<span>Starting upload ...\n</span>');
+				
+				$.upload( form.action, new FormData( form))
+				.progress( function( progressEvent, upload) {
+					dumpProgress( progressEvent, upload);
+				})
+				.done( function() {
+					$( '#console').append( '<span>Finished upload\n</span>');					
+				});
+			}
+			
+				/**
+				* case 2 : tracking progress using global a "ajaxProgress" handler
+				*/
+			function ajaxUpload2( form) {
+				$( '#console').empty().append( '<span>Starting upload ...\n</span>');
+				
+				var handler = function( jqEvent, progressEvent, upload, jqXHR) {
+					dumpProgress( progressEvent, upload);
+				};
+					// connect handler to global ajaxProgress event
+				$( document).on( 'ajaxProgress', handler);				
+				
+				$.upload( form.action, new FormData( form))
+				.done( function() {
+					$( '#console').append( '<span>Finished upload\n</span>');
+					
+						// disconnect handler to global ajaxProgress event
+					$( document).off( 'ajaxProgress', handler);
+				});
+			}
+				
+				/**
+				* case 3 : tracking progress by using $.ajax directly and provide 
+				* progress handler as $.ajax option 
+				*/
+			function ajaxUpload3( form) {
+				$( '#console').empty().append( '<span>Starting upload ...\n</span>');
+				
+				$.ajax({
+					processData	: false,
+				    contentType	: false,
+				    data 		: new FormData( form),
+				    type 		: 'POST',
+				    progress	: function( jqXHR, progressEvent, upload) {
+				    	dumpProgress( progressEvent, upload)
+                    }
+				})
+				.done( function() {
+					$( '#console').append( '<span>Finished upload\n</span>');
+				});
+			}
+		</script>		
+	</head>
+	<body>
+		<form action="upload.php" onSubmit="return false;">
+			<!-- 
+				replace the change handler to checkout the other ajax progress listening
+				options. 
+			-->
+			<input name="toupload" type="file" onchange="ajaxUpload1( this.form)">
+		</form>
+		<p>
+			Select a file to see the plugin in action.
+		</p>
+		<pre id="console"></pre>
+	</body>
+</html>

@@ -1,5 +1,15 @@
+/*!
+ * Orangevolt Ampere Framework 
+ *
+ * http://github.com/lgersman
+ * http://www.orangevolt.com
+ *
+ * Copyright 2012, Lars Gersmann <lars.gersmann@gmail.com>
+ * Dual licensed under the MIT or GPL Version 2 licenses.
+ */
+
 /**
- * ampere core
+ * Ampere Core 
  */
 ;(window.ov && window.ov.ampere) || (function( $) {
 	function object_values( arr) {
@@ -618,6 +628,9 @@
 						} else if( $.isFunction( arguments[0])) {
 							targetState = arguments[0];
 							transitionName = targetState.name!='' ? targetState.name : 'main';
+						} else if( typeof( arguments[0])=='string') {
+							targetState = this.states[ arguments[0]];
+							transitionName = arguments[0];
 						} else {
 							_ns.raise( 'dont know how to handle arguments ', arguments);
 						}
@@ -822,9 +835,23 @@
 			 */
 		'ampere.history.limit' : 0,
 			/* 
-			 * baseurl defaults to document.location by default
+			 * baseurl defaults to the Orangevolt Ampere Loader baseurl 
+			 * (i.e. path to oval.js)
 			 */
-		'ampere.baseurl'	   : document.location.href	
+		'ampere.baseurl'	   : (function() {
+			var scripts = document.getElementsByTagName( 'script');
+			for( var i=0; i<scripts.length; i++) {
+				var url = scripts[i].src;
+				if( /oval.js/.test( url)) {
+					var matches = url.match( /(.+)oval\.js(\?(.+))?/);
+					if( matches) {
+						return baseUrl = matches[ 1];
+					}
+				} 
+			}
+			
+			return document.location.href;
+		})()	
 	};
 	
 	/**

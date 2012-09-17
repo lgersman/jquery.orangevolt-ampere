@@ -1,0 +1,136 @@
+<!doctype html>
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="icon" href="favicon.ico" type="image/x-icon">
+		<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+	
+		<script type="text/javascript" src="../../lib/oval.js"></script>
+				
+		<script id="intro" type="text/template">
+			<div>
+				<center>This <a href="#ampere">Ampere</a> application features a state with multiple views.</center>
+				<br>
+				<center>It's kind of useless but shows the power of <a href="#ampere">Ampere</a>.</center> 
+			</div>
+			<p>
+			<center>
+					<button 
+						class="btn-primary btn-large " 
+						ng-ampere-transition="$ampere.view.state().transitions.main" 
+						xtitle="Click to start"	
+					>
+							Start
+					</button>
+				</center>
+			</p>
+		</script>
+		
+		<script type="text/javascript">
+			var multiview = window.ov.ampere().module( function multiview( module) {
+				this.state({
+					main : function( state) {
+						state.view( 'intro', $('#intro'))
+						.options({
+							'ampere.ui.caption' : null,
+							'ampere.ui.description' : null
+						});
+		
+						state.view.load( 'main', 'main.fragment')
+						.options( {
+							'ampere.ui.caption' 	: null,
+							'ampere.ui.description' : null,
+							'ampere.ui.icon'	: 'icon-home'
+						});
+						
+						state.view.load( 'help', 'help.fragment')
+						.options({
+							'ampere.ui.caption' : 'Help',
+							'ampere.ui.description' : null
+						});
+						
+						state.view( 'about', 'This is the <strong>about</strong> view content of application {{$ampere.ui.getCaption( $ampere.module)}}')
+						.options({
+							'ampere.ui.caption' : 'About',
+							'sampere.ui.description' : null
+						});
+						
+						state.transition( 'main')
+						.options({
+							/* okay : no effect because the template button element provides a non empty text*/'ampere.ui.caption' : 'Alarm',
+							'ampere.ui.icon'	: 'icon-home',
+							'ampere.ui.description' : 'Start application'
+						})
+						
+						state.options( {
+							'ampere.ui.description' : 'description of main state',
+							'ampere.state.view' 	: 'main'
+						})
+					}
+				});
+				
+				function isNotCurrentView( view) {
+					return function() {
+						return module.current().view!==view;
+					};
+				}
+				
+				var main2mainTransition = this.transition( 'main')
+				.enabled( isNotCurrentView( module.states.main.views.main))
+				.options({
+					'ampere.ui.description' : 'Click to go to main view',
+					'ampere.ui.type' 		: undefined,
+					'ampere.ui.icon'	    : 'icon-home'
+				})
+				
+				
+				this.transition( 'intro', this.states.main)
+				.enabled( isNotCurrentView( module.states.main.views.intro))
+				.options({
+					'ampere.ui.description' : 'bla bla',
+					'ampere.ui.icon'		: 'icon-info-sign',
+					'ampere.state.view'		: 'intro'
+				});
+				
+				this.transition( 'help', this.states.main)
+				.enabled( isNotCurrentView( module.states.main.views.help))
+				.options({
+					'ampere.ui.icon'		: 'icon-question-sign',
+					'ampere.state.view'		: 'help'
+				});
+				
+				this.transition( 'about', this.states.main)
+				.enabled( isNotCurrentView( module.states.main.views.about))
+				.options({
+					'ampere.state.view'		: 'about'
+				});
+				
+				this.options({
+					'ampere.ui.description' : 'This is a example multiview app.',
+					'ampere.ui.about' 		: $('<strong>You can go directly to the main view by clicking the brand  symbol at the right top of the page</strong>'),
+					'ampere.ui.about.url'	: main2mainTransition,
+					'ampere.state'	  		: 'main',
+					'ampere.view'	  		: 'intro',
+					'aampere.ui.caption'	: null,
+					'aampere.ui.description': null/*,
+					'ampere.history.limit'	: Number.MAX_VALUE */
+				});
+			});
+
+			$(window).ready( function() {
+				$( 'body').ampere( multiview);
+			});
+		</script>
+ 	</head>
+ 	<body>
+  		<!-- Prompt IE 6 users to install Chrome Frame. Remove this if you support IE 6.
+       		chromium.org/developers/how-tos/chrome-frame-getting-started -->
+  		<!--[if lt IE 7]><p class=chromeframe>Your browser is <em>ancient!</em> <a href="http://browsehappy.com/">Upgrade to a different browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to experience this site.</p><![endif]-->
+	</body>
+</html>

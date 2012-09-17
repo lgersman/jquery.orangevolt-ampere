@@ -1,3 +1,16 @@
+/*!
+ * Orangevolt Ampere Framework 
+ *
+ * http://github.com/lgersman
+ * http://www.orangevolt.com
+ *
+ * Copyright 2012, Lars Gersmann <lars.gersmann@gmail.com>
+ * Dual licensed under the MIT or GPL Version 2 licenses.
+ */
+
+/**
+ * Hotkey support for Twitter Bootstrap / AngularJS Renderer
+ */
 ;(window.ov && window.ov.ampere && window.ov.ampere.ui.hotkey) || (function( $) {
 	var _ns = $.ov.namespace( 'window.ov.ampere.ui.twitterbootstrap'); 
 	

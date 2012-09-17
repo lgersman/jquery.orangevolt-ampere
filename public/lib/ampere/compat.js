@@ -1,3 +1,16 @@
+/*!
+ * Orangevolt Ampere Framework 
+ *
+ * http://github.com/lgersman
+ * http://www.orangevolt.com
+ *
+ * Copyright 2012, Lars Gersmann <lars.gersmann@gmail.com>
+ * Dual licensed under the MIT or GPL Version 2 licenses.
+ */
+
+/**
+ * browser compatibility layer
+ */
 ;(jQuery.ov && jQuery.ov.compat) || (function( $) {
 	$.ov = $.ov || {};
 	$.ov.compat = {};

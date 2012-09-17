@@ -12,8 +12,15 @@
            			<span class="icon-bar"></span>
            			<span class="icon-bar"></span>
          		</a>
-		        <a class="brand" href="{{$ampere.module.options( 'ampere.ui.about.url')}}" target="_blank">{{$ampere.ui.getCaption( $ampere.module)}}</a>
-
+         		
+         		<span ng-switch on="$ampere.module.options( 'ampere.ui.about.url') | type">
+         			<a ng-switch-when="object" class="brand" ng-ampere-transition="$ampere.module.options( 'ampere.ui.about.url')"></a>
+         			
+			        <a ng-switch-default class="brand" href="{{$ampere.module.options( 'ampere.ui.about.url')}}" target="_blank">
+			        	{{$ampere.ui.getCaption( $ampere.module)}}
+			        </a>			        
+				</span>
+				
        		 	<div class="nav-collapse">
 	           		<ul class="nav">
 	           			<li 
@@ -62,7 +69,8 @@
 		</header>
 		<section class="ampere-state name-{{$ampere.view.state().name()}}">
 			<div class="page-header" ng-show="$ampere.ui.getDescription( $ampere.view) || $ampere.ui.getCaption( ($ampere.view.name()!='main' && $ampere.view) || $ampere.view.state())">
-		    	<h2 ng-show="$ampere.ui.getCaption( ($ampere.view.name()!='main' && $ampere.view) || $ampere.view.state())">
+		    	<h2 ng-show="$ampere.ui.getCaption( ($ampere.view.name()!='main' && $ampere.view) || $ampere.view.state()) || $ampere.ui.getIcon( $ampere.view)">
+		    		<i ng-show="$ampere.ui.getIcon( $ampere.view)" ng-class="$ampere.ui.getIcon( $ampere.view)"></i>
 		    		{{$ampere.ui.getCaption( ($ampere.view.name()!='main' && $ampere.view) || $ampere.view.state())}}
 		    		<a ng-show="$ampere.ui.getTransitions( {'ampere.ui.hotkey' : $ampere.ui.regexp( '.+')}).length" ng-click="$ampere.ui.toggleHelp()" title="Help" class="icon-question-sign"></a>
 		    	</h2>

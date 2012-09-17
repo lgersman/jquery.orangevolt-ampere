@@ -1,0 +1,85 @@
+<!doctype html>
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="icon" href="favicon.ico" type="image/x-icon">
+		<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+	
+		<script type="text/javascript" src="../../lib/oval.js"></script>
+		<script type="text/javascript">
+			var undoredo = window.ov.ampere().module( function undoredo( module) {
+				this.state({
+					main : function() {
+						this.value = 0;
+						
+						this.transition( module.states.inc);
+					},
+					inc : function() {
+						this.transition( module.states.main)
+						.action( function( transition) {
+							var value = transition.target().value;
+		
+							return function inc( source, target) {
+								target.value = target.value+1;
+								//console.warn( 'inc called');
+		
+								return function dec( source, target) {
+									source.value = value;
+									//console.warn( 'dec called');
+		
+									return inc; 
+								}; 
+							};
+						}); 
+					}
+				});
+	
+				this.transition( module.history().undo.target)
+				.action( module.history().undo)
+				.enabled( module.history().canUndo)
+				.options({
+					'ampere.ui.caption' : function() {
+						return 'Undo ' + (module.history().canUndo() ? 'enabled' : 'disabled') + ' target=' + (module.history().undo.target() && module.history().undo.target().fullName() || 'undefined');
+					},
+					'ampere.ui.hotkey'  : 'Ctrl+Z'
+				});
+	
+				this.transition( module.history().redo.target)
+				.action( module.history().redo)
+				.enabled( module.history().canRedo)
+				.options({
+					'ampere.ui.caption' : function() {
+						return 'Redo ' + (module.history().canRedo() ? 'enabled' : 'disabled') + ' target=' + (module.history().redo.target() && module.history().redo.target().fullName() || 'undefined');
+					},
+					'ampere.ui.hotkey'  : 'Ctrl+Y'
+				});
+	
+				this.transition( module.history().reset.target)
+				.action( module.history().reset)
+				.enabled( module.history().canReset)
+				.options({
+					'ampere.ui.caption' : function() {
+						return 'Reset history (undo:' + module.history().canUndo() + ', redo:' + module.history().canRedo() + ')';
+					}
+				});	
+			}).defaults( {
+				'ampere.history.limit'	: Number.MAX_VALUE
+			});
+			
+			$( window).ready( function() {
+				$( 'body').ampere( undoredo);
+			});
+		</script>
+ 	</head>
+ 	<body>
+  		<!-- Prompt IE 6 users to install Chrome Frame. Remove this if you support IE 6.
+       		chromium.org/developers/how-tos/chrome-frame-getting-started -->
+  		<!--[if lt IE 7]><p class=chromeframe>Your browser is <em>ancient!</em> <a href="http://browsehappy.com/">Upgrade to a different browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to experience this site.</p><![endif]-->
+	</body>
+</html>

@@ -1,0 +1,56 @@
+<!doctype html>
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="icon" href="favicon.ico" type="image/x-icon">
+		<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+	
+		<script type="text/javascript" src="../../lib/oval.js"></script>
+		<script type="text/javascript">
+			var greet = ov.ampere().module( function greet( module) {
+				module.state( {
+					main : function() {
+						 this.transition( module.states.greet)
+						 .enabled( function() {
+							 return document.getElementsByTagName( 'form')[0].checkValidity();
+						 });
+						 
+						 this.view( document.getElementById( 'main'));
+					},
+					
+					greet : function() {
+						this.transition( module.states.main);
+						
+						this.view( 
+							'<h4>Hello {{$ampere.module.states.main.value | ucwords}} !</h4>' + 
+							'<button ng-ampere-transition="$ampere.view.state().transitions.main"></button>'							 
+						);
+					}
+				});
+			});
+			
+			$( window).ready( function() {
+				$( 'body').ampere( greet);
+			});
+		</script>
+		<script id="main" type="text/template">
+			<form>
+				<label for="value">Enter name to greet:</label>
+				<input type="text" id="value" ng-model="value" required>
+				<br>
+				<submit ng-ampere-transition="$ampere.view.state().transitions.greet">
+			</form>
+		</script>
+ 	</head>
+ 	<body>
+  		<!-- Prompt IE 6 users to install Chrome Frame. Remove this if you support IE 6.
+       		chromium.org/developers/how-tos/chrome-frame-getting-started -->
+  		<!--[if lt IE 7]><p class=chromeframe>Your browser is <em>ancient!</em> <a href="http://browsehappy.com/">Upgrade to a different browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to experience this site.</p><![endif]-->
+	</body>
+</html>

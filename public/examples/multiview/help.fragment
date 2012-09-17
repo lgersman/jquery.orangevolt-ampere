@@ -1,0 +1,4 @@
+<h3>{{$ampere.ui.getCaption( $ampere.module.name())}} overview</h3>
+<section>
+	This is the help view.
+</section>

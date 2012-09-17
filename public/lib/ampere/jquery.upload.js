@@ -1,6 +1,22 @@
 /*!
  * jQuery Upload Plugin v1.0.0
  * 
+ * This plugin extends jQuery Ajax functionality :  
+ * 
+ * provides function $.upload( FormData) to upload arbitrary files using without reloading the page.
+ * $.upload smoothly integrates with Jquery $.ajax by supporting jQuery $.ajaxSettings.
+ * 
+ * The plugin also advances $.ajax by delegating both upload and download progress notifications of the 
+ * native XMLHTTPRequest to the Promise object returned by any jQuery Ajax request (via its progress function).
+ *  
+ * The progress feature is automatically available to all jQuery ajax functions if the plugin was loaded.
+ * See https://github.com/lgersman/jquery.orangevolt-ampere for tests and examples.
+ * 
+ * The plugin works fine for both single and multiple file uploads. 
+ * 
+ * Source and examples:
+ * http://github.com/lgersman/jquery.orangevolt-ampere
+ * 
  * Works in all modern browsers supporting XMLHTTPRequest v2 (i.e. Chome/FF/Webkit etc.)
  * 
  * Requires jQuery v1.7.0 or later
@@ -16,11 +32,6 @@
  * 
  */
 ;(jQuery && jQuery.fn.upload) || (function( $) {
-	$.fn.ajaxProgress = function( fn) {
-		//return $.proxy( fn, this);
-        return this.on( "ajaxProgress", fn);
-    };
-    	
     	// abort if xhr progress is not supported
     if( !($.support.ajaxProgress = ("onprogress" in $.ajaxSettings.xhr()))) {
     	return;
@@ -50,18 +61,18 @@
             		return function( event) {
 		            		/*
 		            		 * trigger the global event.
-		                	 * function handler(jqEvent, progressEvent, jqXHR) {}
+		                	 * function handler( jqEvent, progressEvent, upload, jqXHR) {}
 		            		 */ 
-		                options.global && $.event.trigger( "ajaxProgress", [ event, jqXHR, upload]);
+	                options.global && $.event.trigger( "ajaxProgress", [ event, upload, jqXHR]);
 		
 		                	/*
 		                	 * trigger the local event.
-		                 	 * function handler(jqXHR, progressEvent)
+		                 	 * function handler(jqXHR, progressEvent, upload)
 		                 	 */ 
 		                $.isFunction( options.progress) && options.progress( jqXHR, event, upload);
 		                
 		                deferred.notifyWith( jqXHR, [event, upload]);
-	                }
+	                };
             	};            	
             	
                 xhr.upload.addEventListener( "progress", progressListener( true), false);
@@ -79,7 +90,7 @@
     	
     		// overwrite the jqXHR promise methods with our promise and return the patched jqXHR  
     	return jqXHR;
-    }
+    };
     
     /**
      * jQuery.upload( url [, data] [, success(data, textStatus, jqXHR)] [, dataType] )
