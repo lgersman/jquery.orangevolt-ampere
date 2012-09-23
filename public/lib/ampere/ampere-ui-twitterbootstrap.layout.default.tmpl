@@ -23,9 +23,7 @@
 				
        		 	<div class="nav-collapse">
 	           		<ul class="nav">
-	           			<li 
-	           				ng-class="{disabled : !transition.enabled()}"
-	           				sng-class="$ampere.view==transition.target().views[ $ampere.view.name()] && 'active'" 
+	           			<li ng-class="{disabled : !transition.enabled()}"
 	           				ng-repeat="transition in $ampere.ui.getTransitions({ 'ampere.ui.type':'global'})">
 	           				<a ng-ampere-transition="transition"></a>
 	           			</li>
@@ -97,7 +95,7 @@
 		</footer>	
 	</div>
 	<div class="overlay"></div>
-	<div class="flash">
+	<div class="container flash">
 		<div class="alert alert-info alert-block fade in">
 			<button type="button" class="close">×</button>
 			<div class="message"></div>

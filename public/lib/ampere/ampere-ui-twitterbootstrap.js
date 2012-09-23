@@ -19,7 +19,7 @@
 		 * for angular 
 		 */
 	(function() {
-		var ampere = angular.module('window.ov.ampere.ui.twitterbootstrap', [ 'ngResource', 'ngCookies']).run( function(/* $rootScope, $window, $http*/) {
+		var ampere = angular.module('window.ov.ampere.ui.twitterbootstrap', [ 'ngResource', 'ngCookies']).run( function( /* $rootScope, $window, $http*/) {
 			/*
 			$rootScope.ov = {
 				ampere : {
@@ -28,6 +28,11 @@
 			};
 			*/
 		});
+		//.config( ['$locationProvider'/*,'$routeProvider'*/, function( $locationProvider/*, $routeProvider*/) {
+		//	$locationProvider.html5Mode( $( 'html').hasClass( 'history'));
+		//	$locationProvider.hashPrefix( '!');
+		//}]);
+		
 		ampere.filter( 'ucwords', function() {
 		    return function( input, scope) {
 		        return window.ov.ampere.util.ucwords( input);
@@ -60,7 +65,7 @@
 		    };
 		});
 		
-		var ampereTwitterbootstrapController = function( $scope, $rootElement, $window, $http, $timeout,  $log, $resource, $cookies) {
+		var ampereTwitterbootstrapController = function( $scope, $rootElement, $window, $http, $timeout,  $log, $resource, $cookies/*, $location*/) {
 			var controller = $rootElement.parent().data( 'ampere.controller');
 			/* 
 			 * TODO : this is a dirty hack to transport the initial template into
@@ -68,7 +73,13 @@
 			 */ 
 			var template = controller._initial_template;
 			controller._initial_template = undefined;
-			
+			$scope.$ampere = {
+				module 	: controller.module,
+				ui 	   	: controller.ui,
+				template: template, 
+				view   	: controller.module.current().view
+			};
+
 				// copy services to root scope
 			$scope.$window = $window;
 			$scope.$http = $http;
@@ -76,15 +87,29 @@
 			$scope.$log = $log;
 			$scope.$resource = $resource;
 			$scope.$cookies = $cookies;
-			
-			$scope.$ampere = {
-				module 	: controller.module,
-				ui 	   	: controller.ui,
-				template: template, 
-				view   	: controller.module.current().view
-			};
+//			$scope.$location = $location;
+
+			/*
+			$scope.$watch( 
+		    	function() { 
+		    		return $scope.$location.search()
+		    	}, 
+		    	function( oldValue, newValue) {
+		    		if( !$location._ignore ) {
+		    			console.warn( '$location1 changed ', oldValue, newValue, angular.equals( oldValue, newValue));
+		    			if( newValue.u && $scope.$ampere.module.history().canUndo()) {
+		    				$timeout( $scope.$ampere.module.history().undo);
+		    			} else if( newValue.r && $scope.$ampere.module.history().canRedo()) {
+		    				$timeout( $scope.$ampere.module.history().redo);
+		    			}
+		    		} else {
+		    			delete $location._ignore;
+		    		}
+		    	}
+		    );
+			*/
 		};
-		ampereTwitterbootstrapController.$inject = ['$scope', '$rootElement', '$window', '$http', '$timeout',  '$log', '$resource', '$cookies'];
+		ampereTwitterbootstrapController.$inject = ['$scope', '$rootElement', '$window', '$http', '$timeout',  '$log', '$resource', '$cookies'/*, '$location'*/];
 		
 		ampere.controller( 'amperetwitterbootstrap', ampereTwitterbootstrapController);
 		
@@ -97,8 +122,7 @@
 					var controller = element.parents().filter( function( obj) { return $.data( this, 'ampere.controller'); })
 					.data( 'ampere.controller');
 					 */
-
-					// var oldChangeset = {};
+					
 					scope.$watch( '$ampere', function() {
 							// destroy all child scopes (->transitions)
 						while( scope.$$childHead) {
@@ -363,15 +387,13 @@
 								var ui = scope.$ampere.ui;
 								var controller = ui.controller;
 
-								!ui.isBlocked() && controller.proceed( transition);
-							
-								event.preventDefault();
-									// prevent any other hotkey handler to be invoked
-								event.stopPropagation();
-								event.stopImmediatePropagation();
+								!ui.isBlocked() && controller.proceed( transition, event);
 							} else {
-								_ns.debug( 'attribute "ng-ampere-' + eventName + '" (=' +  attrs[ directive] + ') doesnt resolve to an ampere transition');
+								_ns._ns.error( 'attribute "ng-ampere-' + eventName + '" (=' +  attrs[ directive] + ') doesnt resolve to an ampere transition');
 							}
+							event.preventDefault();
+							event.stopPropagation();
+							event.stopImmediatePropagation();
 						});
 					}
 				};
@@ -380,6 +402,37 @@
 		eventDirective( 'change');
 		eventDirective( 'click');
 		eventDirective( 'dblclick');
+		
+		ampere.directive( 'ngAmpereDrop', [ function() {
+			var _ns = $.ov.namespace( 'ngAmpereDrop');
+			
+			return {
+				restrict   : 'A',
+				link: function( scope, element, attrs) {
+					$( element).on( 'drop', function( event) {
+						var transition = scope.$eval( attrs.ngAmpereDrop);
+
+						if( transition) {
+							var ui = scope.$ampere.ui;
+							var controller = ui.controller;
+
+							!ui.isBlocked() && controller.proceed( transition, [ event]);
+						} else {
+							_ns.error( 'attribute "ngAmpereDrop" (=' +  attrs.ngAmpereDrop + ') doesnt resolve to an ampere transition');
+						}
+						event.preventDefault();
+						event.stopPropagation();
+						event.stopImmediatePropagation();
+						
+						return false;
+					})
+					// ff : this is needed for ff to prevent loading file into browser
+					.on( 'dragover', function( event) {
+						event.preventDefault();
+					})
+				}
+			};
+		}]);
 		
 		ampere.directive( 'ngAmpereHotkey', [ function() {
 			var _ns = $.ov.namespace( 'ngAmpereHotkey');
@@ -469,6 +522,22 @@
 		}
 	}
 	
+		/*
+		* allow anchors with attribute "draggable" 
+		* to be draggable to the desktop
+		*/
+	function onDraggableAnchor( event) {
+		//console.warn( "DownloadUrl=", $( this).data( 'downloadurl') || "application/octet-stream:" + basename( this.href) + ':'+ this.href);
+		
+		var dragImage = $( this).find( '[class^="icon-"]:first');
+		dragImage.length && event.originalEvent.dataTransfer.setDragImage( dragImage[0], -10, -10);
+		
+		event.originalEvent.dataTransfer.setData( 
+			'DownloadURL',
+			$( this).data( 'downloadurl') || "application/octet-stream:" + basename( this.href) + ':'+ this.href						
+		);
+	}
+	
 	function twitterbootstrap( controller, options) {
 		if( !(this instanceof twitterbootstrap)) {
 			return new twitterbootstrap( controller, options);
@@ -516,6 +585,9 @@
 				
 			this.controller.element.on( 'click', '.flash .alert button.close', onActionAbort); 
 			
+				// allow anchors with attribute "draggable" to be draggable to the desktop
+			$( this.controller.element).on( 'dragstart', 'a[draggable]', onDraggableAnchor); 
+			
 			focus( controller.element);
 		};
 
@@ -527,6 +599,8 @@
 			
 			this.controller.element.off( 'click', '.ampere-transition', onTransitionClicked);
 			this.controller.element.off( 'click', '.flash .alert button.close', onActionAbort);
+			
+			$( this.controller.element).off( 'dragstart', 'a[draggable]', onDraggableAnchor);
 		};		
 		
 		this.isBlocked = function() {
@@ -540,7 +614,7 @@
 		this.unblock = function() {
 			this.controller.element.removeClass( 'overlay').find( '.overlay').removeClass( 'block');
 		};
-
+		
 		this.getTemplate = function( view) {
 			var template = view.template();
 
@@ -667,7 +741,7 @@
 		
 			// see Ampere.Ui
 		this.popup = function( url, /* function */ initializer) {
-			var popup = $( '<div class="popup"><iframe width="100%" height="100%" border="no" src="' + url + '"></iframe></div>');
+			var popup = $( '<div class="container popup"><iframe width="100%" height="100%" border="no" src="' + url + '"></iframe></div>');
 			this.controller.element.addClass( 'popup').find( '.ampere-module').append( popup);
 
 			popup.find( 'iframe').focus();

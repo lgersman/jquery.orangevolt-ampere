@@ -45,6 +45,9 @@ ex = ov.ampere().module 'ex', (module) ->
 			@transition module.states.two
 
 	@transition( module.states.main)
+	@options
+		'ampere.ui.about' 		: 'This is a sample <a target="_blank" href="https://github.com/lgersman/jquery.orangevolt-ampere">Ampere</a> application.'
+		'ampere.ui.about.url'	: 'https://github.com/lgersman/jquery.orangevolt-ampere'
 
 $( window).ready -> $( 'body').ampere ex
 		</script>

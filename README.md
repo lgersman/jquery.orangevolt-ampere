@@ -8,4 +8,5 @@ jquery.orangevolt-ampere utilizes:
 
 * [AngularJS](http://angularjs.org/)
 * [jQuery](http://jquery.com)
-* [Twitter Bootstrap](http://twitter.github.com/bootstrap/) + [Font Awesome](http://fortawesome.github.com/Font-Awesome/)
+* [Twitter Bootstrap](http://twitter.github.com/bootstrap/)
+* [Font Awesome](http://fortawesome.github.com/Font-Awesome/)

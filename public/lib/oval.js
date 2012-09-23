@@ -20,15 +20,16 @@ for( var i=0; i<scripts.length; i++) {
 			'bootstrap-2.1.1/css/bootstrap.css',
 			'Font-Awesome/css/font-awesome.css',
 			'bootstrap-2.1.1/css/bootstrap-responsive.css',	
-			'ampere/ampere-ui-twitterbootstrap.css'
+			'ampere/ampere-ui-twitterbootstrap.css',
+			'colorpicker/css/colorpicker.css',
+			'datepicker/css/datepicker.css',
+			
 		];
 		for( var i in CSS) {
 			document.writeln( '<link rel="stylesheet" type="text/css" href="' + baseUrl + CSS[i] + '">');
 		}
 		
 		var LESS = [
-			'colorpicker/less/colorpicker.less',
-			'datepicker/less/datepicker.less',
 			'ampere/ampere-ui-twitterbootstrap.less'
 		];
 		for( var i in LESS) {

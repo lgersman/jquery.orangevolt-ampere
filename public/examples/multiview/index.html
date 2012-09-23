@@ -38,40 +38,40 @@
 					main : function( state) {
 						state.view( 'intro', $('#intro'))
 						.options({
-							'ampere.ui.caption' : null,
-							'ampere.ui.description' : null
+							'ampere.ui.caption' : null
 						});
 		
 						state.view.load( 'main', 'main.fragment')
 						.options( {
 							'ampere.ui.caption' 	: null,
-							'ampere.ui.description' : null,
 							'ampere.ui.icon'	: 'icon-home'
 						});
 						
 						state.view.load( 'help', 'help.fragment')
 						.options({
-							'ampere.ui.caption' : 'Help',
-							'ampere.ui.description' : null
+							'ampere.ui.caption' : 'Help'
 						});
 						
 						state.view( 'about', 'This is the <strong>about</strong> view content of application {{$ampere.ui.getCaption( $ampere.module)}}')
 						.options({
-							'ampere.ui.caption' : 'About',
-							'sampere.ui.description' : null
+							'ampere.ui.caption' : 'About'
 						});
 						
 						state.transition( 'main')
 						.options({
 							/* okay : no effect because the template button element provides a non empty text*/'ampere.ui.caption' : 'Alarm',
-							'ampere.ui.icon'	: 'icon-home',
-							'ampere.ui.description' : 'Start application'
+							'ampere.ui.icon'	: 'icon-home'
 						})
 						
 						state.options( {
 							'ampere.ui.description' : 'description of main state',
 							'ampere.state.view' 	: 'main'
 						})
+						
+						state.options(
+							'ampere.ui.description', 
+							"<strong>You can go directly to the main view by clicking the brand  symbol at the right top of the page</strong>"	
+						)
 					}
 				});
 				
@@ -80,15 +80,6 @@
 						return module.current().view!==view;
 					};
 				}
-				
-				var main2mainTransition = this.transition( 'main')
-				.enabled( isNotCurrentView( module.states.main.views.main))
-				.options({
-					'ampere.ui.description' : 'Click to go to main view',
-					'ampere.ui.type' 		: undefined,
-					'ampere.ui.icon'	    : 'icon-home'
-				})
-				
 				
 				this.transition( 'intro', this.states.main)
 				.enabled( isNotCurrentView( module.states.main.views.intro))
@@ -110,11 +101,23 @@
 				.options({
 					'ampere.state.view'		: 'about'
 				});
+
+					/*
+					 * this transition is exclusively used as  
+					 * value for option 'ampere.ui.about.url' 
+					 */
+				var aboutUrl = this.transition( 'main')
+				.enabled( isNotCurrentView( module.states.main.views.main))
+				.options({
+					'ampere.ui.description' : 'Click to go to main view.<br>',
+					'ampere.ui.type' 		: undefined,
+					'ampere.ui.icon'	    : 'icon-home'
+				})
 				
 				this.options({
 					'ampere.ui.description' : 'This is a example multiview app.',
-					'ampere.ui.about' 		: $('<strong>You can go directly to the main view by clicking the brand  symbol at the right top of the page</strong>'),
-					'ampere.ui.about.url'	: main2mainTransition,
+					'ampere.ui.about' 		: 'This is a sample <a target="_blank" href="https://github.com/lgersman/jquery.orangevolt-ampere">Ampere</a> application.',
+					'ampere.ui.about.url'	: aboutUrl,
 					'ampere.state'	  		: 'main',
 					'ampere.view'	  		: 'intro',
 					'aampere.ui.caption'	: null,

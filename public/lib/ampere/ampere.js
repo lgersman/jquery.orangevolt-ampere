@@ -76,10 +76,15 @@
 		 * - playback all redo actions			:
 		 * 		myCommandStack.playback()
 		 */
-	function History( module, /* provide undefined for infinite size */size) {
+	function History( module, options) {
 		if( !(this instanceof History)) {
-			return new History( module, size===undefined || size===null ? 0 : size);
+			return new History( module, options);
 		} 
+		
+		options = options || {}; 
+		
+		var size = options['ampere.history.limit']; 
+		size = (size===undefined || size===null) ? 0 : size;
 		
 		var history = this;
 		
@@ -109,7 +114,43 @@
 		this.canRetry = function() {
 			return lastCommand;
 		};	
+		
+			/*
+			 * this variable keeps the unique
+			 * id counter for history entries
+			 * 
+			 * if its undefefined html5 history support is
+			 * not given (option is false or browser doesnt support it)
+			 */  
+		var html5_history_hash = undefined;
+		// h = $('body').ampere().module.history(); JSON.stringify( { stack : $( h.stack).map( function( index, item) { return this.hash;}).get(), position : h.position })
+		if( size && options['ampere.history.html5'] && window.history && window.history.pushState) {
+			html5_history_hash = parseInt( $.now() + '00');
 			
+				// push initial state
+			window.history.replaceState( html5_history_hash, document.title, window.location.pathname);// + '#' + html5_history_hash);		
+
+				// register history listener
+			$( window).on( 'popstate', function( event) {
+				if( event.originalEvent.state) {
+					for( var i=0; i<history.stack.length; i++) {
+						var entry = history.stack[ i];
+							// this is the entry to go back to
+						if( entry.hash==event.originalEvent.state) {
+							if( i<history.position) {
+								//console.warn( 'undo (length:' + history.stack.length + ',position:' + history.position + ',i:' + i + ')');
+								history.undo( event);
+							} else {
+								//console.warn( 'redo (length:' + history.stack.length + ',position:' + history.position + ',i:' + i + ')');
+								history.redo( event);
+							}
+							return;
+						}
+					}
+				}
+			});
+		}
+		
 		/**
 		 * @param action the new action to execute and store 
 		 * or undefined (i.e no argument) to redo the last undo action. 
@@ -121,44 +162,61 @@
 		this.redo = function( /*parameter stucture  is { command : ..., source : ..., target : ..., view : ..., [ ui : ...]?}*/) {
 			var redoCommand = undefined;
 			if( arguments.length) {
-				var arg = arguments[0];
-				var view = module.current().view;
-				var undoCommand;
-				
-				redoCommand = function RedoCommand( historyReady) {
-					var redoResult = module._transit( arg.command, arg.source, arg.target, arg.view, arg.ui, historyReady);
-				
-					if( !undoCommand) {
-						if( $.isFunction( redoResult)) {
-							undoCommand = function UndoCommand( historyReady) {
-								var undoResult = module._transit( redoResult, arg.target, arg.source, view, arg.ui, historyReady);
-								redoCommand.promise = $.when( undoResult).promise;
-								return $.isFunction( undoResult) ? redoCommand : undefined;
-							}; 
-							undoCommand.target = arg.source;
-							undoCommand.view = view;
+				if( !(arguments[0] instanceof jQuery.Event)) {
+					var ui = arguments.length && arguments[0].ui; 
+					var arg = arguments[0];
+					var view = module.current().view;
+					var undoCommand;
+					
+					redoCommand = function RedoCommand( historyReady) {
+						var redoResult = module._transit( arg.command, arg.source, arg.target, arg.view, arg.ui, historyReady);
+					
+						if( !undoCommand) {
+							if( $.isFunction( redoResult)) {
+								undoCommand = function UndoCommand( historyReady) {
+									var undoResult = module._transit( redoResult, arg.target, arg.source, view, arg.ui, historyReady);
+									redoCommand.promise = $.when( undoResult).promise;
+									return $.isFunction( undoResult) ? redoCommand : undefined;
+								}; 
+								undoCommand.target = arg.source;
+								undoCommand.view = view;
+							}
 						}
-					}
-					undoCommand && (undoCommand.promise = $.when( redoResult).promise);
-					return $.isFunction( redoResult) ? undoCommand : undefined;
-				};
-				redoCommand.target = arg.target;
-				redoCommand.view = arg.view;
+						undoCommand && (undoCommand.promise = $.when( redoResult).promise);
+						return $.isFunction( redoResult) ? undoCommand : undefined;
+					};
+					redoCommand.target = arg.target;
+					redoCommand.view = arg.view;
+				}
+			} else if( html5_history_hash && history.canRedo() && !(arguments[0] instanceof jQuery.Event)) {
+				// if html5 history is enabled and no argument given and redo enabled
+				// trigger html 5 navigation forward
+				window.history.forward();
 			} 
 			
  			var historyReady = $.Deferred(); 
-			var redo = redoCommand || (this.canRedo() && this.stack[ this.position]);
+			var redo = redoCommand || (history.canRedo() && history.stack[ history.position]);
 			var undo = $.isFunction( redo) && redo( historyReady);
-
+				
 			$.when( undo)
 			.done( function() {
 				if( size>0) {
-					if( undo) { 
+					if( undo) {
+						undo.hash = window.history.state;
 						if( redoCommand) {
 							history.stack.splice( history.position); 	// cleanup recent redo actions
 							history.stack.push( undo);
 							history.position = history.stack.length;
-						} else if( history.canRedo()){
+							
+							html5_history_hash && historyReady.done( function() {
+								var hash = ++html5_history_hash;
+								window.history.pushState( hash, document.title, window.location.pathname);// + '#' + hash);
+							});
+						} else if( history.canRedo()) {
+							html5_history_hash && historyReady.done( function() {
+								undo.hash = /*window.history.state*/redo.hash-1;
+								// window.history.replaceState( undo.hash, document.title, window.location.pathname + '#' + redo.hash);
+							});
 							history.stack[ history.position++] = undo;// point to next redo action
 						}
 					} else if( redo) {							// cleanup recent undo actions	
@@ -167,7 +225,7 @@
 					}
 					
 					if( history.stack.length>size) {
-						historyis.stack.shift();
+						history.stack.shift();
 						history.position = history.stack.length;
 					}
 				} else {
@@ -188,8 +246,14 @@
 		 * @return the undo instance
 		 */
 		this.undo = function() {
-			if( this.canUndo()) {
-				var undo = this.stack[ --this.position];
+			if( history.canUndo()) {
+				if( html5_history_hash && !(arguments[0] instanceof jQuery.Event)) {
+					// if html5 history is enabled and no argument given 
+					// trigger html 5 navigation back
+					window.history.back();
+				}
+				
+				var undo = history.stack[ --history.position];
 				
 				var historyReady = $.Deferred();
 				var redo = undo( historyReady);
@@ -197,6 +261,10 @@
 				$.when( redo)
 				.done( function() {
 					if( redo) {
+						html5_history_hash && historyReady.done( function() {
+							redo.hash = /*window.history.state*/undo.hash+1;
+							//window.history.replaceState( redo.hash, document.title, window.location.pathname + '#' + undo.hash);
+						});
 						history.stack[ history.position] = redo;	// replace undo by its returned redo action
 					} else {								// cleanup recent redo actions
 						history.stack.splice( history.position);
@@ -768,7 +836,7 @@
 					this._super();
 					this.options( angular.extend( {}, this.ampere().options(), _defaults, options));
 
-					var history = History( this, this.options( 'ampere.history.limit'));
+					var history = History( this, this.options());
 					this.history = function() {
 						return history; 
 					};
@@ -830,10 +898,22 @@
 		/* 'ui' : controller: foobarUI, */ 
 		'ampere.ui.options' : {},
 			/* 
-			 * history is disabled by default
+			 * history is enabled by default
 			 * set Number.MAX_VALUE as value for infinite undo/redo stack
 			 */
-		'ampere.history.limit' : 0,
+		'ampere.history.limit' : Number.MAX_VALUE,
+			/*
+			 * enable html5 history api support (if the browser supports it)
+			 * if enabled the browser back/forward buttons
+			 * can be used to navigate in the browser history
+			 * 
+			 * this option has only effect when options 
+			 * 'ampere.history.limit' is >0 (i.e. enabled)
+			 * 
+			 * ATTENTION : $.fn.ampere overrides this option
+			 * (if not defined) to true if the attached element is BODY     
+			 */
+		'ampere.history.html5' : false,
 			/* 
 			 * baseurl defaults to the Orangevolt Ampere Loader baseurl 
 			 * (i.e. path to oval.js)
@@ -851,7 +931,7 @@
 			}
 			
 			return document.location.href;
-		})()	
+		})()
 	};
 	
 	/**
@@ -920,26 +1000,6 @@
 								return;
 							}	
 						}
-						/*
-						var fn = elements[i].data( 'ampere.hotkey-directive') || $.noop();
-						var o = fn() || {};
-						for( var i in o) {
-							var _hotkey = hotkey.replace(/\+/g, '_').toLowerCase();
-							if( $.inArray( _hotkey, matchingHotkeys)!=-1) {
-								self._ns.debug( 'hotkey ' + controller + ' activated');
-								
-								event.preventDefault();
-									// prevent any other hotkey handler to be invoked
-								event.stopImmediatePropagation();
-								
-								if( o[i] instanceof transition) {
-									self.controller.proceed( transition);
-								}
-								
-								return true;
-							}
-						}
-						*/
 					}
 			
 						// inspect transitions with an ampere hotkey provided as ng-ampere-hotkey attribute
@@ -952,26 +1012,6 @@
 								return;
 							}
 						}
-						/*
-						var fn = elements[i].data( 'ampere.hotkey-directive') || $.noop();
-						var o = fn() || {};
-						for( var i in o) {
-							var _hotkey = hotkey.replace(/\+/g, '_').toLowerCase();
-							if( $.inArray( _hotkey, matchingHotkeys)!=-1) {
-								self._ns.debug( 'hotkey ' + controller + ' activated');
-								
-								event.preventDefault();
-									// prevent any other hotkey handler to be invoked
-								event.stopImmediatePropagation();
-								
-								if( o[i] instanceof transition) {
-									self.controller.proceed( transition);
-								}
-								
-								return true;
-							}
-						}
-						*/
 					}
 					
 						// inspect current state's transitions
@@ -1067,7 +1107,6 @@
 			
 			return transitions;
 		};
-		
 		
 		this.regexp = function( pattern,modifiers) {
 			return new RegExp( pattern,modifiers); 
@@ -1248,7 +1287,7 @@
 			 * --
 			 */
 		
-		this.proceed = function( transition) {
+		this.proceed = function( transition, /*optional transition data from events*/data) {
 				// if transistion is enabled und target state defined
 			var target; 
 			if( transition.enabled() && (target=transition.target())) {
@@ -1269,33 +1308,54 @@
 					this.ui.render( 'State', this.module.current().view);
 				} else {
 						// create a new action 
-					var command = action.call( transition, transition, this.ui);
-	
-					// compute target view
-					var view = transition.options( 'ampere.state.view') || target.options( 'ampere.state.view');
-					if( typeof( view)=='string') {
-						var _view = target.views[ view];
-						_ns.assert( _view instanceof View, 'target view "', view, '" not found in ', target.fullName(), '.views');
+					var command = action.call( transition, transition, this.ui, data);
+											
+					if( !command) {
+							// no command returned -> abort proceeding
+						return false;
+					} else {
+							/* 
+							 * when action returned a function -> wrap it within a deferred
+							 * otherwise assume the returned object is a deferred/promise
+							 * 
+							 * in both cases actionDeferred should keep afterwards a promise
+							 * returning the real command/redo function as argument of the done handler
+							 */ 
+						var actionDeferred = !$.isFunction( command) 
+							? command 
+							: $.Deferred( function() { 
+								this.resolve( command);
+							});
 						
-						view = _view;
-					} else if( !view) {
-						for( var key in target.views) {
-							view = target.views[ key];
-							break;
-						}
+							// wait for action to complete
+						actionDeferred.done( function( command) {
+								// compute target view
+							var view = transition.options( 'ampere.state.view') || target.options( 'ampere.state.view');
+							if( typeof( view)=='string') {
+								var _view = target.views[ view];
+								_ns.assert( _view instanceof View, 'target view "', view, '" not found in ', target.fullName(), '.views');
+								
+								view = _view;
+							} else if( !view) {
+								for( var key in target.views) {
+									view = target.views[ key];
+									break;
+								}
+							}
+							/*
+							 *  // this cannot happen anymore
+							 *  _ns.assert( view instanceof View, 'no default view "', view, '" found in ', target.fullName(), '.views'); 
+							 */
+							
+							controller.module.history().redo({
+								command  : command, 
+								source   : transition.state(), 
+								target   : transition.target(), 
+								view 	 : view,
+								ui 		 : controller.ui
+							});
+						});
 					}
-					/*
-					 *  // this cannot happen anymore
-					 *  _ns.assert( view instanceof View, 'no default view "', view, '" found in ', target.fullName(), '.views'); 
-					 */
-					
-					this.module.history().redo({
-						command  : command, 
-						source   : transition.state(), 
-						target   : transition.target(), 
-						view 	 : view,
-						ui 		 : this.ui
-					});
 				}
 				return true;
 			} else {
@@ -1345,7 +1405,14 @@
 		
 	$.fn.ampere = function( module, options) {
 		if( arguments.length) {
+			options = options || {};
 			if( $.isFunction( module)) {
+					// enable html5 by default (i.e. if not set in options)
+					// if the ampere module will be attached to the BODY element
+				if( !('ampere.history.html5' in options)) {
+					options['ampere.history.html5'] = this[0].tagName=='BODY';
+				}
+				
 				module = new module( options);
 			}
 			

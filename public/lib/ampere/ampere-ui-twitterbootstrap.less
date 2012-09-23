@@ -1,23 +1,10 @@
-/*!
- * Orangevolt Ampere Framework 
- *
- * http://github.com/lgersman
- * http://www.orangevolt.com
- *
- * Copyright 2012, Lars Gersmann <lars.gersmann@gmail.com>
- * Dual licensed under the MIT or GPL Version 2 licenses.
- */
-
-/**
- * Twitter Bootstrap / AngularJS Renderer
- */
 .ampere-app {
 	overflow-x : auto;
 	overflow-y : scroll;
 
 	.ampere-module {
 		position  : relative;
-		overflow  : auto;
+		overflow : hidden;
 		
 		/* crunch bootstrap default space */
 		header .breadcrumb, header .navbar {
@@ -31,17 +18,6 @@
 			
 			.breadcrumb + .navbar.subnav-fixed {
 				margin-top: 0;
-			}
-		}
-		
-		.ampere-state {
-			.page-header {
-				h2 {
-					[class^="icon-"]:first-child, >[class*=" icon-"]:first-child {
-						width: 21px;
-						margin-top: 10px;
-					}
-				}
 			}
 		}
 		
@@ -71,21 +47,21 @@
 		
 		> .navbar-inverse { 
 			.brand {
-				  padding-right: 0;
-				  padding-left: 0;
-				  margin-left: 20px;
-				  float: right;
-				  font-weight: bold;
-				  color: #333; 
-				  text-shadow: 1px 1px 0 rgba(255,255,255,.4), 0 0 30px rgba(255,255,255,.125);
-				  -webkit-transition: all .2s linear;
-				     -moz-transition: all .2s linear;
-				          transition: all .2s linear;
-				  
-				  [class^="icon-"], [class*=" icon-"] {
-						width: 21px;
-					  	line-height: 21px;
-					}
+			  padding-right: 0;
+			  padding-left: 0;
+			  margin-left: 20px;
+			  float: right;
+			  font-weight: bold;
+			  color: #333; 
+			  text-shadow: 1px 1px 0 rgba(255,255,255,.4), 0 0 30px rgba(255,255,255,.125);
+			  -webkit-transition: all .2s linear;
+			     -moz-transition: all .2s linear;
+			          transition: all .2s linear;
+			          
+				i[class^="icon-"], [class*=" icon-"] {
+					width      : inherit;
+					line-height: 21px;
+			  	}
 			}
 		   
 			.brand:hover {
@@ -116,7 +92,14 @@
 					font-size 		: small;
 					text-decoration : none; 
 				}
-	
+
+				H2 {
+					i[class^="icon-"], [class*=" icon-"] {
+						width      : inherit;
+						line-height: 31px;
+					}
+				}
+
 				a.disabled {
 					color : #555555;
 				}
@@ -186,13 +169,6 @@
 	     	-moz-transition		: opacity 0.6s ease;
 	       	-o-transition		: opacity 0.6s ease;
 	          transition		: opacity 0.6s ease;
-	         
-	        @media (max-width: 767px) {
-				left	: 9px;
-				right	: 9px;
-				top		: 9px; 
-				bottom	: 9px;
-			}
 	          
 	        iframe {
 	        	overflow 	: auto;
@@ -244,20 +220,6 @@
 					margin-left : 20px;
 				}
 			}
-			
-			@media (min-width: 768px) and (max-width: 980px) {
-					top		: 20px; 
-					left	: 20px;
-					left	: 20px;
-					right	: 20px;
-			}
-			
-			@media (max-width: 767px) {
-					left	: 10px;
-					right	: 10px;
-					top		: 10px; 
-					bottom	: 10px;
-			}
 		}
 		
 			/* Fixed subnav on scroll, but only for 980px and up (sorry IE!) */
@@ -300,7 +262,7 @@
 /* 
  * wizard template specific 
  */
-.ampere-app.layout-name-wizard {
+.ampere-app.wizard {
 	padding-bottom: 40px;
 	
 		// hide disabled left oriented transitions
@@ -341,7 +303,7 @@
 	overflow 		: hidden;
 	
 	>.ampere-module {
-		>.navbar-fixed-top, >.navbar-fixed-bottom, >.container {
+		>.navbar-fixed-top, >.navbar-fixed-bottom, >.container:not(.popup) {
 			-webkit-filter	: blur(1px);
 			-moz-filter		: blur(1px);
 			-ms-filter		: blur(1px);
@@ -369,10 +331,24 @@
     transition			: opacity 0.3s ease;
 }
 
+/* fixes bootstrap.css */
+
+.lead code, pre {
+	font-size : inherit;
+}
+
 /* fixes bootstrap-responsive.css */
 @media (max-width: 767px) {
   body.ampere-app {
     padding-right: 0;
     padding-left: 0;
+    
+    		/* this fixes the wizard top/bottom navigation bars */ 
+		.navbar-fixed-top,
+	  	.navbar-fixed-bottom,
+	  	.navbar-static-top {
+	    	margin-right: inherit;
+	    	margin-left: inherit;
+	  	}
   }
 }

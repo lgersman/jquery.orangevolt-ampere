@@ -1,5 +1,6 @@
-* automatic transition support (including undo/redo integration)
-
+* improve exception-in-progress handling 
+* improve offline support (for application caching : http://slides.html5rocks.com/#app-cache)
+ 
 * CRUD test app (either via "states imported from module" or "module wrapped as state")
 
 * provide an option to make transition results "invisible" from history ui interface point of view
@@ -9,15 +10,12 @@
 * ng-ampere-dblclick example
 * ng-ampere-hotkey standalone example (table up/down?)
 * filter next/prev example (also table up/down?)  
-* adressbook example (picture upload etc)
+* adressbook example (picture upload etc) or better a SCRUM example ????
 
 * ng-ampere-transition + input[file] example supporting example loading / uploading via jquery.upload.js 
 * jquery.upload dokumentieren
 
-* module options : move "ampere.ui.about.url" to "ampere.ui.link" (value might be a state(/view)? object)
-* 'brand' should be configurable to point to a transition (main by default ?)
-
 * ng-drag/ng-drop directive 
-* pushstate history api anbinden
-* drag/drop directive
 * replace Ampere.ui.regex with a "match"/"test" or "regex" filter
+
+* import jquery 1.8.2

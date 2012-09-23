@@ -20,7 +20,14 @@ $scope.$cookies = $cookies;
 
 "batteries included"
 "AngularJS on stereoids"
+"Create single page web apps with state"
 
 'ampere.ui.type' = 'global' || 'breadcrumb' || 'primary' || 'secondary' || undefined
 transition.enabled( value || function)
 * option 'ampere.ui.about.url' can now also be a module transition (see multiview example
+
+* option 'ampere.history.html5' added to support html5 history navigation   
+(automatically set to true if a module is instantated on a BODY element and the browser supports this feature)
+
+* twitterboostrap renderer : automatic html5 drag-to-desktop ability for anchors having the droppable attribute set.
+
