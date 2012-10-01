@@ -64,6 +64,21 @@
 				return $.type( input);
 		    };
 		});
+		ampere.filter( 'match', function() {
+		    return function( items, property, value) {
+		    	if( !$.isArray( value)) {
+		    		value = [ value];
+		    	}
+		    	
+		    	return $.grep( items, function( item) {
+		    		for( var i in value) {
+		    			if( (value[i] instanceof RegExp) ? value[i].test( item[property]) : item[property]==value[i]) {
+		    				return true;
+		    			}
+		    		}
+		    	});				
+		    };
+		});
 		
 		var ampereTwitterbootstrapController = function( $scope, $rootElement, $window, $http, $timeout,  $log, $resource, $cookies/*, $location*/) {
 			var controller = $rootElement.parent().data( 'ampere.controller');
@@ -352,7 +367,13 @@
 							var f = $compile( templates[ type]);
 							var replacement = f( scope);
 							
-							element.replaceWith( replacement);
+							element.replaceWith( replacement);	
+							
+								// add data- attributes
+							var dataAttributes = Object.keys( element[0].dataset);
+							for( var i=0; i<dataAttributes.length; i++) {
+								replacement[0].setAttribute( 'data-' + dataAttributes[i], element[0].dataset[ dataAttributes[i]]);
+							} 
 							
 							var hotkey = attrs.ngAmpereHotkey || scope.$ampere.ui.getHotkey( scope.transition);
 								
@@ -387,7 +408,7 @@
 								var ui = scope.$ampere.ui;
 								var controller = ui.controller;
 
-								!ui.isBlocked() && controller.proceed( transition, event);
+								!ui.isBlocked() && controller.proceed( transition, [event]);
 							} else {
 								_ns._ns.error( 'attribute "ng-ampere-' + eventName + '" (=' +  attrs[ directive] + ') doesnt resolve to an ampere transition');
 							}
@@ -434,13 +455,62 @@
 			};
 		}]);
 		
+		ampere.directive( 'ngAmpereSortable', function( $timeout) {
+			var _ns = $.ov.namespace( 'ngAmpereSortable');
+			
+			return {
+				restrict   : 'A',
+				link: function( scope, element, attrs) {
+					var options = {
+						forcePlaceholderSize : true, 
+						placeholder : element[0].tagName=='TBODY' && $('<tr><td></td></tr>')	
+					};
+
+					var transition = undefined;
+					var value = scope.$eval( attrs.ngAmpereSortable);
+					if( $.isPlainObject( value)) {
+						
+						_ns.assert(
+							(!Object.hasOwnProperty.call( value, 'transition') || value.transition) 
+							&& (!Object.hasOwnProperty.call( value, 'ng-ampere-transition') || value['ng-ampere-transition']), 
+							'value option transition or ng-ampere-transition doesnt resolve to a transition'
+						);
+					
+						transition = value['ng-ampere-transition'] || value.transition || transition;
+						
+						$.extend( options, value);
+					} else if( value) {
+						transition = value;
+					} 
+					
+					$timeout( function() {
+						var sortable = $( element.get()).sortable( options);
+						
+						var ui = scope.$ampere.ui;
+						var controller = ui.controller;
+						
+						transition && sortable.on( 'sortupdate', function( event, options) {
+							event.data = { items : options.item, position : options.item.index()};
+							
+							!ui.isBlocked() && controller.proceed( transition, [ event]);
+							event.preventDefault();
+							event.stopPropagation();
+							event.stopImmediatePropagation();
+						});
+					});
+					
+					
+				}
+			};
+		})
+		.$inject = [ '$timeout']; 
+		
 		ampere.directive( 'ngAmpereHotkey', [ function() {
 			var _ns = $.ov.namespace( 'ngAmpereHotkey');
 			
 			return {
 				restrict   : 'A',
 				link: function( scope, element, attrs) {
-					
 						/*
 						 * it the ng-ampere-hotkey attribute is not
 						 * used in combination with ng-ampere-transition
@@ -468,7 +538,7 @@
 	        // If already fixed, then do nothing
 	        if ($('.subnav').hasClass('subnav-fixed')) return;
 	        // Remember top position
-	        var offset = $('.subnav').offset();
+	        var offset = $('.subnav').offset() || {};
 	        $('.subnav').attr('data-top', offset.top);
 	    }
 
@@ -485,7 +555,7 @@
 		var transition = angular.element( this).scope().transition;
 		var controller = $( this).closest( '.ampere-app').ampere();
 
-		!controller.ui.isBlocked() && controller.proceed( transition);
+		!controller.ui.isBlocked() && controller.proceed( transition, [event]);
 	
 		event.preventDefault();
 			// prevent any other hotkey handler to be invoked
@@ -572,6 +642,14 @@
 			}
 		}
 		
+		function onMessage( event) {
+			var location = event.originalEvent.source.location;
+			if( onMessage.handlers[ location]) {
+				onMessage.handlers[ location]( event.originalEvent.data, event.originalEvent.source);
+			}
+		};
+		onMessage.handlers = {};
+		
 		var _init = this.init;
 		this.init = function() {
 			_init.call( this);
@@ -588,6 +666,8 @@
 				// allow anchors with attribute "draggable" to be draggable to the desktop
 			$( this.controller.element).on( 'dragstart', 'a[draggable]', onDraggableAnchor); 
 			
+			$( window).on( 'message', onMessage);
+			
 			focus( controller.element);
 		};
 
@@ -601,6 +681,8 @@
 			this.controller.element.off( 'click', '.flash .alert button.close', onActionAbort);
 			
 			$( this.controller.element).off( 'dragstart', 'a[draggable]', onDraggableAnchor);
+			
+			$( window).off( 'message', onMessage);
 		};		
 		
 		this.isBlocked = function() {
@@ -618,7 +700,7 @@
 		this.getTemplate = function( view) {
 			var template = view.template();
 
-			if( !template) {
+			if( !template && template!='') {
 				if( this.options( 'ampere.ui.view')) {
 					var view = this.options( 'ampere.ui.view');
 					template = $.get( view);
@@ -710,7 +792,7 @@
 							 * function without providing a template
 							 * so we take the already used one as fallback  
 							 */  
-						template : template || scope.$ampere.template 
+						template : template=='' ? template : template || scope.$ampere.template 
 					};
 				} 
 			});
@@ -739,8 +821,53 @@
 			});
 		};
 		
-			// see Ampere.Ui
-		this.popup = function( url, /* function */ initializer) {
+		// see Ampere.Ui
+		this.modal = function( url, options) {
+			options = options || {};
+			var callback = $.noop;
+			
+			if( !options.container) {
+				var popup = $( '<div class="container modal-popup"><iframe width="100%" height="100%" border="no" src="' + url + '"></iframe></div>');
+				controller.element.addClass( 'modal-popup').find( '.ampere-module').append( popup);
+
+				url = popup.find( 'iframe')[0].src;
+				callback =function() {
+					controller.element.removeClass( 'modal-popup');
+					popup.remove();
+				}; 
+			} else {
+				var popup = $( '<div class="modal-embed-backdrop"></div><div class="container modal-embed"><iframe border="no" src="' + url + '"></iframe></div>');
+				controller.element.addClass( 'modal-embed');
+
+				options.container
+				.addClass( 'modal-embed-container')
+				.append( popup);
+
+				url = popup.find( 'iframe')[0].src;
+				callback = function() {
+					controller.element.removeClass( 'modal-embed');
+					options.container.removeClass( 'modal-embed-container');
+					popup.remove();
+				};
+			}
+			
+			popup.find( 'iframe').focus();
+			
+			var deferred = $.Deferred( options.callback || $.noop);
+			onMessage.handlers[ url] = $.proxy( options.onMessage || $.noop, deferred);
+
+				// remove popup when deferred is done/rejected 
+			deferred.always( function() {
+				callback();
+					// remove message handler
+				delete onMessage.handlers[ url];
+			}); 
+			
+			return deferred;
+		}; 
+		
+		/*
+		this.popup = function( url, initializer) {
 			var popup = $( '<div class="container popup"><iframe width="100%" height="100%" border="no" src="' + url + '"></iframe></div>');
 			this.controller.element.addClass( 'popup').find( '.ampere-module').append( popup);
 
@@ -759,6 +886,32 @@
 			
 			return deferred;
 		};
+		*/
+		
+		/*
+		// see Ampere.Ui
+		this.embed = function( parent, url, initializer) {
+			var popup = $( '<div class="embed-backdrop"></div><div class="container embed"><iframe border="no" src="' + url + '"></iframe></div>');
+			this.controller.element.addClass( 'embed');
+			
+			parent.addClass( 'embed-container').append( popup);
+
+			popup.find( 'iframe').focus();
+			
+			var deferred = $.Deferred();
+			initializer.call( deferred, deferred);		
+
+			var self = this;
+			
+				// remove popup when deferred is done/rejected 
+			deferred.always( function() {
+				self.controller.element.removeClass( 'embed');
+				popup.remove();
+			}); 
+			
+			return deferred;
+		};
+		*/
 		
 		this.toggleHelp = function() {
 			controller.element.find( '.page-header >.ampere-help').toggle( 'slow');

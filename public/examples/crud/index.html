@@ -56,22 +56,17 @@
 						.action( function( transition, ui) {
 							var selection = state.entry;
 							var entry = undefined;
-							var wizard;
+							
+							var wizard = ui.modal( '../wizard/', {
+								onMessage : function( data) {
+									if( $.isPlainObject( data)) {
+										entry = data;
+									} 
+									this.resolve( entry && 'Entry created');									
+								}
+							}); 
 							
 							return function redo( create, list, view) {
-								if( !wizard) {
-									wizard = ui.popup( '../wizard/', function( deferred) {
-										function onMessage( event) {
-											if( $.isPlainObject( event.originalEvent.data)) {
-												entry = event.originalEvent.data;
-											} 
-											deferred.resolve( entry && 'Entry created');
-										}
-											// register message event handler fo exactly one message event (via window.postMessage API)
-										$( window).one( 'message', onMessage);
-									}); 
-								}
-			
 								wizard.done( function() { 
 									entry && list.entries.push( list.entry = entry);
 								});

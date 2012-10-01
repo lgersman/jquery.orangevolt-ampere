@@ -17,6 +17,6 @@
 					return $1.toUpperCase( ); 
 				}
 			) : s;
-		}	
+		}
 	};
 })( jQuery);

@@ -1,18 +1,20 @@
 /* Add additional stylesheets below
 -------------------------------------------------- */
-
+/*
 @IMPORT url("http://fonts.googleapis.com/css?family=Cousine");
 
+font-family : Cousine, Inconsolata, Monospace;
+*/
 input:not( [type="button"]):not( [type="reset"]):not( [type="submit"]):not( .search-query), textarea {
-	font-family : Cousine, Monospace;
+	font-family : Monospace;
 }
 
 input:not( [type="button"]):not( [type="reset"]):not( [type="submit"]):-moz-placeholder, textarea:-moz-placeholder {
-	font-family : Cousine, Monospace;
+	font-family : Monospace;
 }
 
 :not( .search-query)::-webkit-input-placeholder {
-	font-family : Cousine, Monospace;
+	font-family : Monospace;
 }
 
 /*

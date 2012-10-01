@@ -22,7 +22,8 @@ $.fn.sortable = function(options) {
 			return;
 		}
 		var isHandle, index, items = $(this).children(options.items);
-		var placeholder = $('<' + items[0].tagName + ' class="sortable-placeholder">');
+		var placeholder = options.placeholder ? $( options.placeholder) : $('<' + (/^ul|ol$/i.test(this.tagName) ? 'li' : 'div') + '>');
+		placeholder.addClass( 'sortable-placeholder');
 		items.find(options.handle).mousedown(function() {
 			isHandle = true;
 		}).mouseup(function() {
@@ -43,10 +44,13 @@ $.fn.sortable = function(options) {
 			dt.setData('Text', 'dummy');
 			index = (dragging = $(this)).addClass('sortable-dragging').index();
 		}).on('dragend.h5s', function() {
-			dragging.removeClass('sortable-dragging').fadeIn();
+			if (!dragging) {
+				return;
+			}
+			dragging.removeClass('sortable-dragging').show();
 			placeholders.detach();
 			if (index != dragging.index()) {
-				items.parent().trigger('sortupdate', {item: dragging});
+				dragging.parent().trigger('sortupdate', {item: dragging});
 			}
 			dragging = null;
 		}).not('a[href], img').on('selectstart.h5s', function() {
@@ -59,17 +63,21 @@ $.fn.sortable = function(options) {
 			if (e.type == 'drop') {
 				e.stopPropagation();
 				placeholders.filter(':visible').after(dragging);
+				dragging.trigger('dragend.h5s');
 				return false;
 			}
 			e.preventDefault();
 			e.originalEvent.dataTransfer.dropEffect = 'move';
 			if (items.is(this)) {
 				if (options.forcePlaceholderSize) {
-					placeholder.height(dragging.height());
+					placeholder.height(dragging.outerHeight());
 				}
 				dragging.hide();
 				$(this)[placeholder.index() < $(this).index() ? 'after' : 'before'](placeholder);
 				placeholders.not(placeholder).detach();
+			} else if (!placeholders.is(this) && !$(this).children(options.items).length) {
+				placeholders.detach();
+				$(this).append(placeholder);
 			}
 			return false;
 		});

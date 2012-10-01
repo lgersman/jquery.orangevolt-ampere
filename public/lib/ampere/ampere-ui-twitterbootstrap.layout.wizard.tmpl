@@ -1,5 +1,8 @@
 <div class="ng-cloak ampere-module" ng-app="window.ov.ampere.ui.twitterbootstrap" ng-controller="amperetwitterbootstrap">
-	<div class="navbar navbar-inverse navbar-fixed-top">
+	<div
+		class="navbar navbar-inverse navbar-fixed-top" 
+		ng-show="$ampere.ui.getCaption( $ampere.module) || $ampere.module.options( 'ampere.ui.about.caption') || $ampere.ui.getTransitions({ 'ampere.ui.type':'global'}).length"
+	>
     	<div class="navbar-inner">
        		<div class="container">
          		<a 
@@ -17,7 +20,7 @@
          			<a ng-switch-when="object" class="brand" ng-ampere-transition="$ampere.module.options( 'ampere.ui.about.url')"></a>
          			
 			        <a ng-switch-default class="brand" href="{{$ampere.module.options( 'ampere.ui.about.url')}}" target="_blank">
-			        	{{$ampere.ui.getCaption( $ampere.module)}}
+			        	{{$ampere.ui.getCaption( $ampere.module) || $window.ov.ampere.util.ucwords( $ampere.module.options( 'ampere.ui.about.caption'))}}
 			        </a>			        
 				</span>
 

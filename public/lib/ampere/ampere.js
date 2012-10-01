@@ -509,13 +509,13 @@
 					viewName = template.name;
 				} else if( (template||{}).jquery) {
 					viewName = template.selector;
-				} else {
-					viewName = 'main';
-				}
+				} 
+				
+				viewName = viewName || 'main';
 			}
 
 			_ns.assert( !this.views[ viewName], 'view "' + viewName + '" already exists');
-			_ns.assert( template || template==null, 'view "' + viewName + '" : template argument missing');
+			_ns.assert( template || template=='' || template==null, 'view "' + viewName + '" : template argument missing');
 
 			return this.views[ viewName] = new View( this, viewName, template);
 		};
@@ -748,20 +748,7 @@
 				
 				var self = this; 
 
-				$.when( result, historyReady)
-				.done( function() {
-					module.current( target, view);
-					var template = ui && ui.getTemplate( view); 
-					template.done( function( data) {
-						if( data instanceof Element) {
-							data = $( data);
-						} 
-						template = data.jquery ? data.text() : template.responseText || data;
-						ui && ui.render( 'State', view, template, result);
-						ui && ui.unblock();
-					});
-				})
-				.fail( function() {
+				function errorHandler() {
 					if( arguments.length==1 && arguments[0]==self) {
 						/* 
 						 * deferred failed controlled by user 
@@ -787,7 +774,24 @@
 							ui.render( 'Error', $.ov.json.stringify( arguments, $.ov.json.stringify.COMPACT), onRetry);
 						}
 					}
-				});
+				}
+				
+				$.when( result, historyReady)
+				.done( function() {
+					module.current( target, view);
+					var template = ui && ui.getTemplate( view); 
+					template
+					.done( function( data) {
+						if( data instanceof Element) {
+							data = $( data);
+						} 
+						template = data.jquery ? data.text() : template.responseText || data;
+						ui && ui.render( 'State', view, template, result);
+						ui && ui.unblock();
+					})
+					.fail( errorHandler);
+				})
+				.fail( errorHandler);
 				
 				return result;
 			};
@@ -1065,12 +1069,13 @@
 		this.isBlocked = function() {};
 		
 			/**
-			 * open an popup  
+			 * open an modal dialog  
 			 * 
 			 * @param url
 			 * @param initializer
+			 * @param options
 			 */
-		this.popup = function( url, /* function */ initializer) {};
+		this.modal = function( url, /* function */ initializer, /*optional */ options) {};
 		
 			/**
 			 * filter may be an object (filter by example, like { type : 'global'}) or function argument
@@ -1409,8 +1414,9 @@
 			if( $.isFunction( module)) {
 					// enable html5 by default (i.e. if not set in options)
 					// if the ampere module will be attached to the BODY element
+					// and ampere is not running within an iframe
 				if( !('ampere.history.html5' in options)) {
-					options['ampere.history.html5'] = this[0].tagName=='BODY';
+					options['ampere.history.html5'] = this[0].tagName=='BODY' && window.top===window.self;
 				}
 				
 				module = new module( options);

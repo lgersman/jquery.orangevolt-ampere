@@ -1,4 +1,53 @@
 .ampere-app {
+	@fs : 13px; 
+	
+	font-size: @fs;
+	
+	.btn, select, textarea, input[type="text"], input[type="password"], input[type="datetime"], input[type="datetime-local"], input[type="date"], input[type="month"], input[type="time"], input[type="week"], input[type="number"], input[type="email"], input[type="url"], input[type="search"], input[type="tel"], input[type="color"], .uneditable-input {
+		font-size: @fs;
+	} 
+	
+	label, input, button, select, textarea {
+		font-size: @fs;
+	}
+	
+	.navbar .brand {
+		font-size : 16px;
+	}
+	
+	h1 {
+		font-size : 30px;
+	}
+	
+	h2 {
+		font-size : 22px;
+	}
+	
+	.lead {
+		font-size : 18px;
+	}
+	
+	code {
+		color : rgb(36, 95, 20);	
+	}
+	
+		/* sortable */
+	.table-striped tbody tr.sortable-placeholder td, .table-striped tbody tr.sortable-placeholder th {
+		background-color : transparent;
+	}
+	
+	tr.sortable-placeholder {
+		cursor : move;
+		background-image : -webkit-linear-gradient(-45deg, #fff 50%, #ddd 100%);
+		background-size	 : 2px 2px;
+		background-color : transparent; 
+		
+		>td, >th, >*.not( td, th) {
+			background-color : transparent; 
+		}
+	}
+		/* -- */
+	
 	overflow-x : auto;
 	overflow-y : scroll;
 
@@ -52,8 +101,8 @@
 			  margin-left: 20px;
 			  float: right;
 			  font-weight: bold;
-			  color: #333; 
-			  text-shadow: 1px 1px 0 rgba(255,255,255,.4), 0 0 30px rgba(255,255,255,.125);
+			  //color: #333; 
+			  //text-shadow: 1px 1px 0 rgba(255,255,255,.4), 0 0 30px rgba(255,255,255,.125);
 			  -webkit-transition: all .2s linear;
 			     -moz-transition: all .2s linear;
 			          transition: all .2s linear;
@@ -120,6 +169,10 @@
 					}
 				}
 			}
+			
+			.page-header.view-empty {
+				border : 0;
+			}
 		}
 		
 		/* gray out disabled anchors in navbars */
@@ -127,7 +180,7 @@
 			color: #555555;
 		}
 		
-		.overlay {
+		>.overlay {
 			/*
 			opacity	: 0.8; 
 			filter	: alpha(opacity=80);
@@ -148,56 +201,14 @@
 	          transition		: opacity 0.6s ease;
 		}
 		
-		.overlay.block {
+		>.overlay.block {
 			visibility	: visible;
 	  		opacity		: 0.2;
 	  		transition	: opacity 0.8s linear;
 	  		cursor  	: wait;  
 		}
 		
-		.popup {
-			position: fixed; 
-			top		: 19px; 
-			left	: 19px; 
-			bottom	: 19px;
-			right	: 19px;
-			z-index	: 1042;
-			cursor 	: auto;
-			background-color : transparent;
-			
-			-webkit-transition	: opacity 0.6s ease;
-	     	-moz-transition		: opacity 0.6s ease;
-	       	-o-transition		: opacity 0.6s ease;
-	          transition		: opacity 0.6s ease;
-	          
-	        iframe {
-	        	overflow 	: auto;
-	
-	        	/*
-	        	border: 2px solid #ffffff;
-				-webkit-border-radius: 4px;
-				-moz-border-radius: 4px;
-				border-radius: 4px;
-				*/
-				
-				background-color: #ffffff;
-				border: 1px solid #999;
-				border: 1px solid rgba(0, 0, 0, 0.3);
-				*border: 1px solid #999;
-				-webkit-border-radius: 6px;
-				   -moz-border-radius: 6px;
-				        border-radius: 6px;
-				-webkit-box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
-				   -moz-box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
-				        box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
-				-webkit-background-clip: padding-box;
-				   -moz-background-clip: padding-box;
-				        background-clip: padding-box;
-				padding : 1px;
-	        } 
-		}
-		
-		.flash {
+		>.flash {
 			display : none;
 			position: fixed; 
 			top		: 20px; 
@@ -262,7 +273,7 @@
 /* 
  * wizard template specific 
  */
-.ampere-app.wizard {
+.ampere-app.layout-name-wizard {
 	padding-bottom: 40px;
 	
 		// hide disabled left oriented transitions
@@ -281,8 +292,23 @@
 /* class overlay is applied if an popup is currently overlaying it */
 .ampere-app.overlay {
 	>.ampere-module {
+		>.navbar-fixed-top, >.navbar-fixed-bottom, >.container:not( .modal-popup) {
+		//	-webkit-filter	: blur(1px);
+		//	-moz-filter		: blur(1px);
+		//	-ms-filter		: blur(1px);
+		//	-o-filter		: blur(1px);
+		//	filter			: blur(1px);
+		}
+	}
+}
+
+/* class popup is applied if an popup is currently overlaying it */
+.ampere-app.modal-popup {
+	overflow 		: hidden;
+	
+	>.ampere-module {
 		/*
-		>.navbar-fixed-top, >.navbar-fixed-bottom, >.container {
+		>.navbar-fixed-top, >.navbar-fixed-bottom, >.container:not(.modal-popup) {
 			-webkit-filter	: blur(1px);
 			-moz-filter		: blur(1px);
 			-ms-filter		: blur(1px);
@@ -291,44 +317,105 @@
 		}
 		*/
 		
-		-webkit-transition	: all 0.3s ease;
-	   	-moz-transition		: all 0.3s ease;
-	    -o-transition		: all 0.3s ease;
-	    transition			: all 0.3s ease; 
+		.modal-popup {
+			position: fixed; 
+			top		: 19px; 
+			left	: 19px; 
+			bottom	: 19px;
+			right	: 19px;
+			z-index	: 1042;
+			cursor 	: auto;
+			background-color : transparent;
+		         
+		       iframe {
+		       	overflow 	: auto;
+		
+		       	/*
+		       	border: 2px solid #ffffff;
+				-webkit-border-radius: 4px;
+				-moz-border-radius: 4px;
+				border-radius: 4px;
+				*/
+				
+				background-color: #ffffff;
+				border: 1px solid #999;
+				border: 1px solid rgba(0, 0, 0, 0.3);
+				*border: 1px solid #999;
+				-webkit-border-radius: 6px;
+				   -moz-border-radius: 6px;
+				        border-radius: 6px;
+				-webkit-box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+				   -moz-box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+				        box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+				-webkit-background-clip: padding-box;
+				   -moz-background-clip: padding-box;
+				        background-clip: padding-box;
+				padding : 1px;
+		       } 
+		}
 	}
 }
 
-/* class popup is applied if an popup is currently overlaying it */
-.ampere-app.popup {
+/* class modal-embed is applied if an popup is currently overlaying it */
+.ampere-app.modal-embed {
 	overflow 		: hidden;
 	
 	>.ampere-module {
-		>.navbar-fixed-top, >.navbar-fixed-bottom, >.container:not(.popup) {
+		/*
+		>.navbar-fixed-top, >.navbar-fixed-bottom, >.container:not(.modal-embed) {
 			-webkit-filter	: blur(1px);
 			-moz-filter		: blur(1px);
 			-ms-filter		: blur(1px);
 			-o-filter		: blur(1px);
 			filter			: blur(1px);
 		}
+		*/
 		
-		>.overlay {
-			-webkit-filter	: blur(1px);
-			-moz-filter		: blur(1px);
-			-ms-filter		: blur(1px);
-			-o-filter		: blur(1px);
-			filter			: blur(1px);
+		>.overlay.block, >.flash {
+			display : none !important;
+		}
+		
+		.modal-embed-container {
+			position : relative;
+
+			.modal-embed-backdrop {
+				position: fixed; 
+				top		: 0; 
+				left	: 0; 
+				bottom	: 0;
+				right	: 0;
+				z-index	: 1040;
+			  	background-color: #000000;
+		  		opacity		: 0.2;
+		  		cursor  	: wait;  
+			}
 			
-			-webkit-transition	: all 0.3s ease;
-		   	-moz-transition		: all 0.3s ease;
-		    -o-transition		: all 0.3s ease;
-		    transition			: all 0.3s ease;
-		} 
+			.modal-embed {
+				position: absolute; 
+				top		: 0; 
+				left	: 0;
+				width   : 100%;
+				height  : 100%;  
+				z-index	: 1042;
+				cursor 	: auto;
+				min-height : 300px;
+				background-color: #ffffff;
+				border: 2px inset #ffffff;
+			
+			-webkit-border-radius: 6px;
+			   -moz-border-radius: 6px;
+			   border-radius: 6px;
+				
+		        iframe {
+		        	overflow 	: auto;
+		        	width		: 100%;
+		        	height		: 100%;
+					border		: 0;
+					min-height : 300px;
+		        } 
+			}
+		}
 	}
-	
-	-webkit-transition	: opacity 0.3s ease;
-   	-moz-transition		: opacity 0.3s ease;
-    -o-transition		: opacity 0.3s ease;
-    transition			: opacity 0.3s ease;
 }
 
 /* fixes bootstrap.css */
@@ -351,4 +438,10 @@
 	    	margin-left: inherit;
 	  	}
   }
+}
+
+@media (max-width: 979px) {
+	.navbar-fixed-top {
+		margin-bottom: inherit;
+	}
 }

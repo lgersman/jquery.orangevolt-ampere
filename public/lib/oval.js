@@ -40,7 +40,7 @@ for( var i=0; i<scripts.length; i++) {
 			'coffeescript-1.3.3.js',
 			'modernizr-2.6.2.js',
 			'lesscss-1.3.0.js',
-			'jquery-1.7.2.js',
+			'jquery-1.8.2.js',
 			'bootstrap-2.1.1/js/bootstrap.js',
 			'jquery.sortable.js',
 			'datepicker/js/bootstrap-datepicker.js',
