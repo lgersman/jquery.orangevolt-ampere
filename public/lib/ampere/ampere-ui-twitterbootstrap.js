@@ -282,8 +282,8 @@
 					+ '{{$.trim( element.text()) || $ampere.ui.getCaption( transition)}}'
 					+ '</button>'
 					+ '<input' 
-					+ ' id="{{attrs.id || attrs.name}}"'
-					+ ' name="{{attrs.name || attrs.id}}"'
+					+ ' id="{{attrs.id}}"'
+					+ ' name="{{attrs.name}}"'
 					+ ' class="ampere-transition-companion"'
 					+ ' type="file"' 
 					+ ' ng-ampere-change="transition"'
@@ -364,7 +364,14 @@
 						);
 						
 						if( templates[ type]) {
-							var f = $compile( templates[ type]);
+							var template = templates[ type];
+							
+								// special case : tag a with type="file"  
+							if( type="file" &&  element[0].tagName=="A") {
+								template = template.replace( /\type="button"|btn/g, '').replace( /button/g, 'a');
+							}
+							
+							var f = $compile( template);
 							var replacement = f( scope);
 							
 							element.replaceWith( replacement);	
@@ -372,7 +379,7 @@
 								// add data- attributes
 							var dataAttributes = Object.keys( element[0].dataset);
 							for( var i=0; i<dataAttributes.length; i++) {
-								replacement[0].setAttribute( 'data-' + dataAttributes[i], element[0].dataset[ dataAttributes[i]]);
+								replacement.attr( 'data-' + dataAttributes[i], element[0].dataset[ dataAttributes[i]]);
 							} 
 							
 							var hotkey = attrs.ngAmpereHotkey || scope.$ampere.ui.getHotkey( scope.transition);
@@ -525,6 +532,19 @@
 			};
 		}]);
 		
+		ampere.directive( 'ngAmpereData', [ function() {
+			var _ns = $.ov.namespace( 'ngAmpereData');
+			
+			return {
+				restrict   : 'A',
+				link: function( scope, element, attrs) {
+					var data = scope.$eval( attrs.ngAmpereData);
+					_ns.assert( $.isPlainObject( data), 'attribute "ng-ampere-data"(="' + attrs.ngAmpereData + '") expected to evaluate to an object');
+					
+					angular.extend( element.data(), data);
+				}
+			};
+		}]);
 	})();
 	
 		/**
@@ -588,7 +608,7 @@
 			flash.hide();
 			
 				// trigger handler
-			deferred.reject( controller);
+			deferred.reject( controller.module);
 		}
 	}
 	

@@ -462,7 +462,7 @@
 						transitionName = targetState.name();
 					} else if( $.isFunction( arguments[0])) {
 						targetState = arguments[0];
-						transitionName = targetState.name!='' ? targetState.name : 'main';
+						transitionName = window.ov.ampere.util.functionName( targetState)!='' ? window.ov.ampere.util.functionName( targetState) : 'main';
 					} else {
 						_ns.raise( 'dont know how to handle arguments ', arguments);
 					}
@@ -506,7 +506,7 @@
 			
 			if( !viewName) {
 				if( $.isFunction( template)) {
-					viewName = template.name;
+					viewName = window.ov.ampere.util.functionName( template);
 				} else if( (template||{}).jquery) {
 					viewName = template.selector;
 				} 
@@ -629,11 +629,11 @@
 						// create states
 					for( var i=0; i<arr.length; i++) {
 						_ns.assert( $.isFunction( arr[i]) || typeof( arr[i])=='string', 'array item type "function" or "string" expected');
-						this.state( $.isFunction( arr[i]) ? arr[i].name : arr[i]);
+						this.state( $.isFunction( arr[i]) ? window.ov.ampere.util.functionName( arr[i]) : arr[i]);
 					}
 						// initialize states
 					for( var i=0; i<arr.length; i++) {
-						$.isFunction( arr[i]) && arr[i].call( this.states[ arr[i].name], this.states[ arr[i].name]); 
+						$.isFunction( arr[i]) && arr[i].call( this.states[ window.ov.ampere.util.functionName( arr[i])], this.states[ window.ov.ampere.util.functionName( arr[i])]); 
 					}
 					return this;
 				} else if( arguments.length==1 && $.isPlainObject( arguments[0])) {
@@ -654,7 +654,7 @@
 					var name = args.shift();
 					
 					var fn   = $.isFunction( name) ? name : args.shift() || $.noop;
-					var name = typeof( name)=='string' ? name : name.name;
+					var name = typeof( name)=='string' ? name : window.ov.ampere.util.functionName( name);
 					_ns.assert( !this.states[ name], 'state "' + name + '" already exists');
 					
 					function state() {
@@ -695,7 +695,7 @@
 							transitionName = targetState.name();
 						} else if( $.isFunction( arguments[0])) {
 							targetState = arguments[0];
-							transitionName = targetState.name!='' ? targetState.name : 'main';
+							transitionName = window.ov.ampere.util.functionName( targetState)!='' ? window.ov.ampere.util.functionName( targetState) : 'main';
 						} else if( typeof( arguments[0])=='string') {
 							targetState = this.states[ arguments[0]];
 							transitionName = arguments[0];
@@ -749,14 +749,16 @@
 				var self = this; 
 
 				function errorHandler() {
+					debugger
 					if( arguments.length==1 && arguments[0]==self) {
 						/* 
 						 * deferred failed controlled by user 
-						 * (ui rejects with controller instance as argument to indentify this case)
+						 * (ui rejects with module instance as argument to indentify this case)
 						 * so the only thing to do is unblock the view 
 						 */ 
 						
 						ui && ui.unblock();
+							// render flash "user aborted transition"
 					} else if( ui) {
 						function onRetry() {
 							module.history().redo( retryArgs);
@@ -829,7 +831,7 @@
 			}
 
 			var fn   = $.isFunction( name) ? name : args.shift();
-			var name = typeof( name)=='string' ? name : fn.name;
+			var name = typeof( name)=='string' ? name : window.ov.ampere.util.functionName( fn);
 			_ns.assert( name && name!='', 'module name not given (module constructor function seems also anonymous)');
 			_ns.assert( !this.modules[ name], 'module "' + name + '" already exists');
 			

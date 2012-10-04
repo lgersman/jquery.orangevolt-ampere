@@ -17,6 +17,15 @@
 					return $1.toUpperCase( ); 
 				}
 			) : s;
+		},
+	
+			/** 
+			 * ie doesnt support function property name 
+			 * 
+			 * @return function name
+			 */
+		functionName : function( /*function*/f) {
+			return f.name!==undefined ? f.name : f.toString().match(/^function ([^(]+)/)[1];
 		}
 	};
 })( jQuery);

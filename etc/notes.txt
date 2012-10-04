@@ -31,3 +31,7 @@ transition.enabled( value || function)
 
 * twitterboostrap renderer : automatic html5 drag-to-desktop ability for anchors having the droppable attribute set.
 
+* <a type="file" ng-ampere-transition=""></a> supported
+* directive ng-ampere-data : 
+** attention - do not use in consumption with data- attributes ( they will get lost)
+** expected value is an object which will be merged (by reference, not by copy) into the current data object 
