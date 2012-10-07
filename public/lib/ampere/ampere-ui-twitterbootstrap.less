@@ -37,14 +37,24 @@
 	}
 	
 	tr.sortable-placeholder {
-		cursor : move;
-		background-image : -webkit-linear-gradient(-45deg, #fff 50%, #ddd 100%);
-		background-size	 : 2px 2px;
-		background-color : transparent; 
-		
+		cursor 				: move;
+		//background-image 	: -webkit-linear-gradient(-45deg, #fff 50%, #ddd 100%);
+		//background-size	: 2px 2px;
+		background-color 	: rgba(0, 136, 204, 0.47); 
+		        			
 		>td, >th, >*.not( td, th) {
 			background-color : transparent; 
 		}
+	}
+	
+	[ng-ampere-sortable] >[draggable]:not( .ng-ampere-sortable-nohandle):hover,
+	[ng-ampere-sortable] >[draggable]:not( .ng-ampere-sortable-nohandle):hover * {
+		cursor : move;
+	}
+	
+	[ng-ampere-sortable] >[draggable]:hover .ng-ampere-sortable-nohandle,
+	[ng-ampere-sortable] >[draggable]:hover .ng-ampere-sortable-nohandle *  {
+		cursor : auto;
 	}
 		/* -- */
 	

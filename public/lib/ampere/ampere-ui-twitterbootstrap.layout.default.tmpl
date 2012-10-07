@@ -27,7 +27,7 @@
 				
        		 	<div class="nav-collapse">
 	           		<ul class="nav">
-	           			<li ng-class="{disabled : !transition.enabled()}"
+	           			<li ng-class="{disabled : !transition.enabled(), active : transition.active()}"
 	           				ng-repeat="transition in $ampere.ui.getTransitions({ 'ampere.ui.type':'global'})">
 	           				<a ng-ampere-transition="transition"></a>
 	           			</li>
@@ -42,7 +42,7 @@
 			<div class="lead" ng-bind-html-unsafe="$ampere.ui.getDescription( $ampere.module)"></div>
 
 			<ul class="breadcrumb" ng-show="$ampere.ui.getTransitions({ 'ampere.ui.type':'breadcrumb'}).length">
-				<li ng-repeat="transition in $ampere.ui.getTransitions({ 'ampere.ui.type':'breadcrumb'})" ng-class="{disabled : !transition.enabled()}">
+				<li ng-repeat="transition in $ampere.ui.getTransitions({ 'ampere.ui.type':'breadcrumb'})" ng-class="{disabled : !transition.enabled(), active : transition.active()}">
 		          	<a ng-ampere-transition="transition"></a>
 		          	<span ng-show="!$last" class="divider">/</span> 
 		        </li>
@@ -50,8 +50,8 @@
 			
 			<div class="navbar subnav" ddata-top="40" ng-show="$ampere.ui.getTransitions({ 'ampere.ui.type':'primary'}).length || $ampere.ui.getTransitions({ 'ampere.ui.type':'secondary'}).length">
 				<div class="navbar-inner">
-			          <ul class="nav nav-pills">
-			          	<li ng-repeat="transition in $ampere.ui.getTransitions({ 'ampere.ui.type':'primary'})" ng-class="{disabled : !transition.enabled()}">
+			          <ul class="nav">
+			          	<li ng-repeat="transition in $ampere.ui.getTransitions({ 'ampere.ui.type':'primary'})" ng-class="{disabled : !transition.enabled(), active : transition.active()}">
 			          		<a ng-ampere-transition="transition"></a> 
 			          	</li>
 			          	<li class="dropdown" ng-show="$ampere.ui.getTransitions({ 'ampere.ui.type':'secondary'}).length">
@@ -60,7 +60,7 @@
 						      <b class="caret"></b>
 						    </a>
 						    <ul class="dropdown-menu">
-						    	<li ng-repeat="transition in $ampere.ui.getTransitions({ 'ampere.ui.type':'secondary'})" ng-class="{disabled : !transition.enabled()}">
+						    	<li ng-repeat="transition in $ampere.ui.getTransitions({ 'ampere.ui.type':'secondary'})" ng-class="{disabled : !transition.enabled(), active : transition.active()}">
 					          		<a ng-ampere-transition="transition"></a> 
 					          	</li> 
 						    </ul>

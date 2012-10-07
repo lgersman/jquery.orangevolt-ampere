@@ -19,3 +19,15 @@
 
 * <a type="file" ng-ampere-transition=""></a> example
 * ng-ampere-data example 
+
+* getCaption/Description/Icon : when target==state -> skip state/target investigation
+
+* make a less-free production version:
+** all js concatenated/minimized
+** all css concatenated/minimized
+*** all less converted to css
+** oval-min.js helds references to the minimized css + js
+
+* make an oval-all.js for jsfiddle and friends to provide a template/lessccs free version containing everything    
+
+* add active() function to transition (reflected as class "active" in templates)

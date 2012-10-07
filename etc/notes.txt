@@ -21,6 +21,7 @@ $scope.$cookies = $cookies;
 "batteries included"
 "AngularJS on stereoids"
 "Create single page web apps with state"
+"Einfach zauberhaft"
 
 'ampere.ui.type' = 'global' || 'breadcrumb' || 'primary' || 'secondary' || undefined
 transition.enabled( value || function)
@@ -35,3 +36,8 @@ transition.enabled( value || function)
 * directive ng-ampere-data : 
 ** attention - do not use in consumption with data- attributes ( they will get lost)
 ** expected value is an object which will be merged (by reference, not by copy) into the current data object 
+
+* transition : if state===target caption/icon/description from state/target will be ignored
+
+* transaction.active( function/boolean) can be used to signal that this transition was the last "active" one 
+(will be highlighted in the ui layouts according to their state)  

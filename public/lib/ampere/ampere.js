@@ -375,14 +375,44 @@
 						};
 					}
 					$.ov.namespace(	this.fullName() + '.enabled()').assert( 
-						arguments.length==1,  
-						'single argument expected'
+						arguments.length==1, 'single argument expected'
 					);
 					delegate = fn;
 					return this;
 				} else {
 					var enabled = delegate.call( this, this);
 					return enabled;
+				}
+			};
+		})();
+		
+		this.active = (function() {
+			var delegate = $.noop;
+			
+			return function active() {
+				if( arguments.length) {
+					var fn = arguments[0];
+					if( !$.isFunction( fn)) {
+						var value = arguments[0];
+						fn = function() {
+							return value;
+						};
+					}
+					$.ov.namespace(	this.fullName() + '.active()').assert( 
+						arguments.length==1, 'single argument expected'
+					);
+					if( !delegate) {
+						debugger
+					}
+					
+					delegate = fn;
+					return this;
+				} else {
+					if( !delegate) {
+						debugger
+					}
+					var active = delegate.call( this, this);
+					return active;
 				}
 			};
 		})();
@@ -961,7 +991,7 @@
 					var matchingHotkeys = window.ov.ampere.ui.hotkey.computeMatchingHotkeys( event);
 					var module = self.controller.module;
 
-					function proceedTransitionHotkey( transition, ngAmpereHotkey) {
+					function proceedTransitionHotkey( transition, ngAmpereHotkey, domElement) {
 						var hotkey = ngAmpereHotkey || transition.options( 'ampere.ui.hotkey');
 						
 						if( transition.enabled() && hotkey) {
@@ -973,7 +1003,10 @@
 									// prevent any other hotkey handler to be invoked
 								event.stopImmediatePropagation();
 								
-								self.controller.proceed( transition);
+									// patch matching hotkey element into event 
+								event.currentTarget = event.delegateTarget = event.srcElement = event.target = domElement;
+									// provide patched event to transition action
+								self.controller.proceed( transition, [event]);
 								
 								return true;
 							}
@@ -981,7 +1014,7 @@
 					}
 
 						// inspect ng-ampere-hotkey attributed elements (i.e. not transitions)
-					var elements = $( '*[ng-ampere-hotkey]').get();
+					var elements = $( '*[ng-ampere-hotkey]', self.controller.element).get();
 					for( var i in elements) {
 						var element = $( elements[i]);
 						var hotkeys = element.data( 'ampereHotkey');
@@ -997,7 +1030,10 @@
 
 								var value = hotkeys[ hotkey];
 								if( value instanceof Transition) {
-									self.controller.proceed( value);
+										// patch matching hotkey element into event 
+									event.currentTarget = event.delegateTarget = event.srcElement = event.target = element[0];
+										// provide patched event to transition action
+									self.controller.proceed( value, [event]);
 								} else {
 									var scope = angular.element( element).scope();
 									scope.$apply( value);
@@ -1009,12 +1045,12 @@
 					}
 			
 						// inspect transitions with an ampere hotkey provided as ng-ampere-hotkey attribute
-					var elements = $( '.ampere-transition[data-ampere-hotkey!=""]').get();
+					var elements = $( '.ampere-transition[data-ampere-hotkey!=""]', self.controller.element).get();
 					for( var i in elements) {
 						var element = $( elements[i]);
 						if( element.hasClass( 'ampere-transition')) {
 							var transition = element.data( 'ampereTransition');
-							if( transition && proceedTransitionHotkey( transition, element.data( 'ampere-hotkey'))) {
+							if( transition && proceedTransitionHotkey( transition, undefined, element.data( 'ampere-hotkey', self.controller.element), element[0])) {
 								return;
 							}
 						}
@@ -1022,14 +1058,14 @@
 					
 						// inspect current state's transitions
 					for( var i in module.current().state.transitions) {
-						if( proceedTransitionHotkey( module.current().state.transitions[i])) {
+						if( proceedTransitionHotkey( module.current().state.transitions[i], undefined, $( '.ampere-view:first', self.controller.element)[0])) {
 							return;
 						} 
 					}
 					
 						// inspect module transitions
 					for( var i in module.transitions) {
-						if( proceedTransitionHotkey( module.transitions[i])) {
+						if( proceedTransitionHotkey( module.transitions[i], undefined, $( '.ampere-module:first', self.controller.element)[0])) {
 							return;
 						} 
 					}
@@ -1151,7 +1187,7 @@
 						value = object.options( property);
 						
 						var targetState = object.target();
-						if( value===undefined && $.inArray( 'target', allowedParentTraversalTypes)!=-1 && targetState) {
+						if( value===undefined && $.inArray( 'target', allowedParentTraversalTypes)!=-1 && targetState && targetState!==object.state()) {
 							object = targetState;
 						}
 					}

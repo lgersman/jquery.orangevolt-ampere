@@ -102,6 +102,7 @@
 			$scope.$log = $log;
 			$scope.$resource = $resource;
 			$scope.$cookies = $cookies;
+			$scope.$ = $;
 //			$scope.$location = $location;
 
 			/*
@@ -246,7 +247,7 @@
 			var templates = {
 				'a' 	: '<a href="javascript:void(0)"'
 					+ ' class="ampere-transition name-{{transition.name()}} {{attrs.class}}"'
-   					+ ' ng-class="{disabled : !transition.enabled(), \'ampere-hotkey\' : hotkey}"'
+   					+ ' ng-class="{disabled : !transition.enabled(), active : transition.active(), \'ampere-hotkey\' : hotkey}"'
    					+ ' accesskey="{{attrs.accesskey}}"'
    					+ ' id="{{attrs.id}}"'
    					+ ' style="{{attrs.style}}"'
@@ -258,7 +259,7 @@
        			'button' : '<button type="button"'
    					+ ' ng-disabled="!transition.enabled()"'
    					+ ' class="ampere-transition name-{{transition.name()}} btn {{attrs.class}}"'
-   					+ ' ng-class="{\'ampere-hotkey\' : hotkey}"'
+   					+ ' ng-class="{disabled : !transition.enabled(), active : transition.active(), \'ampere-hotkey\' : hotkey}"'
    					+ ' ng-disabled="!transition.enabled()"'
    					+ ' id="{{attrs.id}}"'
    					+ ' accesskey="{{attrs.accesskey}}"'
@@ -272,7 +273,7 @@
 					+ ' onclick="$( this).next().click()"'
 					+ ' ng-disabled="!transition.enabled()"'
 					+ ' class="ampere-transition name-{{transition.name()}} btn ampere-transition-companion {{attrs.class}}"'
-					+ ' ng-class="{\'ampere-hotkey\' : hotkey}"'
+					+ ' ng-class="{disabled : !transition.enabled(), active : transition.active(), \'ampere-hotkey\' : hotkey}"'
 					+ ' ng-disabled="!transition.enabled()"'
 					+ ' accesskey="{{attrs.accesskey}}"'
 					+ ' style="{{attrs.style}}"'
@@ -285,13 +286,14 @@
 					+ ' id="{{attrs.id}}"'
 					+ ' name="{{attrs.name}}"'
 					+ ' class="ampere-transition-companion"'
+					+ ' ng-class="{disabled : !transition.enabled()}"'
 					+ ' type="file"' 
 					+ ' ng-ampere-change="transition"'
 					+ '>',
 				'submit' : '<button type="submit"'
    					+ ' ng-disabled="!transition.enabled()"'
    					+ ' class="ampere-transition name-{{transition.name()}} btn {{attrs.class}}"'
-   					+ ' ng-class="{\'ampere-hotkey\' : hotkey}"'
+   					+ ' ng-class="{disabled : !transition.enabled(), active : transition.active(), \'ampere-hotkey\' : hotkey}"'
    					+ ' ng-disabled="!transition.enabled()"'
    					+ ' id="{{attrs.id}}"'
    					+ ' accesskey="{{attrs.accesskey}}"'
@@ -304,7 +306,7 @@
 				'reset' : '<button type="reset"'
    					+ ' ng-disabled="!transition.enabled()"'
    					+ ' class="ampere-transition name-{{transition.name()}} btn {{attrs.class}}"'
-   					+ ' ng-class="{\'ampere-hotkey\' : hotkey}"'
+   					+ ' ng-class="{disabled : !transition.enabled(), active : transition.active(), \'ampere-hotkey\' : hotkey}"'
    					+ ' ng-disabled="!transition.enabled()"'
    					+ ' accesskey="{{attrs.accesskey}}"'
    					+ ' style="{{attrs.style}}"'
@@ -374,7 +376,10 @@
 							var f = $compile( template);
 							var replacement = f( scope);
 							
-							element.replaceWith( replacement);	
+							element.replaceWith( replacement);
+							
+								// keep tabindex
+							replacement.tabIndex=element.tabInde;
 							
 								// add data- attributes
 							var dataAttributes = Object.keys( element[0].dataset);
@@ -417,7 +422,7 @@
 
 								!ui.isBlocked() && controller.proceed( transition, [event]);
 							} else {
-								_ns._ns.error( 'attribute "ng-ampere-' + eventName + '" (=' +  attrs[ directive] + ') doesnt resolve to an ampere transition');
+								_ns.error( 'attribute "ng-ampere-' + eventName + '" (=' +  attrs[ directive] + ') doesnt resolve to an ampere transition');
 							}
 							event.preventDefault();
 							event.stopPropagation();
@@ -647,9 +652,8 @@
 			controller.element.addClass( 'layout-name-' + layout)
 			layout = this.options( 'ampere.baseurl') + 'ampere/ampere-ui-twitterbootstrap.layout.' + layout + '.tmpl';
 		}
-		this.template = $.get( layout);
+		this.layout = typeof( layout)=='string' ? $.get( layout) : layout;
 			
-		
 		/*
 		 * automagically add 'ampere.ui.type':'global' for module transactions 
 		 */
@@ -951,7 +955,7 @@
 			
 			var deferred = $.Deferred();
 			
-			$.when( controller.module.current().view, controller.module.current().view.template, this.template, controller.module)
+			$.when( controller.module.current().view, controller.module.current().view.template, this.layout, controller.module)
 			.progress( function() {
 				_ns.debug( 'progress', this, arguments);
 			})
@@ -964,7 +968,7 @@
 				.text( 'Bootstrapping ' + controller.module.name() + ' failed ! ')
 				.append( 
 					$('<a href="#">Details</a>').one( 'click', function() {
-						controller.element.append( '<div class="alert">' + (self.template.isRejected() ? self.template.statusText + ' : ' + layout : $.ov.json.stringify( args, $.ov.json.stringify.COMPACT)) + '</div>');
+						controller.element.append( '<div class="alert">' + (self.layout.isRejected() ? self.layout.statusText + ' : ' + layout : $.ov.json.stringify( args, $.ov.json.stringify.COMPACT)) + '</div>');
 					}) 
 				);
 				$( '.progress', controller.element).addClass( 'progress-danger');
@@ -972,7 +976,7 @@
 				eProgress.remove();
 				
 				controller.element
-				.append( self.template.responseText);
+				.append( $.isFunction( self.layout.promise) ? self.layout.responseText : self.layout);
 				
 				var template = self.getTemplate( controller.module.current().view); 
 				template.done( function( data) {
