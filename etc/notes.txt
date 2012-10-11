@@ -41,3 +41,11 @@ transition.enabled( value || function)
 
 * transaction.active( function/boolean) can be used to signal that this transition was the last "active" one 
 (will be highlighted in the ui layouts according to their state)  
+
+* window.ov.ampere.type( obj) : returns the ampere type ('ampere'/'state'/'transition'/'view'/'module') or $.type result if no ampere type 
+** type filter returns result of window.ov.ampere.type  
+
+* flash API 
+
+* templates can now be provided as jquery script elements referenced by id 
+

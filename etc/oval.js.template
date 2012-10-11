@@ -1,0 +1,64 @@
+/*
+ * Orangevolt Ampere Framework 
+ *
+ * http://github.com/lgersman
+ * http://www.orangevolt.com
+ *
+ * Copyright 2012, Lars Gersmann <lars.gersmann@gmail.com>
+ * Dual licensed under the MIT or GPL Version 2 licenses.
+ */
+ 
+/**
+ * Oval is the OrangeVolt Ampere Loader
+ * 
+ * embed this script in the head of your html page
+ * to load all Orangevolt Ampere dependencies automatically 
+ */
+
+(function() {
+	var scripts = document.getElementsByTagName( 'script');
+	for( var i=0; i<scripts.length; i++) {
+		var url = scripts[i].src;
+		if( scripts[i].type=="text/javascript" && /oval.js/.test( url)) {
+			var matches = url.match( /(.+)oval\.js(\?(.+))?/);
+			if( !matches) {
+				throw new Error( "failed to eval ampere base url");
+			}
+			var baseUrl = matches[ 1];
+			
+			var CSS = <%= JSON.stringify( css) %>;
+			for( var i in CSS) {
+				document.writeln( '<link rel="stylesheet" type="text/css" href="' + baseUrl + CSS[i] + '">');
+			}
+			
+			var LESS = <%= JSON.stringify( less) %>;
+			for( var i in LESS) {
+				document.writeln( '<link rel="stylesheet/less" href="' + baseUrl + LESS[i] + '">');
+			}
+			
+			var JS = <%= JSON.stringify( js) %>;
+			for( var i in JS) {
+				var defer = (/coffeescript/.test( JS[i]) && 'defer') || '';
+				document.writeln( '<script type="text/javascript" ' + defer + ' src="' + baseUrl + JS[i] + '"></script>');
+			}
+			
+			break;
+		}
+	}
+	
+	<%for( var id in templates) { %>
+	document.writeln( 
+		'<script type="text/template" id="<%=id%>"><![CDATA[\n' + 
+		<%= JSON.stringify( templates[ id]) %> + 
+		'\n]]></script>'
+	);
+	<% } %> 
+	
+	<%for( var i in scripts) { %>
+	document.writeln( 
+		'<script type="text/javascript">\n' + 
+		<%= JSON.stringify( scripts[ i]) %> + 
+		'</script>'
+	);
+	<% } %> 
+})();

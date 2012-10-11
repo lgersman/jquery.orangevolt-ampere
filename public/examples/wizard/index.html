@@ -11,7 +11,9 @@
 		<link rel="icon" href="favicon.ico" type="image/x-icon">
 		<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
 	
-		<script type="text/javascript" src="../../lib/oval.js"></script>
+		<script type="text/javascript" src="../../../src/oval.js"></script>
+		<script type="text/_javascript" src="../../../dist/debug/oval.js"></script>
+		<script type="text/_javascript" src="../../../dist/min/oval.js"></script>
 		
 		<script id="wizard-main" type="text/template">
 	<h4>
@@ -184,7 +186,7 @@
 				.enabled( module.history().canUndo)
 				.options({
 					'ampere.ui.caption'  : 'Back',
-					'ampere.ui.hotkey'  : 'left',
+					'ampere.ui.hotkey'  : 'shift+left',
 					'ampere.ui.icon' 	: 'icon-chevron-left',
 					'ampere.ui.type'	: 'wizard-left' 
 				});

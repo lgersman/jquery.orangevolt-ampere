@@ -1,0 +1,468 @@
+/*
+ * Orangevolt Ampere Framework 
+ *
+ * http://github.com/lgersman
+ * http://www.orangevolt.com
+ *
+ * Copyright 2012, Lars Gersmann <lars.gersmann@gmail.com>
+ * Dual licensed under the MIT or GPL Version 2 licenses.
+ */
+ 
+.ampere-app {
+	@fs : 13px; 
+	
+	font-size: @fs;
+	
+	.btn, select, textarea, input[type="text"], input[type="password"], input[type="datetime"], input[type="datetime-local"], input[type="date"], input[type="month"], input[type="time"], input[type="week"], input[type="number"], input[type="email"], input[type="url"], input[type="search"], input[type="tel"], input[type="color"], .uneditable-input {
+		font-size: @fs;
+	} 
+	
+	label, input, button, select, textarea {
+		font-size: @fs;
+	}
+	
+	.navbar .brand {
+		font-size : 16px;
+	}
+	
+	h1 {
+		font-size : 30px;
+	}
+	
+	h2 {
+		font-size : 22px;
+	}
+	
+	.lead {
+		font-size : 18px;
+	}
+	
+	code {
+		color : rgb(36, 95, 20);	
+	}
+	
+		/* sortable */
+	.table-striped tbody tr.sortable-placeholder td, .table-striped tbody tr.sortable-placeholder th {
+		background-color : transparent;
+	}
+	
+	tr.sortable-placeholder {
+		cursor 				: move;
+		//background-image 	: -webkit-linear-gradient(-45deg, #fff 50%, #ddd 100%);
+		//background-size	: 2px 2px;
+		background-color 	: rgba(0, 136, 204, 0.47); 
+		        			
+		>td, >th, >*.not( td, th) {
+			background-color : transparent; 
+		}
+	}
+	
+	[ng-ampere-sortable] >[draggable]:not( .ng-ampere-sortable-nohandle):hover,
+	[ng-ampere-sortable] >[draggable]:not( .ng-ampere-sortable-nohandle):hover * {
+		cursor : move;
+	}
+	
+	[ng-ampere-sortable] >[draggable]:hover .ng-ampere-sortable-nohandle,
+	[ng-ampere-sortable] >[draggable]:hover .ng-ampere-sortable-nohandle *  {
+		cursor : auto;
+	}
+		/* -- */
+	
+	overflow-x : auto;
+	overflow-y : scroll;
+
+	.ampere-module {
+		position  : relative;
+		overflow : hidden;
+		
+		/* crunch bootstrap default space */
+		header .breadcrumb, header .navbar {
+			margin-bottom: 0;
+		} 
+		
+		header {
+			.breadcrumb + .navbar {
+				margin-top: 20px;
+			}
+			
+			.breadcrumb + .navbar.subnav-fixed {
+				margin-top: 0;
+			}
+		}
+		
+		input:invalid, textarea:invalid, select:invalid {
+			border-color: #e9322d;
+		}
+		
+		/* css for input[file] declared with ng-ampere-transition */
+		.ampere-transition + input[type="file"].ampere-transition-companion {
+			visibility	: hidden;
+			position	: absolute;
+			top			: -50px;
+			right		: 0;
+			opacity		: 0;
+			filter		: alpha(opacity=0);
+			font-size	: 100px;
+		}
+		 
+		.nav > li.disabled > a {
+			color: #999999;
+		}
+		
+		 .breadcrumb > li.disabled > a {
+		 	text-decoration : none;
+			cursor : default;
+		 }
+		
+		> .navbar-inverse { 
+			.brand {
+			  padding-right: 0;
+			  padding-left: 0;
+			  margin-left: 20px;
+			  float: right;
+			  font-weight: bold;
+			  //color: #333; 
+			  //text-shadow: 1px 1px 0 rgba(255,255,255,.4), 0 0 30px rgba(255,255,255,.125);
+			  -webkit-transition: all .2s linear;
+			     -moz-transition: all .2s linear;
+			          transition: all .2s linear;
+			    /*      
+				i[class^="icon-"], [class*=" icon-"] {
+					width      : inherit;
+					line-height: 21px;
+			  	}
+			  	*/
+			}
+		   
+			.brand:hover {
+			  color: #ffffff;
+			  text-decoration: none;
+			  text-shadow: 1px 1px 0 rgba(255,255,255,.4), 0 0 30px rgba(255,255,255,.4);
+			}	   
+		}
+		
+		/* overwrite bootstrap responsive layout seeting for this */
+		@media (max-width: 979px) {
+	  		.navbar-fixed-bottom {
+	    		position: fixed;
+	  		}
+	  	}
+		
+		.alert-block {
+			padding-bottom: 7px;
+		}
+		
+		section {
+			padding-top: 10px;
+		}
+		
+		.ampere-state {
+			.page-header {
+				a.icon-question-sign, .ampere-help a {
+					font-size 		: small;
+					text-decoration : none; 
+				}
+
+				H2 {
+					i[class^="icon-"], [class*=" icon-"] {
+						width      : inherit;
+						line-height: 21px;
+					}
+				}
+
+				a.disabled {
+					color : #555555;
+				}
+				
+				.ampere-help {
+					display : none;
+					
+					ul.hotkeys {
+						list-style-type : none;
+						
+						li.disabled >* {
+							color : #999999
+						}
+						
+						li >.description {
+							margin-left : 13px; 
+						}
+					}
+				}
+			}
+			
+			.page-header.view-empty {
+				border : 0;
+			}
+		}
+		
+		/* gray out disabled anchors in navbars */
+		.navbar-inverse .nav > li.disabled > a {
+			color: #555555;
+		}
+		
+		>.overlay {
+			/*
+			opacity	: 0.8; 
+			filter	: alpha(opacity=80);
+			*/ 
+			position: fixed; 
+			top		: 0; 
+			left	: 0; 
+			bottom	: 0;
+			right	: 0;
+			z-index	: 1040;
+		  	background-color: #000000;
+		  	
+		  	visibility:hidden;
+		  	opacity	:0;
+		  	-webkit-transition	: opacity 0.6s ease;
+	     	-moz-transition		: opacity 0.6s ease;
+	       	-o-transition		: opacity 0.6s ease;
+	          transition		: opacity 0.6s ease;
+		}
+		
+		>.overlay.block {
+			visibility	: visible;
+	  		opacity		: 0.2;
+	  		transition	: opacity 0.8s linear;
+	  		cursor  	: wait;  
+		}
+		
+		>.flash {
+			display : none;
+			position: fixed; 
+			top		: 20px; 
+			left	: 47px; 
+			bottom	: 40px;
+			right	: 47px;
+			z-index	: 1041;
+			cursor 	: wait;
+			
+			-webkit-transition	: opacity 0.6s ease;
+	     	-moz-transition		: opacity 0.6s ease;
+	       	-o-transition		: opacity 0.6s ease;
+	          transition		: opacity 0.6s ease;
+
+			.message {
+				text-align		: center;
+				padding-bottom  : 8px;
+				
+				.retry {
+					margin-left : 20px;
+				}
+			}
+		}
+		
+			/* Fixed subnav on scroll, but only for 980px and up (sorry IE!) */
+		@media (min-width: 980px) {
+		  .subnav-fixed {
+		    position: fixed;
+		    top: 40px;
+		    left: 0;
+		    right: 0;
+		    z-index: 1020; /* 10 less than .navbar-fixed to prevent any overlap */
+		    border-color: #d5d5d5;
+		    border-width: 0 0 1px; /* drop the border on the fixed edges */
+		    -webkit-border-radius: 0;
+		       -moz-border-radius: 0;
+		            border-radius: 0;
+		    -webkit-box-shadow: inset 0 1px 0 #fff, 0 1px 5px rgba(0,0,0,.1);
+		       -moz-box-shadow: inset 0 1px 0 #fff, 0 1px 5px rgba(0,0,0,.1);
+		            box-shadow: inset 0 1px 0 #fff, 0 1px 5px rgba(0,0,0,.1);
+		    filter: progid:DXImageTransform.Microsoft.gradient(enabled=false); /* IE6-9 */
+		  }
+		  .subnav-fixed .nav {
+		    width: 938px;
+		    margin: 0 auto;
+		    padding: 0 1px;
+		  }
+		  .subnav .nav > li:first-child > a,
+		  .subnav .nav > li:first-child > a:hover {
+		    -webkit-border-radius: 0;
+		       -moz-border-radius: 0;
+		            border-radius: 0;
+		  }
+		  
+		  .subnav-fixed >.navbar-inner {
+		  	border-width: 0 0 1px; /* drop the border on the fixed edges */
+		  }
+		}
+	}
+}
+
+/* 
+ * wizard template specific 
+ */
+.ampere-app.layout-name-wizard {
+	padding-bottom: 40px;
+	
+		// hide disabled left oriented transitions
+		// (typically the back button)  
+	.navbar.navbar-fixed-bottom {
+		.navbar-inner {
+			.nav:not( .pull-right) {
+				li.disabled {
+					display : none;
+				}
+			}
+		}
+	}
+}
+
+/* class overlay is applied if an popup is currently overlaying it */
+.ampere-app.overlay {
+	>.ampere-module {
+		>.navbar-fixed-top, >.navbar-fixed-bottom, >.container:not( .modal-popup) {
+		//	-webkit-filter	: blur(1px);
+		//	-moz-filter		: blur(1px);
+		//	-ms-filter		: blur(1px);
+		//	-o-filter		: blur(1px);
+		//	filter			: blur(1px);
+		}
+	}
+}
+
+/* class popup is applied if an popup is currently overlaying it */
+.ampere-app.modal-popup {
+	overflow 		: hidden;
+	
+	>.ampere-module {
+		/*
+		>.navbar-fixed-top, >.navbar-fixed-bottom, >.container:not(.modal-popup) {
+			-webkit-filter	: blur(1px);
+			-moz-filter		: blur(1px);
+			-ms-filter		: blur(1px);
+			-o-filter		: blur(1px);
+			filter			: blur(1px);
+		}
+		*/
+		
+		.modal-popup {
+			position: fixed; 
+			top		: 19px; 
+			left	: 19px; 
+			bottom	: 19px;
+			right	: 19px;
+			z-index	: 1042;
+			cursor 	: auto;
+			background-color : transparent;
+		         
+		       iframe {
+		       	overflow 	: auto;
+		
+		       	/*
+		       	border: 2px solid #ffffff;
+				-webkit-border-radius: 4px;
+				-moz-border-radius: 4px;
+				border-radius: 4px;
+				*/
+				
+				background-color: #ffffff;
+				border: 1px solid #999;
+				border: 1px solid rgba(0, 0, 0, 0.3);
+				*border: 1px solid #999;
+				-webkit-border-radius: 6px;
+				   -moz-border-radius: 6px;
+				        border-radius: 6px;
+				-webkit-box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+				   -moz-box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+				        box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+				-webkit-background-clip: padding-box;
+				   -moz-background-clip: padding-box;
+				        background-clip: padding-box;
+				padding : 1px;
+		       } 
+		}
+	}
+}
+
+/* class modal-embed is applied if an popup is currently overlaying it */
+.ampere-app.modal-embed {
+	overflow 		: hidden;
+	
+	>.ampere-module {
+		/*
+		>.navbar-fixed-top, >.navbar-fixed-bottom, >.container:not(.modal-embed) {
+			-webkit-filter	: blur(1px);
+			-moz-filter		: blur(1px);
+			-ms-filter		: blur(1px);
+			-o-filter		: blur(1px);
+			filter			: blur(1px);
+		}
+		*/
+		
+		>.overlay.block, >.flash {
+			display : none !important;
+		}
+		
+		.modal-embed-container {
+			position : relative;
+
+			.modal-embed-backdrop {
+				position: fixed; 
+				top		: 0; 
+				left	: 0; 
+				bottom	: 0;
+				right	: 0;
+				z-index	: 1040;
+			  	background-color: #000000;
+		  		opacity		: 0.2;
+		  		cursor  	: wait;  
+			}
+			
+			.modal-embed {
+				position: absolute; 
+				top		: 0; 
+				left	: 0;
+				width   : 100%;
+				height  : 100%;  
+				z-index	: 1042;
+				cursor 	: auto;
+				min-height : 300px;
+				background-color: #ffffff;
+				border: 2px inset #ffffff;
+			
+			-webkit-border-radius: 6px;
+			   -moz-border-radius: 6px;
+			   border-radius: 6px;
+				
+		        iframe {
+		        	overflow 	: auto;
+		        	width		: 100%;
+		        	height		: 100%;
+					border		: 0;
+					min-height : 300px;
+		        } 
+			}
+		}
+	}
+}
+
+/* fixes bootstrap.css */
+
+.lead code, pre {
+	font-size : inherit;
+}
+
+/* fixes bootstrap-responsive.css */
+@media (max-width: 767px) {
+  body.ampere-app {
+    padding-right: 0;
+    padding-left: 0;
+    
+    		/* this fixes the wizard top/bottom navigation bars */ 
+		.navbar-fixed-top,
+	  	.navbar-fixed-bottom,
+	  	.navbar-static-top {
+	    	margin-right: inherit;
+	    	margin-left: inherit;
+	  	}
+  }
+}
+
+@media (max-width: 979px) {
+	.navbar-fixed-top {
+		margin-bottom: inherit;
+	}
+}

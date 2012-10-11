@@ -1,0 +1,35 @@
+{
+  "name": "jquery.orangevolt-ampere",
+  "title": "jQuery Orangevolt Ampere",
+  "description": "The best jQuery plugin ever.",
+  "version": "0.1.0",
+  "homepage": "https://github.com/lgersman/jquery.orangevolt-ampere",
+  "author": {
+    "name": "Lars Gersmann",
+    "email": "lars.gersmann@gmail.com",
+    "url": "http://www.orangevolt.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/lgersman/jquery.orangevolt-ampere.git"
+  },
+  "bugs": {
+    "url": "https://github.com/lgersman/jquery.orangevolt-ampere/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://www.opensource.org/licenses/MIT"
+    },
+    {
+      "type": "GPL",
+      "url": "http://www.opensource.org/licenses/GPL-2.0"
+    }
+  ],
+  "dependencies": {
+    "jquery"		   : "~1.8.2",
+    "angularjs" 	   : "~1.0.1",
+    "twitterbootstrap" : "~2.1.1"
+  },
+  "keywords": []
+}

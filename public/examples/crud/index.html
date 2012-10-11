@@ -11,7 +11,10 @@
 		<link rel="icon" href="favicon.ico" type="image/x-icon">
 		<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
 	
-		<script type="text/javascript" src="../../lib/oval.js"></script>
+		<script type="text/javascript" src="../../../src/oval.js"></script>
+		<script type="text/_javascript" src="../../../dist/debug/oval.js"></script>
+		<script type="text/_javascript" src="../../../dist/min/oval.js"></script>
+		
 		<script type="text/javascript">
 			var crud = ov.ampere().module( function crud( module) {
 				this.state({
@@ -223,7 +226,7 @@
 					'ampere.ui.icon' 	: 'icon-undo'
 				});
 	
-				this.transition( module.history().redo.target)
+				this.transition( 'redo', module.history().redo.target)
 				.action( module.history().redo)
 				.enabled( module.history().canRedo)
 				.options({
@@ -231,8 +234,8 @@
 					'ampere.ui.hotkey'  : 'ctrl+Y',
 					'ampere.ui.icon' 	: 'icon-repeat'
 				});	
-	
-				this.transition( module.history().reset.target)
+				
+				this.transition( 'undo', module.history().reset.target)
 				.action( module.history().reset)
 				.enabled( module.history().canReset)
 				.options({

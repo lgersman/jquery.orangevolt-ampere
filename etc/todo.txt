@@ -4,6 +4,7 @@
 * CRUD test app (either via "states imported from module" or "module wrapped as state")
 
 * provide an option to make transition results "invisible" from history ui interface point of view
+** -> can be done by implementing the operation inside the action constructor
 
 * ng-ampere-change example (select to choose targetstate, file upload)
 * ng-ampere-click example 
@@ -15,19 +16,5 @@
 * ng-ampere-transition + input[file] example supporting example loading / uploading via jquery.upload.js 
 * jquery.upload dokumentieren
 
-* replace Ampere.ui.regex with a "match"/"test" or "regex" filter
-
 * <a type="file" ng-ampere-transition=""></a> example
 * ng-ampere-data example 
-
-* getCaption/Description/Icon : when target==state -> skip state/target investigation
-
-* make a less-free production version:
-** all js concatenated/minimized
-** all css concatenated/minimized
-*** all less converted to css
-** oval-min.js helds references to the minimized css + js
-
-* make an oval-all.js for jsfiddle and friends to provide a template/lessccs free version containing everything    
-
-* add active() function to transition (reflected as class "active" in templates)
