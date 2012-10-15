@@ -1,20 +1,22 @@
-* improve exception-in-progress handling 
+* improve exception-in-progress handling
 * improve offline support (for application caching : http://slides.html5rocks.com/#app-cache)
- 
+
 * CRUD test app (either via "states imported from module" or "module wrapped as state")
 
 * provide an option to make transition results "invisible" from history ui interface point of view
 ** -> can be done by implementing the operation inside the action constructor
 
 * ng-ampere-change example (select to choose targetstate, file upload)
-* ng-ampere-click example 
+* ng-ampere-click example
 * ng-ampere-dblclick example
 * ng-ampere-hotkey standalone example (table up/down?)
-* filter next/prev example (also table up/down?)  
+* filter next/prev example (also table up/down?)
 * adressbook example (picture upload etc) or better a SCRUM example ????
 
-* ng-ampere-transition + input[file] example supporting example loading / uploading via jquery.upload.js 
+* ng-ampere-transition + input[file] example supporting example loading / uploading via jquery.upload.js
 * jquery.upload dokumentieren
 
 * <a type="file" ng-ampere-transition=""></a> example
-* ng-ampere-data example 
+* ng-ampere-data example
+
+* gruntjs/jasmine test integration

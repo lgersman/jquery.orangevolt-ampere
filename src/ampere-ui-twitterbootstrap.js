@@ -13,7 +13,7 @@
  */
 ;(window.ov && window.ov.ampere && window.ov.ampere.ui.twitterbootstrap) || (function( $) {
 	var _ns = $.ov.namespace( 'window.ov.ampere.ui.twitterbootstrap');
-	
+
 		/**
 		 * declare window.ov.ampere.ui.twitterbootstrap module
 		 * for angular
@@ -28,58 +28,54 @@
 			};
 			*/
 		});
-		//.config( ['$locationProvider'/*,'$routeProvider'*/, function( $locationProvider/*, $routeProvider*/) {
-		//	$locationProvider.html5Mode( $( 'html').hasClass( 'history'));
-		//	$locationProvider.hashPrefix( '!');
-		//}]);
-		
+
 		ampere.filter( 'ucwords', function() {
-            return function( input, scope) {
-                return window.ov.ampere.util.ucwords( input);
-            };
+			return function( input, scope) {
+				return window.ov.ampere.util.ucwords( input);
+			};
 		});
 		ampere.filter( 'replace', function() {
-            return function( input, regexp, replace) {
-                var lastSlashIndex = regexp.lastIndexOf("/");
+			return function( input, regexp, replace) {
+				var lastSlashIndex = regexp.lastIndexOf("/");
 
-                var re = new RegExp( regexp.substr( 1, lastSlashIndex-1), regexp.substr( lastSlashIndex+1));
-                return input.replace( re, replace);
-            };
+				var re = new RegExp( regexp.substr( 1, lastSlashIndex-1), regexp.substr( lastSlashIndex+1));
+				return input.replace( re, replace);
+			};
 		});
-		
+
 		ampere.filter( 'next', function() {
-            return function( items, current) {
+			return function( items, current) {
 				var pos = $.inArray( current, items);
-                return pos<items.length-1 ? items[ pos+1] : current;
-            };
+				return pos<items.length-1 ? items[ pos+1] : current;
+			};
 		});
 		ampere.filter( 'prev', function() {
-            return function( items, current) {
+			return function( items, current) {
 				var pos = $.inArray( current, items);
-                return pos>0 ? items[ pos-1] : current;
-            };
+				return pos>0 ? items[ pos-1] : current;
+			};
 		});
 		ampere.filter( 'type', function() {
-            return function( input) {
+			return function( input) {
 				return window.ov.ampere.type( input);
-            };
+			};
 		});
 		ampere.filter( 'match', function() {
-            return function( items, property, value) {
-                if( !$.isArray( value)) {
-                    value = [ value];
-                }
-                
-                return $.grep( items, function( item) {
-                    for( var i in value) {
-                        if( (value[i] instanceof RegExp) ? value[i].test( item[property]) : item[property]==value[i]) {
-                            return true;
-                        }
-                    }
-                });
-            };
+			return function( items, property, value) {
+				if( !$.isArray( value)) {
+					value = [ value];
+				}
+
+				return $.grep( items, function( item) {
+					for( var i in value) {
+						if( (value[i] instanceof RegExp) ? value[i].test( item[property]) : item[property]==value[i]) {
+							return true;
+						}
+					}
+				});
+			};
 		});
-		
+
 		var ampereTwitterbootstrapController = function( $scope, $rootElement, $window, $http, $timeout,  $log, $resource, $cookies/*, $location*/) {
 			var controller = $rootElement.parent().data( 'ampere.controller');
 			/*
@@ -89,10 +85,10 @@
 			var template = controller._initial_template;
 			controller._initial_template = undefined;
 			$scope.$ampere = {
-                module     : controller.module,
-                ui            : controller.ui,
+				module	: controller.module,
+				ui		: controller.ui,
 				template: template,
-                view       : controller.module.current().view
+				view	: controller.module.current().view
 			};
 
 				// copy services to root scope
@@ -104,53 +100,28 @@
 			$scope.$cookies = $cookies;
 			$scope.$ = $;
 //			$scope.$location = $location;
-
-			/*
-			$scope.$watch(
-                function() {
-                    return $scope.$location.search()
-                },
-                function( oldValue, newValue) {
-                    if( !$location._ignore ) {
-                        console.warn( '$location1 changed ', oldValue, newValue, angular.equals( oldValue, newValue));
-                        if( newValue.u && $scope.$ampere.module.history().canUndo()) {
-                            $timeout( $scope.$ampere.module.history().undo);
-                        } else if( newValue.r && $scope.$ampere.module.history().canRedo()) {
-                            $timeout( $scope.$ampere.module.history().redo);
-                        }
-                    } else {
-                        delete $location._ignore;
-                    }
-                }
-            );
-			*/
 		};
 		ampereTwitterbootstrapController.$inject = ['$scope', '$rootElement', '$window', '$http', '$timeout',  '$log', '$resource', '$cookies'/*, '$location'*/];
-		
+
 		ampere.controller( 'amperetwitterbootstrap', ampereTwitterbootstrapController);
-		
+
 		ampere.directive( 'ngAmpereState', [ '$compile', '$window', function( $compile, $window) {
 			return {
-				restrict   : 'A',
-				scope      : 'isolate',
-				link: function( scope, element, attrs) {
-					/*
-					var controller = element.parents().filter( function( obj) { return $.data( this, 'ampere.controller'); })
-					.data( 'ampere.controller');
-					 */
-					
+				restrict	: 'A',
+				scope		: 'isolate',
+				link		: function( scope, element, attrs) {
 					scope.$watch( '$ampere', function() {
 							// destroy all child scopes (->transitions)
 						while( scope.$$childHead) {
 							scope.$$childHead.$destroy();
 						}
-						
+
 						var _ns = $.ov.namespace('ngAmpereTransition(' + scope.$ampere.module.current().state.fullName() + ')');
 						_ns.debug( 'ampere changed');
-						
+
 							// remove old scope variables
 						var i, properties = Object.keys( scope);
-						
+
 						for( i in properties) {
 							if( /*properties[i]!='ampere' &&*/ properties[i]!='this' && properties[i].charAt( 0)!='$') {
 								_ns.debug( 'delete previsouly defined scope.' + properties[i]);
@@ -164,33 +135,33 @@
 							//.assert( properties[i]!='ampere', 'state variable named "ampere" is forbidden')
 							.assert( properties[i]!='this', 'state property named "this" is forbidden')
 							.assert( properties[i].charAt( 0)!='$', 'state property starting with $ (="', properties[i], '") is forbidden');
-							
+
 							if( properties[i]!='promise') {
 								scope[ properties[i]] = scope.$ampere.module.current().state[ properties[i]];
 								_ns.debug( 'set initial scope.' + properties[i] + '=', $window.$.ov.json.stringify( scope[ properties[i]], $window.$.ov.json.stringify.COMPACT));
 							}
 						}
-						
+
 						var template = scope.$ampere.template;
 
 						_ns.debug( 'template=' + template);
-						
+
 						element.html( template);
 						$compile( element.contents())( scope);
 					});
-					
+
 					scope.$watch( function() {
 						var _ns = $.ov.namespace('ngAmpereTransition(' + scope.$ampere.module.current().state.fullName() + ')');
 							/*
 							 * get current filtered scope variables
 							 */
-                        var i, changeset = {}, keys = Object.keys( scope);
+												var i, changeset = {}, keys = Object.keys( scope);
 						for( i in keys) {
 							if( /*keys[i]!='ampere' &&*/ keys[i]!='promise' && keys[i]!='this' && keys[i].charAt( 0)!='$') {
 								changeset[ keys[i]] = scope[ keys[i]];
 							}
 						}
-						
+
 							/*
 							 * detect changes
 							 */
@@ -199,7 +170,7 @@
 						$window.jQuery.each( Object.keys( scope.$ampere.module.current().state), function( index, item) {
 							$.inArray( item, keys)!=-1 || keys.push( item);
 						});
-						
+
 							/*
 							 * filter out equal values
 							 */
@@ -217,7 +188,7 @@
 								}
 							}
 						}
-	
+
 							/*
 							 * if changes occured
 							 */
@@ -227,13 +198,13 @@
 								scope.$ampere.module.current().state[ toSet[i]] = changeset[ toSet[i]];
 								_ns.debug( scope.$ampere.module.current().state.fullName(), '.', toSet[i], '=', changeset[ toSet[i]]);
 							}
-							
+
 								// remove deleted properties
 							for( i in toDelete) {
 								delete scope.$ampere.module.current().state[ toDelete[i]];
 								_ns.debug( 'delete ', scope.$ampere.module.current().state.fullName(), '.', toDelete[i]);
 							}
-							
+
 							_ns.debug( 'broadcast ampere-model-changed ( ', changeset, ', ', toDelete, ')');
 							scope.$root.$broadcast( 'ampere-model-changed', changeset, toDelete);
 						}
@@ -241,7 +212,7 @@
 				}
 			};
 		}]);
-		
+
 		ampere.directive( 'ngAmpereTransition', [ '$compile', '$parse', '$window', function( $compile, $parse, $window) {
 			var templates = {
 				'a'     : '<a href="javascript:void(0)"\
@@ -255,7 +226,7 @@
 <i ng-class="$ampere.ui.getIcon( transition)"></i>\
 {{$.trim( element.text()) || $ampere.ui.getCaption( transition)}}\
 </a>',
-                'button' : '<button type="button"\
+								'button' : '<button type="button"\
  ng-disabled="!transition.enabled()"\
  class="ampere-transition name-{{transition.name()}} btn {{attrs.class}}"\
  ng-class="{disabled : !transition.enabled(), active : transition.active(), \'ampere-hotkey\' : hotkey}"\
@@ -323,71 +294,66 @@
 				templates[names[i]] = $compile( templates[ names[i]]);
 			}
 			*/
-			
+
 			var _ns = $.ov.namespace('ngAmpereTransition');
-			
+
 			return {
 				restrict   : 'A',
-                scope        : 'isolate',
+								scope        : 'isolate',
 				link: function(scope, element, attrs) {
-					/*
-					var controller = element.parents().filter( function( obj) { return $.data( this, 'ampere.controller'); })
-					.data( 'ampere.controller');
-					*/
 					scope.element = element;
 					scope.attrs = attrs;
 					scope.$ = $window.jQuery;
-					
+
 					scope.$on( 'ampere-model-changed' ,function( /*object*/changeset, /*array<string>*/deleted) {
 						// _ns.debug( scope.transition.fullName(),' ampere-model-changed (', changeset, ', ', deleted, ')');
 						if( scope.transition){
 							scope.$enabled = scope.transition.enabled();
 						}
 					});
-					
+
 					scope.$watch( attrs.ngAmpereTransition, function( oldValue, newValue) {
 						if( !newValue) {
-                             element.replaceWith( '<span style="background-color:crimson; color:white">' + 'attribute "ng-ampere-transition" (="' + attrs.ngAmpereTransition + '") does not resolve to a ampere transition' + '</span>');
-                             return;
+														 element.replaceWith( '<span style="background-color:crimson; color:white">' + 'attribute "ng-ampere-transition" (="' + attrs.ngAmpereTransition + '") does not resolve to a ampere transition' + '</span>');
+														 return;
 						}
-						
+
 						_ns = $.ov.namespace('ngAmpereTransition(' + newValue.fullName() + ')');
-						
+
 						var type = attrs.type || ($.inArray( element[0].tagName.toLowerCase(), Object.keys( templates))!=-1 ? element[0].tagName.toLowerCase() : 'button');
-						
+
 						scope.transition = newValue;
-						
 						scope.$enabled = scope.transition.enabled();
-						
+
 						_ns.assert(
 							$.type( scope.transition)=='object' && scope.transition.constructor && scope.transition.constructor.name=='Transition',
 							'attribute "ng-ampere-transition" (="', attrs.ngAmpereTransition, '") does not resolve to a ampere transition'
 						);
-						
+
 						if( templates[ type]) {
 							var template = templates[ type];
-							
+
 								// special case : tag a with type="file"
 							if( type="file" &&  element[0].tagName=="A") {
 								template = template.replace( /\type="button"|btn/g, '').replace( /button/g, 'a');
 							}
-							
+
 							var f = $compile( template);
 							var replacement = f( scope);
-							
+
 							element.replaceWith( replacement);
-							
+
 								// keep tabindex
 							replacement.tabIndex=element.tabInde;
-							
+
 								// add data- attributes
 							var dataAttributes = Object.keys( element[0].dataset);
 							for( var i=0; i<dataAttributes.length; i++) {
 								replacement.attr( 'data-' + dataAttributes[i], element[0].dataset[ dataAttributes[i]]);
 							}
-							
+
 							var hotkey = attrs.ngAmpereHotkey || scope.$ampere.ui.getHotkey( scope.transition);
-								
+
 							if( hotkey) {
 								scope.hotkey = ' (' + window.ov.ampere.util.ucwords( hotkey) + ')';
 							}
@@ -399,19 +365,16 @@
 				}
 			};
 		}]);
-		
+
 		function eventDirective( eventName) {
 			var directive = 'ngAmpere' + window.ov.ampere.util.ucwords( eventName);
-				
+
 			ampere.directive( directive, [ function() {
 				var _ns = $.ov.namespace( directive);
-				
+
 				return {
 					restrict   : 'A',
 					link: function( scope, element, attrs) {
-						// doesnt work with input event :-)
-						//var event = Modernizr.hasEvent( 'input', element[0]) ? 'input' : 'change';
-
 						$( element).on( eventName, function( event) {
 							var transition = scope.$eval( attrs[ directive]);
 
@@ -434,10 +397,10 @@
 		eventDirective( 'change');
 		eventDirective( 'click');
 		eventDirective( 'dblclick');
-		
+
 		ampere.directive( 'ngAmpereDrop', [ function() {
 			var _ns = $.ov.namespace( 'ngAmpereDrop');
-			
+
 			return {
 				restrict   : 'A',
 				link: function( scope, element, attrs) {
@@ -455,7 +418,7 @@
 						event.preventDefault();
 						event.stopPropagation();
 						event.stopImmediatePropagation();
-						
+
 						return false;
 					})
 					// ff : this is needed for ff to prevent loading file into browser
@@ -465,10 +428,10 @@
 				}
 			};
 		}]);
-		
-		ampere.directive( 'ngAmpereSortable', function( $timeout) {
+
+		ampere.directive( 'ngAmpereSortable', [ '$timeout', function( $timeout) {
 			var _ns = $.ov.namespace( 'ngAmpereSortable');
-			
+
 			return {
 				restrict   : 'A',
 				link: function( scope, element, attrs) {
@@ -480,45 +443,41 @@
 					var transition;
 					var value = scope.$eval( attrs.ngAmpereSortable);
 					if( $.isPlainObject( value)) {
-						
 						_ns.assert(
-							(!Object.hasOwnProperty.call( value, 'transition') || value.transition) && 
+							(!Object.hasOwnProperty.call( value, 'transition') || value.transition) &&
 							(!Object.hasOwnProperty.call( value, 'ng-ampere-transition') || value['ng-ampere-transition']),
 							'value option transition or ng-ampere-transition doesnt resolve to a transition'
 						);
-					
+
 						transition = value['ng-ampere-transition'] || value.transition || transition;
-						
+
 						$.extend( options, value);
 					} else if( value) {
 						transition = value;
 					}
-					
+
 					$timeout( function() {
 						var sortable = $( element.get()).sortable( options);
-						
+
 						var ui = scope.$ampere.ui;
 						var controller = ui.controller;
-						
+
 						transition && sortable.on( 'sortupdate', function( event, options) {
 							event.data = { items : options.item, position : options.item.index()};
-							
+
 							!ui.isBlocked() && controller.proceed( transition, [ event]);
 							event.preventDefault();
 							event.stopPropagation();
 							event.stopImmediatePropagation();
 						});
 					});
-					
-					
 				}
 			};
-		})
-		.$inject = [ '$timeout'];
-		
+		}]);
+
 		ampere.directive( 'ngAmpereHotkey', [ function() {
 			var _ns = $.ov.namespace( 'ngAmpereHotkey');
-			
+
 			return {
 				restrict   : 'A',
 				link: function( scope, element, attrs) {
@@ -529,52 +488,52 @@
 					if( !attrs.ngAmpereTransition) {
 						var hotkeys = scope.$eval( attrs.ngAmpereHotkey);
 						_ns.assert( $.isPlainObject( hotkeys), 'attribute "ng-ampere-hotkey"(="' + attrs.ngAmpereHotkey + '") expected to evaluate to an object');
-						
+
 						element.data( 'ampereHotkey', hotkeys);
 					}
 				}
 			};
 		}]);
-		
+
 		ampere.directive( 'ngAmpereData', [ function() {
 			var _ns = $.ov.namespace( 'ngAmpereData');
-			
+
 			return {
 				restrict   : 'A',
 				link: function( scope, element, attrs) {
 					var data = scope.$eval( attrs.ngAmpereData);
 					_ns.assert( $.isPlainObject( data), 'attribute "ng-ampere-data"(="' + attrs.ngAmpereData + '") expected to evaluate to an object');
-					
+
 					angular.extend( element.data(), data);
 				}
 			};
 		}]);
 	})();
-	
+
 		/**
 		 * twitter bootstrap scroll functionality
 		 *
 		 *  http://stackoverflow.com/questions/9179708/replicating-bootstraps-main-nav-and-subnav
 		 */
 	function onBodyscroll() {
-        // If has not activated (has no attribute "data-top"
-        if( !$('.subnav').attr('data-top')) {
-            // If already fixed, then do nothing
-            if ($('.subnav').hasClass('subnav-fixed')) { 
-                return;
-            }
-            // Remember top position
-            var offset = $('.subnav').offset() || {};
-            $('.subnav').attr('data-top', offset.top);
-        }
+		// If has not activated (has no attribute "data-top"
+		if( !$('.subnav').attr('data-top')) {
+				// If already fixed, then do nothing
+				if ($('.subnav').hasClass('subnav-fixed')) {
+						return;
+				}
+				// Remember top position
+				var offset = $('.subnav').offset() || {};
+				$('.subnav').attr('data-top', offset.top);
+		}
 
-        if( $(this).scrollTop() && $('.subnav').attr('data-top') - $('.subnav').outerHeight() <= $(this).scrollTop()) {
-            $('.subnav').addClass('subnav-fixed');
-        } else {
-            $('.subnav').removeClass('subnav-fixed');
-        }
+		if( $(this).scrollTop() && $('.subnav').attr('data-top') - $('.subnav').outerHeight() <= $(this).scrollTop()) {
+				$('.subnav').addClass('subnav-fixed');
+		} else {
+				$('.subnav').removeClass('subnav-fixed');
+		}
 	}
-	
+
 		/**
 		 * a transition was clicked
 		 */
@@ -583,7 +542,7 @@
 		var controller = $( this).closest( '.ampere-app').ampere();
 
 		!controller.ui.isBlocked() && controller.proceed( transition, [event]);
-	
+
 		event.preventDefault();
 			// prevent any other hotkey handler to be invoked
 		event.stopPropagation();
@@ -594,22 +553,21 @@
 	 * focuses first form element in computed template
 	 */
 	function focus( /*jquery*/root) {
-		//var formControls = root.find( '.ampere-state .ampere-view :input:not(input[type=button],input[type=submit],button),select,textarea').filter( '[tabIndex!="-1"]:visible');
 		var formControls = root.find( '.ampere-state .ampere-view input,select,textarea,button').filter( '[tabIndex!="-1"]:visible:enabled');
 		if( !formControls.filter( '*[autofocus]').focus().length) {
 			formControls.first().focus();
 		}
 	}
-	
+
 	function onActionAbort() {
 		$.ov.namespace('twitterboostrap::onActionAbort()').debug( 'action aborted');
-		
+
 		var controller = $( this).closest( '.ampere-app').ampere();
-		
+
 		if( window.confirm( 'Really abort transition ?')) {
 				// hide flash
 			controller.ui.flash();
-			
+
 			var deferred = controller.ui.flash.getElement().data( 'ampere.action-deferred');
 			_ns.assert( deferred && $.isFunction( deferred.promise), 'no action deferred registered on flash element');
 
@@ -617,31 +575,29 @@
 			deferred.reject( controller.module);
 		}
 	}
-	
+
 		/*
 		* allow anchors with attribute "draggable"
 		* to be draggable to the desktop
 		*/
 	function onDraggableAnchor( event) {
-		//console.warn( "DownloadUrl=", $( this).data( 'downloadurl') || "application/octet-stream:" + basename( this.href) + ':'+ this.href);
-		
 		var dragImage = $( this).find( '[class^="icon-"]:first');
 		dragImage.length && event.originalEvent.dataTransfer.setDragImage( dragImage[0], -10, -10);
-		
+
 		event.originalEvent.dataTransfer.setData(
 			'DownloadURL',
 			$( this).data( 'downloadurl') || "application/octet-stream:" + this.href.replace(/^.*[\/\\]/g, '') + ':'+ this.href
 		);
 	}
-	
+
 	function twitterbootstrap( controller, options) {
 		if( !(this instanceof twitterbootstrap)) {
 			return new twitterbootstrap( controller, options);
 		}
 		var self = this;
-		
+
 		this._super( controller, angular.extend( {}, twitterbootstrap.defaults, options || {}));
-		
+
 		var layout = 'default';
 		if( Object.hasOwnProperty.call( this.options(), 'ampere.ui.layout')) {
 			layout = this.options( 'ampere.ui.layout');
@@ -666,10 +622,10 @@
 			controller.element.addClass( 'layout-name-' + layout.replace(/(^.*[\/\\])|\./g, ''));
 		}
 		this.layout = typeof( layout)=='string' ? $.get( layout) : layout;
-			
-		/*
-		 * automagically add 'ampere.ui.type':'global' for module transactions
-		 */
+
+			/*
+			 * automagically add 'ampere.ui.type':'global' for module transactions
+			 */
 		for( name in controller.module.transitions) {
 			var transition = controller.module.transitions[ name];
 			// doesnt work if value is undefined :
@@ -678,7 +634,7 @@
 				transition.options( 'ampere.ui.type','global');
 			}
 		}
-		
+
 		function onMessage( event) {
 			var location = event.originalEvent.source.location;
 			if( onMessage.handlers[ location]) {
@@ -686,25 +642,25 @@
 			}
 		}
 		onMessage.handlers = {};
-		
+
 		var _init = this.init;
 		this.init = function() {
 			_init.call( this);
-			
+
 			(this.controller.element[0].tagName=="BODY") && $( window).on( 'resize', onBodyscroll);
 			(this.controller.element[0].tagName=="BODY") && $( document).on( 'scroll', onBodyscroll);
-			
+
 				// react on click only on standalone ampere transition representants
 				// but not companions (like the representant of input[file] wit ng-ampere-transition)
 			this.controller.element.on( 'click', '.ampere-transition:not( .ampere-transition-companion)', onTransitionClicked);
-				
+
 			this.controller.element.on( 'click', '.flash .alert button.close', onActionAbort);
-			
+
 				// allow anchors with attribute "draggable" to be draggable to the desktop
 			$( this.controller.element).on( 'dragstart', 'a[draggable]', onDraggableAnchor);
-			
+
 			$( window).on( 'message', onMessage);
-			
+
 			focus( controller.element);
 		};
 
@@ -713,39 +669,39 @@
 			_destroy.call( this);
 			(this.controller.element[0].tagName=="BODY") && $( window).off( 'resize', onBodyscroll);
 			(this.controller.element[0].tagName=="BODY") && $( document).off( 'scroll', onBodyscroll);
-			
+
 			this.controller.element.off( 'click', '.ampere-transition', onTransitionClicked);
 			this.controller.element.off( 'click', '.flash .alert button.close', onActionAbort);
-			
+
 			$( this.controller.element).off( 'dragstart', 'a[draggable]', onDraggableAnchor);
-			
+
 			$( window).off( 'message', onMessage);
 		};
-		
+
 		this.flash = function( message, /* optional */options) {
 			if( arguments.length) {
 				options = options || {};
 				var flash = this.flash.getElement();
-				
+
 				switch( options.type) {
-					case 'progress' : 
+					case 'progress' :
 						flash.find( '.alert').removeClass( 'alert-error').addClass( 'alert-info');
 						flash.find('.progress').show()
 						.find( '.bar').css( 'width', options.value);
 
 						flash.find( '.message').text( message);
-						
+
 						var deferred = options.deferred;
 							// add abort button if the provided promise
 							// is a deferred
 						flash.find( 'button.close')[ deferred && $.isFunction( deferred.reject) ? 'show' : 'hide']();
-						
+
 						break;
-					case 'error' : 
+					case 'error' :
 							// reset flash style to default
 						flash.find( '.alert').removeClass( 'alert-info').addClass( 'alert-error');
 						flash.find('.progress').hide();
-						
+
 						flash.find( '.message').text( 'Error occured : ' + message);
 						if( options.value) {
 							var retry = $('<button class="btn retry"><i class="icon-refresh"></i>Retry</button>');
@@ -757,22 +713,22 @@
 						}
 						flash.find( 'button.close').hide();
 						break;
-					default : 
+					default :
 						flash.find( '.alert').removeClass( 'alert-error alert-info');
-						
+
 						flash.find( '.progress, button.close').hide();
-						
+
 						flash.find( '.message').text( message);
-						
+
 						flash.show().fadeOut( 1000);
 						return;
 				}
-				
+
 				flash.show();
 			} else {
 				this.flash.getElement().hide();
 			}
-			
+
 			return  this.flash;
 		};
 		this.flash.getElement = function() {
@@ -791,38 +747,22 @@
 				value    : onRetry
 			});
 		};
-		
+
 		this.isBlocked = function() {
 			return this.controller.element.find( '.overlay').hasClass( 'block');
 		};
-		
+
 		this.block = function() {
 			this.controller.element.addClass( 'overlay').find( '.overlay').addClass( 'block');
 		};
-		
+
 		this.unblock = function() {
 			this.controller.element.removeClass( 'overlay').find( '.overlay').removeClass( 'block');
 		};
-		
+
 		this.getTemplate = function( view) {
 			var template = view.template();
-/*
-			if( $.inArray( layout, [ 'default', 'nolayout', 'wizard'])!=-1) {
-				var template = 'ampere-ui-twitterbootstrap.layout.' + layout + '.tmpl';
-				if( document.getElementById( template)) {
-					layout = $( document.getElementById( template));
-				} else {
-					layout = this.options( 'ampere.baseurl') + 'ampere-ui-twitterbootstrap.layout.' + layout + '.tmpl';
-				}
-				controller.element.addClass( 'layout-name-' + layout);
-			} else if( typeof( layout)=='string') {
-				if( document.getElementById( layout)) {
-					layout = $( document.getElementById( layout));
-				}
-				controller.element.addClass( 'layout-name-' + layout.replace(/^.*[\/\\]/g, ''));
-			}
-			this.layout = typeof( layout)=='string' ? $.get( layout) : layout;
-	*/
+
 			if( !template && template!=='') {
 				template = this.options( 'ampere.ui.view');
 				if( typeof( template)=='string') {
@@ -842,20 +782,20 @@
 			} else if( $.isFunction( template)) {
 				template = template.call( view, view);
 			}
-             
+
 			$.ov.namespace( 'ngState').assert(
 				!$.isFunction( template.promise) || template.promise().state()!='success',
 				'view fragment is not ready : state=', $.isFunction( template.promise) ? template.promise().state() : ''
 			);
-			
+
 			return $.when( $.isFunction( template.promise) ? template.promise() : template);
 		};
-				
+
 		this.renderAction = function( promise) {
 			this.flash
 			.progress( 'Transition in progress ...', '100%', promise)
 			.getElement().data( 'ampere.action-deferred', promise);
-			
+
 			promise
 			.progress( self.flash.progress)
 			.then( function() {
@@ -863,37 +803,18 @@
 				self.flash().getElement().removeData( 'ampere.action-deferred');
 			});
 		};
-		
+
 		this.renderError = function( message, onRetry) {
-			/*
-			var flash = this.controller.element.find( '.flash');
-				// reset flash style to default
-			flash.find( '.alert').removeClass( 'alert-info').addClass( 'alert-error');
-			flash.find('.progress').hide();
-			
-			flash.find( '.message').text( 'Error occured : ' + message);
-			if( onRetry) {
-				var retry = $('<button class="btn retry"><i class="icon-refresh"></i>Retry</button>');
-				retry.click( function() {
-					flash.hide();
-					onRetry();
-				});
-				flash.find( '.message').append( retry);
-			}
-			flash.find( 'button.close').hide();
-			flash.show();
-			*/
-			
 			this.flash.error( message, onRetry);
 		};
-		
+
 		this.renderState = function( view, template, transitionResult) {
 				// remember scroll position
 			var scrollX = window.scrollX;
 			var scrollY = window.scrollY;
-			
+
 			var scope = angular.element( controller.element.find( '>.ampere-module')).scope();
-			
+
 			scope.$apply( function() {
 					/*
 					 * if no view was given - just rerender the current view
@@ -902,7 +823,7 @@
 				if( view) {
 					scope.$ampere = {
 						module   : controller.module,
-                        ui          : controller.ui,
+												ui          : controller.ui,
 						view     : view,
 							/*
 							 * module.current.reset is calling this
@@ -913,39 +834,26 @@
 					};
 				}
 			});
-			
+
 				// compute optional flash message
 			$.when( transitionResult).done( function() {
 				focus( controller.element);
-				
+
 				window.scrollTo( scrollX, scrollY);
 				//window.scrollTo( 0, 0);
 				//onBodyscroll();
-				
+
 				if( arguments.length==1 && typeof( arguments[0])=='string') {
 					self.flash( arguments[0]);
-					/*
-					var flash = controller.element.find( '.flash');
-					
-						// reset flash style to default
-					flash.find( '.alert').removeClass( 'alert-info');
-					flash.find( '.progress').hide();
-					
-					flash.find( '.message').text( arguments[0]);
-					flash.find( 'button.close').hide();
-					flash.show();
-					
-					flash.fadeOut( 1000);
-					*/
 				}
 			});
 		};
-		
+
 		// see Ampere.UI
 		this.modal = function( url, options) {
 			options = options || {};
 			var popup, callback = $.noop;
-			
+
 			if( !options.container) {
 				popup = $( '<div class="container modal-popup"><iframe width="100%" height="100%" border="no" src="' + url + '"></iframe></div>');
 				controller.element.addClass( 'modal-popup').find( '.ampere-module').append( popup);
@@ -970,9 +878,9 @@
 					popup.remove();
 				};
 			}
-			
+
 			popup.find( 'iframe').focus();
-			
+
 			var deferred = $.Deferred( options.callback || $.noop);
 			onMessage.handlers[ url] = $.proxy( options.onMessage || $.noop, deferred);
 
@@ -982,75 +890,28 @@
 					// remove message handler
 				delete onMessage.handlers[ url];
 			});
-			
+
 			return deferred;
 		};
-		
-		/*
-		this.popup = function( url, initializer) {
-			var popup = $( '<div class="container popup"><iframe width="100%" height="100%" border="no" src="' + url + '"></iframe></div>');
-			this.controller.element.addClass( 'popup').find( '.ampere-module').append( popup);
 
-			popup.find( 'iframe').focus();
-			
-			var deferred = $.Deferred();
-			initializer.call( deferred, deferred);
-
-			var self = this;
-			
-				// remove popup when deferred is done/rejected
-			deferred.always( function() {
-				self.controller.element.removeClass( 'popup');
-				popup.remove();
-			});
-			
-			return deferred;
-		};
-		*/
-		
-		/*
-		// see Ampere.UI
-		this.embed = function( parent, url, initializer) {
-			var popup = $( '<div class="embed-backdrop"></div><div class="container embed"><iframe border="no" src="' + url + '"></iframe></div>');
-			this.controller.element.addClass( 'embed');
-			
-			parent.addClass( 'embed-container').append( popup);
-
-			popup.find( 'iframe').focus();
-			
-			var deferred = $.Deferred();
-			initializer.call( deferred, deferred);
-
-			var self = this;
-			
-				// remove popup when deferred is done/rejected
-			deferred.always( function() {
-				self.controller.element.removeClass( 'embed');
-				popup.remove();
-			});
-			
-			return deferred;
-		};
-		*/
-		
 		this.toggleHelp = function() {
 			controller.element.find( '.page-header >.ampere-help').toggle( 'slow');
 		};
-		
+
 		this.renderBootstrap = function() {
 			var controller = this.controller;
-			
+
 			var eProgress = $('<div class="progress progress-striped active"><div class="bar" style="width: 100%;"></div></div>');
-			
+
 			controller.element
 			.append( eProgress)
 			.css( 'cursor', 'wait');
-			
+
 			var bar = controller.element.find( '.bar');
 			bar.text( 'Bootstrapping ' + controller.module.name() + ' ...');
-			
+
 			var deferred = $.Deferred();
-			
+
 			$.when( controller.module.current().view, controller.module.current().view.template, this.layout, controller.module)
 			.progress( function() {
 				_ns.debug( 'progress', this, arguments);
@@ -1070,10 +931,10 @@
 				$( '.progress', controller.element).addClass( 'progress-danger');
 			}).done( function() {
 				eProgress.remove();
-				
+
 				controller.element
 				.append( self.layout.responseText ? self.layout.responseText : (self.layout.jquery && self.layout[0].tagName=='SCRIPT' ? self.layout.text().replace( "<![CDATA[", "").replace("]]>", "") : self.layout));
-				
+
 				var template = self.getTemplate( controller.module.current().view);
 				template.done( function( data) {
 					if( data instanceof HTMLElement) {
@@ -1086,18 +947,18 @@
 						 * the ampere structure of angularjs
 						 */
 					controller._initial_template = template;
-					
+
 					angular.bootstrap(
 						controller.element.find( '>.ampere-module')
 						.addClass( 'name-' + controller.module.name()),
 						['window.ov.ampere.ui.twitterbootstrap']
 					);
-					
+
 					self.init();
 					deferred.resolve();
 				});
 			});
-			
+
 			return deferred;
 		};
 	}
@@ -1105,7 +966,7 @@
 	twitterbootstrap.defaults = {
 		'ampere.ui.twitterbootstrap.theme' : 'default'
 	};
-	
+
 	window.ov.ampere.defaults['ampere.ui'] = window.ov.ampere.ui.twitterbootstrap = twitterbootstrap;
 
 		// add css class "iframe" to root node if loaded in iframe

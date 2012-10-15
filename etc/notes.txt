@@ -1,15 +1,22 @@
+== dev ==
+
+* Setup GitHub Pages "gh-pages" branch and "master" branch as subfolders of a parent project folder ("grandmaster")
+-> https://gist.github.com/833223
+
+* http://www.jointjs.com/tutorial.html
+
 == twitterboostrap renderer ==
 
-* focus : first form element ([autofocus] || [tabIndex!="-1"]):visible in rendered templated will be focused  
+* focus : first form element ([autofocus] || [tabIndex!="-1"]):visible in rendered templated will be focused
 
 * ng-ampere-transition : attribute ng-ampere-hotkey is taken in account for applying hotkeys
 
-* attribute ng-ampere-hotkey : Alt+Shift+N works whereas Shift+Alt+N  
+* attribute ng-ampere-hotkey : Alt+Shift+N works whereas Shift+Alt+N
 
 'ampere.ui.layout' : url to layout template or null/false/undefined for no layout. if not set default layout will be used
 'ampere.ui.view'   : url to default view template. if not set default view will be used
 
-available rootScope services : 
+available rootScope services :
 $scope.$ = jQuery
 $scope.$window = $window;
 $scope.$http = $http;
@@ -22,30 +29,32 @@ $scope.$cookies = $cookies;
 "AngularJS on stereoids"
 "Create single page web apps with state"
 "Einfach zauberhaft"
+"Wunderbar"
+"the Egg Laying Woolmilkpig"
+
 
 'ampere.ui.type' = 'global' || 'breadcrumb' || 'primary' || 'secondary' || undefined
 transition.enabled( value || function)
 * option 'ampere.ui.about.url' can now also be a module transition (see multiview example
 
-* option 'ampere.history.html5' added to support html5 history navigation   
+* option 'ampere.history.html5' added to support html5 history navigation
 (automatically set to true if a module is instantated on a BODY element and the browser supports this feature)
 
 * twitterboostrap renderer : automatic html5 drag-to-desktop ability for anchors having the droppable attribute set.
 
 * <a type="file" ng-ampere-transition=""></a> supported
-* directive ng-ampere-data : 
+* directive ng-ampere-data :
 ** attention - do not use in consumption with data- attributes ( they will get lost)
-** expected value is an object which will be merged (by reference, not by copy) into the current data object 
+** expected value is an object which will be merged (by reference, not by copy) into the current data object
 
 * transition : if state===target caption/icon/description from state/target will be ignored
 
-* transaction.active( function/boolean) can be used to signal that this transition was the last "active" one 
-(will be highlighted in the ui layouts according to their state)  
+* transaction.active( function/boolean) can be used to signal that this transition was the last "active" one
+(will be highlighted in the ui layouts according to their state)
 
-* window.ov.ampere.type( obj) : returns the ampere type ('ampere'/'state'/'transition'/'view'/'module') or $.type result if no ampere type 
-** type filter returns result of window.ov.ampere.type  
+* window.ov.ampere.type( obj) : returns the ampere type ('ampere'/'state'/'transition'/'view'/'module') or $.type result if no ampere type
+** type filter returns result of window.ov.ampere.type
 
-* flash API 
+* flash API
 
-* templates can now be provided as jquery script elements referenced by id 
-
+* templates can now be provided as jquery script elements referenced by id

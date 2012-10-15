@@ -18,7 +18,7 @@
 				}
 			) : s;
 		},
-	
+
 			/**
 			 * ie doesnt support function property name
 			 *
