@@ -2,7 +2,7 @@
  * jQuery Orangevolt Ampere
  *
  * version : 0.1.0
- * created : 2012-10-11
+ * created : 2012-10-15
  * source  : https://github.com/lgersman/jquery.orangevolt-ampere
  *
  * author  : Lars Gersmann (lars.gersmann@gmail.com)
@@ -15,7 +15,7 @@
  */
 ;(window.ov && window.ov.ampere && window.ov.ampere.ui.hotkey) || (function( $) {
 	var _ns = $.ov.namespace( 'window.ov.ampere.ui.twitterbootstrap');
-	
+
 	var specialKeys = {
 		8: "backspace", 9: "tab", 13: "return", 16: "shift", 17: "ctrl", 18: "alt", 19: "pause",
 		20: "capslock", 27: "esc", 32: "space", 33: "pageup", 34: "pagedown", 35: "end", 36: "home",
@@ -32,7 +32,7 @@
 		"8": "*", "9": "(", "0": ")", "-": "_", "=": "+", ";": ": ", "'": "\"", ",": "<",
 		".": ">",  "/": "?",  "\\": "|"
 	};
-	
+
 	function computeMatchingHotkeys( event) {
 		// Keypress represents characters, not special keys
 		var special = event.type !== "keypress" && specialKeys[ event.which ],
@@ -74,7 +74,7 @@
 
 		return possible;
 	}
-	
+
 	window.ov.ampere.ui.hotkey = {
 		computeMatchingHotkeys : computeMatchingHotkeys
 	};

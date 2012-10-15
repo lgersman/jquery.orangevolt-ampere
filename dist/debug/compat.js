@@ -2,7 +2,7 @@
  * jQuery Orangevolt Ampere
  *
  * version : 0.1.0
- * created : 2012-10-11
+ * created : 2012-10-15
  * source  : https://github.com/lgersman/jquery.orangevolt-ampere
  *
  * author  : Lars Gersmann (lars.gersmann@gmail.com)
@@ -22,7 +22,7 @@
 	if(Object.keys && Object.keys.toString().indexOf('[native code]') == -1 ) {
 		Object.keys=function( obj) {
 			var a = [];
-			
+
 			if( this) {
 					// prototype optimization for arrays
 				if( $.isArray( obj)) {
@@ -31,17 +31,17 @@
 					}
 				} else {
 						// Retrieve the names of an object's properties.
-                          // Delegates to **ECMAScript 5**'s native `Object.keys`
+													// Delegates to **ECMAScript 5**'s native `Object.keys`
 					var keys = [];
-                    for (var key in obj) {
-                        if (Object.hasOwnProperty.call(obj, key)) {
-                            keys[keys.length] = key;
-                        }
-                    }
-                    return keys;
+					for (var key in obj) {
+						if (Object.hasOwnProperty.call(obj, key)) {
+							keys[keys.length] = key;
+						}
+					}
+					return keys;
 				}
 			}
-			
+
 			return a;
 		};
 	}

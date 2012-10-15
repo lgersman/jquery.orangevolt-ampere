@@ -2,7 +2,7 @@
  * jQuery Orangevolt Ampere
  *
  * version : 0.1.0
- * created : 2012-10-11
+ * created : 2012-10-15
  * source  : https://github.com/lgersman/jquery.orangevolt-ampere
  *
  * author  : Lars Gersmann (lars.gersmann@gmail.com)
@@ -77,7 +77,7 @@
 	
 	document.writeln( 
 		'<script type="text/javascript">\n' + 
-		"\t/* disable console debug output */\n    $.ov.namespace.filter = function( severity, namespace) { return severity!='debug'; };" + 
+		"\t/* disable console debug output */\n$.ov.namespace.filter = function( severity, namespace) { return severity!='debug'; };" + 
 		'</script>'
 	);
 	 
