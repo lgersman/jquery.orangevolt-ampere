@@ -837,13 +837,34 @@
 		};
 	}
 
+	var ampereInstances = {};
 	/**
 	 * window.ampere()
 	 *  create new ampere instance
 	 */
-	function Ampere( options) {
+	function Ampere( name, options) {
 		if( !(this instanceof Ampere)) {
-			return new Ampere( options);
+				// process arguments
+			switch( arguments.length) {
+				case 0 :
+					name = '';
+					options = {};
+					break;
+				case 1 :
+					var isStringArg = typeof( name)=='string';
+					name = isStringArg && name || '';
+					options = isStringArg && {} || options;
+					break;
+			}
+
+				// if ampere instance exists
+			if( ampereInstances[ name]) {
+					// patch new options into it
+				ampereInstances[ name].options = Options( angular.extend( ampereInstances[ name].options(), options));
+				return ampereInstances[ name];
+			} else {
+				return ampereInstances[ name]=new Ampere( name, options);
+			}
 		}
 
 		var ampere = this;

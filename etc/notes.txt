@@ -58,3 +58,7 @@ transition.enabled( value || function)
 * flash API
 
 * templates can now be provided as jquery script elements referenced by id
+
+* behaviour changed : window.ampere( name, options) || window.ampere( name) || window.ampere( options) returns a the instance if available
+* filter "strip_tags" added
+* ng-ampere-transition : attribute "ng-ampere-icon" added to support overwriting default transition icons

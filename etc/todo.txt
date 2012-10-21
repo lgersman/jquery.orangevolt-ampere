@@ -19,4 +19,5 @@
 * <a type="file" ng-ampere-transition=""></a> example
 * ng-ampere-data example
 
-* gruntjs/jasmine test integration
+* transition( params) implementieren
+* click transition : event mit transportieren

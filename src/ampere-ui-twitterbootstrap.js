@@ -34,6 +34,11 @@
 				return window.ov.ampere.util.ucwords( input);
 			};
 		});
+		ampere.filter( 'strip_tags', function() {
+			return function( input, scope) {
+				return typeof( input)=='string' && window.ov.ampere.util.strip_tags( input) || input;
+			};
+		});
 		ampere.filter( 'replace', function() {
 			return function( input, regexp, replace) {
 				var lastSlashIndex = regexp.lastIndexOf("/");
@@ -222,11 +227,11 @@
  id="{{attrs.id}}"\
  style="{{attrs.style}}"\
  data-ampere-hotkey="{{attrs.ngAmpereHotkey}}"\
- title="{{attrs.title || $ampere.ui.getDescription( transition)}}{{hotkey && \' \' + hotkey}}">\
-<i ng-class="$ampere.ui.getIcon( transition)"></i>\
+ title="{{attrs.title || $ampere.ui.getDescription( transition) | strip_tags}}{{hotkey && \' \' + hotkey}}">\
+<i ng-class="attrs.ngAmpereIcon || $ampere.ui.getIcon( transition)"></i>\
 {{$.trim( element.text()) || $ampere.ui.getCaption( transition)}}\
 </a>',
-								'button' : '<button type="button"\
+				'button' : '<button type="button"\
  ng-disabled="!transition.enabled()"\
  class="ampere-transition name-{{transition.name()}} btn {{attrs.class}}"\
  ng-class="{disabled : !transition.enabled(), active : transition.active(), \'ampere-hotkey\' : hotkey}"\
@@ -235,8 +240,8 @@
  accesskey="{{attrs.accesskey}}"\
  style="{{attrs.style}}"\
  data-ampere-hotkey="{{attrs.ngAmpereHotkey}}"\
- title="{{attrs.title || $ampere.ui.getDescription( transition)}}{{hotkey && \' \' + hotkey}}">\
-<i ng-class="$ampere.ui.getIcon( transition)"></i>\
+ title="{{attrs.title || $ampere.ui.getDescription( transition) | strip_tags}}{{hotkey && \' \' + hotkey}}">\
+<i ng-class="attrs.ngAmpereIcon || $ampere.ui.getIcon( transition)"></i>\
 {{$.trim( element.text()) || $ampere.ui.getCaption( transition)}}\
 </button>',
 				'file' : '<button type="button"\
@@ -248,8 +253,8 @@
  accesskey="{{attrs.accesskey}}"\
  style="{{attrs.style}}"\
  data-ampere-hotkey="{{attrs.ngAmpereHotkey}}"\
- title="{{attrs.title || $ampere.ui.getDescription( transition)}}{{hotkey && \' \' + hotkey}}">\
-<i ng-class="$ampere.ui.getIcon( transition)"></i>\
+ title="{{attrs.title || $ampere.ui.getDescription( transition) | strip_tags}}{{hotkey && \' \' + hotkey}}">\
+<i ng-class="attrs.ngAmpereIcon || $ampere.ui.getIcon( transition)"></i>\
 {{$.trim( element.text()) || $ampere.ui.getCaption( transition)}}\
 </button>\
 <input\
@@ -269,8 +274,8 @@
  accesskey="{{attrs.accesskey}}"\
  style="{{attrs.style}}"\
  data:ampere-hotkey="{{attrs.ngAmpereHotkey}}"\
- title="{{attrs.title || $ampere.ui.getDescription( transition)}}{{hotkey && \' \' + hotkey}}">\
-<i ng-class="$ampere.ui.getIcon( transition)"></i>\
+ title="{{attrs.title || $ampere.ui.getDescription( transition) | strip_tags}}{{hotkey && \' \' + hotkey}}">\
+<i ng-class="attrs.ngAmpereIcon || $ampere.ui.getIcon( transition)"></i>\
 {{$.trim( element.text()) || $ampere.ui.getCaption( transition)}}\
 </button>',
 				'reset' : '<button type="reset"\
@@ -281,8 +286,8 @@
  accesskey="{{attrs.accesskey}}"\
  style="{{attrs.style}}"\
  data-ampere-hotkey="{{attrs.ngAmpereHotkey}}"\
- title="{{attrs.title || $ampere.ui.getDescription( transition)}}{{hotkey && \' \' + hotkey}}">\
-<i ng-class="$ampere.ui.getIcon( transition)"></i>\
+ title="{{attrs.title || $ampere.ui.getDescription( transition) | strip_tags}}{{hotkey && \' \' + hotkey}}">\
+<i ng-class="attrs.ngAmpereIcon || $ampere.ui.getIcon( transition)"></i>\
 {{$.trim( element.text()) || $ampere.ui.getCaption( transition)}}\
 </button>'
 			};
@@ -437,7 +442,7 @@
 				link: function( scope, element, attrs) {
 					var options = {
 						forcePlaceholderSize : true,
-						placeholder : element[0].tagName=='TBODY' && $('<tr><td></td></tr>')
+						placeholder : element[0].tagName=='TBODY' && $('<tr><td>&nbsp;</td></tr>')
 					};
 
 					var transition;

@@ -142,13 +142,18 @@ module.exports = function(grunt) {
 				multistr:true,
 				debug   : true,
 				nonew   : true,
+				jQuery  : true,
 				evil : true /* otherwise document.write is prohibited */
 			},
 			globals: {
 				jQuery  : true,
 				require : true,
 				console : true,
-				angular : true
+				angular : true,
+					// this is for jasmine tests to be "lintable"
+				describe : true,
+				it	     : true,
+				expect   : true
 			}
 		},
 		uglify: {
