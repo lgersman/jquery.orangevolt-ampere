@@ -7,7 +7,7 @@
  * Copyright 2012, Lars Gersmann <lars.gersmann@gmail.com>
  * Dual licensed under the MIT or GPL Version 2 licenses.
  */
- 
+
 /**
  * Oval is the OrangeVolt Ampere Loader
  *
@@ -23,7 +23,7 @@ for( var i=0; i<scripts.length; i++) {
 			throw new Error( "failed to eval ampere base url");
 		}
 		var baseUrl = matches[ 1];
-		
+
 		var CSS = [
 			'../libs/bootstrap-2.1.1/css/bootstrap.css',
 			'../libs/Font-Awesome/css/font-awesome.css',
@@ -35,14 +35,14 @@ for( var i=0; i<scripts.length; i++) {
 		for( var i in CSS) {
 			document.writeln( '<link rel="stylesheet" type="text/css" href="' + baseUrl + CSS[i] + '">');
 		}
-		
+
 		var LESS = [
 			'ampere-ui-twitterbootstrap.less'
 		];
 		for( var i in LESS) {
 			document.writeln( '<link rel="stylesheet/less" href="' + baseUrl + LESS[i] + '">');
 		}
-		
+
 		var JS = [
 			'../libs/coffeescript-1.3.3.js',
 			//'../libs/modernizr-2.6.2.js',
@@ -52,7 +52,7 @@ for( var i=0; i<scripts.length; i++) {
 			'../libs/jquery.sortable.js',
 			'../libs/datepicker/js/bootstrap-datepicker.js',
 			'../libs/colorpicker/js/bootstrap-colorpicker.js',
-			
+
 			'../libs/angular/angular-1.0.1.js',
 			'../libs/angular/angular-cookies-1.0.1.js',
 			'../libs/angular/angular-loader-1.0.1.js',
@@ -61,6 +61,7 @@ for( var i=0; i<scripts.length; i++) {
 			'compat.js',
 			'json.js',
 			'namespace.js',
+			'entity.js',
 			'jquery.upload.js',
 			'ampere.js',
 			'ampere-util.js',
@@ -71,7 +72,7 @@ for( var i=0; i<scripts.length; i++) {
 			var defer = (/coffeescript/.test( JS[i]) && 'defer') || '';
 			document.writeln( '<script type="text/javascript" ' + defer + ' src="' + baseUrl + JS[i] + '"></script>');
 		}
-		
+
 		break;
 	}
 }

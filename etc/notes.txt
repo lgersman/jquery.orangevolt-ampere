@@ -62,3 +62,14 @@ transition.enabled( value || function)
 * behaviour changed : window.ampere( name, options) || window.ampere( name) || window.ampere( options) returns a the instance if available
 * filter "strip_tags" added
 * ng-ampere-transition : attribute "ng-ampere-icon" added to support overwriting default transition icons
+
+* directive "ng-ampere-watch" : can take a function argument or an object. examples
+examples:
+	ng-ampere-watch="onChanged"	
+	ng-ampere-watch="{ 'item.name' : updateName}"
+	ng-ampere-watch="{ 'item.name, item.familyname' : updateWholeName}"
+	ng-ampere-watch="{ 'item.name, item.familyname' : updateWholeName, 'item.email' : updateEmail, 'item.zipcode,*' : othersUpdated}"
+	the called function this is the scope
+	1st argument always state
+	in case of a an property watch (i.e. not '*' !) there are 3 other arguments property, oldValue, newValue
+	!attention! modifications should always be done on the scope !!!!!

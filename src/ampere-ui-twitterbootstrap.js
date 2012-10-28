@@ -83,10 +83,10 @@
 
 		var ampereTwitterbootstrapController = function( $scope, $rootElement, $window, $http, $timeout,  $log, $resource, $cookies/*, $location*/) {
 			var controller = $rootElement.parent().data( 'ampere.controller');
-			/*
-			 * TODO : this is a dirty hack to transport the initial template into
-			 * the ampere structure of angularjs
-			 */
+				/*
+				 * TODO : this is a dirty hack to transport the initial template into
+				 * the ampere structure of angularjs
+				 */
 			var template = controller._initial_template;
 			controller._initial_template = undefined;
 			$scope.$ampere = {
@@ -105,6 +105,13 @@
 			$scope.$cookies = $cookies;
 			$scope.$ = $;
 //			$scope.$location = $location;
+
+				/*
+				 * prepare general purpose ampere structures
+				 */
+				// ampere.disposable is a array of functions executed everytime
+				// the view changes
+			$rootElement.data( 'ampere.disposable', []);
 		};
 		ampereTwitterbootstrapController.$inject = ['$scope', '$rootElement', '$window', '$http', '$timeout',  '$log', '$resource', '$cookies'/*, '$location'*/];
 
@@ -116,6 +123,12 @@
 				scope		: 'isolate',
 				link		: function( scope, element, attrs) {
 					scope.$watch( '$ampere', function() {
+							// execute & cleanup all disposable handlers
+						var disposables = element.closest( '.ampere-module').data( 'ampere.disposable');
+						while( disposables.length) {
+							disposables.pop()();
+						}
+
 							// destroy all child scopes (->transitions)
 						while( scope.$$childHead) {
 							scope.$$childHead.$destroy();
@@ -160,7 +173,7 @@
 							/*
 							 * get current filtered scope variables
 							 */
-												var i, changeset = {}, keys = Object.keys( scope);
+						var i, changeset = {}, keys = Object.keys( scope);
 						for( i in keys) {
 							if( /*keys[i]!='ampere' &&*/ keys[i]!='promise' && keys[i]!='this' && keys[i].charAt( 0)!='$') {
 								changeset[ keys[i]] = scope[ keys[i]];
@@ -229,7 +242,7 @@
  data-ampere-hotkey="{{attrs.ngAmpereHotkey}}"\
  title="{{attrs.title || $ampere.ui.getDescription( transition) | strip_tags}}{{hotkey && \' \' + hotkey}}">\
 <i ng-class="attrs.ngAmpereIcon || $ampere.ui.getIcon( transition)"></i>\
-{{$.trim( element.text()) || $ampere.ui.getCaption( transition)}}\
+ {{$.trim( element.text()) || $ampere.ui.getCaption( transition)}}\
 </a>',
 				'button' : '<button type="button"\
  ng-disabled="!transition.enabled()"\
@@ -242,7 +255,7 @@
  data-ampere-hotkey="{{attrs.ngAmpereHotkey}}"\
  title="{{attrs.title || $ampere.ui.getDescription( transition) | strip_tags}}{{hotkey && \' \' + hotkey}}">\
 <i ng-class="attrs.ngAmpereIcon || $ampere.ui.getIcon( transition)"></i>\
-{{$.trim( element.text()) || $ampere.ui.getCaption( transition)}}\
+ {{$.trim( element.text()) || $ampere.ui.getCaption( transition)}}\
 </button>',
 				'file' : '<button type="button"\
  onclick="$( this).next().click()"\
@@ -255,7 +268,7 @@
  data-ampere-hotkey="{{attrs.ngAmpereHotkey}}"\
  title="{{attrs.title || $ampere.ui.getDescription( transition) | strip_tags}}{{hotkey && \' \' + hotkey}}">\
 <i ng-class="attrs.ngAmpereIcon || $ampere.ui.getIcon( transition)"></i>\
-{{$.trim( element.text()) || $ampere.ui.getCaption( transition)}}\
+ {{$.trim( element.text()) || $ampere.ui.getCaption( transition)}}\
 </button>\
 <input\
  id="{{attrs.id}}"\
@@ -276,7 +289,7 @@
  data:ampere-hotkey="{{attrs.ngAmpereHotkey}}"\
  title="{{attrs.title || $ampere.ui.getDescription( transition) | strip_tags}}{{hotkey && \' \' + hotkey}}">\
 <i ng-class="attrs.ngAmpereIcon || $ampere.ui.getIcon( transition)"></i>\
-{{$.trim( element.text()) || $ampere.ui.getCaption( transition)}}\
+ {{$.trim( element.text()) || $ampere.ui.getCaption( transition)}}\
 </button>',
 				'reset' : '<button type="reset"\
  ng-disabled="!transition.enabled()"\
@@ -288,7 +301,7 @@
  data-ampere-hotkey="{{attrs.ngAmpereHotkey}}"\
  title="{{attrs.title || $ampere.ui.getDescription( transition) | strip_tags}}{{hotkey && \' \' + hotkey}}">\
 <i ng-class="attrs.ngAmpereIcon || $ampere.ui.getIcon( transition)"></i>\
-{{$.trim( element.text()) || $ampere.ui.getCaption( transition)}}\
+ {{$.trim( element.text()) || $ampere.ui.getCaption( transition)}}\
 </button>'
 			};
 			/*
@@ -510,6 +523,64 @@
 					_ns.assert( $.isPlainObject( data), 'attribute "ng-ampere-data"(="' + attrs.ngAmpereData + '") expected to evaluate to an object');
 
 					angular.extend( element.data(), data);
+				}
+			};
+		}]);
+
+		ampere.directive( 'ngAmpereWatch', [ function() {
+			var _ns = $.ov.namespace( 'ngAmpereWatch');
+
+			return {
+				restrict   : 'A',
+				link: function( scope, element, attrs) {
+					function wrap( fn, property) {
+						return function( scope) {
+							var state = (arguments.length==1 ? scope : arguments[2]).$ampere.module.current().state;
+							var args = $.makeArray( arguments);
+							if( arguments.length==1) {
+									// watch all call
+
+									// replace scope argument by state
+								args[0] = state;
+							} else {
+									// watch property call
+
+									// remove scope argument
+								args.pop();
+
+								args.unshift( property);
+								args.unshift( state);
+							}
+							fn.apply( scope, args);
+						};
+					}
+
+					var disposables = element.closest( '.ampere-module').data( 'ampere.disposable');
+					var watcher = scope.$eval( attrs.ngAmpereWatch);
+					if( $.isFunction( watcher)) {
+						_ns.debug( 'activate watch(*) ', window.ov.ampere.util.functionName( watcher) || 'function', '()');
+
+						disposables.push( scope.$watch( wrap( watcher)));
+					} else if( $.isPlainObject( watcher)) {
+						for( var key in watcher) {
+							var f = watcher[ key];
+							_ns.assert( $.isFunction( f), "watcher property value of key '", key, "'(=", $.ov.json.stringify( f, $.ov.json.stringify.COMPACT), ") expected to be a function");
+
+							var watchedProperties = key.split( /\s*,\s*/g);
+							for( var i=0; i<watchedProperties.length; i++) {
+								var property = watchedProperties[i];
+								if( property==='' || property==='*') {
+									_ns.debug( 'activate watch(*) ', window.ov.ampere.util.functionName( f) || 'function', '()');
+									disposables.push( scope.$watch( wrap( f)));
+								} else {
+									_ns.debug( 'activate watch(', property, ') ', window.ov.ampere.util.functionName( f) || 'function', '()');
+									disposables.push( scope.$watch( property, wrap( f, property)));
+								}
+							}
+						}
+					} else {
+						_ns.raise( 'dont know how to handle argument "', attrs.ngAmpereWatch, '". function or plain object argument is expected.');
+					}
 				}
 			};
 		}]);

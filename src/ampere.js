@@ -1035,7 +1035,7 @@
 			var self = this;
 
 			this.onHotKey = function onHotkey( event) {
-				if( !self.isBlocked()) {
+				if( !self.isBlocked() && $.inArray( event.target.tagName, ['TEXTAREA', 'SELECT', 'INPUT'])==-1) {
 					var matchingHotkeys = window.ov.ampere.ui.hotkey.computeMatchingHotkeys( event);
 					var module = self.controller.module;
 
@@ -1462,11 +1462,11 @@
 							 */
 
 							controller.module.history().redo({
-								command  : command,
-								source   : transition.state(),
-								target   : transition.target(),
-																view      : view,
-																ui          : controller.ui
+								command	: command,
+								source	: transition.state(),
+								target	: transition.target(),
+								view    : view,
+								ui		: controller.ui
 							});
 						});
 					}

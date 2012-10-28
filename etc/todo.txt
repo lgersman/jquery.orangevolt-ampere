@@ -19,5 +19,8 @@
 * <a type="file" ng-ampere-transition=""></a> example
 * ng-ampere-data example
 
+* ng-ampere-watch example
+
 * transition( params) implementieren
+* state( object, object, ... ) implementieren
 * click transition : event mit transportieren

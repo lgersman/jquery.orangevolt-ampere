@@ -1,14 +1,14 @@
 <div class="ng-cloak ampere-module" nng-app="window.ov.ampere.ui.twitterbootstrap" ng-controller="amperetwitterbootstrap">
-	<div 
-		class="navbar navbar-inverse navbar-fixed-top" 
+	<div
+		class="navbar navbar-inverse navbar-fixed-top"
 		ng-show="$ampere.ui.getCaption( $ampere.module) || $ampere.module.options( 'ampere.ui.about.caption') || $ampere.ui.getTransitions({ 'ampere.ui.type':'global'}).length"
 	>
-		
+
     	<div class="navbar-inner">
        		<div class="container">
-         		<a 
-         			class="btn btn-navbar" 
-         			data-toggle="collapse" 
+         		<a
+         			class="btn btn-navbar"
+         			data-toggle="collapse"
          			data-target=".nav-collapse"
          			ng-show="$ampere.ui.getTransitions({ 'ampere.ui.type':'global'}).length"
          		>
@@ -16,15 +16,15 @@
            			<span class="icon-bar"></span>
            			<span class="icon-bar"></span>
          		</a>
-         		
+
          		<span ng-switch on="$ampere.module.options( 'ampere.ui.about.url') | type">
          			<a ng-switch-when="transition" class="brand" ng-ampere-transition="$ampere.module.options( 'ampere.ui.about.url')"></a>
-         			
+
 			        <a ng-switch-default class="brand" href="{{$ampere.module.options( 'ampere.ui.about.url')}}" target="_blank">
 			        	{{$ampere.ui.getCaption( $ampere.module) || $window.ov.ampere.util.ucwords( $ampere.module.options( 'ampere.ui.about.caption'))}}
-			        </a>			        
+			        </a>
 				</span>
-				
+
        		 	<div class="nav-collapse">
 	           		<ul class="nav">
 	           			<li ng-class="{disabled : !transition.enabled(), active : transition.active()}"
@@ -44,15 +44,15 @@
 			<ul class="breadcrumb" ng-show="$ampere.ui.getTransitions({ 'ampere.ui.type':'breadcrumb'}).length">
 				<li ng-repeat="transition in $ampere.ui.getTransitions({ 'ampere.ui.type':'breadcrumb'})" ng-class="{disabled : !transition.enabled(), active : transition.active()}">
 		          	<a ng-ampere-transition="transition"></a>
-		          	<span ng-show="!$last" class="divider">/</span> 
+		          	<span ng-show="!$last" class="divider">/</span>
 		        </li>
 			</ul>
-			
+
 			<div class="navbar subnav" ddata-top="40" ng-show="$ampere.ui.getTransitions({ 'ampere.ui.type':'primary'}).length || $ampere.ui.getTransitions({ 'ampere.ui.type':'secondary'}).length">
 				<div class="navbar-inner">
 			          <ul class="nav">
 			          	<li ng-repeat="transition in $ampere.ui.getTransitions({ 'ampere.ui.type':'primary'})" ng-class="{disabled : !transition.enabled(), active : transition.active()}">
-			          		<a ng-ampere-transition="transition"></a> 
+			          		<a ng-ampere-transition="transition"></a>
 			          	</li>
 			          	<li class="dropdown" ng-show="$ampere.ui.getTransitions({ 'ampere.ui.type':'secondary'}).length">
 						    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
@@ -61,8 +61,8 @@
 						    </a>
 						    <ul class="dropdown-menu">
 						    	<li ng-repeat="transition in $ampere.ui.getTransitions({ 'ampere.ui.type':'secondary'})" ng-class="{disabled : !transition.enabled(), active : transition.active()}">
-					          		<a ng-ampere-transition="transition"></a> 
-					          	</li> 
+					          		<a ng-ampere-transition="transition"></a>
+					          	</li>
 						    </ul>
 						  </li>
 			          </ul>
@@ -84,8 +84,8 @@
 						    	<kbd>{{$ampere.ui.getHotkey( transition)}}</kbd>
 						    	<i class=" icon-arrow-right"></i>
 						    	<a ng-ampere-transition="transition"></a>
-						    	<div class="description">{{$ampere.ui.getDescription( transition)}}</div> 
-						    </li> 
+						    	<div class="description" ng-bind-html-unsafe="$ampere.ui.getDescription( transition)"></div>
+						    </li>
 			    		</ul>
 			    	</div>
 		    	</div>
@@ -96,7 +96,7 @@
 		<footer ng-show="$ampere.ui.getAbout( $ampere.module)">
 			<hr>
 			<div ng-bind-html-unsafe="$ampere.ui.getAbout( $ampere.module)"></div>
-		</footer>	
+		</footer>
 	</div>
 	<div class="overlay"></div>
 	<div class="container flash">

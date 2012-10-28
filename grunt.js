@@ -19,6 +19,7 @@ module.exports = function(grunt) {
 		'compat.js',
 		'json.js',
 		'namespace.js',
+		'entity.js',
 		'jquery.upload.js',
 		'ampere.js',
 		'ampere-util.js',
@@ -158,7 +159,7 @@ module.exports = function(grunt) {
 		},
 		uglify: {
 			mangle: {
-				except: [ 'Ampere', 'Module', 'Transition', 'State', 'View', 'History', 'Options', 'Ui', 'UiController']
+				except: [ 'Ampere', 'Module', 'Transition', 'State', 'View', 'History', 'Options', 'Ui', 'UiController', 'Entity']
 			}
 		}
 	});

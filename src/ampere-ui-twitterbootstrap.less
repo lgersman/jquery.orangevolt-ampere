@@ -21,6 +21,10 @@
 		font-size: @fs;
 	}
 
+	.btn-group > .btn, .btn-group > .dropdown-menu {
+		font-size: @fs;
+	}
+
 	.navbar .brand {
 		font-size : 16px;
 	}
@@ -42,8 +46,11 @@
 	}
 
 		// support table selections
-	tr.active {
-		background-color : #f5f5f5;
+	tr.active,
+	.table-hover tbody tr.active:hover td,
+	.table-striped tbody tr:nth-child(odd).active td,
+	.table-striped tbody tr:nth-child(odd).active th {
+		background-color : /*#f5f5f5*/ rgba(82, 168, 236, 0.2);
 	}
 
 		/* sortable */
@@ -89,8 +96,8 @@
 	overflow-y : scroll;
 
 	.ampere-module {
-		position  : relative;
-		overflow : hidden;
+		position : relative;
+		//overflow : hidden;
 
 		/* crunch bootstrap default space */
 		header .breadcrumb, header .navbar {
@@ -105,6 +112,16 @@
 			.breadcrumb + .navbar.subnav-fixed {
 				margin-top: 0;
 			}
+		}
+
+		dt {
+			.btn-mini {
+				margin-bottom : 5px;
+			}
+		}
+
+		dd {
+			margin-bottom : 10px;
 		}
 
 		input:invalid, textarea:invalid, select:invalid {
