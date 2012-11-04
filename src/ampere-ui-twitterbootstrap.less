@@ -71,23 +71,33 @@
 
 	[ng-ampere-sortable] >[draggable]:not( .ng-ampere-sortable-nohandle):hover,
 	[ng-ampere-sortable] >[draggable]:not( .ng-ampere-sortable-nohandle):hover *,
-	[ng-ampere-sortable] >[draggable]:not( .ng-ampere-sortable-nohandle):hover .draghandle {
+	[ng-ampere-sortable] >[draggable]:not( .ng-ampere-sortable-nohandle):hover .draghandle,
+	[ng-ampere-sortable] >:not( .ng-ampere-sortable-nohandle):hover,
+	[ng-ampere-sortable] >:not( .ng-ampere-sortable-nohandle):hover *,
+	[ng-ampere-sortable] >:not( .ng-ampere-sortable-nohandle):hover .draghandle {
 		cursor : move;
 	}
 
-	[ng-ampere-sortable] >[draggable]:not( .ng-ampere-sortable-nohandle):hover .draghandle {
+	[ng-ampere-sortable] >[draggable]:not( .ng-ampere-sortable-nohandle):hover .draghandle,
+	[ng-ampere-sortable] >:not( .ng-ampere-sortable-nohandle):hover .draghandle {
 		background: rgba(0, 0, 0, 0.02);
 	}
 
 	[ng-ampere-sortable] >[draggable]:hover .ng-ampere-sortable-nohandle,
-	[ng-ampere-sortable] >[draggable]:hover .ng-ampere-sortable-nohandle * {
+	[ng-ampere-sortable] >[draggable]:hover .ng-ampere-sortable-nohandle *,
+	[ng-ampere-sortable] >:hover .ng-ampere-sortable-nohandle,
+	[ng-ampere-sortable] >:hover .ng-ampere-sortable-nohandle * {
 		cursor : auto;
 	}
 		// this is a ff fix
 	[ng-ampere-sortable] >[draggable]:hover a.ng-ampere-sortable-nohandle,
 	[ng-ampere-sortable] >[draggable]:hover a.ng-ampere-sortable-nohandle >i,
 	[ng-ampere-sortable] >[draggable]:hover .ng-ampere-sortable-nohandle a,
-	[ng-ampere-sortable] >[draggable]:hover .ng-ampere-sortable-nohandle a >i {
+	[ng-ampere-sortable] >[draggable]:hover .ng-ampere-sortable-nohandle a >i,
+	[ng-ampere-sortable] >:hover a.ng-ampere-sortable-nohandle,
+	[ng-ampere-sortable] >:hover a.ng-ampere-sortable-nohandle >i,
+	[ng-ampere-sortable] >:hover .ng-ampere-sortable-nohandle a,
+	[ng-ampere-sortable] >:hover .ng-ampere-sortable-nohandle a >i {
 		cursor : pointer;
 	}
 		/* -- */
@@ -124,8 +134,40 @@
 			margin-bottom : 10px;
 		}
 
-		input:invalid, textarea:invalid, select:invalid {
+		input:invalid, textarea:invalid, select:invalid,
+		input.invalid, textarea.invalid, select.invalid,
+		.invalid input, .invalid textarea, .invalid select {
 			border-color: #e9322d;
+		}
+
+		input.invalid:focus,
+		textarea.invalid:focus,
+		select.invalid:focus,
+		.invalid input:focus,
+		.invalid textarea.invalid:focus,
+		.invalid select.invalid:focus {
+			 -webkit-box-shadow: 0 0 6px #f8b9b7;
+     		-moz-box-shadow: 0 0 6px #f8b9b7;
+          	box-shadow: 0 0 6px #f8b9b7;
+		}
+
+			/*
+			* hide error help by default
+			*/
+		.inline-help.invalid,
+		.help-block.invalid {
+			visibility:hidden;
+		}
+
+			/*
+			* show error help when its sibling input/textarea/select has errors
+			*/
+		*:invalid~.inline-help.invalid,
+		*:invalid~.help-block.invalid,
+		.invalid~.inline-help.invalid,
+		.invalid~.help-block.invalid {
+			visibility  : visible;
+			color		: #e9322d;
 		}
 
 		/* css for input[file] declared with ng-ampere-transition */
@@ -487,16 +529,16 @@
 /* fixes bootstrap-responsive.css */
 @media (max-width: 767px) {
   body.ampere-app {
-    padding-right: 0;
-    padding-left: 0;
+	padding-right: 0;
+	padding-left: 0;
 
-    		/* this fixes the wizard top/bottom navigation bars */
-		.navbar-fixed-top,
-	  	.navbar-fixed-bottom,
-	  	.navbar-static-top {
-	    	margin-right: inherit;
-	    	margin-left: inherit;
-	  	}
+		/* this fixes the wizard top/bottom navigation bars */
+	.navbar-fixed-top,
+	 	.navbar-fixed-bottom,
+	 	.navbar-static-top {
+	   	margin-right: inherit;
+	   	margin-left: inherit;
+  	}
   }
 }
 

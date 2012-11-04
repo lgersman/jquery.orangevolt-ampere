@@ -475,8 +475,33 @@
 					}
 
 					$timeout( function() {
-						var sortable = $( element.get()).sortable( options);
+						var sortable = $( element.get()).sortable({ /*options*/
+							helper			: function( e, tr) {
+								var $originals = tr.children();
+								var $helper = tr.clone();
+								$helper.children().each(function( index) {
+									$(this).width( $originals.eq( index).width());
+								});
+							    return $helper;
+							},
+							items				: $( element.get()).children( ':not(.ng-ampere-sortable-nohandle)'),
+							placeholder			: 'sortable-placeholder',
+							forcePlaceholderSize: true,
+							stop				: function( event, _ui) {
+								var ui = scope.$ampere.ui;
+								var controller = ui.controller;
 
+								if( transition) {
+									event.data = { items : _ui.item, position : _ui.item.index()};
+
+									!ui.isBlocked() && controller.proceed( transition, [ event]);
+									event.preventDefault();
+									event.stopPropagation();
+									event.stopImmediatePropagation();
+								}
+							}
+						});
+						/*
 						var ui = scope.$ampere.ui;
 						var controller = ui.controller;
 
@@ -488,6 +513,7 @@
 							event.stopPropagation();
 							event.stopImmediatePropagation();
 						});
+						*/
 					});
 				}
 			};

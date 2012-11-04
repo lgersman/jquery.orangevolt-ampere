@@ -6,6 +6,7 @@
  * Released under the MIT license.
  */
 (function($) {
+	return;
 var dragging, placeholders = $();
 $.fn.sortable = function(options) {
 	var method = String(options);

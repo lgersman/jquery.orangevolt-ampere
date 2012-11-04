@@ -65,7 +65,7 @@ transition.enabled( value || function)
 
 * directive "ng-ampere-watch" : can take a function argument or an object. examples
 examples:
-	ng-ampere-watch="onChanged"	
+	ng-ampere-watch="onChanged"
 	ng-ampere-watch="{ 'item.name' : updateName}"
 	ng-ampere-watch="{ 'item.name, item.familyname' : updateWholeName}"
 	ng-ampere-watch="{ 'item.name, item.familyname' : updateWholeName, 'item.email' : updateEmail, 'item.zipcode,*' : othersUpdated}"
@@ -73,3 +73,5 @@ examples:
 	1st argument always state
 	in case of a an property watch (i.e. not '*' !) there are 3 other arguments property, oldValue, newValue
 	!attention! modifications should always be done on the scope !!!!!
+
+* inline-help / help-block support for .invalid/:invalid form controls

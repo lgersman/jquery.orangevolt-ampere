@@ -24,3 +24,5 @@
 * transition( params) implementieren
 * state( object, object, ... ) implementieren
 * click transition : event mit transportieren
+
+* projection api (-> entity.js addition)
