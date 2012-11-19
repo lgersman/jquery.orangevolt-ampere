@@ -1,0 +1,54 @@
+<table class="crud table">
+	<thead ng-show="list.headers().length">
+		<th
+			ng-repeat="header in list.headers()"
+			ng-click="header.orderBy && list.sortable( header.orderBy, !list.sortable().reverse)"
+			ng-ampere-template="header.template"
+			ng-class="header.orderBy && 'sortable'">
+			<i
+				class="orderby"
+				ng-class="{
+				'icon-empty' 		: header.orderBy!=list.sortable().orderBy,
+				'icon-caret-up' 	: header.orderBy==list.sortable().orderBy && list.sortable().reverse,
+				'icon-caret-down'	: header.orderBy==list.sortable().orderBy && !list.sortable().reverse
+				}">
+			</i>
+		</th>
+	</thead>
+	<tbody>
+		<tr
+			ng-init="$.inArray( list.selection(), list.get())!=-1 || list.selection( list.get()[0])"
+			ng-repeat="item in (rows = (list.get() | filter:list.filter() | orderBy:list.sortable().orderBy:list.sortable().reverse))"
+			ng-mousedown="list.selection( item)"
+			class="item"
+			data-position="{{list.get() | indexof:item}}"
+			ng-class="{ active : list.selection()==item, 'ng-ampere-sortable-nohandle' : list.editable() && list.editable().item==item}"
+			ng-ampere-hotkey="{
+				down : 'list.selection( $window.ov.entity.next( rows, list.selection()) || list.selection())',
+				up   : 'list.selection( $window.ov.entity.prev( rows, list.selection()) || list.selection())',
+				home : 'list.selection( $window.ov.entity.first( rows))',
+				end  : 'list.selection( $window.ov.entity.last( rows))'
+			}"
+			ng-ampere-template="list.editable() && list.editable().item==item && { replace : list.editable().template}"
+		>
+			<td ng-repeat="column in list.columns()" ng-ampere-template="column.template">
+				<span ng-switch on="$last && (list.removable() | type)">
+					<a ng-switch-when="object" class="hover pull-right" ng-ampere-transition="list.removable().transition"></a>
+				</span>
+				<span ng-switch on="$last && (list.editable() | type)">
+					<a ng-switch-when="object" class="hover pull-right" ng-ampere-transition="list.editable().transition"></a>
+				</span>
+			</td>
+		</tr>
+		<tr class="no-items" ng-hide="list.get().length">
+			<td colspan="{{list.columns().length}}">
+				List is empty.
+			</td>
+		</tr>
+		<tr class="no-matches" ng-show="list.get().length && !rows.length">
+			<td colspan="{{list.columns().length}}">
+				No item matches filter.
+			</td>
+		</tr>
+	</tbody>
+</table>

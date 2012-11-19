@@ -76,8 +76,16 @@ examples:
 
 * inline-help / help-block support for .invalid/:invalid form controls
 
-* entity && entity.projection api examples
+== new ==
 
-* "ampere.ui.angular" interface / Ampere class "Component" example
-
-* directive "ng-ampere-template" example
+* entity.projection added
+* example boilerplate code updated to take ie10 into account
+* css *help.description can be used to gray down descriptive help elements
+* "ampere.ui.angular" option added (array<function( angularModule)>) to support additional module settings via callback function
+* directive "ng-ampere-template" added
+* twitter bootstrap control "typeahead" fixed in boostrap renderer (triggers change instead of input)
+* filter "indexof" added
+* state initialization : in state construction function applied state members providing a promise() function are automagically taken in account (-> state ready)
+* Ampere class Component created to provide reusable Ampere components
+* ampere component library crud add. initial component is list
+* upgraded to jquery 1.8.3

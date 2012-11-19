@@ -5,10 +5,12 @@
     "node": ">= 0.6.0"
   },
   "scripts": {
-    "test": "grunt qunit"
+    "test": "grunt jasmine"
   },
   "devDependencies": {
     "grunt"			: "~0.3.16",
-    "grunt-contrib" : "~0.2.0"
+    "grunt-contrib" : "~0.2.0",
+    "jasmine-node"	: "",
+    "underscore"	: ""
   }
 }

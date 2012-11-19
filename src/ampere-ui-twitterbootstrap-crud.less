@@ -1,0 +1,59 @@
+/*
+ * Orangevolt Ampere Framework
+ *
+ * http://github.com/lgersman
+ * http://www.orangevolt.com
+ *
+ * Copyright 2012, Lars Gersmann <lars.gersmann@gmail.com>
+ * Dual licensed under the MIT or GPL Version 2 licenses.
+ */
+
+.ampere-app {
+	.ampere-module {
+		TABLE.crud {
+			>THEAD {
+				-webkit-touch-callout: none;
+				-webkit-user-select: none;
+				-khtml-user-select: none;
+				-moz-user-select: none;
+				-ms-user-select: none;
+				user-select: none;
+
+				TH.sortable {
+					cursor : pointer;
+
+					I.orderby {
+						color  : #888888;
+					}
+				}
+			}
+
+			TBODY {
+				TR.item {
+					 a.hover.ampere-transition,
+					 a.hover.ampere-transition i.icon-move {
+					 	visibility : hidden;
+					 	//margin-left: 4px;
+					 	color 	   : black;
+					 }
+
+					 a.hover.hover.ampere-transition.disabled {
+					 	color 	   : inherit;
+					 }
+				}
+
+				TR.item:hover {
+					  a.hover.ampere-transition {
+					 	visibility : inherit;
+					 }
+				}
+
+				TR.no-items,
+				TR.no-matches {
+					color  		: #888888;
+					font-style	: italic;
+				}
+			}
+		}
+	}
+}

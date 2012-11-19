@@ -2,10 +2,10 @@
 module.exports = function(grunt) {
 	var js = {
 		libs  : [
-			'jquery-1.8.2.js',
+			'jquery-1.8.3.js',
 			'jquery-ui-sortable-1.9.1/jquery-ui-1.9.1.custom.min.js',
 			'bootstrap-2.2.0/js/bootstrap.min.js',
-			'jquery.sortable.js',
+			//'jquery.sortable.js',
 			'datepicker/js/bootstrap-datepicker.js',
 			'colorpicker/js/bootstrap-colorpicker.js',
 
@@ -24,6 +24,7 @@ module.exports = function(grunt) {
 		'jquery.upload.js',
 		'ampere.js',
 		'ampere-util.js',
+		'ampere-crud.js',
 		'ampere-ui-twitterbootstrap.js',
 		'ampere-ui-hotkey.js'
 		 ].map( function( item) {
@@ -70,6 +71,7 @@ module.exports = function(grunt) {
 							'dist/debug/libs/angular/' : 'libs/angular/**/*.min.*',
 							'dist/debug/libs/Font-Awesome/' : [ 'libs/Font-Awesome/css/**', 'libs/Font-Awesome/font/*'],
 							'dist/debug/libs/bootstrap-2.2.0/' : 'libs/bootstrap-2.2.0/**/*.min.*',
+							'dist/debug/libs/jquery-ui-sortable-1.9.1/' : 'libs/jquery-ui-sortable-1.9.1/**/*.min.*',
 							'dist/debug/libs/colorpicker/' : ['libs/colorpicker/css/**', 'libs/colorpicker/js/**', 'libs/colorpicker/img/**'],
 							'dist/debug/libs/datepicker/' : ['libs/datepicker/css/**', 'libs/datepicker/js/**'],
 							'dist/debug/' : js.src
@@ -144,7 +146,7 @@ module.exports = function(grunt) {
 				multistr:true,
 				debug   : true,
 				nonew   : true,
-				jQuery  : true,
+				jquery  : true,
 				evil : true /* otherwise document.write is prohibited */
 			},
 			globals: {
@@ -160,7 +162,7 @@ module.exports = function(grunt) {
 		},
 		uglify: {
 			mangle: {
-				except: [ 'Ampere', 'Module', 'Transition', 'State', 'View', 'History', 'Options', 'Ui', 'UiController', 'Entity']
+				except: [ 'Ampere', 'Module', 'Transition', 'State', 'View', 'History', 'Options', 'Ui', 'UiController', 'Component', 'Entity', 'Projection']
 			}
 		}
 	});

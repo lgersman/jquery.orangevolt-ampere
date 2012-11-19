@@ -19,6 +19,10 @@
 			) : s;
 		},
 
+		trueFn : function() {
+			return true;
+		},
+
 			/**
 			 * ie doesnt support function property name
 			 *
@@ -41,6 +45,42 @@
 			return input.replace(commentsAndPhpTags, '').replace(tags, function ($0, $1) {
 				return allowed.indexOf('<' + $1.toLowerCase() + '>') > -1 ? $0 : '';
 			});
+		},
+			/**
+			 * @return regexp reserved characters quoted to be regexp compatible
+			 *
+			 * @see http://stackoverflow.com/questions/3561493/is-there-a-regexp-escape-function-in-javascript
+			 */
+		regexp_quote : function( s) {
+		    return s.replace(/[\-\/\\\^$*+?.()|\[\]{}]/g, '\\$&');
+		},
+
+		getTemplate  : function( o) {
+			if( o instanceof HTMLElement) {
+				o = $( o);
+			}
+
+			if( o.jquery) {
+				$.ov.namespace( 'window.ov.ampere.util.getTemplate()').assert( o.length, 'jQuery collection is empty');
+				if( o[0].tagName=='SCRIPT') {
+					return $.trim( o.text().replace( "<![CDATA[", "").replace("]]>", ""));
+				} else {
+					return $.trim( o.html());
+				}
+			} else {
+				return $.trim( o.responseText || o.toString());
+			}
+		},
+
+		angular : {
+				/**
+				 * returns the jQuery element owning thie sclope argument
+				 */
+			getElement : function( scope) {
+				return $( '[ng-scope]').filter( function() {
+					return $( this).data( '$scope')===scope;
+				});
+			}
 		}
 	};
 })( jQuery);

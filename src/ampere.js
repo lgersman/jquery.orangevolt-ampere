@@ -649,7 +649,7 @@
 			 */
 			this.state = function() {
 				var _ns = $.ov.namespace( this.fullName() + '.state()').assert( arguments.length, 'no arguments given');
-				var name, i;
+				var name, i, state, dependencies=[], members, z, member;
 				if( arguments.length==1 && $.isArray( arguments[0])) {
 					var arr = arguments[0];
 						// create states
@@ -659,7 +659,20 @@
 					}
 						// initialize states
 					for( i=0; i<arr.length; i++) {
-						$.isFunction( arr[i]) && arr[i].call( this.states[ window.ov.ampere.util.functionName( arr[i])], this.states[ window.ov.ampere.util.functionName( arr[i])]);
+						state = this.states[ window.ov.ampere.util.functionName( arr[i])];
+						$.isFunction( arr[i]) && arr[i].call( state, state);
+
+							// collect additional deferreds from state members
+						members = Object.keys( state);
+						for( z in members) {
+							if( members[z]!='promise') {
+								member = state[ members[z]];
+
+								(member instanceof Component)  && member.init( state);
+
+								( $.isFunction( member.promise)) && dependencies.push( member.promise);
+							}
+						}
 					}
 					return this;
 				} else if( arguments.length==1 && $.isPlainObject( arguments[0])) {
@@ -669,19 +682,26 @@
 						this.state( name);
 					}
 
-					/*
-					 * make state a deferred
-					 */
-					var dependencies = [];
-
 						// intialize states
 					for( name in obj) {
 						_ns.assert( $.isFunction( obj[name]), 'initializer function expected as value of state "' , name + '"');
-						dependencies.push(
-							obj[name].call( this.states[ name], this.states[ name])
-						);
 
+						state = this.states[ name];
+						dependencies.push( obj[name].call( state, state));
+
+							// collect additional deferreds from state members
+						members = Object.keys( state);
+						for( z in members) {
+							if( members[z]!='promise') {
+								member = state[ members[z]];
+
+								(member instanceof Component)  && member.init( state);
+
+								( $.isFunction( member.promise)) && dependencies.push( member.promise);
+							}
+						}
 					}
+
 					this.promise = $.when.apply( $.when, dependencies).promise;
 					return this;
 				} else {
@@ -692,14 +712,25 @@
 					name = typeof( name)=='string' ? name : window.ov.ampere.util.functionName( name);
 					_ns.assert( !this.states[ name], 'state "' + name + '" already exists');
 
-					var state = function() {
+					state = function() {
 							/*
 							 * make state a deferred
 							 */
-						var dependencies = [];
-
 						$.isFunction( this.promise) && dependencies.push( this.promise());
 						dependencies.push( fn.call( this, this));
+
+						// collect additional deferreds from state members
+						members = Object.keys( this);
+						for( var u in members) {
+							if( members[u]!='promise') {
+								member = state[ members[u]];
+
+								(member instanceof Component)  && member.init( state);
+
+								( $.isFunction( member.promise)) && dependencies.push( member.promise);
+							}
+						}
+
 						this.promise = $.when.apply( $.when, dependencies).promise;
 					};
 					state.prototype = State( this, name);
@@ -868,6 +899,7 @@
 		}
 
 		var ampere = this;
+
 		this.options = Options( angular.extend( {}, Ampere.defaults, options));
 		this.modules = {};
 		/**
@@ -1503,6 +1535,32 @@
 			}
 		};
 	}
+
+	function Component( name) {
+		if( this instanceof Component) {
+				/*
+				 * default init logic
+				 *
+				 * override this function in your component to get informed when state / module is available
+				 */
+			this.init = function init( state) {
+				$.ov.namespace( this.fullName()).warn( 'component did not override init function ', this);
+			};
+
+			this.name = function() {
+				return name;
+			};
+
+			this.fullName = function() {
+				return 'Ampere.Component::' + this.name();
+			};
+
+			return this;
+		} else {
+			return new Component( name);
+		}
+	}
+	Ampere.Component = Component;
 
 	window.ov = window.ov || {};
 	window.ov.ampere = Ampere;

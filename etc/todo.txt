@@ -25,4 +25,15 @@
 * state( object, object, ... ) implementieren
 * click transition : event mit transportieren
 
-* projection api (-> entity.js addition)
+* ng-ampere-validity directive (https://developer.mozilla.org/en-US/docs/HTML/HTML5/Constraint_validation)
+
+* state should track all of its members having a (Defered) promise member
+* when leaving a state all open deferreds should be aborted
+
+* crud items (https://github.com/litera/jquery-scrollintoview/network)
+
+* testacular instead of phantom https://github.com/vojtajina/testacular/blob/master/README.md
+
+* mocha instead of jasmine (http://visionmedia.github.com/mocha/)
+
+* display all installed hotkeys in help

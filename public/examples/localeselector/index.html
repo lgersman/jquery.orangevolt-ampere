@@ -1,0 +1,160 @@
+<!doctype html>
+<!--[if lt IE 10]> <html class="no-js lt-ie10 lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js lt-ie10 lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js lt-ie10 lt-ie9" lang="en"> <![endif]-->
+<!--[if IE 9]>    <html class="no-js lt-ie10" lang="en"> <![endif]-->
+<!--[if gt IE 9]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="icon" href="favicon.ico" type="image/x-icon">
+		<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+
+		<script type="text/javascript" src="../../../src/oval.js"></script>
+		<script type="text/_javascript" src="../../../dist/debug/oval.js"></script>
+		<script type="text/_javascript" src="../../../dist/min/oval.js"></script>
+
+		<script id="description" type="text/template">
+			This example shows :
+			<ul>
+				<li>module resource loading utilizing a <code>$.getJSON</code></li>
+				<li><code>ng-ampere-watch</code> usage for tracking user input validity</li>
+				<li>form validation / custom form validation messages</li>
+			</ul>
+		</script>
+
+		<script id="main" type="text/template">
+			<form>
+				<label for="value">Enter locale:</label>
+				<div class="form-inline">
+					<input
+						type="text"
+						ng-model="locale"
+						list="locales"
+						ng-ampere-watch="{locale : onLocaleInput}"
+						required
+						placeholder="'de_DE' or similar expected"
+					>
+					<span
+						ng-class="{invalid : $( 'form:first input')[0].validationMessage}"
+						class="inline-help description">
+						{{$( 'form:first input')[0].validationMessage || $ampere.module.locales[ locale]}}
+					</span>
+				</div>
+				<datalist id="locales">
+					<select>
+						<option
+							ng-repeat="(language,country) in $ampere.module.locales"
+							value="{{language}}"
+						>
+							{{language}}
+						</option>
+					</select>
+				</datalist>
+				<br>
+				<label for="value">Same as above but using the typeahead plugin of twitter bootstrap :</label>
+				<div class="form-inline">
+					<input
+						type="text"
+						ng-model="locale2"
+						ng-ampere-watch="{locale2 : onLocaleInput2}"
+						data-provide="typeahead"
+						ng-ampere-data="{
+							source  : getCountries(),
+							updater : getLocaleFromTypeahead
+						}"
+						required
+						placeholder="'de_DE' or similar expected"
+					>
+					<span
+						ng-class="{invalid : $( 'form:first input')[1].validationMessage}"
+						class="inline-help description">
+						{{$( 'form:first input')[1].validationMessage || $ampere.module.locales[ locale2]}}
+					</span>
+				</div>
+				<br>
+				<submit ng-ampere-transition="$ampere.view.state().transitions.done">
+			</form>
+		</script>
+		<script type="text/javascript">
+			var localeselector = ov.ampere().module( function localeselector( module) {
+				module.state( {
+					main : function( state) {
+						state.onLocaleInput = function() {
+							state.locale = $.trim( state.locale);
+							var input = $( 'form:first input')[0];
+							input.setCustomValidity(
+								!state.locale.length && 'Please fill out this field.' || !module.locales[ state.locale] && 'No valid locale entered' || ''
+							);
+						};
+
+						state.onLocaleInput2 = function() {
+							state.locale2 = $.trim( state.locale2);
+							var input = $( 'form:first input')[1];
+							input.setCustomValidity(
+								!state.locale2.length && 'Please fill out this field.' || !module.locales[ state.locale2] && 'No valid locale entered' || ''
+							);
+						};
+
+						state.getCountries = function() {
+							return $.map( Object.keys( module.locales), function( key) {
+								return key + ' / ' + module.locales[key];
+							});
+						};
+
+						state.getLocaleFromTypeahead = function( item) {
+							return item.match( /^(.+) \//)[1];
+						};
+
+						state.transition( module.states.done)
+						.enabled( function() {
+							return $( 'form:first')[0].checkValidity();
+						});
+
+						state.view( document.getElementById( 'main'));
+
+						state.options({
+							'ampere.ui.caption' : null
+						});
+					},
+
+					done : function() {
+						this.transition( module.states.main);
+
+						this.view(
+							'<h4>You have selected locale {{$ampere.module.states.main.locale}} ({{$ampere.module.locales[ $ampere.module.states.main.locale]}})</h4>' +
+							'<button ng-ampere-transition="$ampere.view.state().transitions.main">Select another locale</button>'
+						);
+					}
+				});
+
+				module.options({
+					'ampere.ui.about' 		: 'This is a sample <a target="_blank" href="https://github.com/lgersman/jquery.orangevolt-ampere">Ampere</a> application.',
+					'ampere.ui.about.url'	: 'https://github.com/lgersman/jquery.orangevolt-ampere',
+					'ampere.ui.description' : $( '#description').text()
+				});
+
+				return $.getJSON( '../locales.json').done( function( data) {
+					module.locales = (function( data) {
+						var locales = {};
+						for( var key in data) {
+							locales[ data[key]] = key;
+						}
+						return locales;
+					})( data);
+				});
+			});
+
+			$( window).ready( function() {
+				$( 'body').ampere( localeselector);
+			});
+		</script>
+ 	</head>
+ 	<body>
+  		<!-- Prompt IE 6 users to install Chrome Frame. Remove this if you support IE 6.
+       		chromium.org/developers/how-tos/chrome-frame-getting-started -->
+  		<!--[if lt IE 10]><p class=chromeframe>Your browser is <em>ancient!</em> <a href="http://browsehappy.com/">Upgrade to a different browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to experience this site.</p><![endif]-->
+	</body>
+</html>
