@@ -23,7 +23,7 @@
 			case 'object'	:
 				return function( item) {
 					item = arguments.length ? item : this;
-					var entry = window.ov.entity.find( value.values, item[ value.id || 'id']);
+					var entry = window.ov.entity.find( value.values, $.type( item)=='object' ? item[ value.id || 'id'] : item);
 					return entry;
 				};
 			case 'array'	:
@@ -34,6 +34,7 @@
 				};
 			default			:
 				return function( item) {
+					item = arguments.length ? item : this;
 					return item[ key];
 				};
 		}
@@ -47,17 +48,25 @@
 
 				this[ 'get' + window.ov.ampere.util.ucwords( key)] = _createGetter( key, value);
 			}
-			/*
 			this.options = function() {
 				return options;
 			};
-			*/
 		} else {
 			return new Projection( options);
 		}
 	}
+		/**
+		 * creates an projection for lists containing an atomar datatype acting as the key
+		 * into another list
+		 */
+	Projection.atomic = function( atom) {
+		return Projection({
+			'_' : atom
+		});
+	};
+
 	Projection.prototype.get = function( item, property) {
-		var getterName = 'get' + window.ov.ampere.util.ucwords( property);
+		var getterName = 'get' + window.ov.ampere.util.ucwords( property || '_');
 		if( $.isFunction( this[ getterName])) {
 			return this[ getterName]( item);
 		} else {
@@ -95,7 +104,7 @@
 		var properties;
 		for( var i=0; i<array.length; i++) {
 			if( !properties) {
-				properties = Object.keys( array[i]);
+				properties = $.isPlainObject(array[i]) ? Object.keys( array[i]) : '_';
 			}
 
 			var item = array[i];
@@ -147,6 +156,36 @@
 		return sorted;
 	};
 
+		/**
+		 * @param array all allowed values of param property
+		 * @property (optional) property to compare to. if undefined/not given defaults to 'id'
+		 * @negate (optional) if true all elements not having property==value are returned
+		 *
+		 * @return array with all items matching (or all items not matching if negate==true)
+		 */
+	Projection.prototype.all = function all( array, property, negate) {
+		var hits = [];
+		var property = arguments.length>1 && property || '_';
+
+		var option = this.options()[ property];
+		$.ov.namespace( 'window.ov.entity.projection::all()').assert(
+			$.isPlainObject( option) && $.isArray( option.values),
+			'only mapped array supported right now'
+		);
+
+		for( var i=0; i<option.values.length; i++) {
+			var value = option.values[i], key = value[ option.id];
+
+			if( $.inArray( key, array)!=-1) {
+				!negate && hits.push( value);
+			} else if( negate){
+				hits.push( value);
+			};
+		}
+
+		return hits;
+	};
+
 	function Entity( array, projection) {
 		if( this instanceof Entity) {
 			$.ov.namespace( 'window.ov.entity').assert(
@@ -166,7 +205,7 @@
 							return arguments[0];
 						} else {
 							var record = function() {
-								$.extend( this, item);
+								$.extend( this, $.isPlainObject( item) ? item : this.get_( item));
 								this.get = function() {
 									return item;
 								};
@@ -216,6 +255,13 @@
 		return this.projection().match( this.get(), subject);
 	};
 
+		/**
+		 * see Projection.all
+		 */
+	window.ov.entity.prototype.all = function match( array, property, negate) {
+		return this.projection().all.apply( this.projection(), arguments);
+	};
+
 	function _filter( value, property) {
 		switch( $.type( value)) {
 			case 'function' :
@@ -248,8 +294,8 @@
 			default			:
 				property = property || 'id';
 				return function( item, index, _property) {
-					var o = item[property];
-					return $.isArray( o) ? $.inArray( value, o)!=-1 : item[property]===value;
+					var o = $.isPlainObject( item) ? item[property] : item;
+					return $.isArray( o) ? $.inArray( value, o)!=-1 : o===value;
 				};
 		}
 	}

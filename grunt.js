@@ -7,7 +7,6 @@ module.exports = function(grunt) {
 			'bootstrap-2.2.0/js/bootstrap.min.js',
 			//'jquery.sortable.js',
 			'datepicker/js/bootstrap-datepicker.js',
-			'colorpicker/js/bootstrap-colorpicker.js',
 
 			'angular/angular-1.0.1.min.js',
 			'angular/angular-cookies-1.0.1.min.js',
@@ -72,7 +71,6 @@ module.exports = function(grunt) {
 							'dist/debug/libs/Font-Awesome/' : [ 'libs/Font-Awesome/css/**', 'libs/Font-Awesome/font/*'],
 							'dist/debug/libs/bootstrap-2.2.0/' : 'libs/bootstrap-2.2.0/**/*.min.*',
 							'dist/debug/libs/jquery-ui-sortable-1.9.1/' : 'libs/jquery-ui-sortable-1.9.1/**/*.min.*',
-							'dist/debug/libs/colorpicker/' : ['libs/colorpicker/css/**', 'libs/colorpicker/js/**', 'libs/colorpicker/img/**'],
 							'dist/debug/libs/datepicker/' : ['libs/datepicker/css/**', 'libs/datepicker/js/**'],
 							'dist/debug/' : js.src
 						}
@@ -190,7 +188,6 @@ module.exports = function(grunt) {
 					'libs/bootstrap-2.2.0/css/bootstrap.min.css',
 					'libs/bootstrap-2.2.0/css/bootstrap-responsive.min.css',
 					'libs/Font-Awesome/css/font-awesome.css',
-					'libs/colorpicker/css/colorpicker.css',
 					'libs/datepicker/css/datepicker.css',
 					'ampere-ui-twitterbootstrap.css',
 					'ampere-ui-twitterbootstrap.less.css'
@@ -219,7 +216,6 @@ module.exports = function(grunt) {
 					'libs/bootstrap-2.2.0/css/bootstrap.min.css',
 					'libs/bootstrap-2.2.0/css/bootstrap-responsive.min.css',
 					'libs/Font-Awesome/css/font-awesome.css',
-					'libs/colorpicker/css/colorpicker.css',
 					'libs/datepicker/css/datepicker.css',
 					grunt.config( 'pkg.name') + '.min.css'
 				],

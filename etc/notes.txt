@@ -81,3 +81,13 @@ examples:
 * "ampere.ui.angular" interface / Ampere class "Component" example
 
 * directive "ng-ampere-template" example
+
+* ng-ampere-crud-list
+
+* PERFORMANCE HINT !! transition action : if a transition returns
+- (refresh) command == true forces a full template update
+- (lightweight refresh) command == false reevaluates based on the current dom structure
+
+* ng-ampere-transiton directive : transition option "ampere-ui-input-type" is recognized to support type transportation via transition option
+(needed for crud table with custom file upload "edit" transition)
+

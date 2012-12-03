@@ -52,11 +52,15 @@
 		margin-bottom : inherit;
 	}
 
-	code {
+	code, pre {
 		color : rgb(36, 95, 20);
 	}
 
-	td textarea.fullwidth {
+	pre {
+		padding: 2px 4px;
+	}
+
+	TD textarea.fullwidth {
 		/* Firefox */
 		width: -moz-calc( ~"100% - 14px");
 		/* WebKit */
@@ -68,14 +72,15 @@
 	}
 
 		// support table selections
-	tr.active,
-	.table-hover tbody tr.active:hover td,
-	.table-striped tbody tr:nth-child(odd).active td,
-	.table-striped tbody tr:nth-child(odd).active th {
+	TR.active,
+	.table-hover TBODY TR.active:hover td,
+	.table-striped TBODY TR:nth-child(odd).active td,
+	.table-striped TBODY TR:nth-child(odd).active th {
 		background-color : /*#f5f5f5*/ rgba(82, 168, 236, 0.2);
 	}
 
 		/* sortable */
+	/*
 	.table-striped tbody tr.sortable-placeholder td, .table-striped tbody tr.sortable-placeholder th {
 		background-color : transparent;
 	}
@@ -122,6 +127,7 @@
 	[ng-ampere-sortable] >:hover .ng-ampere-sortable-nohandle a >i {
 		cursor : pointer;
 	}
+	*/
 		/* -- */
 
 	overflow-x : auto;
@@ -143,6 +149,15 @@
 
 			.breadcrumb + .navbar.subnav-fixed {
 				margin-top: 0;
+			}
+
+			H1 {
+				i[class^="icon-"], [class*=" icon-"] {
+					width      : inherit;
+					line-height: 33px;
+				}
+				margin-top : 0px;
+				margin-bottom : 0px;
 			}
 		}
 
@@ -199,7 +214,10 @@
 		*:invalid~.inline-help.invalid,
 		*:invalid~.help-block.invalid,
 		.invalid~.inline-help.invalid,
-		.invalid~.help-block.invalid {
+		.invalid~.help-block.invalid,
+
+		.inline-help.error,
+		.help-block.error {
 			visibility  : visible;
 			color		: #e9322d;
 		}
@@ -275,7 +293,7 @@
 				H2 {
 					i[class^="icon-"], [class*=" icon-"] {
 						width      : inherit;
-						line-height: 21px;
+						line-height: 28px;
 					}
 					margin-top : 0px;
 					margin-bottom : 0px;
@@ -363,6 +381,11 @@
 					margin-left : 20px;
 				}
 			}
+		}
+
+		.tooltip.in {
+			opacity: 1;
+ 			filter: alpha(opacity=100);
 		}
 
 			/* Fixed subnav on scroll, but only for 980px and up (sorry IE!) */

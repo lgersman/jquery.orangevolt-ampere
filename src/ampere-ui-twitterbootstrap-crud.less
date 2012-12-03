@@ -29,11 +29,10 @@
 			}
 
 			TBODY {
-				TR.item {
+				TR {
 					 a.hover.ampere-transition,
-					 a.hover.ampere-transition i.icon-move {
+					 a.hover.ampere-transition {
 					 	visibility : hidden;
-					 	//margin-left: 4px;
 					 	color 	   : black;
 					 }
 
@@ -44,7 +43,8 @@
 
 				TR.item:hover {
 					  a.hover.ampere-transition {
-					 	visibility : inherit;
+					 	visibility  : inherit;
+					 	cursor		: auto;
 					 }
 				}
 
@@ -54,6 +54,80 @@
 					font-style	: italic;
 				}
 			}
+
+				/* sortable */
+			TBODY[ng-ampere-sortable] {
+				TR.sortable-placeholder TD
+				TR.sortable-placeholder TH {
+					background-color : transparent;
+				}
+
+				TR.sortable-placeholder {
+					cursor 				: move;
+					//background-image 	: -webkit-linear-gradient(-45deg, #fff 50%, #ddd 100%);
+					//background-size	: 2px 2px;
+					background-color 	: rgba(0, 136, 204, 0.47);
+
+					>TD, >TH, >*.not( TD, TH) {
+						background-color : transparent;
+					}
+				}
+
+				TR:not( .ng-ampere-sortable-nohandle).draghandle:hover,
+				TR:not( .ng-ampere-sortable-nohandle):hover .draghandle {
+					cursor : move;
+					background: rgba(0, 0, 0, 0.02);
+				}
+
+/*
+				TR[draggable]:not( .ng-ampere-sortable-nohandle):hover,
+				TR[draggable]:not( .ng-ampere-sortable-nohandle):hover *,
+				TR[draggable]:not( .ng-ampere-sortable-nohandle):hover .draghandle,
+				TR.item:not( .ng-ampere-sortable-nohandle):hover,
+				TR.item:not( .ng-ampere-sortable-nohandle):hover *,
+				TR.item:not( .ng-ampere-sortable-nohandle):hover .draghandle {
+					cursor : move;
+
+					a:hover,
+					a:hover *,
+					.ampere-transition,
+					.ampere-transition * {
+						cursor : pointer;
+					}
+				}
+
+				TR[draggable]:not( .ng-ampere-sortable-nohandle):hover .draghandle,
+				TR.item:not( .ng-ampere-sortable-nohandle):hover .draghandle {
+					background: rgba(0, 0, 0, 0.02);
+				}
+
+				TR[draggable]:hover .ng-ampere-sortable-nohandle,
+				TR[draggable]:hover .ng-ampere-sortable-nohandle *,
+				TR.item:hover .ng-ampere-sortable-nohandle,
+				TR.item:hover .ng-ampere-sortable-nohandle * {
+					cursor : auto;
+				}
+					// this is a ff fix
+				TR[draggable]:hover a.ng-ampere-sortable-nohandle,
+				TR[draggable]:hover a.ng-ampere-sortable-nohandle >i,
+				TR[draggable]:hover .ng-ampere-sortable-nohandle a,
+				TR[draggable]:hover .ng-ampere-sortable-nohandle a >i,
+				TR.item:hover a.ng-ampere-sortable-nohandle,
+				TR.item:hover a.ng-ampere-sortable-nohandle >i,
+				TR.item:hover .ng-ampere-sortable-nohandle a,
+				TR.item:hover .ng-ampere-sortable-nohandle a >i {
+					cursor : pointer;
+				}
+				*/
+			}
+				/* -- */
+
+		}
+
+		TABLE.scrollable {
+			overflow : auto;
+			position : relative;
+			display	 : block;
 		}
 	}
 }

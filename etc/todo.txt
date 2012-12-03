@@ -37,3 +37,20 @@
 * mocha instead of jasmine (http://visionmedia.github.com/mocha/)
 
 * display all installed hotkeys in help
+
+* dynamic validation display : 		input[data-invalid],
+		textarea[data-invalid],
+		select[data-invalid] {
+			position : relative;
+		}
+
+		input[data-invalid]:hover:before,
+		textarea[data-invalid]:hover:after,
+		select[data-invalid]:hover:after {
+			content: "attr(data-invalid)";
+			position: absolute;
+			top: 4em;
+			white-space: nowrap;
+		}
+
+http://www.w3schools.com/cssref/sel_empty.asp

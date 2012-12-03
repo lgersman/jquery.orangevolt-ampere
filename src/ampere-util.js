@@ -60,21 +60,29 @@
 				o = $( o);
 			}
 
-			if( o.jquery) {
+			var source;
+			if( o && o.jquery) {
 				$.ov.namespace( 'window.ov.ampere.util.getTemplate()').assert( o.length, 'jQuery collection is empty');
 				if( o[0].tagName=='SCRIPT') {
-					return $.trim( o.text().replace( "<![CDATA[", "").replace("]]>", ""));
+					source = $.trim( o.text().replace( "<![CDATA[", "").replace("]]>", ""));
+						// check if a converter for the given template type is associated
+					var converter = window.ov.ampere.util.getTemplate[ o.attr( 'type')];
+					if( $.isFunction( converter)) {
+						source = converter( source);
+					}
 				} else {
-					return $.trim( o.html());
+					source = $.trim( o.html());
 				}
 			} else {
-				return $.trim( o.responseText || o.toString());
+				source = $.trim( o && (o.responseText || o.toString()) || o);
 			}
+
+			return source;
 		},
 
 		angular : {
 				/**
-				 * returns the jQuery element owning thie sclope argument
+				 * returns the jQuery element associated with the scope argument
 				 */
 			getElement : function( scope) {
 				return $( '[ng-scope]').filter( function() {

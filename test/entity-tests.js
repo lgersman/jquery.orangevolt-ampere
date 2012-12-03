@@ -529,6 +529,55 @@
 				expect( hits[1].name).toEqual( 'batz');
 			});
 		});
+
+		describe( "atomic lists (aka key lists)", function() {
+			var languages = [
+				{ id : 'de_DE', country : 'Germany'},
+				{ id : 'fr_FR', country : 'France'},
+				{ id : 'en_US', country : 'USA'}
+			];
+
+			var list = [ 'de_DE', 'en_US'];
+
+			//var e = window.ov.entity( list, languages);
+
+			it( "projection", function() {
+				var projection = window.ov.entity.projection.atomic({
+					id : 'id',
+					values : languages
+				});
+
+				expect( projection.get( 'fr_FR')).toEqual( languages[1]);
+				expect( projection.get( 'en_US').country).toEqual( 'USA');
+
+				var matches = projection.match( list, 'an');
+
+				expect( matches.length).toEqual( 1);
+				expect( projection.get( matches[0]).country).toEqual( 'Germany');
+
+				var all = projection.all( ['de_DE', 'fr_FR']);
+				expect( all.length).toEqual( 2);
+				expect( all[0].country).toEqual( 'Germany');
+				expect( all[1].country).toEqual( 'France');
+
+				expect( projection.all( ['de_DE', 'fr_FR'], undefined, true).length, 1);
+				expect( projection.all( ['de_DE', 'fr_FR'], undefined, true)[0].name, 'USA');
+
+				var e = window.ov.entity( list, projection);
+				expect( e.find( 'de_DE')).toEqual( 'de_DE');
+				expect( e.find( 'fr_FR')).toEqual( undefined);
+
+				expect( e.projection( e.find( 'de_DE')).country).toEqual( 'Germany');
+
+				all = e.all( ['de_DE', 'fr_FR']);
+				expect( all.length).toEqual( 2);
+				expect( all[0].country).toEqual( 'Germany');
+				expect( all[1].country).toEqual( 'France');
+
+				expect( e.all( ['de_DE', 'fr_FR'], undefined, true).length, 1);
+				expect( e.all( ['de_DE', 'fr_FR'], undefined, true)[0].country, 'USA');
+			});
+		});
 	});
 
 	describe( "Projection", function() {

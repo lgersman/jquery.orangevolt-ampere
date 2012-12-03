@@ -28,7 +28,6 @@ for( var i=0; i<scripts.length; i++) {
 			'../libs/bootstrap-2.2.0/css/bootstrap.css',
 			'../libs/Font-Awesome/css/font-awesome.css',
 			'../libs/bootstrap-2.2.0/css/bootstrap-responsive.css',
-			'../libs/colorpicker/css/colorpicker.css',
 			'../libs/datepicker/css/datepicker.css',
 			'ampere-ui-twitterbootstrap.css'
 		];
@@ -52,7 +51,6 @@ for( var i=0; i<scripts.length; i++) {
 			'../libs/bootstrap-2.2.0/js/bootstrap.js',
 			//'../libs/jquery.sortable.js',
 			'../libs/datepicker/js/bootstrap-datepicker.js',
-			'../libs/colorpicker/js/bootstrap-colorpicker.js',
 
 			'../libs/angular/angular-1.0.1.js',
 			'../libs/angular/angular-cookies-1.0.1.js',

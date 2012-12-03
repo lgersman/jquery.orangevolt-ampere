@@ -38,7 +38,10 @@
 	</div>
 	<div class="container">
 		<header ng-show="$ampere.ui.getDescription( $ampere.module) || $ampere.ui.getCaption( $ampere.module) || $ampere.ui.getTransitions({ 'ampere.ui.type':'primary'}).length || $ampere.ui.getTransitions({ 'ampere.ui.type':'secondary'}).length">
-			<h1>{{$ampere.ui.getCaption( $ampere.module)}}</h1>
+			<h1>
+				<i ng-show="$ampere.ui.getIcon( $ampere.module)" ng-class="$ampere.ui.getIcon( $ampere.module)"></i>
+				{{$ampere.ui.getCaption( $ampere.module)}}
+			</h1>
 			<div class="lead" ng-bind-html-unsafe="$ampere.ui.getDescription( $ampere.module)"></div>
 
 			<ul class="breadcrumb" ng-show="$ampere.ui.getTransitions({ 'ampere.ui.type':'breadcrumb'}).length">

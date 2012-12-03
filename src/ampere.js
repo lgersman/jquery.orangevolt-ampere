@@ -320,7 +320,7 @@
 
 		this.state = function () {
 				// return state or (in case this is a module transition) current state
-			return state || module.current().state;
+			return state /*|| module.current().state*/;
 		};
 
 		//this.transitionName = transitionName;
@@ -1067,8 +1067,21 @@
 			var self = this;
 
 			this.onHotKey = function onHotkey( event) {
-				if( !self.isBlocked() && $.inArray( event.target.tagName, ['TEXTAREA', 'SELECT', 'INPUT'])==-1) {
+				if( !self.isBlocked()) {
 					var matchingHotkeys = window.ov.ampere.ui.hotkey.computeMatchingHotkeys( event);
+
+						// filter out hotkeys which are required for the current focused control to work
+						// (i.e. return is required for textarea whereas it is ok for input[text])
+					if( $.inArray( event.target.tagName, ['TEXTAREA', 'SELECT', 'INPUT'])!=-1) {
+						for( var i in matchingHotkeys) {
+							if( /del|up|down|return|left|right|home|end/.test( matchingHotkeys[i])) {
+								if( !(matchingHotkeys[i]=='return' && event.target.tagName=='INPUT')) {
+									return;
+								}
+							}
+						}
+					}
+
 					var module = self.controller.module;
 
 					var proceedTransitionHotkey = function( transition, ngAmpereHotkey, domElement) {
@@ -1351,7 +1364,7 @@
 		};
 
 		this.getIcon = function( object) {
-			return this._get( 'ampere.ui.icon', object, ['transition', 'view', 'target', 'module']);
+			return this._get( 'ampere.ui.icon', object, ['transition', 'view', 'target', 'state']);
 		};
 	}
 	Ampere.ui = Ui;
@@ -1457,9 +1470,12 @@
 						// create a new action
 					var command = action.call( transition, transition, this.ui, data);
 
-					if( !command) {
-							// no command returned -> abort proceeding
-						return false;
+						// if action returned true the view should be updated
+						// but not completely rerendered
+					if( command===true || !command) {
+							// (heavyweight refresh) command == true forces a full template update
+							// (lightweight refresh) command == false reevaluates based on the current dom structure
+						this.ui.render( 'State', command===true && this.module.current().view);
 					} else {
 							/*
 							 * when action returned a function -> wrap it within a deferred

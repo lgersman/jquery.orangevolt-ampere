@@ -65,9 +65,11 @@
 
 		<script id="main" type="text/template">
 			<input type="search" ng-model="search" tabindex="-1" class="search-query" placeholder="Filter">
+			<span ng-switch on="(list.addable() | type)">
+				<button ng-switch-when="object" ng-ampere-transition="list.addable().transition"></button>
+			</span>
 			<br><br>
-			<div ng-ampere-crud-list="list" style="max-height:400px;overflow:auto">
-			</div>
+			<div ng-ampere-crud-list="list" class="table-hover"></div>
 		</script>
 
 		<script id="note" type="text/template">
@@ -85,14 +87,40 @@
 					<fieldset>
 						<legend>Edit note</legend>
 						<div>
-							<textarea rows="5" placeholder="Enter note" class="fullwidth" ng-model="list.editable().workingcopy.message"></textarea>
+							<textarea class="input-block-level" autofocus required rows="5" placeholder="Enter note" ng-model="list.editable().item.message"></textarea>
 						</div>
 						<div class="pull-right btn-group">
 							<button ng-ampere-transition="list.editable().cancel"></button>
-							<button ng-ampere-transition="list.editable().update"></button>
+							<button ng-ampere-transition="list.editable().commit"></button>
 						</div>
 					</fieldset>
 				</form>
+			</td>
+		</script>
+
+		<script id="note-add" type="text/template">
+			<td>
+				<form style="margin:0">
+					<fieldset>
+						<legend>Add note</legend>
+						<div>
+							<textarea class="input-block-level" autofocus required rows="5" placeholder="Enter note to add" ng-model="list.addable().item.message"></textarea>
+						</div>
+						<div class="pull-right btn-group">
+							<button ng-ampere-transition="list.addable().cancel"></button>
+							<button ng-ampere-transition="list.addable().commit"></button>
+						</div>
+					</fieldset>
+				</form>
+			</td>
+		</script>
+
+		<script id="word-add" type="text/template">
+			<td>
+				<input required type="text" autofocus placeholder="Enter new word" ng-model="list.addable().item">
+				<div class="block-help description">
+					Press <kbd>Return</kbd> to commit or <kbd>Esc</kbd> to cancel <strong>adding new word</strong>.
+				</div>
 			</td>
 		</script>
 
@@ -184,25 +212,18 @@
 						])
 						.options({
 							"onTemplate" : function( jTable, list) {
-								jTable.addClass( "table-hover table-bordered");
+								jTable.addClass( "table-bordered");
 							}
 						});
 
 						state.view( document.getElementById( 'main'));
-
-						state.options({
-							'ampere.ui.caption' : null
-						});
-
-							// return deferred of the crud list (i.e. its template)
-						return state.list;
 					},
 					locales : function( state) {
 						entityTransitions( state);
 
 						state.list = ov.ampere.crud.list( module.locales, [
    						    {
-   						    	property 	: "name",
+   						    	property	: 'name',
    						    	template 	: '<strong>{{item.name}}</strong>'
    						    },
    						    'id'
@@ -217,7 +238,7 @@
 						])
 						.options({
 							"onTemplate" : function( jTable, list) {
-								jTable.addClass( "table-hover");
+								jTable.addClass( "scrollable").css( 'max-height', '400px');
 							}
 						});
 
@@ -237,31 +258,44 @@
 						});
 
 						state.view( document.getElementById( 'main'));
-
-						state.options({
-							'ampere.ui.caption' : null
-						});
 					},
 					words : function( state) {
 						entityTransitions( state);
 
-						state.list = ov.ampere.crud.list( ['Alpha', 'Beta', 'Gamma'])
+						state.list = ov.ampere.crud.list( ['Alpha', 'Beta', 'Gamma'], [	{ template : '<a target="_blank" href="http://wikipedia.org/wiki/{{item}}">{{item | uppercase}}</a>'}])
 						.filter( function( item) {
 							var search = $.trim( state.search).toLowerCase();
 							return !search.length || item.toLowerCase().indexOf( state.search)!=-1;
 						})
 						.draggable( function( draggable) {
+								// suppress show up flash messages
 							draggable.transition.options({
 								"redo.message" : null,
 								"undo.message" : null
 							});
-						});
+						})
+						.addable({
+							template : document.getElementById('word-add'),
+							callback : function( addable) {
+								var action = addable.transition.action();
+								addable.transition.action( function( transition, ui, data) {
+									var redo = action( transition, ui, data);
+									addable.item = 'hey !!!!!!!';
+									return redo;
+								});
+
+								addable.commit
+								.enabled( function() {
+									return $.trim( $(':text').val()).length>0;
+								})
+								.options({
+									'ampere.ui.hotkey' : 'return'
+								});
+							}
+						})
+						.removable( true);
 
 						state.view( document.getElementById( 'main'));
-
-						state.options({
-							'ampere.ui.caption' : null
-						});
 					},
 					notes : function( state) {
 						entityTransitions( state);
@@ -270,7 +304,7 @@
 						//.selectable( false)
 						.filter( function( item) {
 							var search = $.trim( state.search).toLowerCase();
-							return !search.length || item.message.toLowerCase().indexOf( state.search)!=-1 || item.author.toLowerCase().indexOf( state.search)!=-1;
+							return !search.length || item.message.toLowerCase().indexOf( search)!=-1 || item.author.toLowerCase().indexOf( search)!=-1;
 						})
 						.draggable({
 							handle : '.draghandle'
@@ -278,22 +312,35 @@
 						.editable({
 							template	: function() {
 								return $('#note-editor');
-							},
-							callback	: function( editable) {
-								/*
-								editable.transition.action( function( transition, ui, event) {
-									alert( 'coool !');
-								});
-								*/
 							}
 						})
-						.removable( true);
+						.removable( true)
+						.addable({
+							template	: function() {
+								return $('#note-add');
+							},
+							callback	: function( addable) {
+								var action = addable.transition.action();
+
+								addable.transition.action( function( transition, ui, data) {
+									var redo = action( transition, ui, data);
+										// configure
+									addable.item = {
+										author : 'lars.gersmann@gmail.com',
+										message: 'This is the default note.',
+										date : $.now()
+									};
+									addable.index = 0;
+									return redo;
+								});
+							}
+						})
+						.options({
+							'list-empty.message' 	 : 'No notes in list.',
+							'list-nomatches.message' : 'No note matches filter.'
+						});
 
 						state.view( document.getElementById( 'main'));
-
-						state.options({
-							'ampere.ui.caption' : null
-						});
 					}
 				});
 

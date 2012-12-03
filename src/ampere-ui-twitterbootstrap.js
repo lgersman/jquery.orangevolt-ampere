@@ -72,7 +72,8 @@
 			};
 		});
 		ampere.filter( 'match', function() {
-			return function( items, property, value) {
+			return function( items, value, property) {
+				property = property!==undefined || 'id';
 				if( !$.isArray( value)) {
 					value = [ value];
 				}
@@ -84,6 +85,21 @@
 						}
 					}
 				});
+			};
+		});
+		ampere.filter( 'find', function() {
+			return function( items, value, property) {
+				property = property!==undefined && property || 'id';
+				if( !$.isArray( value)) {
+					value = [ value];
+				}
+
+				var hit;
+				for( var i in value) {
+					if( hit = window.ov.entity.find( items, value[i], property)) {
+						return hit;
+					};
+				}
 			};
 		});
 
@@ -167,9 +183,6 @@
 						}
 
 						var template = scope.$ampere.template;
-
-						_ns.debug( 'template=' + template);
-
 						element.html( template);
 						$compile( element.contents())( scope);
 					});
@@ -344,7 +357,7 @@
 
 						_ns = $.ov.namespace('ngAmpereTransition(' + newValue.fullName() + ')');
 
-						var type = attrs.type || ($.inArray( element[0].tagName.toLowerCase(), Object.keys( templates))!=-1 ? element[0].tagName.toLowerCase() : 'button');
+						var type = attrs.type || newValue.options( 'ampere-ui-input-type') || ($.inArray( element[0].tagName.toLowerCase(), Object.keys( templates))!=-1 ? element[0].tagName.toLowerCase() : 'button');
 
 						scope.transition = newValue;
 						scope.$enabled = scope.transition.enabled();
@@ -385,7 +398,7 @@
 						} else {
 							_ns.raise( 'type "', type, '" is unknown');
 						}
-					});
+					}, true);
 				}
 			};
 		}]);
@@ -407,7 +420,7 @@
 								var controller = ui.controller;
 
 								!ui.isBlocked() && controller.proceed( transition, [event]);
-							} else {
+							} else if( transition!==false) {
 								_ns.error( 'attribute "ng-ampere-' + eventName + '" (=' +  attrs[ directive] + ') doesnt resolve to an ampere transition');
 							}
 							event.preventDefault();
@@ -513,6 +526,11 @@
 							options.items = $( element.get()).children( options.items);
 						} else if( !options.items) {
 							options.items = $( element.get()).children( ':not(.ng-ampere-sortable-nohandle)');
+						}
+
+							// custom handle is given
+						if( !options.handle) {
+							options.items.addClass( 'draghandle');
 						}
 
 						var sortable = $( element.get()).sortable( options);
@@ -629,7 +647,7 @@
 		ampere.directive( 'ngAmpereTemplate', [ '$compile', function( $compile) {
 			return {
 				restrict	: 'A',
-				scope		: 'isolate',
+				scope		: false,
 				link		: function( scope, element, attrs) {
 					var contents = element.contents();
 
@@ -805,7 +823,7 @@
 		}
 
 		function onMessage( event) {
-			var location = event.originalEvent.source.location;
+			var location = event.originalEvent.source.location.href.match( /[^#]+/);
 			if( onMessage.handlers[ location]) {
 				onMessage.handlers[ location]( event.originalEvent.data, event.originalEvent.source);
 			}
@@ -851,6 +869,39 @@
 			$( this.controller.element).off( 'dragstart', 'a[draggable]', onDraggableAnchor);
 
 			$( window).off( 'message', onMessage);
+		};
+
+			/**
+			 * (used by crud table for example)
+			 */
+		this.scrollIntoView = function( jElement, /*false==at bottom, true==at top*/bottom) {
+			var jContainer = jElement.parent().closest( '.scrollable');
+
+				// abort if no scrollable container was found
+			if( !jContainer.length) {
+				return;
+			}
+
+			if( bottom) {
+					// if before visible area
+				if( jElement.position().top<0) {
+					this.scrollIntoView( jElement);
+				} else if( jElement.position().top>=jContainer.height()) {
+						// if after visible area
+					jContainer.stop().animate({
+						scrollTop : jContainer.scrollTop() + jElement.position().top - jContainer.height() + jElement.height()
+					}, 'fast');
+				}
+			} else {
+					// if before visible area
+				if( jElement.position().top<0) {
+					jContainer.stop().animate({
+						scrollTop : jContainer.scrollTop() + jElement.position().top
+					}, 'fast');
+				} else if( jElement.position().top>=jContainer.height()) {
+					this.scrollIntoView( jElement, true);
+				}
+			}
 		};
 
 		this.flash = function( message, /* optional */options) {
@@ -983,7 +1034,11 @@
 			this.flash.error( message, onRetry);
 		};
 
+		//var lastView = undefined;
 		this.renderState = function( view, template, transitionResult) {
+				// twitter bootstrap fix : cleanup added dropdowns
+			$('body').children( '.dropdown-menu').remove();
+
 				// remember scroll position
 			var scrollX = window.scrollX;
 			var scrollY = window.scrollY;
@@ -997,9 +1052,9 @@
 					 */
 				if( view) {
 					scope.$ampere = {
-						module   : controller.module,
-												ui          : controller.ui,
-						view     : view,
+						module	: controller.module,
+						ui		: controller.ui,
+						view	: view,
 							/*
 							 * module.current.reset is calling this
 							 * function without providing a template
@@ -1012,6 +1067,13 @@
 
 				// compute optional flash message
 			$.when( transitionResult).done( function() {
+					// initialize datepickers
+				$( 'input[data-date-format]').datepicker({ autoclose : true})
+					// datepicker only triggers chnage but angular expects "input"
+				.on('changeDate', function( event) {
+					$( event.target).trigger( 'input');
+				});
+
 				focus( controller.element);
 
 				window.scrollTo( scrollX, scrollY);
