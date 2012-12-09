@@ -60,7 +60,7 @@
 						}
 					};
 				} else if( $.isPlainObject( column)) {
-					return {
+					return $.extend( {}, column, {
 						get		: $.isFunction( column.get) && column.get || function( item) {
 							return item[ column.get];
 						},
@@ -83,7 +83,7 @@
 								};
 							}
 						})( column.template)
-					};
+					});
 				} else if( $.isFunction( column)) {
 					return {
 						get : column,
@@ -425,8 +425,8 @@
 				 * @returns {Object} either addable, editable or undefined if no editing is currently in action
 				 */
 			this.getEditingContext = function getEditingContext() {
-				return this.addable().item!==undefined && this.addable() ||
-					this.editable().item!==undefined && this.editable();
+				return (this.addable() &&  this.addable().item!==undefined && this.addable()) ||
+				(this.editable() && this.editable().item!==undefined && this.editable());
 			};
 
 			this.init = function( state) {
@@ -463,15 +463,15 @@
 					if( !draggable.transition) {
 						draggable.transition = state.transition( state.name() + '.' + stateProperty + '.list_move').
 						action( function( transition, ui, data) {
-							//debugger
 								// data[0] is the event
 							var event = data[0],
 								dTR = event.data.items[0],
 									// adjust newPosition based on addable TR is relevant
 								newPosition = event.data.position;
-								if( self.addable()) {
-									newPosition -= self.addable().index && self.addable().item!==undefined ? 0 : 1;
-								}
+
+									// substract 1 if not addable or addable.index==0
+								newPosition -= self.addable() && self.addable().index && self.addable().item!==undefined ? 0 : 1;
+
 								oldPosition = $( dTR).data( 'position');
 
 							if( newPosition==oldPosition) {

@@ -64,20 +64,20 @@
 			if( o && o.jquery) {
 				$.ov.namespace( 'window.ov.ampere.util.getTemplate()').assert( o.length, 'jQuery collection is empty');
 				if( o[0].tagName=='SCRIPT') {
-					source = $.trim( o.text().replace( "<![CDATA[", "").replace("]]>", ""));
+					source = o.text().replace( "<![CDATA[", "").replace("]]>", "");
 						// check if a converter for the given template type is associated
 					var converter = window.ov.ampere.util.getTemplate[ o.attr( 'type')];
 					if( $.isFunction( converter)) {
 						source = converter( source);
 					}
 				} else {
-					source = $.trim( o.html());
+					source = o.html();
 				}
 			} else {
-				source = $.trim( o && (o.responseText || o.toString()) || o);
+				source = o && (o.responseText || o.toString()) || o;
 			}
 
-			return source;
+			return $.trim( source);
 		},
 
 		angular : {

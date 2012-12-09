@@ -52,24 +52,48 @@
 		margin-bottom : inherit;
 	}
 
+		/* textile output */
+	pre>code {
+		display : block;
+		//border  : 1px solid #e1e1e8;
+		padding : 2px 4px;
+		background-color: #f5f5f5;
+		white-space: pre;
+		word-wrap:normal;
+	}
+
 	code, pre {
 		color : rgb(36, 95, 20);
 	}
 
 	pre {
 		padding: 2px 4px;
+		overflow : auto;
 	}
 
+		/* suppress margins on standalone elements in table cells */
+	TD >form:FIRST-CHILD:LAST-CHILD,
+	TD >dl:FIRST-CHILD:LAST-CHILD,
+	TD >input:FIRST-CHILD:LAST-CHILD, {
+		margin : 0;
+	}
+
+	dd >TABLE:FIRST-CHILD:LAST-CHILD {
+		margin : 0;
+	}
+
+	/*
 	TD textarea.fullwidth {
-		/* Firefox */
+		// Firefox
 		width: -moz-calc( ~"100% - 14px");
-		/* WebKit */
+		// WebKit
 		width: -webkit-calc( ~"100% - 14px");
-		/* Opera */
+		// Opera
 		width: -o-calc( ~"100% - 14px");
-		/* Standard */
+		// Standard
 		width: calc( ~"100% - 14px");
 	}
+	*/
 
 		// support table selections
 	TR.active,
@@ -280,7 +304,7 @@
 			padding-bottom: 7px;
 		}
 
-		section {
+		SECTION {
 			padding-top: 10px;
 		}
 
@@ -320,8 +344,21 @@
 				}
 			}
 
+			.ampere-view >section:FIRST-CHILD {
+				padding-top : 0;
+			}
+
+
 			.page-header.view-empty {
 				border : 0;
+			}
+
+				// potentially used in twitter bootstrap modals (the header)
+			H1, H2,  H3,  H4, H5 {
+				i[class^="icon-"], [class*=" icon-"] {
+					width      : inherit;
+					line-height: inherit;
+				}
 			}
 		}
 
@@ -407,7 +444,7 @@
 		    filter: progid:DXImageTransform.Microsoft.gradient(enabled=false); /* IE6-9 */
 		  }
 		  .subnav-fixed .nav {
-		    width: 938px;
+		    //width: 938px;
 		    margin: 0 auto;
 		    padding: 0 1px;
 		  }

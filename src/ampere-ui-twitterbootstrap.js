@@ -102,6 +102,11 @@
 				}
 			};
 		});
+		ampere.filter( 'sort', function() {
+			return function( items, property) {
+				return window.ov.entity.sort( items, property);
+			};
+		});
 
 		var ampereTwitterbootstrapController = function( $scope, $rootElement, $window, $http, $timeout,  $log, $resource, $cookies/*, $location*/) {
 			var controller = $rootElement.parent().data( 'ampere.controller');
@@ -521,19 +526,31 @@
 						transition = value;
 					}
 
+					scope.$watch( function() {
+						if( element.hasClass( 'ui-sortable')) {
+							if( !options.handle) {
+								$( options.items, element.get()).addClass( 'draghandle');
+							}
+							$( element.get()).sortable( 'refresh');
+						}
+					});
+
 					$timeout( function() {
 						if( typeof( options.items)=='string') {
-							options.items = $( element.get()).children( options.items);
+							//options.items = $( element.get()).children( options.items);
+							options.items = '> ' + options.items;
 						} else if( !options.items) {
-							options.items = $( element.get()).children( ':not(.ng-ampere-sortable-nohandle)');
+							//options.items = $( element.get()).children( ':not(.ng-ampere-sortable-nohandle)');
+							options.items = '> *:not(.ng-ampere-sortable-nohandle)';
 						}
 
 							// custom handle is given
 						if( !options.handle) {
-							options.items.addClass( 'draghandle');
+							$( options.items, element.get()).addClass( 'draghandle');
 						}
 
 						var sortable = $( element.get()).sortable( options);
+
 						/*
 						var ui = scope.$ampere.ui;
 						var controller = ui.controller;
@@ -935,7 +952,16 @@
 								flash.hide();
 								options.value();
 							});
-							flash.find( '.message').append( retry);
+
+							var cancel = $('<button class="btn"><i></i>Cancel</button>');
+							cancel.click( function() {
+								flash.hide();
+								self.unblock();
+							});
+
+							flash.find( '.message').append(
+								$( '<div class="btn-group">').append( retry, cancel)
+							);
 						}
 						flash.find( 'button.close').hide();
 						break;

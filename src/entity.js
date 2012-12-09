@@ -143,18 +143,6 @@
 
 		return hits;
 	};
-		/**
-		 * searches the array including all (via projection) referenced arrays for matching
-		 * properties.
-		 *
-		 * @param property 'string' an angular expression
-		 * @return sorted array
-		 */
-	Projection.prototype.sort = function match( array, property) {
-		var sorted = [].concat( array);
-			// TODO
-		return sorted;
-	};
 
 		/**
 		 * @param array all allowed values of param property
@@ -369,6 +357,29 @@
 		 */
 	window.ov.entity.last = function last( array) {
 		return array.length && array[ array.length-1] || undefined;
+	};
+
+		/**
+		 * return a sorted copy of the array
+		 *
+		 * @param array
+		 * @param property
+		 * @returns {array}
+		 */
+	window.ov.entity.sort = function sort( array, property) {
+		var property = arguments.length==2 && arguments[1]!==undefined ? arguments[1] : 'id';
+		var sorted = [].concat( array).sort( function( l, r) {
+			l = l[property];
+			r = r[property];
+
+			if( l!=null && l!=undefined) {
+				return l.localeCompare( r);
+			} else {
+				return l!==r ? 1 : -1;
+			}
+		});
+
+		return sorted;
 	};
 
 	window.ov.entity.projection = Projection;
