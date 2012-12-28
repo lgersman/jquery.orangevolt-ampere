@@ -472,7 +472,7 @@
 									// substract 1 if not addable or addable.index==0
 								newPosition -= self.addable() && self.addable().index && self.addable().item!==undefined ? 0 : 1;
 
-								oldPosition = $( dTR).data( 'position');
+								var oldPosition = $( dTR).data( 'position');
 
 							if( newPosition==oldPosition) {
 								return;
@@ -517,11 +517,12 @@
 					}
 				}
 
+				var template;
 				if( this.editable()) {
 					var editable = this.editable();
 
 					if( !$.isFunction( editable.template)) {
-						var template = editable.template;
+						template = editable.template;
 						editable.template = function() {
 							return window.ov.ampere.util.getTemplate( template);
 						};
@@ -578,8 +579,10 @@
 							return function redo() {
 								self.selection( item);
 
-								function undo() {
+								return function undo() {
 									self.selection( item);
+
+									return redo;
 								};
 							};
 
@@ -617,7 +620,7 @@
 									self.selection( selection);
 
 									return $.Deferred().resolve( transition.options( 'undo.message')).promise( redo);
-								};
+								}
 
 								return $.Deferred().resolve( transition.options( 'redo.message')).promise( undo);
 							};
@@ -637,7 +640,7 @@
 					var addable = this.addable();
 
 					if( !$.isFunction( addable.template)) {
-						var template = addable.template;
+						template = addable.template;
 						addable.template = function() {
 							return window.ov.ampere.util.getTemplate( template);
 						};
@@ -729,7 +732,7 @@
 									self.selection( selection);
 
 									return $.Deferred().resolve( transition.options( 'undo.message')).promise( redo);
-								};
+								}
 
 								return $.Deferred().resolve( transition.options( 'redo.message')).promise( undo);
 							};
@@ -738,7 +741,7 @@
 							'redo.message'			: 'Item added.',
 							'ampere.ui.description' : 'Add item',
 							'ampere.ui.caption'		: 'Add',
-							'ampere.ui.hotkey'		: 'Shift+S'
+							'ampere.ui.hotkey'		: 'Shift+Alt+S'
 						});
 					}
 
@@ -768,7 +771,7 @@
 										self.get().splice( index, 0, item);
 
 										return $.Deferred().resolve( transition.options( 'undo.message')).promise( redo);
-									};
+									}
 
 									return $.Deferred().resolve( transition.options( 'redo.message')).promise( undo);
 								};

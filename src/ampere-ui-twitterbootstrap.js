@@ -98,7 +98,7 @@
 				for( var i in value) {
 					if( hit = window.ov.entity.find( items, value[i], property)) {
 						return hit;
-					};
+					}
 				}
 			};
 		});
@@ -262,6 +262,7 @@
  ng-class="{disabled : !transition.enabled(), active : transition.active(), \'ampere-hotkey\' : hotkey}"\
  accesskey="{{attrs.accesskey}}"\
  id="{{attrs.id}}"\
+ tabindex="{{attrs.tabindex}}"\
  style="{{attrs.style}}"\
  data-ampere-hotkey="{{attrs.ngAmpereHotkey}}"\
  title="{{attrs.title || $ampere.ui.getDescription( transition) | strip_tags}}{{hotkey && \' \' + hotkey}}">\
@@ -274,6 +275,7 @@
  ng-class="{disabled : !transition.enabled(), active : transition.active(), \'ampere-hotkey\' : hotkey}"\
  ng-disabled="!transition.enabled()"\
  id="{{attrs.id}}"\
+ tabindex="{{attrs.tabindex}}"\
  accesskey="{{attrs.accesskey}}"\
  style="{{attrs.style}}"\
  data-ampere-hotkey="{{attrs.ngAmpereHotkey}}"\
@@ -288,6 +290,7 @@
  ng-class="{disabled : !transition.enabled(), active : transition.active(), \'ampere-hotkey\' : hotkey}"\
  ng-disabled="!transition.enabled()"\
  accesskey="{{attrs.accesskey}}"\
+ tabindex="{{attrs.tabindex}}"\
  style="{{attrs.style}}"\
  data-ampere-hotkey="{{attrs.ngAmpereHotkey}}"\
  title="{{attrs.title || $ampere.ui.getDescription( transition) | strip_tags}}{{hotkey && \' \' + hotkey}}">\
@@ -309,6 +312,7 @@
  ng-disabled="!transition.enabled()"\
  id="{{attrs.id}}"\
  accesskey="{{attrs.accesskey}}"\
+ tabindex="{{attrs.tabindex}}"\
  style="{{attrs.style}}"\
  data:ampere-hotkey="{{attrs.ngAmpereHotkey}}"\
  title="{{attrs.title || $ampere.ui.getDescription( transition) | strip_tags}}{{hotkey && \' \' + hotkey}}">\
@@ -321,6 +325,7 @@
  ng-class="{disabled : !transition.enabled(), active : transition.active(), \'ampere-hotkey\' : hotkey}"\
  ng-disabled="!transition.enabled()"\
  accesskey="{{attrs.accesskey}}"\
+ tabindex="{{attrs.tabindex}}"\
  style="{{attrs.style}}"\
  data-ampere-hotkey="{{attrs.ngAmpereHotkey}}"\
  title="{{attrs.title || $ampere.ui.getDescription( transition) | strip_tags}}{{hotkey && \' \' + hotkey}}">\
@@ -661,6 +666,26 @@
 			};
 		}]);
 
+		ampere.directive( 'ngAmpereDeferred', [ function() {
+			var _ns = $.ov.namespace( 'ngAmpereDeferred');
+
+			return {
+				restrict   : 'A',
+				link: function( scope, element, attrs) {
+					function wrap( fn) {
+						var deferred = fn.call( element, element);
+						return $.isFunction( deferred.abort) && deferred.abort || $.isFunction( deferred.reject) && deferred.reject || $.noop;
+					}
+
+					var disposables = element.closest( '.ampere-module').data( 'ampere.disposable');
+					var deferredFn = scope.$eval( attrs.ngAmpereDeferred);
+					_ns.assert( $.isFunction( deferredFn), 'Argument ngAmpereDeferred(=', element.attr( 'ng-ampere-deferred'), ') expected to be a function<Deferred>');
+
+					disposables.push( wrap( deferredFn));
+				}
+			};
+		}]);
+
 		ampere.directive( 'ngAmpereTemplate', [ '$compile', function( $compile) {
 			return {
 				restrict	: 'A',
@@ -696,6 +721,36 @@
 							$compile( element.contents())( scope);
 						}
 					}, true);
+				}
+			};
+		}]);
+
+		ampere.directive( 'ngAmpereValidate', [ function( $timeout) {
+			var _ns = $.ov.namespace( 'ngAmpereValidate');
+
+			return {
+				restrict   : 'A',
+				link: function( scope, element, attrs) {
+					var fn = scope.$eval( attrs.ngAmpereValidate);
+					_ns.assert(
+						$.isFunction( fn),
+						'dont know how to handle argument "', attrs.ngAmpereWatch, '". function or plain object argument is expected.'
+					);
+
+					var state = scope.$ampere.module.current().state;
+					if( $.isFunction( fn)) {
+						if( attrs.ngModel) {
+							scope.$watch( attrs.ngModel, function( oldValue, newValue) {
+								element.setCustomValidity( '');
+								fn.call( element.get(), element, state);
+							}, true);
+						} else {
+							element.on( 'input', function() {
+								element.setCustomValidity( '');
+								fn.call( element, element, state);
+							});
+						}
+					}
 				}
 			};
 		}]);
@@ -1098,6 +1153,10 @@
 					// datepicker only triggers chnage but angular expects "input"
 				.on('changeDate', function( event) {
 					$( event.target).trigger( 'input');
+				});
+					// render initial validation results into title 
+				$( ".html5validation-title").each( function() {
+					$( this).attr( 'title', this.validationMessage);
 				});
 
 				focus( controller.element);

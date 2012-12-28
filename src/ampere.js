@@ -164,10 +164,10 @@
 			var redoCommand;
 			if( arguments.length) {
 				if( !(arguments[0] instanceof jQuery.Event)) {
-					var ui = arguments.length && arguments[0].ui;
-					var arg = arguments[0];
-					var view = module.current().view;
-					var undoCommand;
+					var ui = arguments.length && arguments[0].ui,
+						arg = arguments[0],
+						view = module.current().view,
+						undoCommand;
 
 					redoCommand = function RedoCommand( historyReady) {
 						var redoResult = module._transit( arg.command, arg.source, arg.target, arg.view, arg.ui, historyReady);
@@ -179,6 +179,7 @@
 									redoCommand.promise = $.when( undoResult).promise;
 									return $.isFunction( undoResult) ? redoCommand : undefined;
 								};
+
 								undoCommand.target = arg.source;
 								undoCommand.view = view;
 							}
@@ -1073,9 +1074,9 @@
 						// filter out hotkeys which are required for the current focused control to work
 						// (i.e. return is required for textarea whereas it is ok for input[text])
 					if( $.inArray( event.target.tagName, ['TEXTAREA', 'SELECT', 'INPUT'])!=-1) {
-						for( var i in matchingHotkeys) {
-							if( /del|up|down|return|left|right|home|end/.test( matchingHotkeys[i])) {
-								if( !(matchingHotkeys[i]=='return' && event.target.tagName=='INPUT')) {
+						for( var q in matchingHotkeys) {
+							if( /del|up|down|return|left|right|home|end/.test( matchingHotkeys[q])) {
+								if( !(matchingHotkeys[q]=='return' && event.target.tagName=='INPUT')) {
 									return;
 								}
 							}
@@ -1511,7 +1512,7 @@
 
 							controller.module.history().redo({
 								command	: command,
-								source	: transition.state(),
+								source	: transition.state() || module.current().state, /* state() may return null for module transitions*/
 								target	: transition.target(),
 								view    : view,
 								ui		: controller.ui

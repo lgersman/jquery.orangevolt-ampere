@@ -7,6 +7,7 @@ module.exports = function(grunt) {
 			'bootstrap-2.2.0/js/bootstrap.min.js',
 			//'jquery.sortable.js',
 			'datepicker/js/bootstrap-datepicker.js',
+			'cache.js',
 
 			'angular/angular-1.0.1.min.js',
 			'angular/angular-cookies-1.0.1.min.js',
@@ -21,6 +22,7 @@ module.exports = function(grunt) {
 		'namespace.js',
 		'entity.js',
 		'jquery.upload.js',
+		'jquery.html5validation.js',
 		'ampere.js',
 		'ampere-util.js',
 		'ampere-crud.js',
@@ -160,7 +162,7 @@ module.exports = function(grunt) {
 		},
 		uglify: {
 			mangle: {
-				except: [ 'Ampere', 'Module', 'Transition', 'State', 'View', 'History', 'Options', 'Ui', 'UiController', 'Component', 'Entity', 'Projection']
+				except: [ 'Ampere', 'Module', 'Transition', 'State', 'View', 'History', 'Options', 'Ui', 'UiController', 'Component', 'Entity', 'Projection', 'CachePriority', 'Cache']
 			}
 		}
 	});

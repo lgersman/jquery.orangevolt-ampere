@@ -27,8 +27,16 @@
 		font-size: @fs;
 	}
 
-	.navbar .brand {
-		font-size : 16px;
+	.navbar {
+		margin-bottom : 10px;
+
+		.brand {
+			font-size : 16px;
+		}
+	}
+
+	.navbar.navbar-fixed-bottom {
+		margin-bottom : 0;
 	}
 
 	h1 {
@@ -37,6 +45,10 @@
 
 	h2 {
 		font-size : 22px;
+	}
+
+	hr {
+		margin : 4px 0;
 	}
 
 	legend {
@@ -74,7 +86,8 @@
 		/* suppress margins on standalone elements in table cells */
 	TD >form:FIRST-CHILD:LAST-CHILD,
 	TD >dl:FIRST-CHILD:LAST-CHILD,
-	TD >input:FIRST-CHILD:LAST-CHILD, {
+	TD >input:FIRST-CHILD:LAST-CHILD,
+	TD >select:FIRST-CHILD:LAST-CHILD {
 		margin : 0;
 	}
 
@@ -161,14 +174,23 @@
 		position : relative;
 		//overflow : hidden;
 
-		/* crunch bootstrap default space */
-		header .breadcrumb, header .navbar {
-			margin-bottom: 0;
-		}
-
 		header {
-			.breadcrumb + .navbar {
-				margin-top: 20px;
+			>H1:not( .yes):FIRST-CHILD {
+				margin-top : 10px;
+			}
+
+				/* crunch bootstrap default space */
+			.breadcrumb, .navbar {
+				margin-bottom: 0;
+			}
+
+			.breadcrumb:empty {
+				padding : 0;
+				margin  : 0;
+			}
+
+			.breadcrumb:not(:empty) + .navbar {
+				margin-top: 10px;
 			}
 
 			.breadcrumb + .navbar.subnav-fixed {
@@ -187,7 +209,9 @@
 
 		dt {
 			.btn-mini {
-				margin-bottom : 5px;
+				margin-bottom : 6px;
+				margin-top 	  : 4px;
+				margin-left	  : 4px;
 			}
 		}
 
@@ -305,11 +329,14 @@
 		}
 
 		SECTION {
-			padding-top: 10px;
+			padding-top: 4px;
 		}
 
 		.ampere-state {
 			.page-header {
+				padding-bottom 	: 0;	
+				margin 			: 0 0 10px;
+
 				a.icon-question-sign, .ampere-help a {
 					font-size 		: small;
 				}
@@ -342,6 +369,10 @@
 						}
 					}
 				}
+
+				.description:not(:empty) {
+					margin-bottom : 4px;
+				}
 			}
 
 			.ampere-view >section:FIRST-CHILD {
@@ -365,6 +396,13 @@
 		/* gray out disabled anchors in navbars */
 		.navbar-inverse .nav > li.disabled > a {
 			color: #555555;
+		}
+
+		FOOTER {
+				/* this is required to prevent flickering by the moving toolbar */
+			>DIV.description {	
+				min-height: 80px;
+			}
 		}
 
 		>.overlay {

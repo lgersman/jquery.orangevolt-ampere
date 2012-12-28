@@ -607,4 +607,66 @@
 			expect( projection.match( persons, /ar/)[1].name).toEqual( 'marta');
 		});
 	});
+
+	describe( "lamda", function() {
+		var expr = window.ov.entity.lambda( "( person) => person.name=='lars'");
+		var arr = $.grep( persons, expr);
+
+		expect( arr[0]).toEqual( persons[0]);
+	});
+
+	describe( "where", function() {
+		it( "expression", function() {
+			var arr = window.ov.entity.where( persons, "this.name=='lars'");	
+			expect( arr[0]).toEqual( persons[0]);
+
+			arr = window.ov.entity.where( persons, "return this.name=='lars'");	
+			expect( arr[0]).toEqual( persons[0]);
+
+			arr = window.ov.entity.where( persons, "this.name=='lars';");	
+			expect( arr[0]).toEqual( persons[0]);
+
+			arr = window.ov.entity.where( persons, "return this.name=='lars';");	
+			expect( arr[0]).toEqual( persons[0]);
+		});
+
+		it( "expression with argument", function() {
+			var arr = window.ov.entity.where( persons, "( person) => person.name=='lars'");	
+			expect( arr[0]).toEqual( persons[0]);
+		});
+
+		it( "expression with param", function() {
+			var arr = window.ov.entity.where( persons, "( person, index, out, name) => person.name==name", 'lars');	
+			expect( arr[0]).toEqual( persons[0]);
+
+			var expr = window.ov.entity.lambda( "( person, index, out, name) => person.name==name");	
+			arr = window.ov.entity.where( persons, expr, 'lars');	
+			expect( arr[0]).toEqual( persons[0]);
+		});
+
+		it( "unique", function() {
+			var arr = window.ov.entity.select( persons, "( person) => person.country");	
+			arr = window.ov.entity.where( arr, "( country, index, out) => $.inArray( country, out)==-1");	
+			expect( arr).toEqual( [ 'de', 'ru', 'nl']);
+
+				// same but shorter written
+			arr = window.ov.entity.select( persons, "( person) => person.country");	
+			arr = window.ov.entity.where( arr, "( country, index, out) => !~$.inArray( country, out)");	
+			expect( arr).toEqual( [ 'de', 'ru', 'nl']);
+		});
+	});
+
+	describe( "select", function() {
+		it( "expression", function() {
+			var arr = window.ov.entity.select( persons, "this.country");	
+			expect( arr).toEqual( [ 'de', 'ru', 'nl', 'de']);
+
+			arr = window.ov.entity.select( 
+				persons, 
+				"( person, index, out, countries) => window.ov.entity.where( countries, \"this.code=='\" + person.country + \"'\")[0]",
+				countries
+			);
+			expect( arr).toEqual( [ { code : 'de', name : 'Germany' }, { code : 'ru', name : 'Russia' }, { code : 'nl', name : 'Netherlands' }, { code : 'de', name : 'Germany' } ]);
+		});
+	});
 })( jQuery);

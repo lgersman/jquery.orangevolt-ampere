@@ -22,8 +22,41 @@
 					main : function( state) {
 						 this.view( document.getElementById( 'main'));
 
+						 state.re = "(\\d{4})-(bb)";
+						 state.validateRegexp = function( eInput) {
+						 	if( eInput.checkValidity()) {
+								try {
+									new RegExp( state.re);
+								} catch( ex) {
+									eInput.setCustomValidity( ex.message);
+								}
+							}
+						 };
+
+						 state.validateValue = function( eInput) {
+						 	if( eInput.checkValidity()) {
+								try {
+									if( !state.value.match( new RegExp( state.re))) {
+										eInput.setCustomValidity( "Value does'nt match regular expression(='" + state.re + "')");
+									}
+								} catch( ex) {
+								}
+							}
+						 };
+
+						 state.value = "2986-bb";
+						 state.matches = function() {
+							 try {
+							 	var re = new RegExp( state.re);
+							 	return state.value.match( re);
+							 } catch( ex) {
+
+							 }
+						 };
+
 						 state.options({
-							 'ampere.ui.description' : '<em>Hover over the link or &lt;code&gt; elements to see the custom directive usage result.</em>'
+							 'ampere.ui.caption' : '',
+							 'ampere.ui.description' : ''
 						 });
 					}
 				})
@@ -31,45 +64,7 @@
 					'ampere.ui.about' 		: 'This is a sample <a target="_blank" href="https://github.com/lgersman/jquery.orangevolt-ampere">Ampere</a> application.',
 					'ampere.ui.about.url'	: 'https://github.com/lgersman/jquery.orangevolt-ampere',
 					'ampere.ui.caption'		: 'HTML5 validation',
-					'ampere.ui.description'	: "This example shows html5 validaton in a ampere module utilizing the <code>ng-ampere-validation</code> directive",
-					'ampere.ui.angular'		: (function( ampere_ui_angular) {
-
-							/*
-							 * attach a angular module initialization callback function
-							 * to the set of existing angular module initialization callbacks
-							 */
-						ampere_ui_angular.push( function( angularModule) {
-
-								/*
-								 * define a custom directive "ngMyTooltip" utilizing the Twitter Bootstrap Tooltip
-								 */
-							angularModule.directive( 'ngMyTooltip', [ '$timeout', function( $timeout) {
-								var _ns = $.ov.namespace( 'ngMyTooltip');
-
-								return {
-									restrict   : 'A',
-									link: function( scope, element, attrs) {
-										$timeout( function() {
-											var options = scope.$eval( attrs.ngMyTooltip) || {};
-											$( element.get()).tooltip( options);
-										});
-									}
-								};
-							}]);
-
-								/*
-								 * define a custom filter called "jquery" taking its argument
-								 * (-> typically a css selector) and return a jquery collection
-								 */
-							angularModule.filter( 'jquery', function() {
-								return function( input, scope) {
-									return $( input);
-								};
-							});
-						});
-
-						return ampere_ui_angular;
-					})( window.ov.ampere.defaults[ 'ampere.ui.angular'] || [])
+					'ampere.ui.description'	: "This example shows html5 validaton in a ampere module utilizing <br><code>ng-ampere-validation</code> directive and <br><code>ampere html5 validation plugin</code> usage"
 				});
 			});
 
@@ -78,7 +73,47 @@
 			});
 		</script>
 		<script id="main" type="text/template">
-			TODO
+			<hr>
+			<form>
+				<dl>
+				    <dt>
+					    <label>
+						    <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Guide/Regular_Expressions">
+							    Regular expression
+						    </a>
+					    </label>
+				    </dt>
+				    <dd class="form-inline">
+					    <input
+						    class="html5validation-title"
+						    type="text"
+							ng-model="re"
+						    required
+						    ng-ampere-validate="validateRegexp"
+					    >
+					    <span ng-hide="$(':text:first').checkValidity()" class="inline-help error">
+							{{$(':text:first').validationMessage()}}
+						</span>
+				    </dd>
+				    <dt>
+					    <label>
+						    Value to match regular expression
+					    </label>
+				    </dt>
+				    <dd class="form-inline">
+					    <input
+							type="text"
+							ng-model="value"
+							required
+							ng-ampere-validate="validateValue"
+						>
+						<span ng-hide="$('form').checkValidity()" class="inline-help error">
+							{{$(':text:last').validationMessage()}}
+						</span>
+				    </dd>
+			    </dl>
+			</form>
+			<pre class="well" nng-show="$('form').checkValidity()">{{matches() || ''}}</pre>
 		</script>
  	</head>
  	<body>

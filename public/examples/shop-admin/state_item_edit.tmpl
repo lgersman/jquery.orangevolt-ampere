@@ -1,0 +1,90 @@
+<div class="navbar subnav">
+	<div class="navbar-inner">
+		<ul class="nav">
+			<li ng-class="{disabled : !$ampere.view.state().transitions.cancel.enabled(), active : $ampere.view.state().transitions.cancel.active()}">
+				<a ng-ampere-transition="$ampere.view.state().transitions.cancel"></a>
+			</li>
+			<li ng-class="{disabled : !$ampere.view.state().transitions.reset.enabled(), active : $ampere.view.state().transitions.reset.active()}">
+				<a ng-ampere-transition="$ampere.view.state().transitions.reset"></a>
+			</li>
+			<li ng-class="{disabled : !$ampere.view.state().transitions.update.enabled(), active : $ampere.view.state().transitions.update.active()}">
+				<a ng-ampere-transition="$ampere.view.state().transitions.update"></a>
+			</li>
+		</ul>
+	</div>
+</div>
+
+<form>
+	<dl>
+		<dt>
+			Name
+		</dt>
+		<dd>
+			<input
+				type="text"
+				required
+				class="html5validation-title"
+				ng-model="item.name"
+				placeholder="Unique name"
+				ng-ampere-validate="validateName"
+			>
+		</dd>
+		<dt>
+			Caption
+		</dt>
+		<dd>
+			<input
+				type="text"
+				required
+				class="span6 html5validation-title"
+				ng-model="item.caption"
+				placeholder="Unique caption"
+				ng-ampere-validate="validateCaption"
+			>
+		</dd>
+		<dt>
+			Description
+		</dt>
+		<dd>
+			<textarea
+				type="text"
+				required
+				class="span6 html5validation-title"
+				rows="5"
+				ng-model="item.description"
+				placeholder="Enter price in EUR"
+			></textarea>
+		</dd>
+		<dt>
+			Price
+		</dt>
+		<dd class="form-inline">
+			<input
+				type="text"
+				required
+				class="html5validation-title"
+				ng-model="item.price"
+				placeholder="Enter price in EUR"
+				ng-ampere-validate="validatePrice"
+			><strong>&nbsp;€</strong>
+		</dd>
+		<dt>
+			Keywords
+		</dt>
+		<dd>
+			<textarea
+				type="text"
+				required
+				class="span6 html5validation-title"
+				rows="3"
+				ng-model="item.keywords"
+				placeholder="Enter comma separated list of search engine relevant keywords"
+			></textarea>
+		</dd>	
+	</dl>
+</form>
+<div style="display:none" class="btn-group">
+	<button type="button" ng-ampere-transition="$ampere.view.state().transitions.reset"></button>
+	<button type="reset" ng-ampere-transition="$ampere.view.state().transitions.cancel"></button>
+	<button type="submit" ng-ampere-transition="$ampere.view.state().transitions.update"></button>
+</div>

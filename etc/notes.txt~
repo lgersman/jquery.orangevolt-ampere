@@ -91,8 +91,21 @@ examples:
 * ng-ampere-transiton directive : transition option "ampere-ui-input-type" is recognized to support type transportation via transition option
 (needed for crud table with custom file upload "edit" transition)
 
-* html5 validation plugin added (dont forget the "html5validation-title" attribute)
+== new ==
+
+* html5 validation plugin added (dont forget to document "html5validation-title" css marker class)
+
+* bug "undo/redo broken for module transitions" fixed
+* ng-ampere-transition: "tabindex" attribute will be taken over
 
 * ng-ampere-validate directive added
 
-* entity lambda support added : window.ov.entity.lambda, window.ov.entity.select, window.ov.entity.where
+* entity lambda support added : window.ov.entity.lambda, window.ov.entity.select, window.ov.entity.where added
+
+* tests for window.ov.entity.lambda, window.ov.entity.select, window.ov.entity.where added
+
+* cache.js added
+
+* default layout template beautified
+
+* validation plugin is triggered after each rendering automatically for $( ".html5validation-title") elements

@@ -153,7 +153,7 @@
 		 */
 	Projection.prototype.all = function all( array, property, negate) {
 		var hits = [];
-		var property = arguments.length>1 && property || '_';
+		property = arguments.length>1 && property || '_';
 
 		var option = this.options()[ property];
 		$.ov.namespace( 'window.ov.entity.projection::all()').assert(
@@ -168,7 +168,7 @@
 				!negate && hits.push( value);
 			} else if( negate){
 				hits.push( value);
-			};
+			}
 		}
 
 		return hits;
@@ -228,6 +228,21 @@
 	};
 	window.ov.entity.prototype.first = function first( item) {
 		return window.ov.entity.first( this.get());
+	};
+	window.ov.entity.prototype.last = function last( item) {
+		return window.ov.entity.last( this.get());
+	};
+		/**
+		 * example : window.ov.entity( [ 1,3,5,6,7,8]).where( 'this % 2')
+		 */
+	window.ov.entity.prototype.where = function where( expr) {
+		return window.ov.entity.where( this.get(), expr);
+	};
+		/**
+		 * example : window.ov.entity( [ 1,3,5,6,7,8]).select( 'this * 10')
+		 */
+	window.ov.entity.prototype.select = function select( expr) {
+		return window.ov.entity.select( this.get(), expr);
 	};
 	window.ov.entity.prototype.last = function last( item) {
 		return window.ov.entity.last( this.get());
@@ -367,12 +382,12 @@
 		 * @returns {array}
 		 */
 	window.ov.entity.sort = function sort( array, property) {
-		var property = arguments.length==2 && arguments[1]!==undefined ? arguments[1] : 'id';
+		property = arguments.length==2 && arguments[1]!==undefined ? arguments[1] : 'id';
 		var sorted = [].concat( array).sort( function( l, r) {
 			l = l[property];
 			r = r[property];
 
-			if( l!=null && l!=undefined) {
+			if( l!==null && l!==undefined) {
 				return l.localeCompare( r);
 			} else {
 				return l!==r ? 1 : -1;
@@ -383,4 +398,125 @@
 	};
 
 	window.ov.entity.projection = Projection;
+
+		/**
+		 * creates a lamda function from a lambda string or js expression.
+		 * if the javascript expression doesnt contain a return or ending ; it will be added automagically
+		 * 
+		 * @param expr_string a javascript expression or 
+		 *    ( param1, param2, ...) => javascript expression
+		 * 
+		 * @return function
+		 */
+	window.ov.entity.lambda = function lambda( expr_string) {
+		var fn = expr_string.match(/\((.*)\)\s*=>\s*(.*)/), params = [], body = expr_string;
+
+			// if parameters are provided 
+		if( fn && fn.length) {
+				// drop whole string
+			fn.shift();
+			body = fn.pop();
+			params = $.trim( fn.pop().replace(/,/g, ' ')).split( /\s+/);
+		}	
+
+			// prepend a return if not already there.
+		fn = (! /\s*return\s+/.test( body) && "return " || "") + body + ';';
+
+		params.push( fn);
+
+		try {
+			//  unfortunately we cannot catch syntax errors in all browsers ...
+			return Function.apply( {}, params ) ;
+		} catch( ex) {
+			$.ov.namespace( 'window.ov.entity.lambda()').raise( "could not transform lamda expression(='" + expr_string + "') into a function : ", params);
+		}
+	};
+
+		/**
+		 * queries the given array for all elements matching the expr. 
+		 * expr is expected to be  lamda function from a lambda string or js expression.
+		 * @see window.ov.entity.lambda
+		 * 
+		 * examples: 
+		 *  window.ov.entity.where( [ 1,3,5,6,7,8], 'this % 2')
+		 *  window.ov.entity.where( [ 1,3,5,6,7,8], '( item, index, out) => this % 2 && out.length<2')
+		 * 
+		 * @param array the array to query
+		 * @param expr a javascript expression or 
+		 *   ( item, index, result_array) => javascript expression
+		 * 
+		 * @return new array containing all matching elements
+		 */
+	window.ov.entity.where = function where( array, /*function of lamda'able expression string*/expr /*, var_args*/) {
+		expr = $.isFunction( expr) && expr || window.ov.entity.lambda( expr);
+
+			// initialize result array
+		var res = [] ;
+
+			// set up parameters for filter function call
+		var p = [ 0, 0, res ];
+
+			// append any pass-through parameters to parameter array
+		for(var i = arguments.length - 1; i > 1; i--) {
+			p.push( arguments[i]);
+		}
+
+			// for each array element, pass to filter function
+		for( i=0; i<array.length; i++) {
+				// param1 = array element             
+			p[0] = array[ i];
+				// param2 = current indeex
+			p[1] = i;
+         
+				// call filter function. if return true, copy element to results            
+			expr.apply( array[i], p) && res.push( array[i]);
+		}
+
+		return res;
+	};
+
+		/**
+		 * maps the items of the given array for all elements by returning array of expr calls.   
+		 * expr is expected to be  lamda function from a lambda string or js expression.
+		 * @see window.ov.entity.lambda
+		 * 
+		 * examples: 
+		 *  window.ov.entity.select( [ 1,3,5,6,7,8], 'this * 10')
+		 *  window.ov.entity.select( [ 1,3,5,6,7,8], '( item, index, out) => item * index')
+		 * 
+		 * @param array the array to map items from. if not an wrapping array will be created containg the array element
+		 * @param expr a javascript expression or 
+		 *    ( item, index, result_array) => javascript expression
+		 * 
+		 * @return new array containing all mapping result elements
+		 */
+	window.ov.entity.select = function select( array, /*function of lamda'able expression string*/expr /*, var_args*/) {
+		expr = $.isFunction( expr) && expr || window.ov.entity.lambda( expr);
+
+			// initialize result array
+		var res = [] ;
+
+			// set up parameters for filter function call
+		var p = [ 0, 0, res ];
+
+			// append any pass-through parameters to parameter array
+		for(var i = arguments.length - 1; i > 1; i--) {
+			p.push( arguments[i]);
+		}
+
+		array = $.isArray( array) && array || [ array];
+
+			// for each array element, pass to filter function
+		for( i=0; i<array.length; i++) {
+				// param1 = array element             
+			p[0] = array[ i];
+				// param2 = current indeex
+			p[1] = i;
+         
+				// call mapping function and store result
+			res.push( expr.apply( array[i], p));
+		}
+
+		return res;		
+	};
 })( jQuery);
