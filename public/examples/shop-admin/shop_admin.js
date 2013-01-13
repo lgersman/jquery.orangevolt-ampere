@@ -51,8 +51,8 @@ window.shop_admin = ov.ampere().module( function shop_admin( module) {
 		return state.transition( 'cancel', target)
 		.options({
 		//	'ampere.ui.hotkey' 	: 'esc',
-			'ampere.ui.caption' : 'Cancel',
-			'ampere.ui.icon' 	: null
+			'ampere.ui.icon' 	: 'icon-chevron-left',	
+			'ampere.ui.caption' : 'Back'
 		});
 	};
 

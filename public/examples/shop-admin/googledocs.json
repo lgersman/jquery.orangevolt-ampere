@@ -342,7 +342,7 @@
 		},
 		{
 			"caption":"Aurea Skinny Pants",
-			"price":28.99,
+			"price":20.99,
 			"name":"aurea",
 			"keywords":"r\u00f6hre, jeans, skin, tight, leather, leder, pleather",
 			"shipping":"envelope",
@@ -405,8 +405,8 @@
 				]
 			],
 			"stock":[
-				0,
 				1,
+				0,
 				0,
 				1
 			]
@@ -1078,12 +1078,12 @@
 		},
 		{
 			"caption":"Rockstar PU Leather Pants",
-			"price":32.99,
+			"price":26.99,
 			"name":"rockstar",
 			"keywords":"r\u00f6hre, jeans, skin, tight, leather, leder",
 			"shipping":"envelope",
 			"status":[
-				"running-out-of-stock"
+				"no-more-available"
 			],
 			"composition":{
 				"options":[
@@ -1148,7 +1148,7 @@
 			],
 			"stock":[
 				0,
-				1,
+				0,
 				0,
 				0,
 				0
@@ -1161,7 +1161,7 @@
 			"keywords":"r\u00f6hre, jeans, skin, tight, leather, leder",
 			"shipping":"envelope",
 			"status":[
-				"running-out-of-stock"
+				"no-more-available"
 			],
 			"composition":{
 				"options":[
@@ -1216,9 +1216,160 @@
 			],
 			"stock":[
 				0,
-				1,
+				0,
 				0
 			]
+		},
+		{
+			"caption":"Havana Club glass",
+			"price":8.99,
+			"name":"havana",
+			"keywords":"cocktail",
+			"shipping":"parcel",
+			"status":[
+				"new",
+				"again-available"
+			],
+			"composition":{
+				"options":[
+					"100% Glass bottle",
+					"10% Epoxyd"
+				],
+				"description":[
+					"Made from original Liter Havana Club\u00ae bottle.",
+					"A fully recyclable green product."
+				]
+			},
+			"careinstructions":{
+				"options":[
+
+				],
+				"description":[
+					"Washing by hand will keep them in perfect shape for a long time.",
+					"Machine wash is not recommended."
+				]
+			},
+			"options":{
+				"size":[
+					"made from 0.7 Ltr bottle",
+					"made from 1.0 Ltr bottle"
+				]
+			}
+		},
+		{
+			"caption":"Swarowsky Bike chain",
+			"price":8.99,
+			"name":"bike_chain",
+			"shipping":"envelope",
+			"status":[
+				"new",
+				"no-more-available"
+			],
+			"composition":{
+				"options":[
+					"90% Bicycle chain",
+					"10% Swarowsky crystal"
+				],
+				"description":"The bicycle chain is truly recycled - no joke."
+			},
+			"careinstructions":{
+				"options":[
+
+				],
+				"description":"Don't wear them in water - the iron will oxydize by nature."
+			},
+			"options":[
+
+			],
+			"stock":7
+		},
+		{
+			"caption":"XXXXL Torpedo Boob Bra",
+			"price":79.99,
+			"name":"torpedo_boobs",
+			"keywords":"fetish",
+			"shipping":"envelope",
+			"status":[
+				"new"
+			],
+			"description":"Looking more female is impossible",
+			"composition":{
+				"options":[
+
+				],
+				"description":[
+					"silk and shiny high quality leather imitate",
+					"very comfortable to wear",
+					"stretchy fabric"
+				]
+			},
+			"careinstructions":{
+				"options":[
+					"wash_30",
+					"handwash"
+				],
+				"description":"Wear it - wash it - ready !"
+			},
+			"options":{
+				"size":[
+					"XL",
+					"L",
+					"M"
+				],
+				"color":[
+					"black",
+					"brown"
+				]
+			},
+			"stock":[
+				[
+					2,
+					4
+				],
+				[
+					6,
+					8
+				],
+				[
+					10,
+					12
+				]
+			]
+		},
+		{
+			"caption":"Original Aperol\u00ae Bottle glasses",
+			"price":8.99,
+			"name":"aperol",
+			"shipping":"parcel",
+			"status":[
+				"new"
+			],
+			"description":"Glasses from genuine Aperol\u00ae bottles",
+			"composition":{
+				"options":[
+					"100% Glass bottle",
+					"10% Epoxyd"
+				],
+				"description":[
+					"Made from original Aperol\u00ae bottle.",
+					"A fully recyclable green product."
+				]
+			},
+			"careinstructions":{
+				"options":[
+
+				],
+				"description":[
+					"Washing by hand will keep them in perfect shape for a long time.",
+					"Machine wash is not recommended."
+				]
+			},
+			"options":{
+				"size":[
+					"made from 0.7 Ltr bottle",
+					"made from 1.0 Ltr bottle"
+				]
+			}
 		}
 	],
 	"shipping":[

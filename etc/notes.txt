@@ -91,8 +91,8 @@ examples:
 * ng-ampere-transiton directive : transition option "ampere-ui-input-type" is recognized to support type transportation via transition option
 (needed for crud table with custom file upload "edit" transition)
 
-* html5 validation plugin added (dont forget the "html5validation-title" attribute)
+* html5 validation plugin added (dont forget the "html5validation-title" class)
 
 * ng-ampere-validate directive added
 
-* entity lambda support added : window.ov.entity.lambda, window.ov.entity.select, window.ov.entity.where
+* entity lambda support added : window.ov.entity.lambda, window.ov.entity.select, window.ov.entity.where 

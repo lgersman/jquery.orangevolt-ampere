@@ -222,6 +222,8 @@
 		// prevent underlined icons within links
 		a [class^="icon-"], a [class*=" icon-"] {
 			text-decoration: none;
+				// this is a patch to fix font awesome 3.0 which makes width:auto which compresses the icons
+			width: 14px;
 		}
 
 
@@ -651,6 +653,8 @@
 /* fixes font awesome */
 .btn [class^="icon-"], .btn [class*=" icon-"] {
 	line-height: 1em;
+	display : inline-block;
+	width: 14px;
 }
 
 /* fixes bootstrap.css */
@@ -679,4 +683,21 @@
 	.navbar-fixed-top {
 		margin-bottom: inherit;
 	}
+}
+
+/* fixes twitter bootstrap */
+input:focus:invalid,
+textarea:focus:invalid,
+select:focus:invalid {
+  color: #b94a48;
+  border-color: #ee5f5b;
+}
+
+input:focus:invalid:focus,
+textarea:focus:invalid:focus,
+select:focus:invalid:focus {
+  border-color: #e9322d;
+  -webkit-box-shadow: 0 0 6px #f8b9b7;
+     -moz-box-shadow: 0 0 6px #f8b9b7;
+          box-shadow: 0 0 6px #f8b9b7;
 }

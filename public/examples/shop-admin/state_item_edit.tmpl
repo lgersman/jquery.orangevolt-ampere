@@ -37,7 +37,7 @@
 				type="text"
 				required
 				class="span6 html5validation-title"
-				ng-model="item.caption"
+				ng-model="item.caption"				
 				placeholder="Unique caption"
 				ng-ampere-validate="validateCaption"
 			>
@@ -52,7 +52,7 @@
 				class="span6 html5validation-title"
 				rows="5"
 				ng-model="item.description"
-				placeholder="Enter price in EUR"
+				placeholder="Enter a short description"
 			></textarea>
 		</dd>
 		<dt>
@@ -65,6 +65,7 @@
 				class="html5validation-title"
 				ng-model="item.price"
 				placeholder="Enter price in EUR"
+				pattern="\d+(\.\d{1,2})?"
 				ng-ampere-validate="validatePrice"
 			><strong>&nbsp;€</strong>
 		</dd>

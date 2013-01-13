@@ -1,0 +1,47 @@
+<div class="navbar subnav">
+	<div class="navbar-inner">
+		<ul class="nav">
+			<li ng-class="{disabled : !$ampere.view.state().transitions.cancel.enabled(), active : $ampere.view.state().transitions.cancel.active()}">
+				<a ng-ampere-transition="$ampere.view.state().transitions.cancel"></a>
+			</li>
+			<li ng-class="{disabled : !$ampere.view.state().transitions.edit.enabled(), active : $ampere.view.state().transitions.edit.active()}">
+				<a ng-ampere-transition="$ampere.view.state().transitions.edit"></a>
+			</li>
+		</ul>
+	</div>
+</div>
+
+<dl>
+	<dt>
+		Name
+	</dt>
+	<dd>
+		{{item.name}}
+	</dd>
+	<dt>
+		Caption
+	</dt>
+	<dd>
+		{{item.caption}}
+	</dd>
+	<dt>
+		Description
+	</dt>
+	<dd>
+		{{item.description}}
+	</dd>
+	<dt>
+		Price
+	</dt>
+	<dd>
+		{{item.price}} €
+	</dd>
+	<dt>
+		Keywords
+	</dt>
+	<dd>
+		<span class="badge badge-info" ng-repeat="keyword in item.keywords.split( $ampere.ui.regexp( '\s*,\s*'))">	
+			{{keyword}}
+		</span>
+	</dd>	
+</dl>

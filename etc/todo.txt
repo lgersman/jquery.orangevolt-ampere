@@ -54,3 +54,5 @@
 http://www.w3schools.com/cssref/sel_empty.asp
 
 * ng-ampere-deferred example
+
+* can ng-ampere-template be used to inject description etc as true angular snippets ??

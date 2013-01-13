@@ -2,7 +2,7 @@
 	<thead ng-show="list.headers().length">
 		<th
 			ng-repeat="header in list.headers()"
-			ng-click="header.orderBy && list.sortable( header.orderBy, !list.sortable().reverse)"
+			ng-click="header.orderBy && list.sortable( header.orderBy, !list.sortable().reverse) || list.sortable( false, !list.sortable().reverse)"
 			ng-ampere-template="header.template"
 			ng-class="header.orderBy && 'sortable'">
 			<i

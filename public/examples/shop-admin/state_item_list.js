@@ -7,7 +7,7 @@ window.shop_admin.STATES.item_list = function item_list( state) {
 
 	state.module().breadcrumb( state, [ state.module().states.main]);
 
-	state.transition( 'details', m.states.item_list)
+	state.transition( 'details', m.states.item_show)
 	.action( function( transition, ui, data) {
 		var item = state.list.selection();
 
@@ -153,7 +153,7 @@ window.shop_admin.STATES.item_list = function item_list( state) {
 			addable.validatePrice = function( eInput) {
 				if( eInput.checkValidity()) {
 					var n = parseFloat( state.list.addable().item.price);
-					if( !$.isNumeric( n) || n<=0) {
+					if( !$.isNumeric( n) || n<0) {
 						eInput.setCustomValidity( 'Price must be a positive floating number');
 					}
 				}	

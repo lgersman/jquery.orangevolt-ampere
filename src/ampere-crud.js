@@ -211,11 +211,11 @@
 			})( this);
 
 			this.sortable = (function( list) {
-				var _sortable = { orderBy : $.noop, reverse : true};
+				var _sortable = { orderBy : false, reverse : true};
 
 				return function( fn, reverse) {
 					if( arguments.length) {
-						_sortable.orderBy = fn || $.noop;
+						_sortable.orderBy = fn || false;
 						arguments.length==2 && (_sortable.reverse=reverse);
 
 						return list;
@@ -507,10 +507,15 @@
 
 								return $.Deferred().resolve( transition.options( 'redo.message')).promise( undo);
 							};
-						}).options( {
+						})
+						.options( {
 							'undo.message' : 'Item move undoed.',
 							'redo.message' : 'Item moved.',
 							'ampere.ui.description' : 'Drag to reorder items'
+						})
+						.enabled( function() {
+								// dragging is only enabled when rows are unsorted
+							return !self.sortable().orderBy; 
 						});
 
 						$.isFunction( draggable.callback) && draggable.callback.call( this, draggable);

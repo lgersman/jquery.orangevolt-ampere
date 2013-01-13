@@ -554,6 +554,17 @@
 							$( options.items, element.get()).addClass( 'draghandle');
 						}
 
+							// supress drag start if transition is disabled
+						$( element.get()).on( 'mousedown', options.items, function() {
+							if( !transition.enabled()) {
+								event.preventDefault();
+								event.stopPropagation();
+								event.stopImmediatePropagation();
+
+								return false;
+							}
+						});
+
 						var sortable = $( element.get()).sortable( options);
 
 						/*
@@ -987,7 +998,13 @@
 						flash.find('.progress').show()
 						.find( '.bar').css( 'width', options.value);
 
-						flash.find( '.message').text( message);
+							// it is an progress event ?
+						if( message && 'progress'===message.type) {
+							var isUpload = !!options.value;
+							flash.find( '.message').text( isUpload ? 'Uploading ...' : 'Downloading ...');
+						} else {
+							flash.find( '.message').text( message);
+						}
 
 						var deferred = options.deferred;
 							// add abort button if the provided promise
@@ -1161,11 +1178,11 @@
 
 				focus( controller.element);
 
-				window.scrollTo( scrollX, scrollY);
+				//window.scrollTo( scrollX, scrollY);
 				//window.scrollTo( 0, 0);
 				//onBodyscroll();
 
-				if( arguments.length==1 && typeof( arguments[0])=='string') {
+				if( /*arguments.length==1 &&*/ typeof( arguments[0])=='string') {
 					self.flash( arguments[0]);
 				}
 			});

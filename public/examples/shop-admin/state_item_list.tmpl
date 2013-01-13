@@ -52,7 +52,7 @@
 		<input
 			type="text"
 			id="price"
-			pattern="\d+(\.\d+)?"
+			pattern="\d+(\.\d{1,2})?"
 			ng-model="list.addable().item.price"
 			required
 			placeholder="20.43 or so"

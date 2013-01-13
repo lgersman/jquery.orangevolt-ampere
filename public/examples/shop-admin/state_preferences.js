@@ -1,7 +1,8 @@
 window.shop_admin.STATES.preferences = function preferences( state) {
 	state.options({
 		'ampere.ui.caption' 	: 'Preferences',
-		'ampere.ui.description' : 'Preferences of shop administration.'
+		'ampere.ui.description' : 'Preferences of shop administration.',
+		'ampere.ui.icon'		: 'icon-wrench'
 	});
 
 	state.module().breadcrumb( state, [ state.module().states.main]);

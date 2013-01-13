@@ -37,6 +37,7 @@ for( var i=0; i<scripts.length; i++) {
 			'state_main.js',
 			'state_item_list.js',
 			'state_item_edit.js',
+			'state_item_show.js',
 			'state_preferences.js'
 		];
 		for( var i in JS) {

@@ -5,7 +5,7 @@ window.shop_admin.STATES.item_edit = function item_edit( state) {
 		'ampere.ui.caption' : function() {
 			return 'Edit ' + m.states.item_list.list.selection().caption;
 		},
-		'ampere-ui-icon' 	: 'icon-pencil'
+		'ampere.ui.icon' 	: 'icon-pencil'
 	});
 
 	state.module().breadcrumb( state, [ m.states.main, m.states.item_list]);
@@ -25,10 +25,6 @@ window.shop_admin.STATES.item_edit = function item_edit( state) {
 				return redo;
 			};
 		};
-	})
-	.options({
-		'ampere.ui.caption' : 'Back',
-		'ampere.ui.icon' 	: 'icon-chevron-left'
 	});
 
 	state.transition( 'reset')
@@ -52,28 +48,28 @@ window.shop_admin.STATES.item_edit = function item_edit( state) {
 	var byName = window.ov.entity.lambda( '(item, index, out, $1) => item.name==$1');
 	state.validateName = function( eInput) {
 		if( eInput.checkValidity()) {
-			//var hits = window.ov.entity.where( state.list.get(), byName, state.list.addable().item.name)
-			//if( hits.length) {
-			//	eInput.setCustomValidity( 'Name is already in use by another item');
-			//}
+			var hits = window.ov.entity.where( m.states.item_list.list.get(), byName, state.item.name);
+			if( hits.length && hits[0]!==m.states.item_list.list.selection()) {
+				eInput.setCustomValidity( 'Name is already in use by another item');
+			}
 		}
 	};
 
 	var byCaption = window.ov.entity.lambda( '(item, index, out, $1) => item.caption==$1');
 	state.validateCaption = function( eInput) {
 		if( eInput.checkValidity()) {
-			//var hits = window.ov.entity.where( state.list.get(), byCaption, state.list.addable().item.caption)
-			//if( hits.length) {
-			//	eInput.setCustomValidity( 'Caption is already in use by another item');
-			//}					
+			var hits = window.ov.entity.where( m.states.item_list.list.get(), byCaption, state.item.caption);
+			if( hits.length && hits[0]!==m.states.item_list.list.selection()) {
+				eInput.setCustomValidity( 'Caption is already in use by another item');
+			}				
 		}
 	};
 
 	state.validatePrice = function( eInput) {
 		if( eInput.checkValidity()) {
 			var n = parseFloat( state.item.price);
-			if( !$.isNumeric( n) || n<=0) {
-				eInput.setCustomValidity( 'Price must be a positive floating number');
+			if( !$.isNumeric( n) || n<0) {
+				eInput.setCustomValidity( 'Price must be a positive floating number or 0');
 			}
 		}	
 	};
