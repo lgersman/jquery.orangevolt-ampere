@@ -37,6 +37,46 @@
 		};
 	}
 
+	function Template( control, default_tmpl) {
+		var template = control.options( 'template');
+
+		if( !template && template!=='') {
+			if( typeof( template)=='string') {
+				if( document.getElementById( template)) {
+					template = $( document.getElementById( template));
+				} else {
+					template = $.get( template);
+				}
+			} else if( !template) {
+				template = default_tmpl;
+				if( document.getElementById( template)) {
+					template = $( document.getElementById( template));
+				} else {
+					template = $.get( window.ov.ampere.defaults['ampere.baseurl'] + template);
+				}
+			}
+		} else if( $.isFunction( template)) {
+			template = template.call( control, control);
+		}
+
+		if( $.isFunction( template.promise)) {
+			template.promise().done( function( data) {
+				if( data instanceof HTMLElement) {
+					data = $( data);
+				}
+
+				template = data.jquery ? (data[0].tagName=='SCRIPT' ? data.text().replace( "<![CDATA[", "").replace("]]>", "") : data) : template.responseText || data;
+			});
+
+				// attach promise to the crud control instance
+			control.promise = template.promise;
+		}
+
+		return function() {
+			return template;
+		};
+	}
+
 	window.ov.ampere.crud = function Crud() {
 	};
 	window.ov.ampere.crud.list = function List( array, columns, options) {
@@ -211,12 +251,17 @@
 			})( this);
 
 			this.sortable = (function( list) {
-				var _sortable = { orderBy : false, reverse : true};
+				var _sortable = { 
+					orderBy 	: false, 	// token to match or false for no sorting
+					reverse 	: true, 	// acending/descending
+					delegated	: false     // set this property to true to delegate sorting to someone else (->paginator or example)
+				};
 
-				return function( fn, reverse) {
+				return function( fn, reverse, delegated) {
 					if( arguments.length) {
 						_sortable.orderBy = fn || false;
-						arguments.length==2 && (_sortable.reverse=reverse);
+						arguments.length>1 && (_sortable.reverse=reverse);
+						arguments.length>2 && (_sortable.delegated=delegated);
 
 						return list;
 					}
@@ -331,6 +376,29 @@
 			})( this);
 
 				/**
+				 * accessor for the splice property. 
+				 * splice can be used to set a custom splice function used by removable/addable/editable
+				 * splice is by default mapped directly to Array.prototype.splice. 
+				 * the array asociated with the list will only be modified using the function provided via the splice accessor.
+				 * 
+				 * @param  {spliceFn} optional parameter to set the splice function used by the list
+				 * @return the list if called with _spliceFn argument as setter, otherwise the list instance
+				 */
+			this.splice = (function( list) {
+				var spliceFn = Array.prototype.splice;
+
+				return function( _spliceFn) {
+					if( arguments.length) {
+						_ns.assert( $.isFunction( _spliceFn), 'argument expected to be a array like splice function');
+						spliceFn = _spliceFn;
+
+						return list;
+					}
+					return spliceFn;
+				};
+			})( this);
+
+				/**
 				 * takes a filter function( item)->boolean as argument
 				 * if set, the whole array will always be filtered before display
 				 *
@@ -381,45 +449,7 @@
 
 			this.options = Options( $.extend( {}, window.ov.ampere.crud.list.DEFAULTS, options || {}));
 
-			this.template = (function( list) {
-				var template = list.options( 'template');
-
-				if( !template && template!=='') {
-					if( typeof( template)=='string') {
-						if( document.getElementById( template)) {
-							template = $( document.getElementById( template));
-						} else {
-							template = $.get( template);
-						}
-					} else if( !template) {
-						template = 'ampere-crud-list.default.tmpl';
-						if( document.getElementById( template)) {
-							template = $( document.getElementById( template));
-						} else {
-							template = $.get( window.ov.ampere.defaults['ampere.baseurl'] + template);
-						}
-					}
-				} else if( $.isFunction( template)) {
-					template = template.call( list, list);
-				}
-
-				if( $.isFunction( template.promise)) {
-					template.promise().done( function( data) {
-						if( data instanceof HTMLElement) {
-							data = $( data);
-						}
-
-						template = data.jquery ? (data[0].tagName=='SCRIPT' ? data.text().replace( "<![CDATA[", "").replace("]]>", "") : data) : template.responseText || data;
-					});
-
-						// attach promise to the crud list instance
-					list.promise = template.promise;
-				}
-
-				return function() {
-					return template;
-				};
-			})( this);
+			this.template = Template( this, 'ampere-crud-list.default.tmpl');
 
 				/**
 				 * @returns {Object} either addable, editable or undefined if no editing is currently in action
@@ -489,18 +519,18 @@
 							}
 
 							return function redo() {
-									// remove note at index
-								var item = self.get().splice( oldPosition, 1)[0];
+									// remove item at index
+								var item = self.splice().call( self.get(), oldPosition, 1)[0];
 
 									// insert at position
-								self.get().splice( newPosition, 0, item);
+								self.splice().call( self.get(), newPosition, 0, item);
 
 								function undo() {
 										// remove from position
-									self.get().splice( newPosition, 1);
+									self.splice().call( self.get(), newPosition, 1);
 
 										// insert at index
-									self.get().splice( oldPosition, 0, item);
+									self.splice().call( self.get(), oldPosition, 0, item);
 
 									return $.Deferred().resolve( transition.options( 'undo.message')).promise( redo);
 								}
@@ -617,11 +647,11 @@
 							}
 
 							return function redo() {
-								self.get().splice( index, 1, workingcopy);
+								self.splice().call( self.get(), index, 1, workingcopy);
 								self.selection( workingcopy);
 
 								function undo() {
-									self.get().splice( index, 1, selection);
+									self.splice().call( self.get(), index, 1, selection);
 									self.selection( selection);
 
 									return $.Deferred().resolve( transition.options( 'undo.message')).promise( redo);
@@ -729,11 +759,11 @@
 							delete addable.item;
 
 							return function redo() {
-								self.get().splice( index, 0, item);
+								self.splice().call( self.get(), index, 0, item);
 								self.selection( item);
 
 								function undo() {
-									self.get().splice( index, 1);
+									self.splice().call( self.get(), index, 1);
 									self.selection( selection);
 
 									return $.Deferred().resolve( transition.options( 'undo.message')).promise( redo);
@@ -770,10 +800,10 @@
 								var item = self.selection(), index = $.inArray( item, self.get());
 
 								return function redo() {
-									self.get().splice( index, 1);
+									self.splice().call( self.get(), index, 1);
 
 									function undo() {
-										self.get().splice( index, 0, item);
+										self.splice().call( self.get(), index, 0, item);
 
 										return $.Deferred().resolve( transition.options( 'undo.message')).promise( redo);
 									}
@@ -886,7 +916,7 @@
 		'list-nomatches.message': 'No item matches filter.'
 	};
 
-	window.ov.ampere.crud.angular = function( angularModule) {
+	window.ov.ampere.crud.list.angular = function( angularModule) {
 		angularModule.directive( 'ngAmpereCrudList', [ '$compile', '$parse', '$window', function( $compile, $parse, $window) {
 			return {
 				restrict	: 'A',
@@ -944,5 +974,393 @@
 	};
 
 	window.ov.ampere.defaults[ 'ampere.ui.angular'] = window.ov.ampere.defaults[ 'ampere.ui.angular'] || [];
-	window.ov.ampere.defaults[ 'ampere.ui.angular'].push( window.ov.ampere.crud.angular);
+	window.ov.ampere.defaults[ 'ampere.ui.angular'].push( window.ov.ampere.crud.list.angular);
+
+	/*
+		paginator
+	 */
+
+	window.ov.ampere.crud.paginator = function Paginator( array, options) {
+		if( this instanceof Paginator) {
+			_ns.assert( $.isFunction( array) || $.isArray( array), 'first argument expected to be an array or <array>function() but is of type ', $.type( array));
+			this.get = function() {
+				return $.isFunction( array) ? array.call( this, this) : array;
+			};
+
+			this.options = Options( $.extend( {}, window.ov.ampere.crud.paginator.DEFAULTS, options || {}));
+
+			this.template = Template( this, 'ampere-crud-paginator.default.tmpl');
+
+				/**
+				 * @return the number of pages
+				 */
+			this.getPageCount = function() {
+				if( this.getItemCountPerPage()===Infinity || this.getItemCountPerPage()<1) {
+					return 1;
+				}
+
+				var length = this.getPageItems().length;
+				return Math.max( Math.ceil( length / this.getItemCountPerPage()), 1);
+			};
+
+				/**
+				 * @return the number of items per page
+				 */
+			this.getItemCountPerPage = function() {
+				return this.options( 'itemCountPerPage');
+			};
+
+				/**
+				 * sets or gets the current page number
+				 * 
+				 * @param {int} currentPageNumber (optional) pagenumber when used as setter
+				 * @return the current page number when used as getter, otherwise this
+				 */
+			this._currentPageNumber = 1;
+			this.currentPageNumber = function( currentPageNumber) {
+				if( arguments.length) {
+					_ns.assert( 
+						currentPageNumber<=this.getPageCount(), 
+						'currentPageNumber(=' + currentPageNumber + ') must be less than pageCount(=' + this.getPageCount() + ')'
+					);
+
+					this._currentPageNumber = currentPageNumber;
+					return this;
+				} else {
+					return this._currentPageNumber;
+				}
+			};
+
+				/**
+				 * takes a filter function( item)->boolean as argument
+				 * if set, the whole array will always be filtered before display
+				 *
+				 * @return this when called without arguments, otherwise the filter object
+				 */
+			this.filter = (function() {
+				var filter = $.noop;
+
+				return function() {
+					if( arguments.length && $.isFunction( arguments[0])) {
+						filter = arguments[0];
+					}
+					return arguments.length ? this : filter;
+				};
+			})();
+
+				/**
+				 * return all items matching filter
+				 * 
+				 * @return {array} resulting filtered array
+				 */
+			this.getPageItems = function() {
+				var filter = this.filter();
+				if( filter===$.noop) {
+					return this.get();
+				}
+
+				var filtered = this.get().slice( 0), i=filtered.length;
+	 			while( i--) {
+	 				if( !filter.call( this, filtered[i])) {
+	 					filtered.splice( i, 1);
+	 				}
+	 			}
+
+	 				// adjust currentPageNumber
+	 			var pageCount = this.getItemCountPerPage()===Infinity || this.getItemCountPerPage()<1 ? 1 : Math.ceil( filtered.length / this.getItemCountPerPage());
+	 			if( this._currentPageNumber>pageCount) {
+	 				this._currentPageNumber=pageCount || 1;
+	 			}
+
+	 			return filtered;
+			};
+
+				/**
+				 * @return return all items of the current page
+				 */
+			this.getCurrentPageItems = $.proxy( function() {
+				var pageItems = this.getPageItems();
+
+				if( this.getItemCountPerPage()===Infinity || this.getItemCountPerPage()<1) {
+					return pageItems;
+				}
+
+	 			var ofs = this.getItemCountPerPage()*(this._currentPageNumber-1);
+
+ 				return pageItems.slice( ofs, Math.min( ofs + this.getItemCountPerPage(), pageItems.length));
+			}, this);
+
+			this.getPageRange = function() {
+				var pageCount 			= this.getPageCount(),
+					pageRange 			= Math.min( this.options('pageRange')-1, pageCount),
+					currentPageNumber   = this.currentPageNumber(),
+					half 				= Math.floor( pageRange/2);
+
+				var min = Math.max( currentPageNumber - half, 1);	
+				var max = Math.min( min + pageRange, pageCount);
+				
+				if( max-min<pageRange) {
+					min = pageRange>=pageCount ? 1 : pageCount-pageRange;
+				}
+
+				var result = [];
+				for(var i=min;i<=max; i++) {
+					result.push( i);
+				}
+
+				return result;
+			};
+
+			var propertyWrapper = function() {
+				var current = $.noop;
+
+				return function( value) {
+					if( arguments.length) {
+						current = value; 
+						return this;
+					} else {
+						return current;
+					}
+				}
+			};
+
+				// getter/setter for the paginator transitions
+			this.gotoFirstPage = propertyWrapper();
+			this.gotoPrevPageRange = propertyWrapper();
+			this.gotoPrevPage = propertyWrapper();
+			this.gotoPage = propertyWrapper();
+			this.gotoNextPage = propertyWrapper();
+			this.gotoNextPageRange = propertyWrapper();
+			this.gotoLastPage = propertyWrapper();
+
+			this.init = function( state) {
+				_ns.assert( window.ov.ampere.type( state)=='state', 'expected to be attached to a state but was attached to a "', window.ov.ampere.type( state), '"');
+
+				this.state = function() {
+					return state;
+				};
+
+					// eval name of instance
+				var members = Object.keys( state);
+				for( var i in members) {
+					if( state[ members[ i]]===this) {
+						break;
+					}
+				}
+				var stateProperty = members[ i], prefix = this.name();
+				this.name = function() {
+					return prefix + '(' + state.name() + '.' + stateProperty + ')';
+				};
+
+				var self = this, callback;
+
+				this.gotoFirstPage((function( cb) {
+					var transition = state.transition( state.name() + '.' + stateProperty + '.firstpage')
+					.action( function( transition, ui, data) {
+						self.currentPageNumber( 1);
+					}) 
+					.enabled( function() {
+						return self.currentPageNumber()>1;
+					})
+					.options({
+						'ampere.ui.caption' 	: self.options( 'firstpage.caption'),
+						'ampere.ui.description' : self.options( 'firstpage.description'),
+						'ampere.ui.icon' 		: self.options( 'firstpage.icon')
+					});
+
+					cb.call( self, transition);
+
+					return transition;
+				})( this.gotoFirstPage()));
+
+				this.gotoPrevPageRange((function( cb) {
+					var transition = state.transition( state.name() + '.' + stateProperty + '.prevpagerange')
+					.action( function( transition, ui, data) {
+						self.currentPageNumber( Math.max( self.currentPageNumber()-self.options( 'pageRange'), 1));
+					}) 
+					.enabled( function() {
+						return self.currentPageNumber()>1;
+					})
+					.options({
+						'ampere.ui.caption' 	: self.options( 'prevpagerange.caption'),
+						'ampere.ui.description' : self.options( 'prevpagerange.description'),
+						'ampere.ui.icon' 		: self.options( 'prevpagerange.icon')
+					});
+
+					cb.call( self, transition);
+
+					return transition;				
+				})( this.gotoPrevPageRange()));
+
+				this.gotoPrevPage((function( cb) {
+					var transition = state.transition( state.name() + '.' + stateProperty + '.prevpage')
+					.action( function( transition, ui, data) {
+						 self.currentPageNumber( self.currentPageNumber()-1);
+					})
+					.enabled( function() {
+						return self.currentPageNumber()>1;
+					}) 
+					.options({
+						'ampere.ui.caption' 	: self.options( 'prevpage.caption'),
+						'ampere.ui.description' : self.options( 'prevpage.description'),
+						'ampere.ui.icon' 		: self.options( 'prevpage.icon')
+					});
+
+					cb.call( self, transition);
+
+					return transition;
+				})( this.gotoPrevPage()));
+
+				this.gotoPage((function( cb) {
+					var transition = state.transition( state.name() + '.' + stateProperty + '.page')
+					.action( function( transition, ui, data) {
+						var event = data[0];
+						var page = $( event.target).data( 'page');
+
+						self.currentPageNumber( page);	
+					})
+					.options({
+						'ampere.ui.caption' 	: self.options( 'page.caption'),
+						'ampere.ui.description' : self.options( 'page.description'),
+						'ampere.ui.icon' 		: self.options( 'page.icon')
+					});
+
+					cb.call( self, transition);
+
+					return transition;
+				})( this.gotoPage()));
+
+				this.gotoNextPage((function( cb) {
+					var transition = state.transition( state.name() + '.' + stateProperty + '.nextpage')
+					.action( function( transition, ui, data) {
+						self.currentPageNumber( self.currentPageNumber()+1);	
+					})
+					.enabled( function() {
+						return self.currentPageNumber() < self.getPageCount(); 
+					}) 
+					.options({
+						'ampere.ui.caption' 	: self.options( 'nextpage.caption'),
+						'ampere.ui.description' : self.options( 'nextpage.description'),
+						'ampere.ui.icon' 		: self.options( 'nextpage.icon')
+					});
+
+					cb.call( self, transition);
+
+					return transition;
+				})( this.gotoNextPage()));
+
+				this.gotoNextPageRange((function( cb) {
+					var transition = state.transition( state.name() + '.' + stateProperty + '.nextpagerange')
+					.action( function( transition, ui, data) {
+						self.currentPageNumber( Math.min( self.currentPageNumber()+self.options( 'pageRange'), self.getPageCount()));
+					})
+					.options({
+						'ampere.ui.caption' 	: self.options( 'nextpagerange.caption'),
+						'ampere.ui.description' : self.options( 'nextpagerange.description'),
+						'ampere.ui.icon' 		: self.options( 'nextpagerange.icon')
+					}) 
+					.enabled( function() {
+						return self.currentPageNumber() < self.getPageCount(); 
+					});
+
+					cb.call( self, transition);
+
+					return transition;
+				})( this.gotoNextPageRange()));
+
+				this.gotoLastPage((function( cb) {
+					var transition = state.transition( state.name() + '.' + stateProperty + '.lastpage')
+					.action( function( transition, ui, data) {
+						self.currentPageNumber( self.getPageCount());
+					}) 
+					.options({
+						'ampere.ui.caption' 	: self.options( 'lastpage.caption'),
+						'ampere.ui.description' : self.options( 'lastpage.description'),
+						'ampere.ui.icon' 		: self.options( 'lastpage.icon')
+					}) 
+					.enabled( function() {
+						return self.currentPageNumber() < self.getPageCount(); 
+					});
+
+					cb.call( self, transition);
+					
+					return transition;
+				})( this.gotoLastPage()));
+			};
+		} else {
+			return new Paginator( array, options);
+		}
+	}
+
+	window.ov.ampere.crud.paginator.prototype = new window.ov.ampere.Component( 'window.ov.ampere.crud.paginator');
+	window.ov.ampere.crud.paginator.DEFAULTS = {
+		itemCountPerPage 			: 10,
+		pageRange 		 			: 10,
+
+		'firstpage.caption' 		: 'First',
+		'firstpage.description' 	: 'Goto first page',
+		'firstpage.icon' 			: null,
+
+		'prevpagerange.caption'		: null,
+		'prevpagerange.description'	: 'Previous page range',
+		'prevpagerange.icon' 		: 'icon-double-angle-left',
+
+		'prevpage.caption'			: null,
+		'prevpage.description' 		: 'Previous page',
+		'prevpage.icon'				: 'icon-angle-left',
+
+		'page.caption'				: null,
+		'page.description' 			: null,
+		'page.icon'					: null,
+
+		'nextpage.caption'			: null,
+		'nextpage.description'		: 'Next page',
+		'nextpage.icon'				: 'icon-angle-right',
+
+		'nextpagerange.caption'		: null,
+		'nextpagerange.description' : 'Next page range',
+		'nextpagerange.icon'		: 'icon-double-angle-right',
+
+		'lastpage.caption'			: 'Last',
+		'lastpage.description' 		: 'Last page',
+		'lastpage.icon'				: null
+	};
+
+	window.ov.ampere.crud.paginator.angular = function( angularModule) {
+		angularModule.directive( 'ngAmpereCrudPaginator', [ '$compile', '$parse', '$window', function( $compile, $parse, $window) {
+			return {
+				restrict	: 'A',
+				scope		: 'isolate',
+				link		: function( scope, element, attrs) {
+					scope.$watch( attrs.ngAmpereCrudPaginator, function( oldPaginatorController, paginatorController) {
+						if( paginatorController) {
+							scope.paginator = paginatorController;
+
+							var template = paginatorController.template();
+
+							var jTemplate = $( template);
+
+							jTemplate.addClass( element.attr( 'class'));
+							jTemplate.attr( 'style', element.attr( 'style'));
+
+							var onTemplate = paginatorController.options( 'onTemplate');
+							if( $.isFunction( onTemplate)) {
+								onTemplate.call( paginatorController, jTemplate, paginatorController);
+							}
+
+							template = jTemplate[0].outerHTML;
+
+							var f = $compile( template);
+							var replacement = f( scope);
+
+							element.replaceWith( replacement);
+						}
+					});
+				}
+			};
+		}]);
+	};
+
+	window.ov.ampere.defaults[ 'ampere.ui.angular'] = window.ov.ampere.defaults[ 'ampere.ui.angular'] || [];
+	window.ov.ampere.defaults[ 'ampere.ui.angular'].push( window.ov.ampere.crud.paginator.angular);
 })( jQuery);

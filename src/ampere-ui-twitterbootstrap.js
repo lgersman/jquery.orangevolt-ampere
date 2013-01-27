@@ -827,7 +827,7 @@
 
 			var deferred = controller.ui.flash.getElement().data( 'ampere.action-deferred');
 			_ns.assert( deferred && $.isFunction( deferred.promise), 'no action deferred registered on flash element');
-
+			
 				// trigger handler
 			deferred.reject( controller.module);
 		}
@@ -932,7 +932,12 @@
 			this.controller.element.on( 'click', '.flash .alert button.close', onActionAbort);
 
 				// allow anchors with attribute "draggable" to be draggable to the desktop
-			$( this.controller.element).on( 'dragstart', 'a[draggable]', onDraggableAnchor);
+			this.controller.element.on( 'dragstart', 'a[draggable]', onDraggableAnchor);
+
+				// fix buggy centering of bootstrap modals
+			//this.controller.element.on( 'show', '.modal', function() {
+			//	$(this).css({'margin-top':($(window).height()-$(this).height())/2,'top':'0'});
+			//});			
 
 			$( window).on( 'message', onMessage);
 
@@ -994,6 +999,7 @@
 
 				switch( options.type) {
 					case 'progress' :
+						flash.addClass( 'wait');
 						flash.find( '.alert').removeClass( 'alert-error').addClass( 'alert-info');
 						flash.find('.progress').show()
 						.find( '.bar').css( 'width', options.value);
@@ -1009,10 +1015,17 @@
 						var deferred = options.deferred;
 							// add abort button if the provided promise
 							// is a deferred
+						
 						flash.find( 'button.close')[ deferred && $.isFunction( deferred.reject) ? 'show' : 'hide']();
 
 						break;
 					case 'error' :
+							// skip possibly running animations (fadeout or example ...) and force flash to be visible
+						flash.stop( true).css( 'opacity', '1');
+
+
+						flash.removeClass( 'wait');
+
 							// reset flash style to default
 						flash.find( '.alert').removeClass( 'alert-info').addClass( 'alert-error');
 						flash.find('.progress').hide();
@@ -1038,6 +1051,7 @@
 						flash.find( 'button.close').hide();
 						break;
 					default :
+						flash.removeClass( 'wait');
 						flash.find( '.alert').removeClass( 'alert-error alert-info');
 
 						flash.find( '.progress, button.close').hide();

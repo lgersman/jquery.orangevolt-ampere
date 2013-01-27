@@ -16,11 +16,11 @@
 		</ul>
 		<form class="form-search navbar-search pull-right">
 			<span class="input-append">
-				<input tabIndex="-1" type="text" class="search-query" ng-model="filter" placeholder="Filter">
+				<input tabIndex="-1" type="text" class="search-query" ng-model="filter" ng-disabled="list.getEditingContext()" placeholder="Filter">
 				 <button
 				 	class="btn"
 				 	ng-click="filter=''"
-					ng-disabled="!filter.length"
+					ng-disabled="!filter.length || list.getEditingContext()"
 				 ><i class="icon-remove"></i></button>
 			</span>
 		</form>

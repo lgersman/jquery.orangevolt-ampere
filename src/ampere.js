@@ -808,6 +808,11 @@
 					}
 				}
 
+				if( !result) {
+					ui && ui.unblock();
+					return;
+				}
+
 					// render "transaction in progress" overlay
 				if( result && $.isFunction( result.promise) && result.promise().state()=='pending') {
 					ui && ui.render( 'Action', result);
@@ -839,7 +844,7 @@
 							throw arguments[0];
 						} else if( arguments.length==3 && ($.isFunction( arguments[0].statusCode))) {
 							ui.render( 'Error', 'Ajax request failed (' + arguments[0].status + ') : ' + arguments[0].statusText || arguments[0].responseText, onRetry);
-							throw arguments[0].responseText;
+							//throw arguments[0].responseText;
 						} else {
 							ui.render( 'Error', $.ov.json.stringify( arguments, $.ov.json.stringify.COMPACT), onRetry);
 						}
@@ -1490,6 +1495,9 @@
 								this.resolve( command);
 							});
 
+						var proceedArgs = arguments;		
+						var self = this;
+
 							// wait for action to complete
 						actionDeferred.done( function( command) {
 								// compute target view
@@ -1517,6 +1525,23 @@
 								view    : view,
 								ui		: controller.ui
 							});
+						})
+						.fail( function() {
+							var redo = function() {
+								return self.proceed.apply( self, proceedArgs);	
+							};
+
+							if( arguments.length==1 && typeof( arguments[0])=='string') {
+								controller.ui.render( 'Error', arguments[0], redo);
+							} else if( arguments.length==1 && (arguments[0] instanceof Error)) {
+								controller.ui.render( 'Error', arguments[0], redo);
+								throw arguments[0];
+							} else if( arguments.length==3 && ($.isFunction( arguments[0].statusCode))) {
+								controller.ui.render( 'Error', 'Ajax request failed (' + arguments[0].status + ') : ' + arguments[0].statusText || arguments[0].responseText, redo);
+								throw arguments[0].responseText;
+							} else {
+								controller.ui.render( 'Error', $.ov.json.stringify( arguments, $.ov.json.stringify.COMPACT), redo);
+							}
 						});
 					}
 				}

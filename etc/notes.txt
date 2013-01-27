@@ -96,3 +96,6 @@ examples:
 * ng-ampere-validate directive added
 
 * entity lambda support added : window.ov.entity.lambda, window.ov.entity.select, window.ov.entity.where 
+
+* ampere-crud-paginator added
+

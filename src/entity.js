@@ -162,12 +162,12 @@
 		);
 
 		for( var i=0; i<option.values.length; i++) {
-			var value = option.values[i], key = value[ option.id];
+			var value = option.values[i], key = value[ option.id], pos;
 
-			if( $.inArray( key, array)!=-1) {
-				!negate && hits.push( value);
+			if( (pos=$.inArray( key, array))!=-1) {
+				!negate && hits.splice( Math.min( pos, hits.length), 0, value);
 			} else if( negate){
-				hits.push( value);
+				hits.splice( Math.min( i, hits.length), 0, value);
 			}
 		}
 
@@ -311,6 +311,10 @@
 		 */
 	window.ov.entity.find = function find( /*Array collection*/array, /*value to compare with or comparator function*/value, /*options, fallback is 'id'*/property) {
 		var f = _filter( value, property);
+
+		if( !$.isArray( array)) {
+			return;
+		}
 
 		for( var i=0; i<array.length; i++) {
 			var item = array[i];
@@ -518,5 +522,69 @@
 		}
 
 		return res;		
+	};
+
+	window.ov.entity.sort = function sort( array, sortPredicate, reverseOrder) {
+    	if( !(array instanceof Array)) {
+    		return array;
+    	}
+
+    	if( !sortPredicate) {
+    		return array;
+    	}
+
+    	function identity( p) {
+    		return p;
+    	}
+
+		sortPredicate = $.isArray( sortPredicate) ? sortPredicate: [sortPredicate];
+		sortPredicate = $.map( sortPredicate, function( predicate) {
+			var descending = false, get = predicate || identity;
+			if( typeof( predicate)=='string') {
+				if( (predicate.charAt(0) == '+' || predicate.charAt(0) == '-')) {
+					descending = predicate.charAt(0) == '-';
+					predicate = predicate.substring(1);
+				}
+				get = function( item) {
+					return item[ predicate];
+				};
+			}
+
+			return reverseComparator( function( a,b){
+				return compare( get( a),get( b));
+			}, descending);
+		});
+
+    	array.sort( reverseComparator( comparator, reverseOrder));
+		
+		function comparator( o1, o2){
+			for( var i = 0; i < sortPredicate.length; i++) {
+				var comp = sortPredicate[i](o1, o2);
+				if( comp !== 0) {
+					return comp;
+				}
+			}
+			return 0;
+		}
+
+		function reverseComparator( comp, descending) {
+			return !!descending ? function( a,b) { return comp( b,a); } : comp;
+		}
+
+		function compare( v1, v2){
+			var t1 = typeof( v1);
+			var t2 = typeof( v2);
+
+			if( t1 == t2) {
+				if( t1 == "string") v1 = v1.toLowerCase();
+				if( t1 == "string") v2 = v2.toLowerCase();
+				if( v1 === v2) {
+					return 0;
+				}
+				return v1 < v2 ? -1 : 1;
+			} else {
+				return t1 < t2 ? -1 : 1;
+			}
+		}
 	};
 })( jQuery);

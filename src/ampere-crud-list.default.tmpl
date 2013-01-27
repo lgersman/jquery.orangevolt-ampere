@@ -2,7 +2,7 @@
 	<thead ng-show="list.headers().length">
 		<th
 			ng-repeat="header in list.headers()"
-			ng-click="header.orderBy && list.sortable( header.orderBy, !list.sortable().reverse) || list.sortable( false, !list.sortable().reverse)"
+			ng-click="list.getEditingContext() || header.orderBy && list.sortable( header.orderBy, !list.sortable().reverse) || list.sortable( false, !list.sortable().reverse)"
 			ng-ampere-template="header.template"
 			ng-class="header.orderBy && 'sortable'">
 			<i
@@ -22,7 +22,7 @@
 		</tr>
 		<tr
 			ng-init="$.inArray( list.selection(), list.get())!=-1 || list.selection( $window.ov.entity.first( list.get()))"
-			ng-repeat="item in (list.rows = (list.get() | filter:list.filter() | orderBy:list.sortable().orderBy:list.sortable().reverse))"
+			ng-repeat="item in (list.rows = (list.get() | filter:list.filter() | orderBy:(!list.sortable().delegated) && list.sortable().orderBy:list.sortable().reverse))"
 			ng-mousedown="(!list.addable() || list.addable().item==undefined) && (!list.editable() || list.editable().item==undefined) && list.selection( item)"
 			ng-class="{
 				item							: (!list.editable() || list.editable().item!=item) && (!list.addable() || list.addable().item!=item),
@@ -34,10 +34,10 @@
 			ng-ampere-template="list.editable() && list.editable().item!=undefined && item==list.selection() && { replace : list.editable().template}"
 		>
 			<td ng-repeat="column in list.columns()" ng-ampere-template="column.template">
-				<span ng-switch on="$last && (list.removable() | type)">
+				<span ng-hide="list.getEditingContext()" ng-switch on="$last && (list.removable() | type)">
 					<a ng-switch-when="object" class="hover pull-right" ng-ampere-transition="list.removable().transition"></a>
 				</span>
-				<span ng-switch on="$last && (list.editable() | type)">
+				<span ng-hide="list.getEditingContext()" ng-switch on="$last && (list.editable() | type)">
 					<a ng-switch-when="object" class="hover pull-right" ng-ampere-transition="list.editable().transition"></a>
 				</span>
 			</td>
