@@ -252,9 +252,9 @@
 
 			this.sortable = (function( list) {
 				var _sortable = { 
-					orderBy 	: false, 	// token to match or false for no sorting
-					reverse 	: true, 	// acending/descending
-					delegated	: false     // set this property to true to delegate sorting to someone else (->paginator or example)
+					orderBy		: false,	// token to match or false for no sorting
+					reverse     : true,		// acending/descending
+					delegated   : false		// set this property to true to delegate sorting to someone else (->paginator or example)
 				};
 
 				return function( fn, reverse, delegated) {
@@ -1060,20 +1060,20 @@
 				}
 
 				var filtered = this.get().slice( 0), i=filtered.length;
-	 			while( i--) {
-	 				if( !filter.call( this, filtered[i])) {
-	 					filtered.splice( i, 1);
-	 				}
-	 			}
+				while( i--) {
+					if( !filter.call( this, filtered[i])) {
+						filtered.splice( i, 1);
+					}
+				}
 
-	 				// adjust currentPageNumber
-	 			var pageCount = this.getItemCountPerPage()===Infinity || this.getItemCountPerPage()<1 ? 1 : Math.ceil( filtered.length / this.getItemCountPerPage());
-	 			if( this._currentPageNumber>pageCount) {
-	 				this._currentPageNumber=pageCount || 1;
-	 			}
+					// adjust currentPageNumber
+				var pageCount = this.getItemCountPerPage()===Infinity || this.getItemCountPerPage()<1 ? 1 : Math.ceil( filtered.length / this.getItemCountPerPage());
+				if( this._currentPageNumber>pageCount) {
+					this._currentPageNumber=pageCount || 1;
+				}
 
-	 			return filtered;
-			};
+					return filtered;
+				};
 
 				/**
 				 * @return return all items of the current page
@@ -1085,16 +1085,16 @@
 					return pageItems;
 				}
 
-	 			var ofs = this.getItemCountPerPage()*(this._currentPageNumber-1);
+				var ofs = this.getItemCountPerPage()*(this._currentPageNumber-1);
 
- 				return pageItems.slice( ofs, Math.min( ofs + this.getItemCountPerPage(), pageItems.length));
+				return pageItems.slice( ofs, Math.min( ofs + this.getItemCountPerPage(), pageItems.length));
 			}, this);
 
 			this.getPageRange = function() {
-				var pageCount 			= this.getPageCount(),
-					pageRange 			= Math.min( this.options('pageRange')-1, pageCount),
+				var pageCount           = this.getPageCount(),
+					pageRange           = Math.min( this.options('pageRange')-1, pageCount),
 					currentPageNumber   = this.currentPageNumber(),
-					half 				= Math.floor( pageRange/2);
+					half                = Math.floor( pageRange/2);
 
 				var min = Math.max( currentPageNumber - half, 1);	
 				var max = Math.min( min + pageRange, pageCount);
@@ -1121,7 +1121,7 @@
 					} else {
 						return current;
 					}
-				}
+				};
 			};
 
 				// getter/setter for the paginator transitions
@@ -1163,9 +1163,9 @@
 						return self.currentPageNumber()>1;
 					})
 					.options({
-						'ampere.ui.caption' 	: self.options( 'firstpage.caption'),
+						'ampere.ui.caption'     : self.options( 'firstpage.caption'),
 						'ampere.ui.description' : self.options( 'firstpage.description'),
-						'ampere.ui.icon' 		: self.options( 'firstpage.icon')
+						'ampere.ui.icon'        : self.options( 'firstpage.icon')
 					});
 
 					cb.call( self, transition);
@@ -1182,9 +1182,9 @@
 						return self.currentPageNumber()>1;
 					})
 					.options({
-						'ampere.ui.caption' 	: self.options( 'prevpagerange.caption'),
+						'ampere.ui.caption'     : self.options( 'prevpagerange.caption'),
 						'ampere.ui.description' : self.options( 'prevpagerange.description'),
-						'ampere.ui.icon' 		: self.options( 'prevpagerange.icon')
+						'ampere.ui.icon'        : self.options( 'prevpagerange.icon')
 					});
 
 					cb.call( self, transition);
@@ -1201,9 +1201,9 @@
 						return self.currentPageNumber()>1;
 					}) 
 					.options({
-						'ampere.ui.caption' 	: self.options( 'prevpage.caption'),
+						'ampere.ui.caption'     : self.options( 'prevpage.caption'),
 						'ampere.ui.description' : self.options( 'prevpage.description'),
-						'ampere.ui.icon' 		: self.options( 'prevpage.icon')
+						'ampere.ui.icon'        : self.options( 'prevpage.icon')
 					});
 
 					cb.call( self, transition);
@@ -1220,9 +1220,9 @@
 						self.currentPageNumber( page);	
 					})
 					.options({
-						'ampere.ui.caption' 	: self.options( 'page.caption'),
+						'ampere.ui.caption'     : self.options( 'page.caption'),
 						'ampere.ui.description' : self.options( 'page.description'),
-						'ampere.ui.icon' 		: self.options( 'page.icon')
+						'ampere.ui.icon'        : self.options( 'page.icon')
 					});
 
 					cb.call( self, transition);
@@ -1239,9 +1239,9 @@
 						return self.currentPageNumber() < self.getPageCount(); 
 					}) 
 					.options({
-						'ampere.ui.caption' 	: self.options( 'nextpage.caption'),
+						'ampere.ui.caption'     : self.options( 'nextpage.caption'),
 						'ampere.ui.description' : self.options( 'nextpage.description'),
-						'ampere.ui.icon' 		: self.options( 'nextpage.icon')
+						'ampere.ui.icon'        : self.options( 'nextpage.icon')
 					});
 
 					cb.call( self, transition);
@@ -1255,9 +1255,9 @@
 						self.currentPageNumber( Math.min( self.currentPageNumber()+self.options( 'pageRange'), self.getPageCount()));
 					})
 					.options({
-						'ampere.ui.caption' 	: self.options( 'nextpagerange.caption'),
+						'ampere.ui.caption'     : self.options( 'nextpagerange.caption'),
 						'ampere.ui.description' : self.options( 'nextpagerange.description'),
-						'ampere.ui.icon' 		: self.options( 'nextpagerange.icon')
+						'ampere.ui.icon'        : self.options( 'nextpagerange.icon')
 					}) 
 					.enabled( function() {
 						return self.currentPageNumber() < self.getPageCount(); 
@@ -1274,9 +1274,9 @@
 						self.currentPageNumber( self.getPageCount());
 					}) 
 					.options({
-						'ampere.ui.caption' 	: self.options( 'lastpage.caption'),
-						'ampere.ui.description' : self.options( 'lastpage.description'),
-						'ampere.ui.icon' 		: self.options( 'lastpage.icon')
+						'ampere.ui.caption'		: self.options( 'lastpage.caption'),
+						'ampere.ui.description'	: self.options( 'lastpage.description'),
+						'ampere.ui.icon'		: self.options( 'lastpage.icon')
 					}) 
 					.enabled( function() {
 						return self.currentPageNumber() < self.getPageCount(); 
@@ -1290,27 +1290,27 @@
 		} else {
 			return new Paginator( array, options);
 		}
-	}
+	};
 
 	window.ov.ampere.crud.paginator.prototype = new window.ov.ampere.Component( 'window.ov.ampere.crud.paginator');
 	window.ov.ampere.crud.paginator.DEFAULTS = {
-		itemCountPerPage 			: 10,
-		pageRange 		 			: 10,
+		itemCountPerPage            : 10,
+		pageRange                   : 10,
 
-		'firstpage.caption' 		: 'First',
-		'firstpage.description' 	: 'Goto first page',
-		'firstpage.icon' 			: null,
+		'firstpage.caption'			: 'First',
+		'firstpage.description'		: 'Goto first page',
+		'firstpage.icon'			: null,
 
 		'prevpagerange.caption'		: null,
 		'prevpagerange.description'	: 'Previous page range',
-		'prevpagerange.icon' 		: 'icon-double-angle-left',
+		'prevpagerange.icon'		: 'icon-double-angle-left',
 
 		'prevpage.caption'			: null,
-		'prevpage.description' 		: 'Previous page',
+		'prevpage.description'		: 'Previous page',
 		'prevpage.icon'				: 'icon-angle-left',
 
 		'page.caption'				: null,
-		'page.description' 			: null,
+		'page.description'			: null,
 		'page.icon'					: null,
 
 		'nextpage.caption'			: null,
@@ -1318,11 +1318,11 @@
 		'nextpage.icon'				: 'icon-angle-right',
 
 		'nextpagerange.caption'		: null,
-		'nextpagerange.description' : 'Next page range',
+		'nextpagerange.description'	: 'Next page range',
 		'nextpagerange.icon'		: 'icon-double-angle-right',
 
 		'lastpage.caption'			: 'Last',
-		'lastpage.description' 		: 'Last page',
+		'lastpage.description'		: 'Last page',
 		'lastpage.icon'				: null
 	};
 

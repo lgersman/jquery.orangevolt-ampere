@@ -29,10 +29,64 @@ window.shop_admin.STATES.item_list = function item_list( state) {
 		'ampere.ui.caption' : 'Details'
 	});
 
+	state.validateShipping = function( eInput) {
+		if( eInput.checkValidity() && !state.list.getEditingContext().item.shipping) {
+			eInput.setCustomValidity( 'Shipping is required but not set');
+		}	
+	};
+
+	state.paginator = ov.ampere.crud.paginator( function() {
+		return m.data.items;
+	}, {
+		_itemCountPerPage : 5
+	})
+	.filter( function( item) {
+		var search = $.trim( state.filter).toLowerCase();
+		return !search.length ||
+			[ item.name, item.caption, item.price, item.shipping, item.keywords].join( ' ')
+			.toLowerCase().indexOf( search)!=-1;
+	});
+		// override getPageItems to make paginator result chacheable
+	state.paginator.getPageItems = (function( getPageItemsFn) {
+		var pageItems, 
+			conditions = {};
+
+		var getPageItems = function() {
+			if( 
+				conditions.data!==m.data.items ||
+				conditions.filter!==state.filter ||
+				conditions.orderBy!==state.list.sortable().orderBy ||
+				conditions.reverse!==state.list.sortable().reverse
+			) {
+				conditions.data=m.data.items;
+				conditions.filter=state.filter;
+				conditions.orderBy=state.list.sortable().orderBy;
+				conditions.reverse=state.list.sortable().reverse;
+
+					// get filtered page items
+				pageItems = getPageItemsFn.call( this);
+
+					// order page items
+				window.ov.entity.sort( pageItems, state.list.sortable().orderBy, state.list.sortable().reverse);
+			} else {
+					 // adjust currentPageNumber if needed
+	 			var pageCount = this.getItemCountPerPage()===Infinity || this.getItemCountPerPage()<1 ? 1 : Math.ceil( pageItems.length / this.getItemCountPerPage());
+	 			if( this._currentPageNumber>pageCount) {
+	 				this._currentPageNumber = pageCount || 1;
+	 			}
+			}
+
+			return pageItems;
+		};
+		getPageItems.reset = function() {
+			conditions = {};
+		};
+
+		return getPageItems;
+	})( state.paginator.getPageItems);
+
 	state.list = window.ov.ampere.crud.list( 
-		function() {
-			return m.data.items;
-		}, [
+		state.paginator.getCurrentPageItems, [
 		{
 			template : '{{item.name}}'
 		},
@@ -70,11 +124,11 @@ window.shop_admin.STATES.item_list = function item_list( state) {
 			template : 'Keywords'
 		}	
 	])
-	.filter( function( item) {
-		var search = $.trim( state.filter).toLowerCase();
-		return !search.length ||
-			[ item.name, item.caption, item.price, item.shipping, item.keywords].join( ' ')
-			.toLowerCase().indexOf( search)!=-1;
+	.sortable( false, true, true)		// tell list that sorting is managed by someone else (-> the paginator in our case)
+	.splice( function( ofs) {
+		var ofs = state.paginator.getItemCountPerPage()*(state.paginator.currentPageNumber()-1) + ofs;
+		state.paginator.getPageItems.reset();
+		return Array.prototype.splice.apply( state.paginator.get(), arguments);
 	})
 	.removable( true)
 	.draggable( true)
@@ -114,7 +168,7 @@ window.shop_admin.STATES.item_list = function item_list( state) {
 						price    		: 0,
 						name     		: '',
 						keywords 		: '',
-						shipping 		: m.preferences.shipping.types[0],
+						shipping 		: '',
 						status   		: [],
 						description 	: '',
 						composition 	: null,

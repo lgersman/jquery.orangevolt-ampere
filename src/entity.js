@@ -525,17 +525,51 @@
 	};
 
 	window.ov.entity.sort = function sort( array, sortPredicate, reverseOrder) {
-    	if( !(array instanceof Array)) {
-    		return array;
-    	}
+		if( !(array instanceof Array)) {
+			return array;
+		}
 
-    	if( !sortPredicate) {
-    		return array;
-    	}
+		if( !sortPredicate) {
+			return array;
+		}
 
-    	function identity( p) {
-    		return p;
-    	}
+		function identity( p) {
+			return p;
+		}
+
+		function comparator( o1, o2) {
+			for( var i = 0; i < sortPredicate.length; i++) {
+				var comp = sortPredicate[i](o1, o2);
+				if( comp !== 0) {
+					return comp;
+				}
+			}
+			return 0;
+		}
+
+		function reverseComparator( comp, descending) {
+			return !!descending ? function( a,b) { return comp( b,a); } : comp;
+		}
+
+		function compare( v1, v2){
+			var t1 = typeof( v1);
+			var t2 = typeof( v2);
+
+			if( t1 == t2) {
+				if( t1 == "string") {
+					v1 = v1.toLowerCase();
+				}
+				if( t1 == "string") {
+					v2 = v2.toLowerCase();
+				}
+				if( v1 === v2) {
+					return 0;
+				}
+				return v1 < v2 ? -1 : 1;
+			} else {
+				return t1 < t2 ? -1 : 1;
+			}
+		}
 
 		sortPredicate = $.isArray( sortPredicate) ? sortPredicate: [sortPredicate];
 		sortPredicate = $.map( sortPredicate, function( predicate) {
@@ -555,36 +589,6 @@
 			}, descending);
 		});
 
-    	array.sort( reverseComparator( comparator, reverseOrder));
-		
-		function comparator( o1, o2){
-			for( var i = 0; i < sortPredicate.length; i++) {
-				var comp = sortPredicate[i](o1, o2);
-				if( comp !== 0) {
-					return comp;
-				}
-			}
-			return 0;
-		}
-
-		function reverseComparator( comp, descending) {
-			return !!descending ? function( a,b) { return comp( b,a); } : comp;
-		}
-
-		function compare( v1, v2){
-			var t1 = typeof( v1);
-			var t2 = typeof( v2);
-
-			if( t1 == t2) {
-				if( t1 == "string") v1 = v1.toLowerCase();
-				if( t1 == "string") v2 = v2.toLowerCase();
-				if( v1 === v2) {
-					return 0;
-				}
-				return v1 < v2 ? -1 : 1;
-			} else {
-				return t1 < t2 ? -1 : 1;
-			}
-		}
+		array.sort( reverseComparator( comparator, reverseOrder));
 	};
 })( jQuery);

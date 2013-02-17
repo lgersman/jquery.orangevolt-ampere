@@ -2,8 +2,8 @@
 module.exports = function(grunt) {
 	var js = {
 		libs  : [
-			'jquery-1.8.3.js',
-			'jquery-ui-sortable-1.9.1/jquery-ui-1.9.1.custom.min.js',
+			'jquery-1.9.0.js',
+			'jquery-ui-sortable-1.10.0/jquery-ui-1.10.0.custom.min.js',
 			'bootstrap-2.2.0/js/bootstrap.min.js',
 			//'jquery.sortable.js',
 			'datepicker/js/bootstrap-datepicker.js',

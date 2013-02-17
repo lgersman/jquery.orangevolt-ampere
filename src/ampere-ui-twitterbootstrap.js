@@ -107,6 +107,11 @@
 				return window.ov.entity.sort( items, property);
 			};
 		});
+		ampere.filter( 'keys', function() {
+			return function( items, property) {
+				return Object.keys( items);
+			};
+		});
 
 		var ampereTwitterbootstrapController = function( $scope, $rootElement, $window, $http, $timeout,  $log, $resource, $cookies/*, $location*/) {
 			var controller = $rootElement.parent().data( 'ampere.controller');
@@ -503,13 +508,14 @@
 							var ui = scope.$ampere.ui;
 							var controller = ui.controller;
 
-							if( transition) {
-								event.data = { items : _ui.item, position : _ui.item.index()};
-
+							event.data = { items : _ui.item, position : _ui.item.index()};							
+							if( window.ov.ampere.type( transition)=='transition') {
 								!ui.isBlocked() && controller.proceed( transition, [ event]);
 								event.preventDefault();
 								event.stopPropagation();
 								event.stopImmediatePropagation();
+							} else {
+								transition( null, ui, [ event]);
 							}
 						}
 					};
@@ -517,19 +523,31 @@
 					var options = $.extend( {}, OPTIONS);
 					var transition;
 					var value = scope.$eval( attrs.ngAmpereSortable);
+
 					if( $.isPlainObject( value)) {
+						/*
+							// commented out to allow also plain functions to be used as callback 
+						 	// for the sortable
 						_ns.assert(
 							(!Object.hasOwnProperty.call( value, 'transition') || value.transition) &&
 							(!Object.hasOwnProperty.call( value, 'ng-ampere-transition') || value['ng-ampere-transition']),
 							'value option transition or ng-ampere-transition doesnt resolve to a transition'
 						);
+						*/
 
 						transition = value['ng-ampere-transition'] || value.transition || transition;
 
 						$.extend( options, value);
 					} else if( value) {
 						transition = value;
+					} else {
+						_ns.raise( 'could not evaluate attribute "ng-ampere-transition" to an object or function (="' + attrs.ngAmpereSortable + '")');
 					}
+
+					_ns.assert(
+						window.ov.ampere.type( transition)=='transition' || $.isFunction( transition),
+						'value option transition or ng-ampere-transition doesnt resolve to a transition'
+					);
 
 					scope.$watch( function() {
 						if( element.hasClass( 'ui-sortable')) {
@@ -554,8 +572,9 @@
 							$( options.items, element.get()).addClass( 'draghandle');
 						}
 
-							// supress drag start if transition is disabled
-						$( element.get()).on( 'mousedown', options.items, function() {
+							// if transition is not just a function but a true transition
+							// suppress drag start if transition is disabled
+						(window.ov.ampere.type( transition)=='transition') && $( element.get()).on( 'mousedown', options.items, function() {
 							if( !transition.enabled()) {
 								event.preventDefault();
 								event.stopPropagation();
@@ -1146,6 +1165,10 @@
 			this.flash.error( message, onRetry);
 		};
 
+		this.update = function() {
+			angular.element( controller.element.find( '>.ampere-module')).scope().$digest();
+		};
+
 		//var lastView = undefined;
 		this.renderState = function( view, template, transitionResult) {
 				// twitter bootstrap fix : cleanup added dropdowns
@@ -1154,6 +1177,7 @@
 				// remember scroll position
 			var scrollX = window.scrollX;
 			var scrollY = window.scrollY;
+			//console.warn( scrollY);
 
 			var scope = angular.element( controller.element.find( '>.ampere-module')).scope();
 

@@ -1,14 +1,104 @@
 window.shop_admin = ov.ampere().module( function shop_admin( module) {
 	module.data = {
 		items : [],
-		shipping : []
-	};
-
-	module.preferences = {
-		shipping : {
-			types : [ 'envelope', 'parcel']
+		shipping : [],
+		"preferences" : {
+			"shipping" : {
+				"size" : [
+					/*
+					{ 
+						"name"		: "free",
+						"weight"	: 0
+					}
+					*/
+				]
+			},
+			"status" : {
+				"running-out-of-stock" : {
+					"caption" : "Running out of stock", 
+					"image" : "images/badges/running-out-of-stock.png"
+				},
+				"new" : {
+					"caption" : "New", 
+					"image" : "images/badges/new.png"
+				},
+				"on-sale" : {
+					"caption" : "On sale", 
+					"image" : "images/badges/on-sale.png"
+				},
+				"again-available" : {
+					"caption" : "Again available", 
+					"image" : "images/badges/again-available.png"
+				},
+				"no-more-available" : {
+					"caption" : "No more available", 
+					"image" : "images/badges/no-more-available.png"
+				}
+			},
+			"careinstructions" : {
+				"bleach" : {
+					"caption" : "Bleach"
+				},
+				"ironing_110" : {
+					"caption" : "Ironing 110°C"
+				},
+				"ironing_150" : {
+					"caption" : "Ironing 150°C"
+				},
+				"ironing_200" : {
+					"caption" : "Ironing 200°C"
+				},
+				"handwash" : {
+					"caption" : "Handwash"
+				},
+				"nobleaching" : {
+					"caption" : "No bleaching"
+				},
+				"noironing" : {
+					"caption" : "No ironing"
+				},
+				"nodrycleaning" : {
+					"caption" : "No dry cleaning"
+				},
+				"nowetcleaning" : {
+					"caption" : "No wet cleaning"
+				},
+				"nowash" : {
+					"caption" : "No wash"
+				},
+				"profcleaningpce" : {
+					"caption" : "Prof cleaning PCE"
+				},
+				"softcleaningpce" : {
+					"caption" : "Soft cleaning PCE"
+				},
+				"oxygenbleach" : {
+					"caption" : "Oxygen bleach"
+				},
+				"dry" : {
+					"caption" : "Dry"
+				},
+				"dryshady" : {
+					"caption" : "Dry shady"
+				},
+				"tumbledrying" : {
+					"caption" : "Tumble drying"
+				},
+				"wash" : {
+					"caption" : "Wash"
+				},
+				"wash_30" : {
+					"caption" : "Wash 30°C"
+				},
+				"wash_30s" : {
+					"caption" : "Wash 30°C soft"
+				},
+				"wash_30ss" : {
+					"caption" : "Wash 30°C super soft"
+				}
+			}
 		}
-	}
+	};
 
 	module.getUrl = function getUrl( path) {
 		return module.options( 'shop_admin.baseurl') + '/' + path;
@@ -120,7 +210,9 @@ window.shop_admin = ov.ampere().module( function shop_admin( module) {
 
 	return $.getJSON( 'googledocs.json')
 	.done( function( data) {
-		$.extend( module.data, data);
+		module.data.items.push.apply( module.data.items, data.items);
+		module.data.shipping.push.apply( module.data.shipping, data.shipping);
+		module.data.preferences.shipping.size.push.apply( module.data.preferences.shipping.size, data.preferences.shipping.size);
 	});
 });
 

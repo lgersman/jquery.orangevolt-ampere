@@ -11,11 +11,12 @@
 
 		it( "getFiltered", function() {
 			var paginator = window.ov.ampere.crud.paginator( data);
-			expect( paginator.getFiltered()).toEqual( paginator.get());
+			
+			expect( paginator.getPageItems()).toEqual( paginator.get());
 
 			paginator = window.ov.ampere.crud.paginator( data)
 			.filter( containsA);
-			expect( paginator.getFiltered()).toEqual( ["a", "aa", "ab", "ka", "ya", "eaaa", "aw"]);
+			expect( paginator.getPageItems()).toEqual( ["a", "aa", "ab", "ka", "ya", "eaaa", "aw"]);
 		});
 
 		it( "getPageCount", function() {
@@ -30,7 +31,7 @@
 			expect( paginator.getPageCount()).toEqual( 1);
 
 			paginator = window.ov.ampere.crud.paginator( [], { itemCountPerPage : 20});
-			expect( paginator.getPageCount()).toEqual( 0);
+			expect( paginator.getPageCount()).toEqual( 1);
 		});
 
 		it( "currentPageNumber", function() {
@@ -47,7 +48,7 @@
 
 			paginator.filter( function( item) {
 				return item.indexOf( 'a')!=-1;
-			}).getFiltered();
+			}).getPageItems();
 
 			expect( paginator.currentPageNumber( 1).currentPageNumber()).toEqual( 1);
 		});
