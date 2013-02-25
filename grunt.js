@@ -2,17 +2,17 @@
 module.exports = function(grunt) {
 	var js = {
 		libs  : [
-			'jquery-1.8.3.js',
-			'jquery-ui-sortable-1.9.1/jquery-ui-1.9.1.custom.min.js',
-			'bootstrap-2.2.0/js/bootstrap.min.js',
+			'jquery-1.9.1.js',
+			'jquery-ui-sortable-1.10.0/jquery-ui-1.10.0.custom.min.js',
+			'bootstrap-2.3.0/js/bootstrap.min.js',
 			//'jquery.sortable.js',
 			'datepicker/js/bootstrap-datepicker.js',
 			'cache.js',
 
-			'angular/angular-1.0.1.min.js',
-			'angular/angular-cookies-1.0.1.min.js',
-			'angular/angular-loader-1.0.1.min.js',
-			'angular/angular-resource-1.0.1.min.js'
+			'angular-1.1.2/angular.min.js',
+			'angular-1.1.2/angular-cookies.min.js',
+			'angular-1.1.2/angular-loader.min.js',
+			'angular-1.1.2/angular-resource.min.js'
 		].map( function( item) {
 		return 'libs/' + item;
 	}),
@@ -69,10 +69,10 @@ module.exports = function(grunt) {
 				debug : {
 						files : {
 							'dist/debug/libs/' : 'libs/*.js',
-							'dist/debug/libs/angular/' : 'libs/angular/**/*.min.*',
+							'dist/debug/libs/angular-1.1.2/' : 'libs/angular-1.1.2/**/*.min.*',
 							'dist/debug/libs/Font-Awesome/' : [ 'libs/Font-Awesome/css/**', 'libs/Font-Awesome/font/*'],
-							'dist/debug/libs/bootstrap-2.2.0/' : 'libs/bootstrap-2.2.0/**/*.min.*',
-							'dist/debug/libs/jquery-ui-sortable-1.9.1/' : 'libs/jquery-ui-sortable-1.9.1/**/*.min.*',
+							'dist/debug/libs/bootstrap-2.3.0/' : 'libs/bootstrap-2.3.0/**/*.min.*',
+							'dist/debug/libs/jquery-ui-sortable-1.10.0/' : 'libs/jquery-ui-sortable-1.10.0/**/*.min.*',
 							'dist/debug/libs/datepicker/' : ['libs/datepicker/css/**', 'libs/datepicker/js/**'],
 							'dist/debug/' : js.src
 						}
@@ -187,8 +187,8 @@ module.exports = function(grunt) {
 			'dist/debug/oval.js',
 			oval_js({
 				css		: [
-					'libs/bootstrap-2.2.0/css/bootstrap.min.css',
-					'libs/bootstrap-2.2.0/css/bootstrap-responsive.min.css',
+					'libs/bootstrap-2.3.0/css/bootstrap.min.css',
+					'libs/bootstrap-2.3.0/css/bootstrap-responsive.min.css',
 					'libs/Font-Awesome/css/font-awesome.css',
 					'libs/datepicker/css/datepicker.css',
 					'ampere-ui-twitterbootstrap.css',
@@ -215,8 +215,8 @@ module.exports = function(grunt) {
 			'dist/min/oval.js',
 			oval_js({
 				css       : [
-					'libs/bootstrap-2.2.0/css/bootstrap.min.css',
-					'libs/bootstrap-2.2.0/css/bootstrap-responsive.min.css',
+					'libs/bootstrap-2.3.0/css/bootstrap.min.css',
+					'libs/bootstrap-2.3.0/css/bootstrap-responsive.min.css',
 					'libs/Font-Awesome/css/font-awesome.css',
 					'libs/datepicker/css/datepicker.css',
 					grunt.config( 'pkg.name') + '.min.css'

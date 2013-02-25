@@ -2091,5 +2091,23 @@
 			"description":"5-7 days",
 			"name":"worldwide_parcel_dhl"
 		}
-	]
+	],
+	"preferences" : {
+		"shipping" : {
+			"size" : [
+				{ 
+					"name"		: "free",
+					"weight"	: 0
+				},
+				{ 
+					"name"		: "envelope",
+					"weight"	: 10
+				},
+				{ 
+					"name"		: "parcel",
+					"weight"	: 20
+				}
+			]
+		}
+	}
 }

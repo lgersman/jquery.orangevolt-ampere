@@ -808,10 +808,13 @@
 					}
 				}
 
+				/*
+					// consider removing this piece of code
 				if( !result) {
 					ui && ui.unblock();
 					return;
 				}
+				*/
 
 					// render "transaction in progress" overlay
 				if( result && $.isFunction( result.promise) && result.promise().state()=='pending') {
@@ -1527,6 +1530,15 @@
 							});
 						})
 						.fail( function() {
+								// if a transition returned a deferred
+								// which gets rejected without arguments
+								// ampere assumes that the transition was just canceled
+								// (ie. no error will be displayed, the display will only be refreshed) 
+							if( !arguments.length) {
+								self.ui.render( 'State');
+								return; 
+							}
+
 							var redo = function() {
 								return self.proceed.apply( self, proceedArgs);	
 							};

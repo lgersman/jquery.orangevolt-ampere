@@ -99,3 +99,33 @@ examples:
 
 * ampere-crud-paginator added
 
+== new ==
+
+* jquery upgraded to version 1.9.1
+
+* jquery ui upgraded to version 1.10.0 
+
+* code fixed to get linted with success
+
+* crud paginator tests fixed
+
+* angular filter "keys" (mapping to Object.keys) added
+
+* ampere behaviour enhanced : if a transition returned a deferred which gets rejected without arguments
+it will be assumed that the transition was just canceled (ie. no error will be displayed, instead - the display will be refreshed) 
+
+* ui.update added (triggering angular digest). this is very useful if you do "things" not visible to angular (asnyc operations via deferreds for example) and want to tell angular that bound data was touched.
+
+* directive ng-ampere-sortable can now also take a plain callback function instead of a transition
+
+* shop-admin example improved
+
+* table crud : draggable transition : the event transports oldPosition and newPosition in its data property
+event.data.oldPosition = oldPosition;
+event.data.newPosition = newPosition;
+
+* directive ng-ampere-sortable : flickering removed when sortable.stop was called 
+
+== NEW ==
+
+* upgraded to twitter bootstrap 2.3.0

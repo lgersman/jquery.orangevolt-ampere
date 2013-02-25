@@ -25,9 +25,9 @@ for( var i=0; i<scripts.length; i++) {
 		var baseUrl = matches[ 1];
 
 		var CSS = [
-			'../libs/bootstrap-2.2.0/css/bootstrap.css',
+			'../libs/bootstrap-2.3.0/css/bootstrap.css',
 			'../libs/Font-Awesome/css/font-awesome.css',
-			'../libs/bootstrap-2.2.0/css/bootstrap-responsive.css',
+			'../libs/bootstrap-2.3.0/css/bootstrap-responsive.css',
 			'../libs/datepicker/css/datepicker.css',
 			'ampere-ui-twitterbootstrap.css'
 		];
@@ -46,17 +46,17 @@ for( var i=0; i<scripts.length; i++) {
 			'../libs/coffeescript-1.3.3.js',
 			//'../libs/modernizr-2.6.2.js',
 			'../libs/lesscss-1.3.0.js',
-			'../libs/jquery-1.8.3.js',
-			'../libs/jquery-ui-sortable-1.9.1/jquery-ui-1.9.1.custom.min.js',
+			'../libs/jquery-1.9.1.js',
+			'../libs/jquery-ui-sortable-1.10.0/jquery-ui-1.10.0.custom.min.js',
 			'../libs/cache.js',
-			'../libs/bootstrap-2.2.0/js/bootstrap.js',
+			'../libs/bootstrap-2.3.0/js/bootstrap.js',
 			//'../libs/jquery.sortable.js',
 			'../libs/datepicker/js/bootstrap-datepicker.js',
 
-			'../libs/angular/angular-1.0.1.js',
-			'../libs/angular/angular-cookies-1.0.1.js',
-			'../libs/angular/angular-loader-1.0.1.js',
-			'../libs/angular/angular-resource-1.0.1.js',
+			'../libs/angular-1.1.2/angular.js',
+			'../libs/angular-1.1.2/angular-cookies.js',
+			'../libs/angular-1.1.2/angular-loader.js',
+			'../libs/angular-1.1.2/angular-resource.js',
 
 			'compat.js',
 			'json.js',

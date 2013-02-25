@@ -87,6 +87,7 @@
 			jqXHR[ method]( deferred[ method]);
 		}
 		jqXHR.progress = deferred.progress;
+
 			// overwrite the jqXHR promise methods with our promise and return the patched jqXHR
 		return jqXHR;
 	};
