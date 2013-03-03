@@ -181,6 +181,7 @@
 			indent					: '',
 			linebreak				: '',
 			skipFunctions			: true,
+			skipUndefined			: true,
 			alignPropertyNames		: false,
 			optimizePropertyNames	: false
 		};

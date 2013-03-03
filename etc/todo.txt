@@ -61,4 +61,4 @@ http://www.w3schools.com/cssref/sel_empty.asp
 
 * 'ampere.ui.uri' to be used by history to be displayed in browsers location  bar 
 
-* introduce state events (list can reset its editingcontext using this event)
+* USE state events (list can reset its editingcontext using this event)

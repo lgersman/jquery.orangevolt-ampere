@@ -382,8 +382,15 @@
 					delegate = fn;
 					return this;
 				} else {
-					var enabled = delegate.call( this, this);
-					return enabled;
+						// broadcast ampere state.enabled event
+						// debugger
+					var event = (state && state.module() || module).trigger( "ampere.transition.enabled", [ this]);
+						// if a handler returned FALSE 
+						// -> skip enabled call and return undefined(==false)
+					if( event.result===undefined || event.result) {
+						var enabled = delegate.call( this, this);
+						return enabled;
+					}
 				}
 			};
 		})();
@@ -874,6 +881,36 @@
 
 				return result;
 			};
+
+				// create event emitter instance
+			(function( module) {
+				var jq = $( module);
+			 
+			    module.trigger = function( event) {
+						// create event object
+					event = event[ jQuery.expando ] ? event : new $.Event( event.type || event, typeof event === "object" && event );
+
+					jq.trigger.apply( jq, arguments);
+
+							/* 
+								ATTENTION : different behaviour than jquery ! 
+								-> our trigger returns the event object instead of 
+								this (aka the module)
+							*/
+						return event;
+					};
+					module.on = $.proxy( jq.on, jq);
+					module.off = $.proxy( jq.off, jq);
+					module.once = $.proxy( jq.once, jq);
+
+					module.destroy = (function( destroy) {
+							// cleanup jquery event queue for our module instance
+						jq.removeData( module);
+
+							// call previous destroyfunction (if any)
+						$.isFunction( destroy) && destroy.call( module);
+					})( module.destroy);
+			})( this);
 		};
 	}
 

@@ -378,6 +378,7 @@
 		return array.length && array[ array.length-1] || undefined;
 	};
 
+
 		/**
 		 * return a sorted copy of the array
 		 *
@@ -385,6 +386,7 @@
 		 * @param property
 		 * @returns {array}
 		 */
+		/*
 	window.ov.entity.sort = function sort( array, property) {
 		property = arguments.length==2 && arguments[1]!==undefined ? arguments[1] : 'id';
 		var sorted = [].concat( array).sort( function( l, r) {
@@ -400,6 +402,7 @@
 
 		return sorted;
 	};
+		*/
 
 	window.ov.entity.projection = Projection;
 
@@ -590,5 +593,7 @@
 		});
 
 		array.sort( reverseComparator( comparator, reverseOrder));
+
+		return [].concat( array);
 	};
 })( jQuery);
