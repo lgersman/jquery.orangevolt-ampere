@@ -1,18 +1,195 @@
 /*!
  * jQuery Orangevolt Ampere
  *
- * version : 0.1.0
- * created : 2012-10-15
+ * version : 0.2.0
+ * created : 2013-03-04
  * source  : https://github.com/lgersman/jquery.orangevolt-ampere
  *
  * author  : Lars Gersmann (lars.gersmann@gmail.com)
  * homepage: http://www.orangevolt.com
  *
- * Copyright (c) 2012 Lars Gersmann; Licensed MIT, GPL
+ * Copyright (c) 2013 Lars Gersmann; Licensed MIT, GPL
  */
+/*
+ * Orangevolt Ampere Framework
+ *
+ * http://github.com/lgersman
+ * http://www.orangevolt.com
+ *
+ * Copyright 2012, Lars Gersmann <lars.gersmann@gmail.com>
+ * Dual licensed under the MIT or GPL Version 2 licenses.
+ */
+.ampere-app .ampere-module TABLE.crud.table {
+  /* sortable */
+
+  /* -- */
+
+}
+.ampere-app .ampere-module TABLE.crud.table > THEAD {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.ampere-app .ampere-module TABLE.crud.table > THEAD TH.sortable {
+  cursor: pointer;
+}
+.ampere-app .ampere-module TABLE.crud.table > THEAD TH.sortable I.orderby {
+  color: #888888;
+}
+.ampere-app .ampere-module TABLE.crud.table TBODY TR a.hover.ampere-transition,
+.ampere-app .ampere-module TABLE.crud.table TBODY TR a.hover.ampere-transition {
+  visibility: hidden;
+  color: black;
+}
+.ampere-app .ampere-module TABLE.crud.table TBODY TR a.hover.hover.ampere-transition.disabled {
+  color: inherit;
+}
+.ampere-app .ampere-module TABLE.crud.table TBODY TR.item:hover a.hover.ampere-transition {
+  visibility: inherit;
+  cursor: auto;
+}
+.ampere-app .ampere-module TABLE.crud.table TBODY TR.no-items,
+.ampere-app .ampere-module TABLE.crud.table TBODY TR.no-matches {
+  color: #888888;
+  font-style: italic;
+}
+.ampere-app .ampere-module TABLE.crud.table TBODY[ng-ampere-sortable] {
+  /*
+				TR[draggable]:not( .ng-ampere-sortable-nohandle):hover,
+				TR[draggable]:not( .ng-ampere-sortable-nohandle):hover *,
+				TR[draggable]:not( .ng-ampere-sortable-nohandle):hover .draghandle,
+				TR.item:not( .ng-ampere-sortable-nohandle):hover,
+				TR.item:not( .ng-ampere-sortable-nohandle):hover *,
+				TR.item:not( .ng-ampere-sortable-nohandle):hover .draghandle {
+					cursor : move;
+
+					a:hover,
+					a:hover *,
+					.ampere-transition,
+					.ampere-transition * {
+						cursor : pointer;
+					}
+				}
+
+				TR[draggable]:not( .ng-ampere-sortable-nohandle):hover .draghandle,
+				TR.item:not( .ng-ampere-sortable-nohandle):hover .draghandle {
+					background: rgba(0, 0, 0, 0.02);
+				}
+
+				TR[draggable]:hover .ng-ampere-sortable-nohandle,
+				TR[draggable]:hover .ng-ampere-sortable-nohandle *,
+				TR.item:hover .ng-ampere-sortable-nohandle,
+				TR.item:hover .ng-ampere-sortable-nohandle * {
+					cursor : auto;
+				}
+					// this is a ff fix
+				TR[draggable]:hover a.ng-ampere-sortable-nohandle,
+				TR[draggable]:hover a.ng-ampere-sortable-nohandle >i,
+				TR[draggable]:hover .ng-ampere-sortable-nohandle a,
+				TR[draggable]:hover .ng-ampere-sortable-nohandle a >i,
+				TR.item:hover a.ng-ampere-sortable-nohandle,
+				TR.item:hover a.ng-ampere-sortable-nohandle >i,
+				TR.item:hover .ng-ampere-sortable-nohandle a,
+				TR.item:hover .ng-ampere-sortable-nohandle a >i {
+					cursor : pointer;
+				}
+				*/
+
+}
+.ampere-app .ampere-module TABLE.crud.table TBODY[ng-ampere-sortable] TR.sortable-placeholder TD TR.sortable-placeholder TH {
+  background-color: transparent;
+}
+.ampere-app .ampere-module TABLE.crud.table TBODY[ng-ampere-sortable] TR.sortable-placeholder {
+  cursor: move;
+  background-color: rgba(0, 136, 204, 0.47);
+}
+.ampere-app .ampere-module TABLE.crud.table TBODY[ng-ampere-sortable] TR.sortable-placeholder > TD,
+.ampere-app .ampere-module TABLE.crud.table TBODY[ng-ampere-sortable] TR.sortable-placeholder > TH,
+.ampere-app .ampere-module TABLE.crud.table TBODY[ng-ampere-sortable] TR.sortable-placeholder > *.not( TD, TH) {
+  background-color: transparent;
+}
+.ampere-app .ampere-module TABLE.crud.table TBODY[ng-ampere-sortable] TR:not( .ng-ampere-sortable-nohandle).draghandle:hover,
+.ampere-app .ampere-module TABLE.crud.table TBODY[ng-ampere-sortable] TR:not( .ng-ampere-sortable-nohandle):hover .draghandle {
+  cursor: move;
+  background: rgba(0, 0, 0, 0.02);
+}
+.ampere-app .ampere-module TABLE.scrollable {
+  overflow: auto;
+  position: relative;
+  display: block;
+}
 .ampere-app {
   font-size: 13px;
+  /* textile output */
+
+  /* suppress margins on standalone elements in table cells */
+
+  /*
+	TD textarea.fullwidth {
+		// Firefox
+		width: -moz-calc( ~"100% - 14px");
+		// WebKit
+		width: -webkit-calc( ~"100% - 14px");
+		// Opera
+		width: -o-calc( ~"100% - 14px");
+		// Standard
+		width: calc( ~"100% - 14px");
+	}
+	*/
+
   /* sortable */
+
+  /*
+	.table-striped tbody tr.sortable-placeholder td, .table-striped tbody tr.sortable-placeholder th {
+		background-color : transparent;
+	}
+
+	tr.sortable-placeholder {
+		cursor 				: move;
+		//background-image 	: -webkit-linear-gradient(-45deg, #fff 50%, #ddd 100%);
+		//background-size	: 2px 2px;
+		background-color 	: rgba(0, 136, 204, 0.47);
+
+		>td, >th, >*.not( td, th) {
+			background-color : transparent;
+		}
+	}
+
+	[ng-ampere-sortable] >[draggable]:not( .ng-ampere-sortable-nohandle):hover,
+	[ng-ampere-sortable] >[draggable]:not( .ng-ampere-sortable-nohandle):hover *,
+	[ng-ampere-sortable] >[draggable]:not( .ng-ampere-sortable-nohandle):hover .draghandle,
+	[ng-ampere-sortable] >:not( .ng-ampere-sortable-nohandle):hover,
+	[ng-ampere-sortable] >:not( .ng-ampere-sortable-nohandle):hover *,
+	[ng-ampere-sortable] >:not( .ng-ampere-sortable-nohandle):hover .draghandle {
+		cursor : move;
+	}
+
+	[ng-ampere-sortable] >[draggable]:not( .ng-ampere-sortable-nohandle):hover .draghandle,
+	[ng-ampere-sortable] >:not( .ng-ampere-sortable-nohandle):hover .draghandle {
+		background: rgba(0, 0, 0, 0.02);
+	}
+
+	[ng-ampere-sortable] >[draggable]:hover .ng-ampere-sortable-nohandle,
+	[ng-ampere-sortable] >[draggable]:hover .ng-ampere-sortable-nohandle *,
+	[ng-ampere-sortable] >:hover .ng-ampere-sortable-nohandle,
+	[ng-ampere-sortable] >:hover .ng-ampere-sortable-nohandle * {
+		cursor : auto;
+	}
+		// this is a ff fix
+	[ng-ampere-sortable] >[draggable]:hover a.ng-ampere-sortable-nohandle,
+	[ng-ampere-sortable] >[draggable]:hover a.ng-ampere-sortable-nohandle >i,
+	[ng-ampere-sortable] >[draggable]:hover .ng-ampere-sortable-nohandle a,
+	[ng-ampere-sortable] >[draggable]:hover .ng-ampere-sortable-nohandle a >i,
+	[ng-ampere-sortable] >:hover a.ng-ampere-sortable-nohandle,
+	[ng-ampere-sortable] >:hover a.ng-ampere-sortable-nohandle >i,
+	[ng-ampere-sortable] >:hover .ng-ampere-sortable-nohandle a,
+	[ng-ampere-sortable] >:hover .ng-ampere-sortable-nohandle a >i {
+		cursor : pointer;
+	}
+	*/
 
   /* -- */
 
@@ -46,8 +223,18 @@
 .ampere-app textarea {
   font-size: 13px;
 }
+.ampere-app .btn-group > .btn,
+.ampere-app .btn-group > .dropdown-menu {
+  font-size: 13px;
+}
+.ampere-app .navbar {
+  margin-bottom: 10px;
+}
 .ampere-app .navbar .brand {
   font-size: 16px;
+}
+.ampere-app .navbar.navbar-fixed-bottom {
+  margin-bottom: 0;
 }
 .ampere-app h1 {
   font-size: 30px;
@@ -55,37 +242,59 @@
 .ampere-app h2 {
   font-size: 22px;
 }
-.ampere-app .lead {
-  font-size: 18px;
+.ampere-app hr {
+  margin: 4px 0;
 }
-.ampere-app code {
+.ampere-app legend {
+  font-size: 13px;
+  padding-bottom: 4px;
+  margin-bottom: 8px;
+  font-weight: bold;
+  line-height: 22px;
+}
+.ampere-app .lead {
+  font-size: 13px;
+  margin-bottom: inherit;
+}
+.ampere-app pre > code {
+  display: block;
+  padding: 2px 4px;
+  background-color: #f5f5f5;
+  white-space: pre;
+  word-wrap: normal;
+}
+.ampere-app code,
+.ampere-app pre {
   color: #245f14;
 }
-.ampere-app .table-striped tbody tr.sortable-placeholder td,
-.ampere-app .table-striped tbody tr.sortable-placeholder th {
-  background-color: transparent;
+.ampere-app pre {
+  padding: 2px 4px;
+  overflow: auto;
 }
-.ampere-app tr.sortable-placeholder {
-  cursor: move;
-  background-color: rgba(0, 136, 204, 0.47);
+.ampere-app TD > form:FIRST-CHILD:LAST-CHILD,
+.ampere-app TD > dl:FIRST-CHILD:LAST-CHILD,
+.ampere-app TD > input:FIRST-CHILD:LAST-CHILD,
+.ampere-app TD > select:FIRST-CHILD:LAST-CHILD {
+  margin: 0;
 }
-.ampere-app tr.sortable-placeholder > td,
-.ampere-app tr.sortable-placeholder > th,
-.ampere-app tr.sortable-placeholder > *.not( td, th) {
-  background-color: transparent;
+.ampere-app dd > TABLE:FIRST-CHILD:LAST-CHILD {
+  margin: 0;
 }
-.ampere-app [ng-ampere-sortable] > [draggable]:not( .ng-ampere-sortable-nohandle):hover,
-.ampere-app [ng-ampere-sortable] > [draggable]:not( .ng-ampere-sortable-nohandle):hover * {
-  cursor: move;
-}
-.ampere-app [ng-ampere-sortable] > [draggable]:hover .ng-ampere-sortable-nohandle,
-.ampere-app [ng-ampere-sortable] > [draggable]:hover .ng-ampere-sortable-nohandle * {
-  cursor: auto;
+.ampere-app TR.active,
+.ampere-app .table-hover TBODY TR.active:hover td,
+.ampere-app .table-striped TBODY TR:nth-child(odd).active td,
+.ampere-app .table-striped TBODY TR:nth-child(odd).active th {
+  background-color: /*#f5f5f5*/ rgba(82, 168, 236, 0.2);
 }
 .ampere-app .ampere-module {
   position: relative;
-  overflow: hidden;
-  /* crunch bootstrap default space */
+  /*
+			* hide error help by default
+			*/
+
+  /*
+			* show error help when its sibling input/textarea/select has errors
+			*/
 
   /* css for input[file] declared with ng-ampere-transition */
 
@@ -96,20 +305,86 @@
   /* Fixed subnav on scroll, but only for 980px and up (sorry IE!) */
 
 }
+.ampere-app .ampere-module header {
+  /* crunch bootstrap default space */
+
+}
+.ampere-app .ampere-module header > H1:not( .yes):FIRST-CHILD {
+  margin-top: 10px;
+}
 .ampere-app .ampere-module header .breadcrumb,
 .ampere-app .ampere-module header .navbar {
   margin-bottom: 0;
 }
-.ampere-app .ampere-module header .breadcrumb + .navbar {
-  margin-top: 20px;
+.ampere-app .ampere-module header .breadcrumb:empty {
+  padding: 0;
+  margin: 0;
+}
+.ampere-app .ampere-module header .breadcrumb:not(:empty) + .navbar {
+  margin-top: 10px;
 }
 .ampere-app .ampere-module header .breadcrumb + .navbar.subnav-fixed {
   margin-top: 0;
 }
+.ampere-app .ampere-module header H1 {
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+.ampere-app .ampere-module header H1 i[class^="icon-"],
+.ampere-app .ampere-module header H1 [class*=" icon-"] {
+  width: inherit;
+  line-height: 33px;
+}
+.ampere-app .ampere-module dt .btn-mini {
+  margin-bottom: 6px;
+  margin-top: 4px;
+  margin-left: 4px;
+}
+.ampere-app .ampere-module dd {
+  margin-bottom: 10px;
+}
+.ampere-app .ampere-module a [class^="icon-"],
+.ampere-app .ampere-module a [class*=" icon-"] {
+  text-decoration: none;
+  width: 14px;
+}
 .ampere-app .ampere-module input:invalid,
 .ampere-app .ampere-module textarea:invalid,
-.ampere-app .ampere-module select:invalid {
+.ampere-app .ampere-module select:invalid,
+.ampere-app .ampere-module input.invalid,
+.ampere-app .ampere-module textarea.invalid,
+.ampere-app .ampere-module select.invalid,
+.ampere-app .ampere-module .invalid input,
+.ampere-app .ampere-module .invalid textarea,
+.ampere-app .ampere-module .invalid select {
   border-color: #e9322d;
+}
+.ampere-app .ampere-module input.invalid:focus,
+.ampere-app .ampere-module textarea.invalid:focus,
+.ampere-app .ampere-module select.invalid:focus,
+.ampere-app .ampere-module .invalid input:focus,
+.ampere-app .ampere-module .invalid textarea.invalid:focus,
+.ampere-app .ampere-module .invalid select.invalid:focus {
+  -webkit-box-shadow: 0 0 6px #f8b9b7;
+  -moz-box-shadow: 0 0 6px #f8b9b7;
+  box-shadow: 0 0 6px #f8b9b7;
+}
+.ampere-app .ampere-module .inline-help.description,
+.ampere-app .ampere-module .help-block.description {
+  color: #5A5A5A;
+}
+.ampere-app .ampere-module .inline-help.invalid,
+.ampere-app .ampere-module .help-block.invalid {
+  visibility: hidden;
+}
+.ampere-app .ampere-module *:invalid ~ .inline-help.invalid,
+.ampere-app .ampere-module *:invalid ~ .help-block.invalid,
+.ampere-app .ampere-module .invalid ~ .inline-help.invalid,
+.ampere-app .ampere-module .invalid ~ .help-block.invalid,
+.ampere-app .ampere-module .inline-help.error,
+.ampere-app .ampere-module .help-block.error {
+  visibility: visible;
+  color: #e9322d;
 }
 .ampere-app .ampere-module .ampere-transition + input[type="file"].ampere-transition-companion {
   visibility: hidden;
@@ -136,7 +411,7 @@
   -webkit-transition: all .2s linear;
   -moz-transition: all .2s linear;
   transition: all .2s linear;
-  /*      
+  /*
 				i[class^="icon-"], [class*=" icon-"] {
 					width      : inherit;
 					line-height: 21px;
@@ -157,18 +432,25 @@
 .ampere-app .ampere-module .alert-block {
   padding-bottom: 7px;
 }
-.ampere-app .ampere-module section {
-  padding-top: 10px;
+.ampere-app .ampere-module SECTION {
+  padding-top: 4px;
+}
+.ampere-app .ampere-module .ampere-state .page-header {
+  padding-bottom: 0;
+  margin: 0 0 10px;
 }
 .ampere-app .ampere-module .ampere-state .page-header a.icon-question-sign,
 .ampere-app .ampere-module .ampere-state .page-header .ampere-help a {
   font-size: small;
-  text-decoration: none;
+}
+.ampere-app .ampere-module .ampere-state .page-header H2 {
+  margin-top: 0px;
+  margin-bottom: 0px;
 }
 .ampere-app .ampere-module .ampere-state .page-header H2 i[class^="icon-"],
 .ampere-app .ampere-module .ampere-state .page-header H2 [class*=" icon-"] {
   width: inherit;
-  line-height: 21px;
+  line-height: 28px;
 }
 .ampere-app .ampere-module .ampere-state .page-header a.disabled {
   color: #555555;
@@ -185,17 +467,44 @@
 .ampere-app .ampere-module .ampere-state .page-header .ampere-help ul.hotkeys li > .description {
   margin-left: 13px;
 }
+.ampere-app .ampere-module .ampere-state .page-header .description:not(:empty) {
+  margin-bottom: 4px;
+}
+.ampere-app .ampere-module .ampere-state .ampere-view > section:FIRST-CHILD {
+  padding-top: 0;
+}
 .ampere-app .ampere-module .ampere-state .page-header.view-empty {
   border: 0;
+}
+.ampere-app .ampere-module .ampere-state H1 i[class^="icon-"],
+.ampere-app .ampere-module .ampere-state H2 i[class^="icon-"],
+.ampere-app .ampere-module .ampere-state H3 i[class^="icon-"],
+.ampere-app .ampere-module .ampere-state H4 i[class^="icon-"],
+.ampere-app .ampere-module .ampere-state H5 i[class^="icon-"],
+.ampere-app .ampere-module .ampere-state H1 [class*=" icon-"],
+.ampere-app .ampere-module .ampere-state H2 [class*=" icon-"],
+.ampere-app .ampere-module .ampere-state H3 [class*=" icon-"],
+.ampere-app .ampere-module .ampere-state H4 [class*=" icon-"],
+.ampere-app .ampere-module .ampere-state H5 [class*=" icon-"] {
+  width: inherit;
+  line-height: inherit;
 }
 .ampere-app .ampere-module .navbar-inverse .nav > li.disabled > a {
   color: #555555;
 }
+.ampere-app .ampere-module FOOTER {
+  /* this is required to prevent flickering by the moving toolbar */
+
+}
+.ampere-app .ampere-module FOOTER > DIV.description {
+  min-height: 80px;
+}
 .ampere-app .ampere-module > .overlay {
   /*
-			opacity	: 0.8; 
+			opacity	: 0.8;
 			filter	: alpha(opacity=80);
 			*/
+
   position: fixed;
   top: 0;
   left: 0;
@@ -224,7 +533,6 @@
   bottom: 40px;
   right: 47px;
   z-index: 1041;
-  cursor: wait;
   -webkit-transition: opacity 0.6s ease;
   -moz-transition: opacity 0.6s ease;
   -o-transition: opacity 0.6s ease;
@@ -236,6 +544,13 @@
 }
 .ampere-app .ampere-module > .flash .message .retry {
   margin-left: 20px;
+}
+.ampere-app .ampere-module > .flash.wait {
+  cursor: wait;
+}
+.ampere-app .ampere-module .tooltip.in {
+  opacity: 1;
+  filter: alpha(opacity=100);
 }
 @media (min-width: 980px) {
   .ampere-app .ampere-module .subnav-fixed {
@@ -256,12 +571,19 @@
     -webkit-box-shadow: inset 0 1px 0 #ffffff, 0 1px 5px rgba(0, 0, 0, 0.1);
     -moz-box-shadow: inset 0 1px 0 #ffffff, 0 1px 5px rgba(0, 0, 0, 0.1);
     box-shadow: inset 0 1px 0 #ffffff, 0 1px 5px rgba(0, 0, 0, 0.1);
-    filter: progid:dximagetransform.microsoft.gradient(enabled=false);
+    filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
     /* IE6-9 */
   
   }
+  .ampere-app .ampere-module .subnav-fixed > .navbar-inner {
+    border-width: 0 0 1px;
+    /* drop the border on the fixed edges */
+  
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    border-radius: 0;
+  }
   .ampere-app .ampere-module .subnav-fixed .nav {
-    width: 938px;
     margin: 0 auto;
     padding: 0 1px;
   }
@@ -271,14 +593,9 @@
     -moz-border-radius: 0;
     border-radius: 0;
   }
-  .ampere-app .ampere-module .subnav-fixed > .navbar-inner {
-    border-width: 0 0 1px;
-    /* drop the border on the fixed edges */
-  
-  }
 }
-/* 
- * wizard template specific 
+/*
+ * wizard template specific
  */
 .ampere-app.layout-name-wizard {
   padding-bottom: 40px;
@@ -393,6 +710,13 @@
   border: 0;
   min-height: 300px;
 }
+/* fixes font awesome */
+.btn [class^="icon-"],
+.btn [class*=" icon-"] {
+  line-height: 1em;
+  display: inline-block;
+  width: 14px;
+}
 /* fixes bootstrap.css */
 .lead code,
 pre {
@@ -404,6 +728,7 @@ pre {
     padding-right: 0;
     padding-left: 0;
     /* this fixes the wizard top/bottom navigation bars */
+  
   }
   body.ampere-app .navbar-fixed-top,
   body.ampere-app .navbar-fixed-bottom,
@@ -417,3 +742,35 @@ pre {
     margin-bottom: inherit;
   }
 }
+/* fixes twitter bootstrap */
+input:focus:invalid,
+textarea:focus:invalid,
+select:focus:invalid {
+  color: #b94a48;
+  border-color: #ee5f5b;
+}
+input:focus:invalid:focus,
+textarea:focus:invalid:focus,
+select:focus:invalid:focus {
+  border-color: #e9322d;
+  -webkit-box-shadow: 0 0 6px #f8b9b7;
+  -moz-box-shadow: 0 0 6px #f8b9b7;
+  box-shadow: 0 0 6px #f8b9b7;
+}
+.modal-backdrop,
+.modal-backdrop.fade.in {
+  opacity: 0.3;
+  filter: alpha(opacity=30);
+}
+/*
+.modal.fade.in {
+	// Firefox 
+	top: -moz-calc( 50% + 20px);
+	// WebKit 
+	top: -webkit-calc( 50% + 20px);
+	// Opera 
+	top: -o-calc( 50% + 20px);
+	// Standard 
+	top: calc( 50% + 20px);
+}
+*/

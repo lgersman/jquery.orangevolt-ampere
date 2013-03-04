@@ -1,15 +1,16 @@
 /*!
  * jQuery Orangevolt Ampere
  *
- * version : 0.1.0
- * created : 2012-10-15
+ * version : 0.2.0
+ * created : 2013-03-04
  * source  : https://github.com/lgersman/jquery.orangevolt-ampere
  *
  * author  : Lars Gersmann (lars.gersmann@gmail.com)
  * homepage: http://www.orangevolt.com
  *
- * Copyright (c) 2012 Lars Gersmann; Licensed MIT, GPL
+ * Copyright (c) 2013 Lars Gersmann; Licensed MIT, GPL
  */
+
 /**
  * Ampere Core
  */
@@ -166,10 +167,10 @@
 			var redoCommand;
 			if( arguments.length) {
 				if( !(arguments[0] instanceof jQuery.Event)) {
-					var ui = arguments.length && arguments[0].ui;
-					var arg = arguments[0];
-					var view = module.current().view;
-					var undoCommand;
+					var ui = arguments.length && arguments[0].ui,
+						arg = arguments[0],
+						view = module.current().view,
+						undoCommand;
 
 					redoCommand = function RedoCommand( historyReady) {
 						var redoResult = module._transit( arg.command, arg.source, arg.target, arg.view, arg.ui, historyReady);
@@ -181,6 +182,7 @@
 									redoCommand.promise = $.when( undoResult).promise;
 									return $.isFunction( undoResult) ? redoCommand : undefined;
 								};
+
 								undoCommand.target = arg.source;
 								undoCommand.view = view;
 							}
@@ -322,7 +324,7 @@
 
 		this.state = function () {
 				// return state or (in case this is a module transition) current state
-			return state || module.current().state;
+			return state /*|| module.current().state*/;
 		};
 
 		//this.transitionName = transitionName;
@@ -383,8 +385,15 @@
 					delegate = fn;
 					return this;
 				} else {
-					var enabled = delegate.call( this, this);
-					return enabled;
+						// broadcast ampere state.enabled event
+						// debugger
+					var event = (state && state.module() || module).trigger( "ampere.transition.enabled", [ this]);
+						// if a handler returned FALSE 
+						// -> skip enabled call and return undefined(==false)
+					if( event.result===undefined || event.result) {
+						var enabled = delegate.call( this, this);
+						return enabled;
+					}
 				}
 			};
 		})();
@@ -651,7 +660,7 @@
 			 */
 			this.state = function() {
 				var _ns = $.ov.namespace( this.fullName() + '.state()').assert( arguments.length, 'no arguments given');
-				var name, i;
+				var name, i, state, dependencies=[], members, z, member;
 				if( arguments.length==1 && $.isArray( arguments[0])) {
 					var arr = arguments[0];
 						// create states
@@ -661,7 +670,20 @@
 					}
 						// initialize states
 					for( i=0; i<arr.length; i++) {
-						$.isFunction( arr[i]) && arr[i].call( this.states[ window.ov.ampere.util.functionName( arr[i])], this.states[ window.ov.ampere.util.functionName( arr[i])]);
+						state = this.states[ window.ov.ampere.util.functionName( arr[i])];
+						$.isFunction( arr[i]) && arr[i].call( state, state);
+
+							// collect additional deferreds from state members
+						members = Object.keys( state);
+						for( z in members) {
+							if( members[z]!='promise') {
+								member = state[ members[z]];
+
+								(member instanceof Component)  && member.init( state);
+
+								( $.isFunction( member.promise)) && dependencies.push( member.promise);
+							}
+						}
 					}
 					return this;
 				} else if( arguments.length==1 && $.isPlainObject( arguments[0])) {
@@ -671,19 +693,26 @@
 						this.state( name);
 					}
 
-					/*
-					 * make state a deferred
-					 */
-					var dependencies = [];
-
 						// intialize states
 					for( name in obj) {
 						_ns.assert( $.isFunction( obj[name]), 'initializer function expected as value of state "' , name + '"');
-						dependencies.push(
-							obj[name].call( this.states[ name], this.states[ name])
-						);
 
+						state = this.states[ name];
+						dependencies.push( obj[name].call( state, state));
+
+							// collect additional deferreds from state members
+						members = Object.keys( state);
+						for( z in members) {
+							if( members[z]!='promise') {
+								member = state[ members[z]];
+
+								(member instanceof Component)  && member.init( state);
+
+								( $.isFunction( member.promise)) && dependencies.push( member.promise);
+							}
+						}
 					}
+
 					this.promise = $.when.apply( $.when, dependencies).promise;
 					return this;
 				} else {
@@ -694,14 +723,25 @@
 					name = typeof( name)=='string' ? name : window.ov.ampere.util.functionName( name);
 					_ns.assert( !this.states[ name], 'state "' + name + '" already exists');
 
-					var state = function() {
+					state = function() {
 							/*
 							 * make state a deferred
 							 */
-						var dependencies = [];
-
 						$.isFunction( this.promise) && dependencies.push( this.promise());
 						dependencies.push( fn.call( this, this));
+
+						// collect additional deferreds from state members
+						members = Object.keys( this);
+						for( var u in members) {
+							if( members[u]!='promise') {
+								member = this[ members[u]];
+
+								(member instanceof Component)  && member.init( this);
+
+								( $.isFunction( member.promise)) && dependencies.push( member.promise);
+							}
+						}
+
 						this.promise = $.when.apply( $.when, dependencies).promise;
 					};
 					state.prototype = State( this, name);
@@ -778,6 +818,14 @@
 					}
 				}
 
+				/*
+					// consider removing this piece of code
+				if( !result) {
+					ui && ui.unblock();
+					return;
+				}
+				*/
+
 					// render "transaction in progress" overlay
 				if( result && $.isFunction( result.promise) && result.promise().state()=='pending') {
 					ui && ui.render( 'Action', result);
@@ -809,7 +857,7 @@
 							throw arguments[0];
 						} else if( arguments.length==3 && ($.isFunction( arguments[0].statusCode))) {
 							ui.render( 'Error', 'Ajax request failed (' + arguments[0].status + ') : ' + arguments[0].statusText || arguments[0].responseText, onRetry);
-							throw arguments[0].responseText;
+							//throw arguments[0].responseText;
 						} else {
 							ui.render( 'Error', $.ov.json.stringify( arguments, $.ov.json.stringify.COMPACT), onRetry);
 						}
@@ -836,19 +884,71 @@
 
 				return result;
 			};
+
+				// create event emitter instance
+			(function( module) {
+				var jq = $( module);
+			 
+			    module.trigger = function( event) {
+						// create event object
+					event = event[ jQuery.expando ] ? event : new $.Event( event.type || event, typeof event === "object" && event );
+
+					jq.trigger.apply( jq, arguments);
+
+							/* 
+								ATTENTION : different behaviour than jquery ! 
+								-> our trigger returns the event object instead of 
+								this (aka the module)
+							*/
+						return event;
+					};
+					module.on = $.proxy( jq.on, jq);
+					module.off = $.proxy( jq.off, jq);
+					module.once = $.proxy( jq.once, jq);
+
+					module.destroy = (function( destroy) {
+							// cleanup jquery event queue for our module instance
+						jq.removeData( module);
+
+							// call previous destroyfunction (if any)
+						$.isFunction( destroy) && destroy.call( module);
+					})( module.destroy);
+			})( this);
 		};
 	}
 
+	var ampereInstances = {};
 	/**
 	 * window.ampere()
 	 *  create new ampere instance
 	 */
-	function Ampere( options) {
+	function Ampere( name, options) {
 		if( !(this instanceof Ampere)) {
-			return new Ampere( options);
+				// process arguments
+			switch( arguments.length) {
+				case 0 :
+					name = '';
+					options = {};
+					break;
+				case 1 :
+					var isStringArg = typeof( name)=='string';
+					name = isStringArg && name || '';
+					options = isStringArg && {} || options;
+					break;
+			}
+
+				// if ampere instance exists
+			if( ampereInstances[ name]) {
+					// patch new options into it
+				ampereInstances[ name].options = Options( angular.extend( ampereInstances[ name].options(), options));
+				return ampereInstances[ name];
+			} else {
+				return ampereInstances[ name]=new Ampere( name, options);
+			}
 		}
 
 		var ampere = this;
+
 		this.options = Options( angular.extend( {}, Ampere.defaults, options));
 		this.modules = {};
 		/**
@@ -1018,6 +1118,19 @@
 			this.onHotKey = function onHotkey( event) {
 				if( !self.isBlocked()) {
 					var matchingHotkeys = window.ov.ampere.ui.hotkey.computeMatchingHotkeys( event);
+
+						// filter out hotkeys which are required for the current focused control to work
+						// (i.e. return is required for textarea whereas it is ok for input[text])
+					if( $.inArray( event.target.tagName, ['TEXTAREA', 'SELECT', 'INPUT'])!=-1) {
+						for( var q in matchingHotkeys) {
+							if( /del|up|down|return|left|right|home|end/.test( matchingHotkeys[q])) {
+								if( !(matchingHotkeys[q]=='return' && event.target.tagName=='INPUT')) {
+									return;
+								}
+							}
+						}
+					}
+
 					var module = self.controller.module;
 
 					var proceedTransitionHotkey = function( transition, ngAmpereHotkey, domElement) {
@@ -1300,7 +1413,7 @@
 		};
 
 		this.getIcon = function( object) {
-			return this._get( 'ampere.ui.icon', object, ['transition', 'view', 'target', 'module']);
+			return this._get( 'ampere.ui.icon', object, ['transition', 'view', 'target', 'state']);
 		};
 	}
 	Ampere.ui = Ui;
@@ -1406,9 +1519,12 @@
 						// create a new action
 					var command = action.call( transition, transition, this.ui, data);
 
-					if( !command) {
-							// no command returned -> abort proceeding
-						return false;
+						// if action returned true the view should be updated
+						// but not completely rerendered
+					if( command===true || !command) {
+							// (heavyweight refresh) command == true forces a full template update
+							// (lightweight refresh) command == false reevaluates based on the current dom structure
+						this.ui.render( 'State', command===true && this.module.current().view);
 					} else {
 							/*
 							 * when action returned a function -> wrap it within a deferred
@@ -1421,6 +1537,9 @@
 							command	: $.Deferred( function() {
 								this.resolve( command);
 							});
+
+						var proceedArgs = arguments;		
+						var self = this;
 
 							// wait for action to complete
 						actionDeferred.done( function( command) {
@@ -1443,12 +1562,38 @@
 							 */
 
 							controller.module.history().redo({
-								command  : command,
-								source   : transition.state(),
-								target   : transition.target(),
-																view      : view,
-																ui          : controller.ui
+								command	: command,
+								source	: transition.state() || module.current().state, /* state() may return null for module transitions*/
+								target	: transition.target(),
+								view    : view,
+								ui		: controller.ui
 							});
+						})
+						.fail( function() {
+								// if a transition returned a deferred
+								// which gets rejected without arguments
+								// ampere assumes that the transition was just canceled
+								// (ie. no error will be displayed, the display will only be refreshed) 
+							if( !arguments.length) {
+								self.ui.render( 'State');
+								return; 
+							}
+
+							var redo = function() {
+								return self.proceed.apply( self, proceedArgs);	
+							};
+
+							if( arguments.length==1 && typeof( arguments[0])=='string') {
+								controller.ui.render( 'Error', arguments[0], redo);
+							} else if( arguments.length==1 && (arguments[0] instanceof Error)) {
+								controller.ui.render( 'Error', arguments[0], redo);
+								throw arguments[0];
+							} else if( arguments.length==3 && ($.isFunction( arguments[0].statusCode))) {
+								controller.ui.render( 'Error', 'Ajax request failed (' + arguments[0].status + ') : ' + arguments[0].statusText || arguments[0].responseText, redo);
+								throw arguments[0].responseText;
+							} else {
+								controller.ui.render( 'Error', $.ov.json.stringify( arguments, $.ov.json.stringify.COMPACT), redo);
+							}
 						});
 					}
 				}
@@ -1484,6 +1629,32 @@
 			}
 		};
 	}
+
+	function Component( name) {
+		if( this instanceof Component) {
+				/*
+				 * default init logic
+				 *
+				 * override this function in your component to get informed when state / module is available
+				 */
+			this.init = function init( state) {
+				$.ov.namespace( this.fullName()).warn( 'component did not override init function ', this);
+			};
+
+			this.name = function() {
+				return name;
+			};
+
+			this.fullName = function() {
+				return 'Ampere.Component::' + this.name();
+			};
+
+			return this;
+		} else {
+			return new Component( name);
+		}
+	}
+	Ampere.Component = Component;
 
 	window.ov = window.ov || {};
 	window.ov.ampere = Ampere;

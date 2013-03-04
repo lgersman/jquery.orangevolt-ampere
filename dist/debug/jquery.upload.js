@@ -1,15 +1,46 @@
 /*!
  * jQuery Orangevolt Ampere
  *
- * version : 0.1.0
- * created : 2012-10-15
+ * version : 0.2.0
+ * created : 2013-03-04
  * source  : https://github.com/lgersman/jquery.orangevolt-ampere
  *
  * author  : Lars Gersmann (lars.gersmann@gmail.com)
  * homepage: http://www.orangevolt.com
  *
- * Copyright (c) 2012 Lars Gersmann; Licensed MIT, GPL
+ * Copyright (c) 2013 Lars Gersmann; Licensed MIT, GPL
  */
+
+/**
+ * jQuery Upload Plugin v1.0.0
+ *
+ * This plugin extends jQuery Ajax functionality :
+ *
+ * provides function $.upload( FormData) to upload arbitrary files using without reloading the page.
+ * $.upload smoothly integrates with Jquery $.ajax by supporting jQuery $.ajaxSettings.
+ *
+ * The plugin also advances $.ajax by delegating both upload and download progress notifications of the
+ * native XMLHTTPRequest to the Promise object returned by any jQuery Ajax request (via its progress function).
+ *
+ * The progress feature is automatically available to all jQuery ajax functions if the plugin was loaded.
+ * See https://github.com/lgersman/jquery.orangevolt-ampere for tests and examples.
+ *
+ * The plugin works fine for both single and multiple file uploads.
+ *
+ * Source and examples:
+ * http://github.com/lgersman/jquery.orangevolt-ampere
+ *
+ * Works in all modern browsers supporting XMLHTTPRequest v2 (i.e. Chome/FF/Webkit etc.)
+ *
+ * Requires jQuery v1.7.0 or later
+ *
+ * http://github.com/lgersman
+ * http://www.orangevolt.com
+ *
+ * Copyright 2012, Lars Gersmann <lars.gersmann@gmail.com>
+ * Dual licensed under the MIT or GPL Version 2 licenses.
+ */
+
 /**
  *
  */
@@ -69,6 +100,7 @@
 			jqXHR[ method]( deferred[ method]);
 		}
 		jqXHR.progress = deferred.progress;
+
 			// overwrite the jqXHR promise methods with our promise and return the patched jqXHR
 		return jqXHR;
 	};
