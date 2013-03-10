@@ -4,7 +4,7 @@ module.exports = function(grunt) {
 		libs  : [
 			'jquery-1.9.1.js',
 			'jquery-ui-sortable-1.10.0/jquery-ui-1.10.0.custom.min.js',
-			'bootstrap-2.3.0/js/bootstrap.min.js',
+			'bootstrap-2.3.1/js/bootstrap.min.js',
 			//'jquery.sortable.js',
 			'datepicker/js/bootstrap-datepicker.js',
 			'cache.js',
@@ -28,14 +28,14 @@ module.exports = function(grunt) {
 		'ampere-crud.js',
 		'ampere-ui-twitterbootstrap.js',
 		'ampere-ui-hotkey.js'
-		 ].map( function( item) {
-				 return 'src/' + item;
-		 })
+		].map( function( item) {
+			return 'src/' + item;
+		})
 	};
 
 	// Project configuration.
 	grunt.initConfig({
-		pkg: '<json:jquery.orangevolt-ampere.jquery.json>',
+		pkg: grunt.file.readJSON("jquery.orangevolt-ampere.jquery.json"),
 		meta: {
 			banner: '/*!\n' +
 				' * <%= pkg.title || pkg.name %>\n *\n' +
@@ -59,75 +59,6 @@ module.exports = function(grunt) {
 				errorReporting: true
 			}
 		},
-		lint: {
-			files: [
-				'grunt.js', 'src/**/*.js', 'test/**/*.js'
-			]
-		},
-		clean: ['dist'],
-		copy : {
-				debug : {
-						files : {
-							'dist/debug/libs/' : 'libs/*.js',
-							'dist/debug/libs/angular-1.1.2/' : 'libs/angular-1.1.2/**/*.min.*',
-							'dist/debug/libs/Font-Awesome/' : [ 'libs/Font-Awesome/css/**', 'libs/Font-Awesome/font/*'],
-							'dist/debug/libs/bootstrap-2.3.0/' : 'libs/bootstrap-2.3.0/**/*.min.*',
-							'dist/debug/libs/jquery-ui-sortable-1.10.0/' : 'libs/jquery-ui-sortable-1.10.0/**/*.min.*',
-							'dist/debug/libs/datepicker/' : ['libs/datepicker/css/**', 'libs/datepicker/js/**'],
-							'dist/debug/' : js.src
-						}
-				},
-				min : {
-						files : {
-							'dist/min/libs/' : 'dist/debug/libs/**/*'
-						}
-				}
-		},
-		less: {
-				debug : {
-					options : {
-						paths: ["src"],
-						compress : false
-					},
-					files: {
-						"dist/debug/ampere-ui-twitterbootstrap.css" : "src/ampere-ui-twitterbootstrap.css",
-						"dist/debug/ampere-ui-twitterbootstrap.less.css" : "src/ampere-ui-twitterbootstrap.less"
-					}
-				},
-		min : {
-					options : {
-						paths: ["src"],
-						compress : true
-					},
-			files: {
-				"dist/min/<%= pkg.name %>.min.css" : [
-					"src/ampere-ui-twitterbootstrap.css",
-					"src/ampere-ui-twitterbootstrap.less"
-				]
-			}
-		}
-	},
-	/*
-		concat: {
-			min: {
-				src: [
-						'<banner:meta.banner>',
-						'dist/min/<%= pkg.name %>.min.css'
-				],
-				dest: 'dist/min/<%= pkg.name %>.min.css'
-			}
-		},
-		*/
-		min: {
-			min: {
-				src: [ /* '<banner:meta.banner>', */ js.src],
-				dest: 'dist/min/<%= pkg.name %>.min.js'
-			}
-		},
-		watch: {
-			files: '<config:lint.files>',
-			tasks: 'default'
-		},
 		jshint: {
 			options: {
 				smarttabs:true,
@@ -147,38 +78,98 @@ module.exports = function(grunt) {
 				debug   : true,
 				nonew   : true,
 				jquery  : true,
-				evil : true /* otherwise document.write is prohibited */
+				evil : true, /* otherwise document.write is prohibited */
+				globals: {
+					jQuery  : true,
+					require : true,
+					console : true,
+					angular : true,
+						// this is for jasmine tests to be "lintable"
+					describe : true,
+					it	     : true,
+					expect   : true
+				}
 			},
-			globals: {
-				jQuery  : true,
-				require : true,
-				console : true,
-				angular : true,
-					// this is for jasmine tests to be "lintable"
-				describe : true,
-				it	     : true,
-				expect   : true
+			all: [ 'grunt.js', 'src/**/*.js', 'test/**/*.js']
+		},
+		clean: ['dist'],
+		copy : {
+			debug : {
+				files : [
+					{ dest: 'dist/debug/', src : [
+						'libs/*.js', 
+						'libs/angular-1.1.2/**/*.min.*',
+						'libs/Font-Awesome/css/**', 
+						'libs/Font-Awesome/font/*',
+						'libs/bootstrap-2.3.1/**/*.min.*',
+						'libs/jquery-ui-sortable-1.10.0/**/*.min.*',
+						'libs/datepicker/css/**', 'libs/datepicker/js/**'
+					]},
+					{ dest: 'dist/debug/', expand : true, flatten:true, src : [ js.src]}
+				]
+			},
+			min : {
+				files : [
+					{ dest: 'dist/min/libs/', expand: true, cwd:'dist/debug/libs/', src : ['**/*']}
+				]
 			}
 		},
+		less: {
+			debug : {
+				options : {
+					paths: ["src"],
+					compress : false
+				},
+				files: {
+					"dist/debug/ampere-ui-twitterbootstrap.css" : "src/ampere-ui-twitterbootstrap.css",
+					"dist/debug/ampere-ui-twitterbootstrap.less.css" : "src/ampere-ui-twitterbootstrap.less"
+				}
+			}
+		},
+		cssmin : {
+			min : {
+				options : {
+					paths: ["src"],
+					compress : true
+				},
+				files: {
+					"dist/min/<%= pkg.name %>.min.css" : [
+						"dist/debug/ampere-ui-twitterbootstrap.css",
+						"dist/debug/ampere-ui-twitterbootstrap.less.css"
+					]
+				}
+			}
+		},
+		watch: {
+			files: [ js.src, 'test/*.js'],
+			tasks: ['default']
+		},
 		uglify: {
-			mangle: {
-				except: [ 'Ampere', 'Module', 'Transition', 'State', 'View', 'History', 'Options', 'Ui', 'UiController', 'Component', 'Entity', 'Projection', 'CachePriority', 'Cache']
+			min: {
+				options : {
+					mangle: {
+						except: [ 'Ampere', 'Module', 'Transition', 'State', 'View', 'History', 'Options', 'Ui', 'UiController', 'Component', 'Entity', 'Projection', 'CachePriority', 'Cache']
+					}
+				},	
+				src: [ /* '<banner:meta.banner>', */ js.src],
+				dest: 'dist/min/<%= pkg.name %>.min.js',
 			}
 		}
 	});
 
 			// some dist debug specific operations
 	grunt.registerTask( 'finish',  'Custom build finish build (adding banners, generate oval.js version, etc).', function() {
-		var banner = grunt.helper( 'banner');
-
 			// read templates
 		var path = require('path');
 		var ampere_templates = {};
-		grunt.file.expandFiles( 'src/*.tmpl').forEach( function( item) {
+		//grunt.file.expandFiles( 'src/*.tmpl').forEach( function( item) {
+		grunt.file.expand( 'src/*.tmpl').forEach( function( item) {
 			var basename = path.basename( item);
 			var content = grunt.file.read( item);
 			ampere_templates[ basename] = content;
 		});
+
+		var banner = grunt.config( 'meta.banner');
 
 				// generate debug version of oval.js
 		var _ = require( 'underscore');
@@ -186,9 +177,10 @@ module.exports = function(grunt) {
 		grunt.file.write(
 			'dist/debug/oval.js',
 			oval_js({
+				banner    : banner,
 				css		: [
-					'libs/bootstrap-2.3.0/css/bootstrap.min.css',
-					'libs/bootstrap-2.3.0/css/bootstrap-responsive.min.css',
+					'libs/bootstrap-2.3.1/css/bootstrap.min.css',
+					'libs/bootstrap-2.3.1/css/bootstrap-responsive.min.css',
 					'libs/Font-Awesome/css/font-awesome.css',
 					'libs/datepicker/css/datepicker.css',
 					'ampere-ui-twitterbootstrap.css',
@@ -209,14 +201,15 @@ module.exports = function(grunt) {
 					scripts   : []
 				})
 		);
-
+		
 			// generate oval.js for min
 		grunt.file.write(
 			'dist/min/oval.js',
 			oval_js({
+				banner    : banner,
 				css       : [
-					'libs/bootstrap-2.3.0/css/bootstrap.min.css',
-					'libs/bootstrap-2.3.0/css/bootstrap-responsive.min.css',
+					'libs/bootstrap-2.3.1/css/bootstrap.min.css',
+					'libs/bootstrap-2.3.1/css/bootstrap-responsive.min.css',
 					'libs/Font-Awesome/css/font-awesome.css',
 					'libs/datepicker/css/datepicker.css',
 					grunt.config( 'pkg.name') + '.min.css'
@@ -239,19 +232,24 @@ $.ov.namespace.filter = function( severity, namespace) { return severity!='debug
 				})
 		);
 
-			// prepend banner to debug sources
-		grunt.file.expandFiles( 'dist/debug/*')
-		.concat( grunt.file.expandFiles( 'dist/min/*'))
+		// prepend banner to debug sources
+		
+		//grunt.file.expandFiles( 'dist/debug/*')
+		grunt.file.expand( 'dist/debug/*')
+		//.concat( grunt.file.expandFiles( 'dist/min/*'))
+		.concat( grunt.file.expand('dist/min/*'))
+		.filter( function( item) {
+			return grunt.file.isFile( item);
+		})
 		.forEach( function( item) {
-				// Concat specified files.
-			var src = banner + grunt.helper( 'concat', [ '<file_strip_banner:' + item + '>']);
+			var src = banner + grunt.file.read( item).replace( /\/\*[\s\S]*?\*\//, '');
 			grunt.file.write( item, src);
 
 				// Fail task if errors were logged.
 			if( this.errorCount) { return false; }
 
 				// Otherwise, print a success message.
-				grunt.log.writeln('Prepended banner to "' + item + '"');
+			grunt.log.writeln('Prepended banner to "' + item + '"');
 		});
 	});
 
@@ -261,12 +259,18 @@ $.ov.namespace.filter = function( severity, namespace) { return severity!='debug
 			// without aquiring the async lock
 			// grunt would immediately exit after executing server.js
 		var done = this.async();
-		require( './server');
+		require( './server.js');
 	});
 
 		// Default task.
-	grunt.registerTask( 'default', 'clean lint jasmine copy less min finish');
+	grunt.registerTask( 'default', ['clean', 'jshint', 'jasmine', 'copy', 'less', 'cssmin', 'uglify', 'finish']);
 
-	grunt.loadNpmTasks('grunt-contrib');
-	grunt.loadNpmTasks('grunt-jasmine-task');
+	grunt.loadNpmTasks('grunt-contrib-less');
+	grunt.loadNpmTasks('grunt-contrib-copy');
+	grunt.loadNpmTasks('grunt-contrib-jasmine');
+	grunt.loadNpmTasks('grunt-contrib-clean');
+	grunt.loadNpmTasks('grunt-contrib-jshint');
+	grunt.loadNpmTasks('grunt-contrib-uglify');
+	grunt.loadNpmTasks('grunt-contrib-watch');
+	grunt.loadNpmTasks('grunt-contrib-cssmin');
 };

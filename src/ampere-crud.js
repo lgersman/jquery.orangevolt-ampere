@@ -13,7 +13,7 @@
 	window.ov.ampere = window.ov.ampere || {};
 
 	var _ns = $.ov.namespace( 'window.ov.ampere.crud');
-
+	
 		/**
 		 * copy of ampere options
 		 */
@@ -44,6 +44,7 @@
 			if( typeof( template)=='string') {
 				if( document.getElementById( template)) {
 					template = $( document.getElementById( template));
+					template && (template=window.ov.ampere.util.getTemplate( template));
 				} else {
 					template = $.get( template);
 				}
@@ -51,6 +52,7 @@
 				template = default_tmpl;
 				if( document.getElementById( template)) {
 					template = $( document.getElementById( template));
+					template && (template=window.ov.ampere.util.getTemplate( template));
 				} else {
 					template = $.get( window.ov.ampere.defaults['ampere.baseurl'] + template);
 				}

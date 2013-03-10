@@ -1,0 +1,22 @@
+# copy "build your own" from https://github.com/jquery/jquery#how-to-build-your-own-jquery
+
+npm install grunt
+
+sudo npm install -g grunt-cli
+sudo npm install -g grunt-init
+
+
+	// be sure the output of "npm list -g" doesnt contain node or any other errorneous package from previous installs
+
+sudo npm install -g grunt-contrib
+
+npm install grunt-contrib-clean --save-dev
+npm install grunt-contrib-jshint --save-dev
+npm install grunt-contrib-copy --save-dev
+npm install grunt-contrib-less --save-dev
+npm install grunt-contrib-uglify --save-dev
+npm install grunt-contrib-watch --save-dev
+npm install grunt-contrib-cssmin --save-dev
+
+	// required by finish task
+sudo npm install underscore

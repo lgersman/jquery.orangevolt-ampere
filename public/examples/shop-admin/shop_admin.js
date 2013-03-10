@@ -166,7 +166,7 @@ window.shop_admin = ov.ampere().module( function shop_admin( module) {
 		'ampere.ui.type' : 'global'
 	});
 
-	module.transition( module.history().undo.target)
+	module.transition( 'undo', module.history().undo.target)
 	.action( module.history().undo)
 	.enabled( module.history().canUndo)
 	.options({
@@ -176,7 +176,7 @@ window.shop_admin = ov.ampere().module( function shop_admin( module) {
 		'ampere.ui.type' 	: null
 	});
 
-	module.transition( module.history().redo.target)
+	module.transition( 'redo', module.history().redo.target)
 	.action( module.history().redo)
 	.enabled( module.history().canRedo)
 	.options({

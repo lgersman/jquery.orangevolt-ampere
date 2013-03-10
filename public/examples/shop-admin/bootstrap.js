@@ -32,7 +32,7 @@ for( var i=0; i<scripts.length; i++) {
 		var JS = [
 			'../../../src/oval.js',
 			//'../../../dist/debug/oval.js',
-			//'../../../dist/min/oval.js,
+			//'../../../dist/min/oval.js',
 			'shop_admin.js',
 			'state_main.js',
 			'state_item_list.js',

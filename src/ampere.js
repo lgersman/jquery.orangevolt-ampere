@@ -731,9 +731,9 @@
 						members = Object.keys( this);
 						for( var u in members) {
 							if( members[u]!='promise') {
-								member = state[ members[u]];
+								member = this[ members[u]];
 
-								(member instanceof Component)  && member.init( state);
+								(member instanceof Component)  && member.init( this);
 
 								( $.isFunction( member.promise)) && dependencies.push( member.promise);
 							}

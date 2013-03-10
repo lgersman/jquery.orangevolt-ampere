@@ -2,7 +2,7 @@
   "name": "jquery.orangevolt-ampere",
   "title": "jQuery Orangevolt Ampere",
   "description": "The best jQuery plugin ever.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "homepage": "https://github.com/lgersman/jquery.orangevolt-ampere",
   "author": {
     "name": "Lars Gersmann",
@@ -27,9 +27,9 @@
     }
   ],
   "dependencies": {
-    "jquery"		   : "~1.8.3",
-    "angularjs" 	   : "~1.0.1",
-    "twitterbootstrap" : "~2.2.1"
+    "jquery"		   : "~1.9.1",
+    "angularjs" 	   : "~1.1.2",
+    "twitterbootstrap" : "~2.3.1"
   },
   "keywords": []
 }

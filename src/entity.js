@@ -8,6 +8,9 @@
  * Dual licensed under the MIT or GPL Version 2 licenses.
  */
 
+/**
+	entity relation utilities
+ */
 ;(window.ov && window.ov.entity) || (function( $) {
 	window.ov = window.ov || {};
 

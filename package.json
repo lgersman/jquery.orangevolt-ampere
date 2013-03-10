@@ -1,16 +1,28 @@
 {
-  "name": "jquery-plugin",
-  "version": "0.0.0-ignored",
+  "name": "jquery.orangevolt-ampere",
+  "version": "0.2.0",
+  "dependencies":{
+    "express":""
+  },
   "engines": {
-    "node": ">= 0.6.0"
+    "node": ">= 0.8.0"
   },
   "scripts": {
-    "test": "grunt jasmine"
+    "test": "grunt jasmine",
+    "start": "node server.js"
   },
   "devDependencies": {
-    "grunt"			: "~0.3.16",
-    "grunt-contrib" : "~0.2.0",
-    "jasmine-node"	: "",
-    "underscore"	: ""
+    "grunt": "0.4",
+    "grunt-contrib": "",
+    "jasmine-node": "",
+    "underscore": "",
+    "grunt-contrib-clean": "~0.4.0",
+    "grunt-contrib-jshint": "~0.2.0",
+    "grunt-contrib-jasmine": "~0.3.3",
+    "grunt-contrib-copy": "~0.4.0",
+    "grunt-contrib-less": "~0.5.0",
+    "grunt-contrib-uglify": "~0.1.2",
+    "grunt-contrib-watch": "~0.3.1",
+    "grunt-contrib-cssmin": "~0.4.1"
   }
 }

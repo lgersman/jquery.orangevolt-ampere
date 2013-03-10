@@ -30,22 +30,31 @@
 
 			TBODY {
 				TR {
-					 a.hover.ampere-transition,
 					 a.hover.ampere-transition {
 					 	visibility : hidden;
 					 	color 	   : black;
 					 }
 
 					 a.hover.hover.ampere-transition.disabled {
-					 	color 	   : inherit;
+					 	color 	   : #999999;
 					 }
 				}
 
 				TR.item:hover {
 					  a.hover.ampere-transition {
 					 	visibility  : inherit;
-					 	cursor		: auto;
 					 }
+
+					 a.hover.ampere-transition:not( .disabled):hover,
+					 a.hover.ampere-transition:not( .disabled):hover >* {
+					 	cursor		: auto;
+						font-weight : bold;
+					}
+
+					a.hover.ampere-transition.disabled:hover,
+					a.hover.ampere-transition.disabled:hover >* {
+						cursor		: default;
+					}
 				}
 
 				TR.no-items,

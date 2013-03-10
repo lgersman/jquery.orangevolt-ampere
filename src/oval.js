@@ -25,9 +25,9 @@ for( var i=0; i<scripts.length; i++) {
 		var baseUrl = matches[ 1];
 
 		var CSS = [
-			'../libs/bootstrap-2.3.0/css/bootstrap.css',
+			'../libs/bootstrap-2.3.1/css/bootstrap.css',
 			'../libs/Font-Awesome/css/font-awesome.css',
-			'../libs/bootstrap-2.3.0/css/bootstrap-responsive.css',
+			'../libs/bootstrap-2.3.1/css/bootstrap-responsive.css',
 			'../libs/datepicker/css/datepicker.css',
 			'ampere-ui-twitterbootstrap.css'
 		];
@@ -49,7 +49,7 @@ for( var i=0; i<scripts.length; i++) {
 			'../libs/jquery-1.9.1.js',
 			'../libs/jquery-ui-sortable-1.10.0/jquery-ui-1.10.0.custom.min.js',
 			'../libs/cache.js',
-			'../libs/bootstrap-2.3.0/js/bootstrap.js',
+			'../libs/bootstrap-2.3.1/js/bootstrap.js',
 			//'../libs/jquery.sortable.js',
 			'../libs/datepicker/js/bootstrap-datepicker.js',
 

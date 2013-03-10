@@ -1,15 +1,15 @@
 {
 	"items":[
 		{
-			"caption":"Muschigrell Liquide PU Leather Pants",
+			"caption":"Viva red pants",
 			"price":92.99,
-			"name":"liquide",
-			"keywords":"design haute couture, leather, leder, pants, r\u00f6hre, pleather",
+			"name":"viva_red",
+			"keywords":"design haute couture, pants",
 			"shipping":"envelope",
 			"status":[
 				"new"
 			],
-			"description":"The Muschigrell Liquide is exclusively sold in our shop.",
+			"description":"The Viva is exclusively sold in our shop.",
 			"composition":{
 				"options":[
 					"80% Polyester",
@@ -67,15 +67,15 @@
 			]
 		},
 		{
-			"caption":"Muschigrell Liquide Shiny PU Leather Pants",
+			"caption":"Viva shiny red pants",
 			"price":92.99,
-			"name":"liquide_shiny",
-			"keywords":"design haute couture, leather, leder, pants, r\u00f6hre, pleather",
+			"name":"viva_red_shiny",
+			"keywords":"design haute couture, pants",
 			"shipping":"envelope",
 			"status":[
 				"new"
 			],
-			"description":"The Muschigrell Liquide Shiny is exclusively sold in our shop.",
+			"description":"The Viva shiny is exclusively sold in our shop.",
 			"composition":{
 				"options":[
 					"80% Polyester",
@@ -133,15 +133,15 @@
 			]
 		},
 		{
-			"caption":"Muschigrell Ultra PU Leather Pants",
+			"caption":"Viva ultra pants",
 			"price":92.99,
-			"name":"ultra",
-			"keywords":"design haute couture, leather, leder, pants, r\u00f6hre, pleather",
+			"name":"viva_ultra",
+			"keywords":"design haute couture, pants",
 			"shipping":"envelope",
 			"status":[
 				"new"
 			],
-			"description":"The Muschigrell Ultra is exclusively sold in our shop.",
+			"description":"Viva ultra pants is exclusively sold in our shop.",
 			"composition":{
 				"options":[
 					"80% Polyester",
@@ -199,15 +199,15 @@
 			]
 		},
 		{
-			"caption":"Muschigrell Ultra Shiny PU Leather Pants",
+			"caption":"Viva ultra shiny pants",
 			"price":92.99,
-			"name":"ultra_shiny",
-			"keywords":"design haute couture, leather, leder, pants, r\u00f6hre, pleather",
+			"name":"viva_ultra_shiny",
+			"keywords":"design haute couture, pants",
 			"shipping":"envelope",
 			"status":[
 				"new"
 			],
-			"description":"The Muschigrell Ultra Shiny is exclusively sold in our shop.",
+			"description":"Viva ultra shiny pants is exclusively sold in our shop.",
 			"composition":{
 				"options":[
 					"80% Polyester",
@@ -265,10 +265,10 @@
 			]
 		},
 		{
-			"caption":"Roxes PU Leather Pants",
+			"caption":"Rolis jeans",
 			"price":38.99,
-			"name":"roxes",
-			"keywords":"r\u00f6hre, jeans, skin, tight, leather, leder, pleather",
+			"name":"rolis",
+			"keywords":"jeans, skin, tight",
 			"shipping":"envelope",
 			"status":[
 				"running-out-of-stock"
@@ -341,10 +341,10 @@
 			]
 		},
 		{
-			"caption":"Aurea Skinny Pants",
+			"caption":"Macbeth skinny pants",
 			"price":20.99,
-			"name":"aurea",
-			"keywords":"r\u00f6hre, jeans, skin, tight, leather, leder, pleather",
+			"name":"macbeth",
+			"keywords":"jeans, skin, tight, pleather",
 			"shipping":"envelope",
 			"status":[
 				"running-out-of-stock"
@@ -412,10 +412,10 @@
 			]
 		},
 		{
-			"caption":"Devil PU Leather Pants",
+			"caption":"Devil jeans",
 			"price":36.99,
 			"name":"devil",
-			"keywords":"r\u00f6hre, jeans, skin, tight, leather, leder, pleather",
+			"keywords":"jeans, skin, tight",
 			"shipping":"envelope",
 			"status":[
 				"on-sale",
@@ -484,15 +484,15 @@
 			]
 		},
 		{
-			"caption":"Muschigrell Nitro PU Leather skirt",
+			"caption":"Rockstar skirt",
 			"price":38.99,
-			"name":"nitro",
-			"keywords":"skirt, rock, skin, tight, leather, leder, pleather",
+			"name":"rockstar",
+			"keywords":"skirt, rock, skin, tight",
 			"shipping":"envelope",
 			"status":[
 				"new"
 			],
-			"description":"The Muschigrell Nitro is exclusively sold in our shop.",
+			"description":"The Rockstar skirt is exclusively sold in our shop.",
 			"composition":{
 				"options":[
 					"80% Polyester",
@@ -544,15 +544,15 @@
 			]
 		},
 		{
-			"caption":"Silverette PU Leather Leggings",
+			"caption":"Willis Leggings",
 			"price":79.99,
-			"name":"silverette",
-			"keywords":"r\u00f6hre, jeans, skin, tight, leather, leder, pleather",
+			"name":"willis",
+			"keywords":"jeans, skin, tight, pleather",
 			"shipping":"envelope",
 			"status":[
 				"on-sale"
 			],
-			"description":"The Silverette is exclusively sold in our shop.",
+			"description":"The Willis Leggings is exclusively sold in our shop.",
 			"composition":{
 				"options":[
 					"80% Polyester",
@@ -610,10 +610,10 @@
 			]
 		},
 		{
-			"caption":"Slinky PU Leather Leggings",
+			"caption":"Shaggy Leggings",
 			"price":88.99,
-			"name":"slinky",
-			"keywords":"r\u00f6hre, jeans, skin, tight, leather, leder, pleather",
+			"name":"shaggy",
+			"keywords":"jeans, skin, tight",
 			"shipping":"envelope",
 			"status":[
 				"on-sale"
@@ -675,15 +675,15 @@
 			]
 		},
 		{
-			"caption":"Original Raw PU Leather Leggings",
+			"caption":"Peerson jeggings",
 			"price":88.99,
-			"name":"raw",
-			"keywords":"haute couture, design, leather, leder, leggings, pleather",
+			"name":"peerson",
+			"keywords":"haute couture, design, leggings, pleather",
 			"shipping":"envelope",
 			"status":[
 				"on-sale"
 			],
-			"description":"The Original Muschigrell Raw is exclusively sold in our shop.",
+			"description":"The Peerson jeggings is exclusively sold in our shop.",
 			"composition":{
 				"options":[
 					"80% Polyester",
@@ -753,10 +753,10 @@
 			]
 		},
 		{
-			"caption":"Splendid PU Leather Pants",
+			"caption":"Fifty five pants",
 			"price":36.99,
-			"name":"splendid",
-			"keywords":"haute couture, design, leather, leder, leggings, pleather",
+			"name":"fifty",
+			"keywords":"haute couture, design, leggings",
 			"shipping":"envelope",
 			"status":[
 				"on-sale"
@@ -822,15 +822,15 @@
 			]
 		},
 		{
-			"caption":"Reptile Alligator PU Leather Leggings",
+			"caption":"Tiger leggings",
 			"price":79.99,
-			"name":"alligator",
-			"keywords":"haute couture, design, leather, leder, leggings, pleather",
+			"name":"tiger",
+			"keywords":"haute couture, design, leggings, pleather",
 			"shipping":"envelope",
 			"status":[
 				"running-out-of-stock"
 			],
-			"description":"The Reptile Alligator is exclusively sold in our shop.",
+			"description":"The Tiger leggings is exclusively sold in our shop.",
 			"composition":{
 				"options":[
 					"100% PU"
@@ -886,15 +886,15 @@
 			]
 		},
 		{
-			"caption":"Reptile Viper PU Leather Leggings",
+			"caption":"Cyperphunk leggings",
 			"price":79.99,
-			"name":"viper",
-			"keywords":"haute couture, design, leather, leder, leggings, pleather",
+			"name":"cyperphunk",
+			"keywords":"haute couture, design, leggings, pleather",
 			"shipping":"envelope",
 			"status":[
 				"running-out-of-stock"
 			],
-			"description":"The Reptile Viper is exclusively sold in our shop.",
+			"description":"The Cyperphunk leggings sold in our shop.",
 			"composition":{
 				"options":[
 					"100% PU"
@@ -950,10 +950,10 @@
 			]
 		},
 		{
-			"caption":"Azul e Colado Jeans",
+			"caption":"Keank jeans",
 			"price":32.95,
-			"name":"azul_e_colado",
-			"keywords":"r\u00f6hre, jeans, skin, tight, stretch, boot, cut",
+			"name":"keank",
+			"keywords":"jeans, skin, tight, stretch, boot, cut",
 			"shipping":"envelope",
 			"status":[
 				"running-out-of-stock"
@@ -1024,9 +1024,9 @@
 			]
 		},
 		{
-			"caption":"Pantera pencil skirt",
+			"caption":"1950 pencil skirt",
 			"price":17.95,
-			"name":"pantera",
+			"name":"1950",
 			"keywords":"skirt, rock, ruffled",
 			"shipping":"envelope",
 			"status":[
@@ -1077,10 +1077,10 @@
 			]
 		},
 		{
-			"caption":"Rockstar PU Leather Pants",
+			"caption":"Leather Pants",
 			"price":26.99,
-			"name":"rockstar",
-			"keywords":"r\u00f6hre, jeans, skin, tight, leather, leder",
+			"name":"leather",
+			"keywords":"jeans, skin, tight, pleather",
 			"shipping":"envelope",
 			"status":[
 				"no-more-available"
@@ -1155,10 +1155,10 @@
 			]
 		},
 		{
-			"caption":"Toxic PU Leather Leggings",
+			"caption":"Skinny leggings",
 			"price":29.99,
-			"name":"toxic",
-			"keywords":"r\u00f6hre, jeans, skin, tight, leather, leder",
+			"name":"skinny",
+			"keywords":"jeans, skin, tight, ",
 			"shipping":"envelope",
 			"status":[
 				"no-more-available"
@@ -1221,9 +1221,9 @@
 			]
 		},
 		{
-			"caption":"Havana Club glass",
+			"caption":"Thuringia glass",
 			"price":8.99,
-			"name":"havana",
+			"name":"thuringia",
 			"keywords":"cocktail",
 			"shipping":"parcel",
 			"status":[
@@ -1236,7 +1236,7 @@
 					"10% Epoxyd"
 				],
 				"description":[
-					"Made from original Liter Havana Club\u00ae bottle.",
+					"Made from original Thuringia Korn bottle.",
 					"A fully recyclable green product."
 				]
 			},
@@ -1257,7 +1257,7 @@
 			}
 		},
 		{
-			"caption":"Swarowsky Bike chain",
+			"caption":"Shimpy bike chain",
 			"price":8.99,
 			"name":"bike_chain",
 			"shipping":"envelope",
@@ -1284,23 +1284,21 @@
 			"stock":7
 		},
 		{
-			"caption":"XXXXL Torpedo Boob Bra",
+			"caption":"Golden key chain",
 			"price":79.99,
-			"name":"torpedo_boobs",
-			"keywords":"fetish",
+			"name":"gold_chain",
+			"keywords":"gold,luxury",
 			"shipping":"envelope",
 			"status":[
 				"new"
 			],
-			"description":"Looking more female is impossible",
+			"description":"Luxury at its finest",
 			"composition":{
 				"options":[
-
+					"very comfortable to wear"
 				],
 				"description":[
-					"silk and shiny high quality leather imitate",
-					"very comfortable to wear",
-					"stretchy fabric"
+					"Luxury"
 				]
 			},
 			"careinstructions":{
@@ -1308,7 +1306,7 @@
 					"wash_30",
 					"handwash"
 				],
-				"description":"Wear it - wash it - ready !"
+				"description":"Wear it to impress !"
 			},
 			"options":{
 				"size":[
@@ -1337,21 +1335,21 @@
 			]
 		},
 		{
-			"caption":"Original Aperol\u00ae Bottle glasses",
+			"caption":"Original Obstler bottle glasses",
 			"price":8.99,
-			"name":"aperol",
+			"name":"obstler",
 			"shipping":"parcel",
 			"status":[
 				"new"
 			],
-			"description":"Glasses from genuine Aperol\u00ae bottles",
+			"description":"Glasses from genuine Obstler bottles",
 			"composition":{
 				"options":[
 					"100% Glass bottle",
 					"10% Epoxyd"
 				],
 				"description":[
-					"Made from original Aperol\u00ae bottle.",
+					"Made from original Obstler bottle.",
 					"A fully recyclable green product."
 				]
 			},
