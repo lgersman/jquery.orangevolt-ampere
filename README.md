@@ -1,8 +1,14 @@
 ## [Orangevolt Ampere](http://lgersman.github.com/jquery.orangevolt-ampere/) is a technology do define programs by modeling your application as a state machine.
 
+### About
+
 jquery.orangevolt-ampere is an Ampere implementation for browsers.
  
 This project allows you to define complex single page web applications using Javascript.
+
+Live demo : http://ampere.eu01.aws.af.cm/
+
+Website : http://lgersman.github.com/jquery.orangevolt-ampere/
 
 [jquery.orangevolt-ampere](http://lgersman.github.com/jquery.orangevolt-ampere/) utilizes:
 
@@ -11,6 +17,19 @@ This project allows you to define complex single page web applications using Jav
 * [Twitter Bootstrap](http://twitter.github.com/bootstrap/)
 * [Font Awesome](http://fortawesome.github.com/Font-Awesome/)
 
+### Compatibility
+
+[jquery.orangevolt-ampere](http://lgersman.github.com/jquery.orangevolt-ampere/) is compatible with any HTML5 compliant browser engine.
+
+The code was sucessfully tested with the following browsers:
+* Firefox
+* Internet Explorer 10
+* Google Chrome
+* Google Chrome for Android 
+
+The engine should also run well in any Webkit based browser engine. Your help is appreciated.
+
+### License
 
 [jquery.orangevolt-ampere](http://lgersman.github.com/jquery.orangevolt-ampere/) is dual licensed under
 
