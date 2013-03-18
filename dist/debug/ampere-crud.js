@@ -2,7 +2,7 @@
  * jQuery Orangevolt Ampere
  *
  * version : 0.2.0
- * created : 2013-03-05
+ * created : 2013-03-15
  * source  : https://github.com/lgersman/jquery.orangevolt-ampere
  *
  * author  : Lars Gersmann (lars.gersmann@gmail.com)
@@ -438,18 +438,30 @@
 				};
 			})();
 
+				/**
+				 * combined getter/setter.
+				 *
+				 * if called with argument, the argument will be set.
+				 * if called without argument, the current selection will be returned. 
+				 * the getter is implemented as "save method" : if the last selection is no more in the model (->get()) undefined will be returned.
+				 * -> you can access anyway the stale selection via list.selection.value. this is unsafe but in rare cases very useful.
+				 * 
+				 * @return the selected object
+				 */
 			this.selection = (function( list) {
-				var selection;
-
-				return function() {
+				var fn = function() {
 					if( arguments.length && list.selectable()( arguments[0])) {
-						selection = arguments[0];
+						fn.value = arguments[0];
 							// disable editor (if given)
 						return this;
 					} else {
-						return $.inArray( selection, list.get())!=-1 ? selection : undefined;
+						return $.inArray( fn.value, list.get())!=-1 ? fn.value : undefined;
 					}
 				};
+
+				fn.value = undefined;
+
+				return fn; 
 			})( this);
 
 			this.options = Options( $.extend( {}, window.ov.ampere.crud.list.DEFAULTS, options || {}));

@@ -2,7 +2,7 @@
  * jQuery Orangevolt Ampere
  *
  * version : 0.2.0
- * created : 2013-03-05
+ * created : 2013-03-15
  * source  : https://github.com/lgersman/jquery.orangevolt-ampere
  *
  * author  : Lars Gersmann (lars.gersmann@gmail.com)
@@ -341,6 +341,13 @@
  {{$.trim( element.text()) || $ampere.ui.getCaption( transition)}}\
 </button>'
 			};
+
+				// add LI creation support (convenience method for easier twitter bootstrap toolbar  creation)
+			templates.li = '<li\
+ class="ampere-transition name-{{transition.name()}}"\
+ ng-class="{disabled : !transition.enabled(), active : transition.active()}">' + templates.a + '</li>'
+			;
+
 			/*
 			 * does not work yet
 				// compile templates
@@ -381,7 +388,7 @@
 						scope.$enabled = scope.transition.enabled();
 
 						_ns.assert(
-							$.type( scope.transition)=='object' && scope.transition.constructor && scope.transition.constructor.name=='Transition',
+							window.ov.ampere.type( scope.transition)=='transition',
 							'attribute "ng-ampere-transition" (="', attrs.ngAmpereTransition, '") does not resolve to a ampere transition'
 						);
 
@@ -749,6 +756,7 @@
 							content = window.ov.ampere.util.getTemplate(
 								$.isFunction( newValue.replace) && newValue.replace.call( window, window) || newValue.replace || ''
 							) || contents;
+
 							content && element.append( content);
 
 							content = window.ov.ampere.util.getTemplate(
@@ -1175,6 +1183,10 @@
 
 		this.update = function() {
 			angular.element( controller.element.find( '>.ampere-module')).scope().$digest();
+		};
+
+		this.refresh = function() {
+			this.renderState( controller.module.current().view);
 		};
 
 		//var lastView = undefined;
