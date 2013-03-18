@@ -1,0 +1,744 @@
+<!doctype html>
+<!--[if lt IE 10]> <html class="no-js lt-ie10 lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js lt-ie10 lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js lt-ie10 lt-ie9" lang="en"> <![endif]-->
+<!--[if IE 9]>    <html class="no-js lt-ie10" lang="en"> <![endif]-->
+<!--[if gt IE 9]><!--> <html class="no-js" lang="en" xmanifest="app.manifest"> <!--<![endif]-->
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	
+		<title>Orangevolt Ampere Crontab editor example</title>
+		
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="icon" href="favicon.ico" type="image/x-icon">
+		<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+	
+			<!-- less files must be loaded before "oval.js" to be seen by lesscss -->
+		<link rel="stylesheet/less" type="text/css" href="crontab.less">
+
+		<script type="text/javascript" src="../../../src/oval.js"></script>
+		<script type="text/_javascript" src="../../../dist/debug/oval.js"></script>
+		<script type="text/_javascript" src="../../../dist/min/oval.js"></script>
+		
+		<script type="text/javascript">
+			var nw = $.isFunction( window.require) && require( 'nw.gui');
+
+			var crontab = ov.ampere().module( function crontab( module) {
+				module.MINUTES = (function() {
+					var minutes = [];
+					for( var i=0; i<60; i++) {
+						minutes[i]=i;
+					}
+					return minutes;
+				})();
+				module.HOURS = (function() {
+					var hours = [];
+					for( var i=0; i<24; i++) {
+						hours[i]=i;
+					}
+					return hours;
+				})();
+				module.DAYS_OF_MONTH = (function() {
+					var days = [];
+					for( var i=1; i<=31; i++) {
+						days[i-1]=i;
+					}
+					return days;
+				})();
+				module.MONTHS = (function() {
+					var months = [];
+					for( var i=1; i<=12; i++) {
+						months[i-1]=i;
+					}
+					return months;
+				})();
+				module.MONTH_NAMES = [ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+				module.DAY_NAMES = [ 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+				module.state( {
+					main : function( state) {
+						state.transition( module.states.edit)
+						.action( function( transition, ui ,data) {
+							var contents = state.contents;
+							var items = parseCrontab( contents);
+							var currentItems = transition.target.items; 
+
+							return function redo( main, edit) {
+								//main.contents = contents;
+								edit.items = items;
+
+								return function undo( main, edit) {
+									//main.contents = contents;
+									edit.items = currentItems;	
+
+									return redo;
+								};
+							};
+						})
+						.enabled( function() {
+							return document.getElementsByTagName( 'form')[0].checkValidity();
+						});
+
+						var parseCrontab = function( string) {
+							var entries = [];
+
+							var lines = string.split( /\n+/);
+							for (var i = 0; i <lines.length; i++) {
+									// process only non empty lines
+								if( $.trim( lines[i].length)) {
+										// if its not a comment
+									if( lines[i].charAt( 0)!='#') {
+										var entry = lines[i].match(/^([0-9,\-\/]+|\*{1}|\*{1}\/[0-9]+)\s+([0-9,\-\/]+|\*{1}|\*{1}\/[0-9]+)\s+([0-9,\-\/]+|\*{1}|\*{1}\/[0-9]+)\s+([0-9,\-\/]+|\*{1}|\*{1}\/[0-9]+)\s+([0-9,\-\/]+|\*{1}|\*{1}\/[0-9]+)\s*(.+)$/);
+										
+											// if parse was successful -> add it to the resulting entries
+										if( entry) {
+											var data = {
+												minute 		: entry[1],
+												hour 		: entry[2],
+												day_of_month: entry[3],
+												month 		: entry[4],
+												day_of_week : entry[5],
+												command 	: entry[6]
+											};
+											entries.push( data);
+										} else {
+											throw new Error( 'Failed to parse crontab line ' + (i+1) + ' : \n\n"' + lines[i] + '"');
+										}
+									}
+								}
+							}
+
+							return entries;
+						}
+
+						state.contents = module.options( 'crontab-contents');
+
+						state.validate=function( jqTextarea) {
+							try {
+								parseCrontab( state.contents);
+							} catch( ex) {
+								jqTextarea.setCustomValidity( ex.message);
+							}							
+						}; 							
+
+						state.view( document.getElementById( 'main'));
+
+						state.options({
+							'ampere.ui.caption' : false			// -> prevent default caption for this state
+						})
+					},
+
+					help  : function( state) {
+						state.view( document.getElementById( 'help'));
+					},
+
+					edit : function( state) {
+						this.transition( module.states.main)
+						.options({
+							'ampere.ui.type' 	: 'primary',
+							'ampere.ui.caption' : 'Back',
+							'ampere.ui.icon'	: 'icon-chevron-left'
+						});
+
+						function generateCrontab() {
+							var lines = [];
+							for (var i = 0; i < state.items.length; i++) {
+								var item = state.items[i]
+								lines.push( 
+									item.minute + ' ' + 
+									item.hour + ' ' + 
+									item.day_of_month + ' ' + 
+									item.month + ' ' + 
+									item.day_of_week + ' ' + 
+									item.command
+								);
+							};
+
+							return lines.join( '\n');
+						}
+
+						this.transition( 'preview', module.states.main)
+						.action( function( transition, ui, data) {
+							var deferred = $.Deferred();
+
+							$( '#preview-dialog textarea').text( generateCrontab());
+
+							$( '#preview-dialog')
+							.modal( 'show')
+							.one( 'hidden', function() {
+								deferred.reject();
+							});
+								// trigger ui to be updated
+							ui.update();
+
+							return deferred;
+						})
+						.options({
+							'ampere.ui.caption' : 'Preview Crontab',
+							'ampere.ui.icon'	: 'icon-eye-open',
+							'commit'			: function( ui) {
+								$( '#preview-dialog').modal( 'hide');
+							}
+						});
+
+						this.transition( 'apply', module.states.main)
+						.action( function( transition, ui, data) {
+							var items = state.items;
+							var oldContents = module.states.main.contents;
+
+							return function redo( edit, main) {
+								edit.items = items;
+								main.contents = generateCrontab();
+
+								return function undo( main, edit) {
+									edit.items = items;
+									main.contents = oldContents;									
+
+									return redo;
+								};
+							};
+						})
+						.options({
+							'ampere.ui.caption' 	: 'Apply and go back',
+							'ampere.ui.description' : 'Apply edited crontab to initial texarea for copy/paste purposes',
+						});
+
+						state.validateCommand = function( eTexarea) {
+							/\r|\n/m.test( state.list.getEditingContext().item.command) && eTexarea.setCustomValidity( 'Line breaks are not allowed in command.');
+						};
+
+						state.normalizeEditingItem = function() {
+							var item = state.list.getEditingContext().item;
+
+								// convert new item	in correct format
+							item.minute = item.minute.length<60 && item.minute.join( ',') || '*';
+							item.hour = item.hour.length<24 && item.hour.join( ',') || '*';
+							item.day_of_month = item.day_of_month.length<31 && item.day_of_month.join( ',') || '*';
+							item.month = item.month.length<12 && item.month.join( ',') || '*';
+
+							item.day_of_week = item.day_of_week.length<7 && item.day_of_week.join( ',') || '*';
+						};
+
+						state.items = [];
+
+						state.list = state.list = window.ov.ampere.crud.list( 
+								// wrap the data model argument in a function
+								// because the model object may be completely replaced 
+							function() { 
+								return state.items; 
+							}, 
+							[
+								{
+									template : '{{item.minute}}'
+								}, {
+									template : '{{item.hour}}'
+								}, {
+									template : '{{item.day_of_month}}'
+								}, {
+									template : '{{item.month}}'
+								}, {
+									get 	 : function( item) {
+										return item=='*' && [ item] || 
+											$.map( item.split( ','), function( day) {
+												return module.DAY_NAMES[ parseInt( day<7 && day || 0)];
+											})
+										; 
+									},
+									template : '{{column.get( item.day_of_week).join( ", ")}}'
+								}, {
+									template : '<pre>{{item.command}}</pre>'
+								}
+							]
+						)
+						.headers([
+							{
+								template : 'Minute'
+							},
+							{
+								template : 'Hour'
+							},
+							{
+								template : 'Day of month'
+							},
+							{
+								template : 'Month'
+							},
+							{
+								template : 'Day of week'
+							},
+							{
+								template : 'Command'
+							}
+						])
+						.removable( true)
+						.draggable( true)
+						.editable({
+							template : function() {
+								return document.getElementById( 'entry-editor');
+							},	
+							callback : function( editable)   {
+								editable.transition.action( (function( action) {
+									return function( transition, ui, data) {
+										var redo = action( transition, ui, data), item = editable.item;
+
+										var toArray = function( s, convertToString) {
+											return $.map( s.split( ','), function( k) {
+												return parseInt( k, 10);
+											})
+										};
+
+											// prepare data item for editing
+										item.minute = item.minute=='*' && [].concat( module.MINUTES) || 
+											toArray( item.minute);
+
+										item.hour = item.hour=='*' && [].concat( module.HOURS) || 
+											toArray( item.hour);
+
+										item.day_of_month = item.day_of_month=='*' && [].concat( module.DAYS_OF_MONTH) || 
+											toArray( item.day_of_month);
+
+										item.month = item.month=='*' && [].concat( module.MONTHS) || 
+											toArray( item.month);
+
+										item.day_of_week = item.day_of_week=='*' && Object.keys( module.DAY_NAMES) || toArray( item.day_of_week);
+
+										item.day_of_week = $.map( item.day_of_week, function( entry) {
+											return (entry>6 ? 0 : entry).toString();
+										});
+
+										editable.original = angular.copy( item);
+
+										return redo;
+									};
+								})( editable.transition.action()));
+
+								editable.commit
+								.action( (function( action) {
+									return function( transition, ui, data) {
+										state.normalizeEditingItem();
+
+											// proceed with default addable logic
+										return action( transition, ui, data);
+									};
+								})( editable.commit.action()))
+								.enabled( function() {
+									return $('textarea:first').checkValidity() && 
+										!angular.equals( state.list.getEditingContext().item, state.list.getEditingContext().original);
+								});
+							}
+						})
+						.addable({
+							template : function() {
+								return document.getElementById( 'entry-editor');
+							},	
+							callback : function( addable)   {
+								
+								addable.transition.action( (function( action) {
+									return function( transition, ui, data) {
+										var redo = action( transition, ui, data);
+
+										addable.item = {
+											minute 		: [].concat( module.MINUTES),
+											hour 		: [].concat( module.HOURS),
+											day_of_month: [].concat( module.DAYS_OF_MONTH),
+											month 		: [].concat( module.MONTHS),
+											day_of_week : Object.keys( module.DAY_NAMES),
+											command 	: 'root echo "" > /www/apache/logs/error_log'
+										};
+
+										return redo;
+									};
+								})( addable.transition.action()));
+
+								addable.commit
+								.action( (function( action) {
+									return function( transition, ui, data) {
+										state.normalizeEditingItem();
+
+											// proceed with default addable logic
+										return action( transition, ui, data);
+									};
+								})( addable.commit.action()))
+								.enabled( function() {
+									return $('textarea:first').checkValidity();
+								});
+							}
+						});
+
+						state.view( document.getElementById( 'edit'));
+					}
+				});
+
+				if( nw) {
+					module.transition( module.history().undo.target)
+					.action( module.history().undo)
+					.enabled( module.history().canUndo)
+					.options({
+						'ampere.ui.caption' : 'Undo',
+						'ampere.ui.hotkey'  : 'ctrl+Z',
+						'ampere.ui.icon' 	: 'icon-undo',
+						'ampere.ui.type' 	: 'global'
+					});
+
+					module.transition( module.history().redo.target)
+					.action( module.history().redo)
+					.enabled( module.history().canRedo)
+					.options({
+						'ampere.ui.caption' : 'Redo',
+						'ampere.ui.hotkey'  : 'ctrl+Y',
+						'ampere.ui.icon' 	: 'icon-repeat',
+						'ampere.ui.type' 	: 'global'
+					});
+				}
+
+				module.transition( module.states.main)
+				.options({
+					'ampere.ui.caption' : 'Intro',
+				})
+				.active( function() {
+					return module.current().state===module.states.main;
+				})
+				.enabled( function() {
+					return module.current().state!==module.states.main;
+				});
+
+				module.transition( module.states.help)
+				.active( function() {
+					return module.current().state===module.states.help;
+				})
+				.enabled( function() {
+					return module.current().state!==module.states.help;
+				});
+
+				module.options({
+					'ampere.ui.caption' 	: 'Crontab editor',
+					'ampere.ui.about' 		: 'This is a sample <a target="_blank" href="https://github.com/lgersman/jquery.orangevolt-ampere">Ampere</a> application.',
+					'ampere.ui.about.url'	: 'https://github.com/lgersman/jquery.orangevolt-ampere',
+					'ampere.ui.description'	: 'Crontab editor is a GUI application that can be used to edit your  crontab file easily'
+				});
+			});
+			
+				// default crontab content
+			
+			var crontabContents = "12,17 *	* * *	root    cd / && run-parts --report /etc/cron.hourly\n25 6	* * *	root	test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.daily )\n47 6	* * 7	root	test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.weekly )\n* 6	1 * *	root	test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.monthly )"
+			;
+
+			if( nw) {
+				var fs = require( 'fs'), path = require( 'path');
+				if( path.existsSync( "/etc/crontab")) {
+						// seems a node-webkit bug : toString() is required to convert the nodejs string to the webkit string
+					crontabContents = fs.readFileSync( "/etc/crontab").toString();
+				}
+			} 
+
+			$( window).ready( function() {
+				$( 'body').ampere( crontab, {
+					'crontab-contents': crontabContents
+				});
+
+					// node-webkit : we declared the window should be hidden by default in package.json
+					// to let the app appaer smootly. Now its time to show up the window.
+				//nw && nw.Window.get().show();
+			});				
+		</script>
+
+		<script id="main_popover" type="text/template">
+			<div class="p">
+				The <code>crontab</code> file is usually available on <strong>*nix</strong> like systems.
+			</div>
+			<div class="p">
+				The file can be found at <code>/etc/crontab</code>.
+			</div>
+		</script>
+
+		<script id="main" type="text/template">
+			<blockquote cite="http://example.com/facts">
+				Cron is the name of program that enables unix users to execute commands or scripts (groups of commands) automatically at a specified time/date. It is normally used for sys admin commands, like makewhatis, which builds a search database for the <code>man -k</code> command, or for running a backup script, but can be used for anything. A common use for it today is connecting to the internet and downloading your email.
+			</blockquote>
+			<form>
+				<label>
+					Your crontab file contents <em style="color:green" ng-show="$window.nw">(read from your local <strong>/etc/crontab</strong> file)</em>
+					<textarea 
+						class="input-block-level html5validation-title"
+						autofocus
+						rows="5"
+						placeholder="Place your crontab here ..."
+						ng-model="contents"
+						ng-ampere-validate="validate"
+						ng-ampere-data="{
+							content		: $( '#main_popover').text(),
+							html		: true,
+							title		: 'Where can I find the crontab file ?',
+							trigger		: 'focus',
+							placement	: 'top'
+						}"
+						onclick="$( this).popover( 'show')"
+					></textarea>
+				</label>
+				<div class="help-block description">
+					Please note that only numerical crontab entries are supported (i.e. <code>Sunday, sun, jan</code> synonyms are unsupported yet)
+				</div>
+				<submit ng-ampere-transition="$ampere.view.state().transitions.edit"/>
+				<div class="help-block error">
+					{{$('textarea').validationMessage()}}
+				</div>
+			</form>
+		</script>
+
+		<script id="entry-editor-minute_popover" type="text/template">
+			Minute can be some of <code>0..59</code> or all <code>*</code>
+		</script>
+
+		<script id="entry-editor-hour_popover" type="text/template">
+			Hour can be some of <code>0..23</code> or all <code>*</code>
+		</script>
+
+		<script id="entry-editor-day_of_month_popover" type="text/template">
+			Day can be some of <code>0..31</code> or all <code>*</code>
+		</script>
+
+		<script id="entry-editor-month_popover" type="text/template">
+			Month can be some of <code>1..12</code> or all <code>*</code>
+		</script>
+
+		<script id="entry-editor-day_of_week_popover" type="text/template">
+			Day can be some of <code>0..6</code> or all <code>*</code>
+		</script>
+
+		<script id="entry-editor-command_popover" type="text/template">
+			<div class="p">
+				Command is the <code>*nix</code> command to execute at this time.
+			</div>
+			<blockquote>A crontab command is prefixed with the name of the user executing the command.</em>
+		</script>
+
+		<script id="entry-editor" type="text/template">
+			<td>
+				<select 
+					class="input-block-level"
+					multiple 
+					ng-model="list.getEditingContext().item.minute"
+					ng-options="minute for minute in $ampere.module.MINUTES"
+					ng-ampere-data="{
+						content		: $( '#entry-editor-minute_popover').text(),
+						html		: true,
+						title		: 'Minute editing help',
+						trigger		: 'focus',
+						placement	: 'top'
+					}"
+					onfocus="$( this).popover( 'show')"
+				></select>
+				<label class="checkbox">	
+					<input 
+						type="checkbox" 
+						ng-click="list.getEditingContext().item.minute = list.getEditingContext().item.minute.length==60 && [ 0] || [].concat( $ampere.module.MINUTES)" 				
+						ng-checked="list.getEditingContext().item.minute.length==60"
+					>
+					Every minute
+				</label>
+			</td><td>
+				<select 
+					class="input-block-level"
+					multiple 
+					ng-model="list.getEditingContext().item.hour"
+					ng-options="hour for hour in $ampere.module.HOURS"
+					ng-ampere-data="{
+						content		: $( '#entry-editor-hour_popover').text(),
+						html		: true,
+						title		: 'Hour editing help',
+						trigger		: 'focus',
+						placement	: 'top'
+					}"
+					onfocus="$( this).popover( 'show')"
+				></select>
+				<label class="checkbox">	
+					<input 
+						type="checkbox" 
+						ng-click="list.getEditingContext().item.hour = list.getEditingContext().item.hour.length==24 && [ 0] || [].concat( $ampere.module.HOURS)" 				
+						ng-checked="list.getEditingContext().item.hour.length==24"
+					>
+					Every hour
+				</label>
+			</td><td>
+				<select 
+					class="input-block-level"
+					multiple 
+					ng-model="list.getEditingContext().item.day_of_month"
+					ng-options="day for day in $ampere.module.DAYS_OF_MONTH"
+					ng-ampere-data="{
+						content		: $( '#entry-editor-day_of_month_popover').text(),
+						html		: true,
+						title		: 'Day editing help',
+						trigger		: 'focus',
+						placement	: 'top'
+					}"
+					onfocus="$( this).popover( 'show')"
+				></select>
+				<label class="checkbox">	
+					<input 
+						type="checkbox" 
+						ng-click="list.getEditingContext().item.day_of_month = list.getEditingContext().item.day_of_month.length==31 && [ 1] || [].concat( $ampere.module.DAYS_OF_MONTH)" 				
+						ng-checked="list.getEditingContext().item.day_of_month.length==31"
+					>
+					Every day
+				</label>
+			</td><td>
+				<select 
+					class="input-block-level"
+					multiple 
+					ng-model="list.getEditingContext().item.month"
+					ng-options="$ampere.module.MONTH_NAMES[ month-1] for month in $ampere.module.MONTHS"
+					ng-ampere-data="{
+						content		: $( '#entry-editor-month_popover').text(),
+						html		: true,
+						title		: 'Month editing help',
+						trigger		: 'focus',
+						placement	: 'top'
+					}"
+					onfocus="$( this).popover( 'show')"
+				></select>
+				<label class="checkbox">	
+					<input 
+						type="checkbox" 
+						ng-click="list.getEditingContext().item.month = list.getEditingContext().item.month.length==12 && [ 1] || [].concat( $ampere.module.MONTHS)" 				
+						ng-checked="list.getEditingContext().item.month.length==12"
+					>
+					Every month
+				</label>
+			</td><td>
+				<select 
+					class="input-block-level"
+					multiple 
+					ng-model="list.getEditingContext().item.day_of_week"
+					ng-options="index as $ampere.module.DAY_NAMES[ index] for index in $ampere.module.DAY_NAMES | keys"
+					ng-ampere-data="{
+						content		: $( '#entry-editor-day_of_week_popover').text(),
+						html		: true,
+						title		: 'Day of week editing help',
+						trigger		: 'focus',
+						placement	: 'top'
+					}"
+					onfocus="$( this).popover( 'show')"
+				></select>
+				<label class="checkbox">	
+					<input 
+						type="checkbox" 
+						ng-click="list.getEditingContext().item.day_of_week = (list.getEditingContext().item.day_of_week.length==7 && [ '0']) || ($ampere.module.DAY_NAMES | keys)" 				
+						ng-checked="list.getEditingContext().item.day_of_week.length==7"
+					>
+					Every week day
+				</label>
+			</td><td>
+				<textarea 
+					class="input-block-level html5validation-title"
+					rows="5"
+					placeholder="Place your command here ..."
+					ng-model="list.getEditingContext().item.command"
+					required
+					ng-ampere-validate="validateCommand"
+					ng-ampere-data="{
+						content		: $( '#entry-editor-command_popover').text(),
+						html		: true,
+						title		: 'Command editing help',
+						trigger		: 'focus',
+						placement	: 'top'
+					}"
+					onclick="$( this).popover( 'show')"
+				></textarea>
+				<div class="btn-group pull-right">
+					<button type="button" ng-ampere-transition="list.getEditingContext().cancel"></button>
+					<button type="submit" ng-ampere-transition="list.getEditingContext().commit"></button>
+				</div>
+			</td>
+		</script>
+
+		<script id="edit" type="text/template">
+			<div class="navbar subnav">
+				<div class="navbar-inner">
+					<ul class="nav">
+						<li ng-ampere-transition="$ampere.module.current().state.transitions.apply"></li>
+						<li class="divider-vertical"></li>
+						<li ng-ampere-transition="$ampere.module.current().state.transitions.preview"></li>
+						<li class="divider-vertical"></li>
+						<li ng-ampere-transition="list.addable().transition">Add</li>
+						<li ng-ampere-transition="list.editable().transition">Edit</li>
+						<li ng-ampere-transition="list.removable().transition">Remove</li>
+					</ul>
+				</div>
+			</div>
+				
+			<div ng-ampere-crud-list="list"></div>
+
+			<div id="preview-dialog" class="modal hide fade" tabindex="-1">
+				<div class="modal-header">
+					<button type="button" class="close" ng-click="$('#preview-dialog').modal( 'hide')">×</button>
+					<h5>Preview Crontab</h5>
+				</div>
+				<div class="modal-body">
+					<textarea 
+						rows="10"
+						cols="60"
+						class="input-block-level"
+						style="white-space: nowrap;"
+					></textarea>
+				</div>
+				<div class="modal-footer">
+					<div class="btn-group">
+						<button 
+							class="btn" 
+							ng-click="$ampere.view.state().transitions.preview.options().commit( $ampere.ui)"
+						>Ok</button>
+					</div>
+				</div>
+			</div>
+		</script>
+
+		<script id="help" type="text/template">
+			<h4>crontab syntax</h4>
+			<div class="p">
+				Each line in a crontab file is a job and follows a particular format as a series of fields, separated by spaces or tabs(see example below). Each field can have a single value or a series of values.
+			</div>
+
+			<div class="p">
+				<h5>crontab operators</h5>
+				<div class="p">
+					There are multiple ways of specifying several date/time values in a field:
+					<ul>
+						<li>
+							The comma <code>,</code> specifies a list of values, for example: <code>1,3,4,7,8</code>
+						</li>
+						<li>
+							The dash <code>-</code> specifies a range. Example: <code>1-6</code>, which is equivalent to <code>1,2,3,4,5,6</code>
+						</li>
+						<li>
+							The asterisk <code>*</code> operator specifies all possible values for a field. For example, an asterisk <code>*</code> in the hour time field would be the same as <em>every hour</em>.
+						</li>
+						<li>
+							There is also an operator which some extended versions of cron support, the slash <code>/</code> operator, which can be used to skip a given number of values. For example, <code>*/3</code> in the hour time field is equivalent to <code>0,3,6,9,12,15,18,21</code>. So <code>*</code> specifies <em>every hour</em> but the <code>*/3</code> means only those hours divisible by <code>3</code>.
+						</li>
+					</ul>	
+					<div class="p">
+						Example: the following will clear the Apache error log at one minute past midnight each day.
+<pre style="line-height: 14px;">
+01 00 * * * echo "" &gt; /www/apache/logs/error_log
+Fields
+╭──────────────── minute (0 - 59) 
+│  ╭───────────── hour (0 - 23)
+│  │  ╭────────── day of month (1 - 31)
+│  │  │  ╭─────── month (1 - 12) OR jan,feb,mar,apr ... 
+│  │  │  │  ╭──── day of week (0 - 6) (Sunday=0 or 7)  OR sun,mon,tue,wed,thu,fri,sat 
+│  │  │  │  │
+*  *  *  *  *     &lt;command to be executed&gt;
+</pre>
+For more information about the cron and crontab, run the command <code>man cron</code> and <code>man crontab</code>.
+				</div>	
+			</div>
+		</script>
+ 	</head>
+ 	<body>
+  		<!-- Prompt IE 6 users to install Chrome Frame. Remove this if you support IE 6.
+       		chromium.org/developers/how-tos/chrome-frame-getting-started -->
+  		<!--[if lt IE 10]><p class=chromeframe>Your browser is <em>ancient!</em> <a href="http://browsehappy.com/">Upgrade to a different browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to experience this site.</p><![endif]-->
+	</body>
+</html>

@@ -117,3 +117,8 @@ event.data.newPosition = newPosition;
 ** once( eventName, ...), 
 ** off( eventName, [handler])
 * module event "ampere.transition.enabled" added to supported global event handlers
+
+* Twitter Bootstrap Renderer : method "refresh" added. refresh rerenders the whole state (whereas method "update" just forces angular scope.$digest)
+
+* crud list : beside the regular list.selection() function you can access the current (dirty) selection by list.selection.value. this feature is introduced to match the use case you want to know what was recently selected but is now dirty (in this case selection() would return undefined ...)
+

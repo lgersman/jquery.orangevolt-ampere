@@ -10,3 +10,9 @@ This project allows you to define complex single page web applications using Jav
 * [jQuery](http://jquery.com)
 * [Twitter Bootstrap](http://twitter.github.com/bootstrap/)
 * [Font Awesome](http://fortawesome.github.com/Font-Awesome/)
+
+
+[jquery.orangevolt-ampere](http://lgersman.github.com/jquery.orangevolt-ampere/) is dual licensed under
+
+* [MIT](http://www.opensource.org/licenses/MIT)
+* [GPL2](http://www.opensource.org/licenses/GPL-2.0)

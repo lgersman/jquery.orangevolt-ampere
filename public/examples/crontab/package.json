@@ -1,0 +1,34 @@
+{
+	"name": "ampere-nodewebkit-crontab-editor example",
+	"main": "index.html",
+	"window": {
+		"icon"		: "icon.png",
+		"xshow"		: false,
+		"toolbar"	: false,
+		"width"		: 1024,
+		"height"	: 768,
+		"min_width"	: 640,
+		"min_height": 480
+	},
+	"maintainers":[ {
+		"name"	: "Lars Gersmann",
+		"email"	: "lars.gersmann@gmail.com",
+		"web"	: "htp://www.orangevolt.com"
+	}],
+	"repository": {
+    	"type": "git",
+    	"url": "git://github.com/lgersman/jquery.orangevolt-ampere.git"
+	},
+		"bugs": {
+		"url": "https://github.com/lgersman/jquery.orangevolt-ampere/issues"
+	},
+	"licenses": [
+	{
+		"type": "MIT",
+		"url": "http://www.opensource.org/licenses/MIT"
+	},
+	{
+		"type": "GPL",
+		"url": "http://www.opensource.org/licenses/GPL-2.0"
+	}]
+}
