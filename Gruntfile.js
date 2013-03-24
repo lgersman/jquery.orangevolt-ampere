@@ -189,7 +189,7 @@ module.exports = function(grunt) {
 				less	: [],
 					js : [
 						'libs/coffeescript-1.3.3.js',
-						'libs/lesscss-1.3.0.js'
+						'libs/lesscss-1.3.3.js'
 					]
 					.concat( js.libs)
 					.concat(
@@ -217,7 +217,7 @@ module.exports = function(grunt) {
 				less      : [],
 				js         : [
 					'libs/coffeescript-1.3.3.js',
-					'libs/lesscss-1.3.0.js'
+					'libs/lesscss-1.3.3.js'
 					]
 					.concat( js.libs)
 					.concat([

@@ -13,7 +13,7 @@
 	"maintainers":[ {
 		"name"	: "Lars Gersmann",
 		"email"	: "lars.gersmann@gmail.com",
-		"web"	: "htp://www.orangevolt.com"
+		"web"	: "http://www.orangevolt.com"
 	}],
 	"repository": {
     	"type": "git",

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="imported" basedir=".">
+    <target name="-pre-build">
+        <mkdir dir="assets/www/ampere" />
+		<copy todir="assets/www/ampere">
+			<fileset dir="../../../.." includes="src/**,libs/**"/>
+		</copy>
+    	<copy todir="assets/www">
+    		<fileset dir=".." includes="css/crontab.less,tmpl/**,crontab.js"/>
+    	</copy>
+	</target>
+
+	<target name="-pre-clean">
+		<delete dir="assets/www/ampere"/>
+		<delete>
+			<fileset dir="assets/www" includes="css/crontab.less,tmpl/**,crontab.js"/>
+		</delete>
+
+	</target>
+</project>

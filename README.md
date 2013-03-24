@@ -26,6 +26,8 @@ The code was sucessfully tested with the following browsers:
 * Internet Explorer 10
 * Google Chrome
 * Google Chrome for Android 
+* [node-webkit](https://github.com/rogerwang/node-webkit)
+* Android native browser
 
 The engine should also run well in any Webkit based browser engine. Your help is appreciated.
 
