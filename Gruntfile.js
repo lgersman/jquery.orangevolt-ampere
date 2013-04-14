@@ -9,10 +9,10 @@ module.exports = function(grunt) {
 			'datepicker/js/bootstrap-datepicker.js',
 			'cache.js',
 
-			'angular-1.1.2/angular.min.js',
-			'angular-1.1.2/angular-cookies.min.js',
-			'angular-1.1.2/angular-loader.min.js',
-			'angular-1.1.2/angular-resource.min.js'
+			'angular-1.1.4/angular.min.js',
+			'angular-1.1.4/angular-cookies.min.js',
+			'angular-1.1.4/angular-loader.min.js',
+			'angular-1.1.4/angular-resource.min.js'
 		].map( function( item) {
 		return 'libs/' + item;
 	}),
@@ -98,7 +98,7 @@ module.exports = function(grunt) {
 				files : [
 					{ dest: 'dist/debug/', src : [
 						'libs/*.js', 
-						'libs/angular-1.1.2/**/*.min.*',
+						'libs/angular-1.1.4/**/*.min.*',
 						'libs/Font-Awesome/css/**', 
 						'libs/Font-Awesome/font/*',
 						'libs/bootstrap-2.3.1/**/*.min.*',

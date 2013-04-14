@@ -873,6 +873,10 @@
 						template = data.jquery ? (data[0].tagName=='SCRIPT' ? data.text().replace( "<![CDATA[", "").replace("]]>", "") : data) : template.responseText || data;
 
 						ui && ui.render( 'State', view, template, result);
+
+							// broadcast ampere.view.changed event
+						self.trigger( "ampere.view.changed", [ view]);
+
 						ui && ui.unblock();
 					})
 					.fail( errorHandler);
@@ -1487,6 +1491,9 @@
 
 			controller.element.data( 'ampere.controller', controller);
 			controller.ui.render( 'Bootstrap');
+
+				// broadcast ampere.view.changed event
+			module.trigger( "ampere.view.changed", [ view]);
 		});
 
 			/*
@@ -1530,7 +1537,7 @@
 							 * in both cases actionDeferred should keep afterwards a promise
 							 * returning the real command/redo function as argument of the done handler
 							 */
-						var actionDeferred = !$.isFunction( command) ?
+						var actionDeferred = !$.isFunction( command) || (command && $.isFunction( command.promise)) ?
 							command	: $.Deferred( function() {
 								this.resolve( command);
 							});
@@ -1539,7 +1546,11 @@
 						var self = this;
 
 							// wait for action to complete
-						actionDeferred.done( function( command) {
+						actionDeferred.done( function( redo) {
+							if( arguments.length===0 || !$.isFunction( redo)) {
+								redo = command;
+							}
+
 								// compute target view
 							var view = transition.options( 'ampere.state.view') || target.options( 'ampere.state.view');
 							if( typeof( view)=='string') {
@@ -1559,7 +1570,7 @@
 							 */
 
 							controller.module.history().redo({
-								command	: command,
+								command	: redo,
 								source	: transition.state() || module.current().state, /* state() may return null for module transitions*/
 								target	: transition.target(),
 								view    : view,

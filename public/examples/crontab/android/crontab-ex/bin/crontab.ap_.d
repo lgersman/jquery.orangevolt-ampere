@@ -44,6 +44,7 @@
 /home/lgersman/public_html/cmag-db/public/libs/ampere/public/examples/crontab/android/crontab-ex/assets/www/ampere/libs/jasmine-1.2.0 \
 /home/lgersman/public_html/cmag-db/public/libs/ampere/public/examples/crontab/android/crontab-ex/assets/www/ampere/libs/angular-1.1.2 \
 /home/lgersman/public_html/cmag-db/public/libs/ampere/public/examples/crontab/android/crontab-ex/assets/www/ampere/libs/lesscss-1.3.3.js \
+/home/lgersman/public_html/cmag-db/public/libs/ampere/public/examples/crontab/android/crontab-ex/assets/www/ampere/libs/angular-1.1.4 \
 /home/lgersman/public_html/cmag-db/public/libs/ampere/public/examples/crontab/android/crontab-ex/assets/www/ampere/libs/cache.js \
 /home/lgersman/public_html/cmag-db/public/libs/ampere/public/examples/crontab/android/crontab-ex/assets/www/ampere/libs/datepicker \
 /home/lgersman/public_html/cmag-db/public/libs/ampere/public/examples/crontab/android/crontab-ex/assets/www/ampere/libs/coffeescript-1.3.3.js \
@@ -170,6 +171,16 @@
 /home/lgersman/public_html/cmag-db/public/libs/ampere/public/examples/crontab/android/crontab-ex/assets/www/ampere/libs/angular-1.1.2/angular-resource.min.js \
 /home/lgersman/public_html/cmag-db/public/libs/ampere/public/examples/crontab/android/crontab-ex/assets/www/ampere/libs/angular-1.1.2/angular-loader.min.js \
 /home/lgersman/public_html/cmag-db/public/libs/ampere/public/examples/crontab/android/crontab-ex/assets/www/ampere/libs/angular-1.1.2/angular-cookies.min.js \
+/home/lgersman/public_html/cmag-db/public/libs/ampere/public/examples/crontab/android/crontab-ex/assets/www/ampere/libs/angular-1.1.4/angular-cookies.js \
+/home/lgersman/public_html/cmag-db/public/libs/ampere/public/examples/crontab/android/crontab-ex/assets/www/ampere/libs/angular-1.1.4/angular.min.js \
+/home/lgersman/public_html/cmag-db/public/libs/ampere/public/examples/crontab/android/crontab-ex/assets/www/ampere/libs/angular-1.1.4/angular.js \
+/home/lgersman/public_html/cmag-db/public/libs/ampere/public/examples/crontab/android/crontab-ex/assets/www/ampere/libs/angular-1.1.4/angular-mobile.js \
+/home/lgersman/public_html/cmag-db/public/libs/ampere/public/examples/crontab/android/crontab-ex/assets/www/ampere/libs/angular-1.1.4/angular-resource.js \
+/home/lgersman/public_html/cmag-db/public/libs/ampere/public/examples/crontab/android/crontab-ex/assets/www/ampere/libs/angular-1.1.4/angular-loader.js \
+/home/lgersman/public_html/cmag-db/public/libs/ampere/public/examples/crontab/android/crontab-ex/assets/www/ampere/libs/angular-1.1.4/angular-resource.min.js \
+/home/lgersman/public_html/cmag-db/public/libs/ampere/public/examples/crontab/android/crontab-ex/assets/www/ampere/libs/angular-1.1.4/angular-loader.min.js \
+/home/lgersman/public_html/cmag-db/public/libs/ampere/public/examples/crontab/android/crontab-ex/assets/www/ampere/libs/angular-1.1.4/angular-cookies.min.js \
+/home/lgersman/public_html/cmag-db/public/libs/ampere/public/examples/crontab/android/crontab-ex/assets/www/ampere/libs/angular-1.1.4/angular-mobile.min.js \
 /home/lgersman/public_html/cmag-db/public/libs/ampere/public/examples/crontab/android/crontab-ex/assets/www/ampere/libs/datepicker/js \
 /home/lgersman/public_html/cmag-db/public/libs/ampere/public/examples/crontab/android/crontab-ex/assets/www/ampere/libs/datepicker/css \
 /home/lgersman/public_html/cmag-db/public/libs/ampere/public/examples/crontab/android/crontab-ex/assets/www/ampere/libs/datepicker/less \

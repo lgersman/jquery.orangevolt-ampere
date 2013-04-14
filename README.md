@@ -19,7 +19,7 @@ Website : http://lgersman.github.com/jquery.orangevolt-ampere/
 
 ### Compatibility
 
-[jquery.orangevolt-ampere](http://lgersman.github.com/jquery.orangevolt-ampere/) is compatible with any HTML5 compliant browser engine.
+[jquery.orangevolt-ampere](http://lgersman.github.io/jquery.orangevolt-ampere/) is compatible with any HTML5 compliant browser engine.
 
 The code was sucessfully tested with the following browsers:
 * Firefox

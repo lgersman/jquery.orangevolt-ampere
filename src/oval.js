@@ -53,10 +53,10 @@ for( var i=0; i<scripts.length; i++) {
 			//'../libs/jquery.sortable.js',
 			'../libs/datepicker/js/bootstrap-datepicker.js',
 
-			'../libs/angular-1.1.2/angular.js',
-			'../libs/angular-1.1.2/angular-cookies.js',
-			'../libs/angular-1.1.2/angular-loader.js',
-			'../libs/angular-1.1.2/angular-resource.js',
+			'../libs/angular-1.1.4/angular.js',
+			'../libs/angular-1.1.4/angular-cookies.js',
+			'../libs/angular-1.1.4/angular-loader.js',
+			'../libs/angular-1.1.4/angular-resource.js',
 
 			'compat.js',
 			'json.js',
@@ -70,6 +70,12 @@ for( var i=0; i<scripts.length; i++) {
 			'ampere-ui-twitterbootstrap.js',
 			'ampere-ui-hotkey.js'
 		];
+
+		var less = {
+			env:"development",
+			dumpLineNumbers:'all'
+		};
+
 		for( var i in JS) {
 			var defer = (/coffeescript/.test( JS[i]) && 'defer') || '';
 			document.writeln( '<script type="text/javascript" ' + defer + ' src="' + baseUrl + JS[i] + '"></script>');

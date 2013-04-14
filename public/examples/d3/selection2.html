@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <script type="text/javascript" src="http://mbostock.github.com/d3/d3.js"></script>
+    <script type="text/javascript" src="https://raw.github.com/mbostock/d3/master/d3.js"></script>
 
     <style>
-        .selection {
+        rect.selection {
             stroke          : gray;
             stroke-dasharray: 4px;
             stroke-opacity  : 0.5;
@@ -52,8 +52,8 @@
     </style>
 </head>
 <body>
-    <div id="test"></div>
     <script type="text/javascript">
+        var radius = 40;
 
         window.states = [
             { x : 43, y : 67, label : "first fdgfdg fd gfd gfg dg dfgfdgfdgdf" },
@@ -64,7 +64,7 @@
             { x : 90, y : 170, label : "last" }
         ]
 
-        window.svg = d3.select("#test")
+        window.svg = d3.select("body")
         .append("svg")
         //.attr("viewBox", "0 0 " + 1000 + " " + 1000 )
         //.attr("preserveAspectRatio", "xMinYMin")
@@ -80,38 +80,55 @@
                 },
                 'class'     : 'state' 
             })
-            .on( "click", function( d, i) {
-                d3.select( this).classed( "selected", true);
-
-                    // reappend dragged element as last 
-                    // so that its stays on top 
-                this.parentNode.appendChild( this);
-            })
         ;
 
         var drag = d3.behavior.drag()
         .on("drag", function( d, i) {
-            d.x += d3.event.dx;
-            d.y += d3.event.dy;
-            d3.select( this).attr("transform", function( d, i) {
+            var selection = d3.selectAll( '.selected');
+
+            if( selection[0].indexOf( this)==-1) {
+                selection.classed( "selected", false);
+                selection = d3.select( this);
+                selection.classed( "selected", true);
+            } 
+
+            selection.attr("transform", function( d, i) {
+                d.x += d3.event.dx;
+                d.y += d3.event.dy;
                 return "translate(" + [ d.x,d.y ] + ")"
             })
                 // reappend dragged element as last 
                 // so that its stays on top 
             this.parentNode.appendChild( this);
+            d3.event.sourceEvent.stopPropagation();
         });
         gState.call( drag);
 
         gState.append( "circle")
             .attr({
-                r       : 44,
+                r       : radius + 4,
                 class   : 'outer'
             })
         ;
         gState.append( "circle")
             .attr({
-                r       : 40,
+                r       : radius,
                 class   : 'inner'
+            })
+            .on( "click", function( d, i) {
+                var e = d3.event,
+                    g = this.parentNode,
+                    isSelected = d3.select( g).classed( "selected");
+
+                if( !e.ctrlKey) {
+                    d3.selectAll( 'g.selected').classed( "selected", false);
+                }
+                
+                d3.select( g).classed( "selected", !isSelected);
+
+                    // reappend dragged element as last 
+                    // so that its stays on top 
+                g.parentNode.appendChild( g);
             })
             .on("mouseover", function(){
                 d3.select(this).style( "fill", "aliceblue");
@@ -121,7 +138,7 @@
             });
         ;        
         
-        gState.append( "svg:text")
+        gState.append( "text")
             .attr({
                 'text-anchor'   : 'middle',
                 y               : 4
@@ -139,7 +156,9 @@
     
         svg
         .on( "mousedown", function() {
-
+            if( !d3.event.ctrlKey) {
+                d3.selectAll( 'g.selected').classed( "selected", false);
+            }
 
             var p = d3.mouse( this);
 
@@ -159,7 +178,6 @@
 
             if( !s.empty()) {
                 var p = d3.mouse( this),
-
                     d = {
                         x       : parseInt( s.attr( "x"), 10),
                         y       : parseInt( s.attr( "y"), 10),
@@ -187,10 +205,40 @@
                 }
                
                 s.attr( d);
+
+                    // deselect all temporary selected state objects
+                d3.selectAll( 'g.state.selection.selected').classed( "selected", false);
+
+                d3.selectAll( 'g.state >circle.inner').each( function( state_data, i) {
+                    if( 
+                        !d3.select( this).classed( "selected") && 
+                            // inner circle inside selection frame
+                        state_data.x-radius>=d.x && state_data.x+radius<=d.x+d.width && 
+                        state_data.y-radius>=d.y && state_data.y+radius<=d.y+d.height
+                    ) {
+
+                        d3.select( this.parentNode)
+                        .classed( "selection", true)
+                        .classed( "selected", true);
+                    }
+                });
             }
         })
         .on( "mouseup", function() {
+               // remove selection frame
             svg.selectAll( "rect.selection").remove();
+
+                // remove temporary selection marker class
+            d3.selectAll( 'g.state.selection').classed( "selection", false);
+        })
+        .on( "mouseout", function() {
+            if( d3.event.relatedTarget.tagName=='HTML') {
+                    // remove selection frame
+                svg.selectAll( "rect.selection").remove();
+
+                    // remove temporary selection marker class
+                d3.selectAll( 'g.state.selection').classed( "selection", false);
+            }
         });
     </script>
 </body>
