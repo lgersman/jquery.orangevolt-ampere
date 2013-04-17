@@ -2,7 +2,7 @@
  * jQuery Orangevolt Ampere
  *
  * version : 0.2.0
- * created : 2013-03-15
+ * created : 2013-04-12
  * source  : https://github.com/lgersman/jquery.orangevolt-ampere
  *
  * author  : Lars Gersmann (lars.gersmann@gmail.com)
@@ -177,7 +177,7 @@
 
 						for( i in properties) {
 							if( /*properties[i]!='ampere' &&*/ properties[i]!='this' && properties[i].charAt( 0)!='$') {
-								_ns.debug( 'delete previsouly defined scope.' + properties[i]);
+								_ns.debug( 'delete previously defined scope.' + properties[i]);
 								delete scope[ properties[i]];
 							}
 						}
@@ -423,7 +423,7 @@
 						} else {
 							_ns.raise( 'type "', type, '" is unknown');
 						}
-					}, true);
+					});
 				}
 			};
 		}]);
@@ -1182,11 +1182,44 @@
 		};
 
 		this.update = function() {
-			angular.element( controller.element.find( '>.ampere-module')).scope().$digest();
+				// transport current state properties into scope
+			var scope = angular.element( controller.element.find( '.ampere-view:first')).scope();
+
+				// remove old scope variables
+			var i, toDelete = $.grep( Object.keys( scope), function( item) {
+				return item!='this' && item.charAt( 0)!='$';
+			});
+
+							// transport state variables into scope
+			var properties = Object.keys( scope.$ampere.module.current().state);
+			for( i in properties) {
+				_ns
+				.assert( properties[i]!='this', 'state property named "this" is forbidden')
+				.assert( properties[i].charAt( 0)!='$', 'state property starting with $ (="', properties[i], '") is forbidden');
+
+				if( properties[i]!='promise') {
+					if( scope[ properties[i]] !== scope.$ampere.module.current().state[ properties[i]]) {
+						scope[ properties[i]] = scope.$ampere.module.current().state[ properties[i]];
+						_ns.debug( 'update scope.' + properties[i] + '=', $.ov.json.stringify( scope[ properties[i]], $.ov.json.stringify.COMPACT));
+					}					
+
+					var index = $.inArray( properties[i], toDelete);
+					index!=-1 && toDelete.splice( index, 1);
+				}
+			}
+
+			for( i in toDelete) {
+				_ns.debug( 'delete previsouly defined scope.' + toDelete[i]);
+				delete scope[ toDelete[i]];
+			}
+
+			scope.$apply( $.noop);
 		};
 
 		this.refresh = function() {
 			this.renderState( controller.module.current().view);
+				// broadcast ampere.view.changed event
+			controller.module.trigger( "ampere.view.changed", [ controller.module.current().view]);
 		};
 
 		//var lastView = undefined;
@@ -1201,7 +1234,7 @@
 
 			var scope = angular.element( controller.element.find( '>.ampere-module')).scope();
 
-			scope.$apply( function() {
+			var apply = function() {
 					/*
 					 * if no view was given - just rerender the current view
 					 * this case happens for history.reset
@@ -1219,7 +1252,13 @@
 						template : template==='' ? template : template || scope.$ampere.template
 					};
 				}
-			});
+			};
+
+			if( scope.$$phase=="$apply") {
+				apply();
+			} else {
+				scope.$apply( apply);
+			}
 
 				// compute optional flash message
 			$.when( transitionResult).done( function() {

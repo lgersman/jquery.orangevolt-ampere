@@ -1,0 +1,567 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>reveal.js - The HTML Presentation Framework</title>
+
+		<meta name="description" content="Orangevolt Ampere is a technology do define programs by modeling your application as a state machine.">
+		<meta name="author" content="Lars Gersmann">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<link rel="stylesheet" href="reveal.js/css/reveal.min.css">
+		<link rel="stylesheet" href="reveal.js/css/theme/default.css" id="theme">
+
+		<!-- For syntax highlighting -->
+		<link rel="stylesheet" href="reveal.js/lib/css/zenburn.css">
+
+		<!-- If the query includes 'print-pdf', use the PDF print sheet -->
+		<script>
+			document.write( '<link rel="stylesheet" href="reveal.js/css/print/' + ( window.location.search.match( /print-pdf/gi ) ? 'pdf' : 'paper' ) + '.css" type="text/css" media="print">' );
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="reveal.js/lib/js/html5shiv.js"></script>
+		<![endif]-->
+
+		<style type="text/css">
+			.reveal section img {
+				border : 0;
+				background : 0;
+				box-shadow : none;
+			}
+
+			.reveal h1, .reveal h2, .reveal h3, .reveal h4, .reveal h5, .reveal h6 {
+				color : #ff8f00;
+			}
+
+			.reveal a:not(.image):hover,
+			.reveal a:not(.image) {
+				color : #00C4FF
+			}
+		</style>
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+
+				<section>
+					<h1>Orangevolt Ampere</h1>
+					<h3>Scalable <a target="_blank" href="http://en.wikipedia.org/wiki/Single-page_application">single web page applications</a> made easy.</h3>
+					<p>
+						<small>Created by <a href="mailto:lars.gersmann@gmail.com">Lars Gersmann</a> / <a href="http://www.orangevolt.com">orangevolt.com</a></small>
+					</p>
+				</section>
+
+				<section>
+					<h2>About</h2>
+					<p>
+						<a target="_blank" href="https://github.com/lgersman/jquery.orangevolt-ampere">Orangevolt Ampere</a>
+						is a technology do define programs by modeling your application as a state machine.
+					</p>
+					<!--
+					<p class="fragment">
+						<small>	
+							<a target="_blank" href="https://github.com/lgersman/jquery.orangevolt-ampere">jquery.orangevolt-ampere</a> is a concrete implementation for browsers. This project allows you to define complex single page web applications using Javascript.
+						</small>
+					</p>
+				-->
+					<aside class="notes">
+						Oh hey, these are some notes. They'll be hidden in your presentation, but you can see them if you open the speaker notes window (hit 's' on your keyboard).
+					</aside>
+				</section>
+
+				<section>
+					<h2>Why Ampere</h2>
+
+						Whats missing in existing <a target="_blank" href="http://en.wikipedia.org/wiki/Single-page_application">SPA</a> frameworks ?
+						
+						<p>
+							<ul>
+								<li class="fragment"> 	
+									Routes are stateless
+								</li>
+								<li class="fragment">	
+									Routes have no dependencies.
+								</li>
+								<li class="fragment">	
+									Data is passed by route parameters
+								</li>
+								<li class="fragment">	
+									Reusability is problematic
+								</li>
+							</ul>
+						</p>
+				</section>
+
+				<section>
+					<h2>Why Ampere</h2>
+
+						<a target="_blank" href="https://github.com/lgersman/jquery.orangevolt-ampere">Ampere</a> applications are modeled as states and transitions instead of routes.
+						<p>
+							<ul>
+								<li class="fragment">  	
+									States encapsulate logic
+								</li>
+								<li class="fragment">	
+									Transitions are directed routes between states
+								</li>
+								<li class="fragment">	
+									Transitions manage data between states
+								</li>
+								<li class="fragment">	
+									<a target="_blank" href="https://github.com/lgersman/jquery.orangevolt-ampere">Ampere</a> modules provide reusability
+								</li>
+							</ul>
+						</p>
+				</section>
+
+				<section>
+					<h2>What else ?</h2>
+
+						<p>
+							<ul>
+								<li class="fragment">  	
+									Infinite Undo/Redo support
+								</li>
+								<li class="fragment">	
+									Transitions are transactional 
+								</li>
+								<li class="fragment">	
+									Everything is a <a target="_blank" href="http://api.jquery.com/category/deferred-object/">Deferred/Promise</a>
+								</li>
+								<li class="fragment">	
+									Reusable as  <a target="_blank" href="https://github.com/lgersman/jquery.orangevolt-ampere">Ampere</a> modules
+								</li>
+								<li class="fragment">	
+									Simplification
+								</li>
+							</ul>
+						</p>
+				</section>
+
+				<section>
+					<h2>And now the burner ...</h2>
+						<p class="fragment">
+							You can explain your application with non programmers !<br>
+							<img border="0" src="images/addressbook.png">
+						</p>
+				</section>
+
+				<section>
+					<h2>Ampere Essentials</h2>
+					Ampere consists of 
+					<p>
+						<ul>
+							<li>
+								<a href="#/ampere">ampere</a> domain objects
+							</li>
+							<li>
+								<a href="#/module">modules</a> and <a href="#/ui">ui</a>
+							</li>
+							<li>
+								<a href="#/state">states</a> and <a href="#/view">views</a>
+							</li>
+							<li>
+								<a href="#/transition">transitions</a>
+							</li>
+						</ul>
+					</p>
+				</section>
+
+				<section id="ampere">
+					<h2>Ampere Essentials</h2>
+					<h3>Ampere</h3>
+					<p>
+						<ul>
+							<li>
+								named singleton / domain object
+							</li>
+							<li>
+								encapsulates <a href="#/module">modules</a>.	
+							</li>	
+							<li>
+								can separate the same <a href="#/module">module</a> 
+								differently configured
+							</li>
+						</ul>
+					</p>
+					<p>
+						<small>
+						* In most cases you will work with the default Ampere domain. Working with mutliple Ampere instances makes only sense in very complex applications.
+						</small>
+					</p>
+				</section>
+
+				<section id="module">
+					<h2>Ampere Essentials</h2>
+					<h3>Module</h3>
+					<p>
+						<ul>
+							<li>
+								encapsulates associated <a href="#/state">states</a> and <a href="#/transition">transitions</a>.	
+							</li>	
+							<li>
+								splices complex applications in handy units.
+							</li>
+							<li>
+								reusable by other modules
+							</li>
+							<li>
+								provides events 
+							</li>
+							<li>
+								configurable
+							</li>
+						</ul>
+					</p>
+					<p>
+						<small>
+						*A good example for an module is an addressbook. You can develop the whole thing completely independent.
+						It might be used as a standalone application. It can be part of another module utilising an addressbook. A module is similar to a <a target="_blank" href="http://www.androiduipatterns.com/2011/06/android-intents-apps-talking-to-each.html">Android Intent</a>.
+						</small>
+					</p>
+					<!--
+					<p>
+						It's like a self contained microcosmos where everybody knows each other.
+					</p>
+					-->
+				</section>
+
+				<section id="state">
+					<h2>Ampere Essentials</h2>
+					<h3>State</h3>
+					<p>
+						<ul>
+							<li>
+								represents a specific state of your <a href="#/module">module</a>
+							</li>	
+							<li>
+								keeps the data associated with the state
+							</li>
+							<li>
+								contains the logic operating on state data
+							</li>
+							<li>
+								has <a href="#/view">view</a>(s)
+							</li>
+							<li>
+								configurable
+							</li>
+						</ul>
+					</p>
+					<p>
+						<small>
+						* An example: A state representing an "addressbook list" will keep
+						the addressbook data (the model) and the logic to operate on the data. Logic means functions for create, edit or delete an addressbook entry. 
+						</small>
+					</p>
+				</section>
+
+				<section id="view">
+					<h2>Ampere Essentials</h2>
+					<h3>State view</h3>
+					<p>
+						<ul>
+							<li>
+								the template to display a <a href="#/state">state</a>
+							</li>
+							<li>
+								controls how to render the <a href="#/state">state</a> to the screen
+							</li>
+							<li>
+								owned by <a href="#/state">state</a>
+							</li>
+						</ul>
+					</p>
+					<p>
+						<small>
+						* In most cases a single view is applied to a <a href="#/state">state</a>. An example for multiple views is a default view and a separate "print" view. If no views were defined by a <a href="#/state">state</a>, Ampere will generate a default view based on the state definition.
+						</small>
+					</p>
+				</section>
+
+				<section id="transition">
+					<h2>Ampere Essentials</h2>
+					<h3>Transition</h3>
+					<p>
+						<ul>
+							<li>
+								represents the directed route between 2 <a href="#/state">states</a>
+							</li>
+							<li>
+								is transactional
+							</li>
+							<li>
+								can operate on source and target <a href="#/state">state</a> data
+							</li>
+							<li>
+								may be reversible (Undo/Redo support)
+							</li>
+							<li>
+								can be disabled depending on custom logic
+							</li>
+							<li>
+								configurable
+							</li>
+						</ul>
+					</p>
+					<p>
+						<small>
+						* The transition is probably the most powerful piece of Ampere. It takes care of the atomicity
+						of transition actions, its reversibility and many more. A typical use case example would be transporting data (the selected address for example) from one state (the "address list") to another.
+						</small>
+					</p>
+				</section>
+
+				<section id="ui">
+					<h2>Ampere Essentials</h2>
+					<h3>UI</h3>
+					<p>
+						<ul>
+							<li>
+								is responsible for rendering the current <a href="#/state">state</a> of a <a href="#/module">module</a>
+							</li>
+							<li>
+								has a master layout (builtin: <strong>default</strong>, <strong>wizard</strong> and <strong>none</strong>)
+							</li>
+							<li>
+								owned by <a href="#/module">module</a> 
+							</li>
+							<li>
+								controls and helpers to simplify writing <a href="#/state">state</a> <a href="#/view">views</a>
+							</li>
+							<li>
+								consumes ui related options of <a href="#/state">state</a>, <a href="#/view">view</a>, <a href="#/module">module</a> and <a href="#/transition">transition</a> for rendering
+							</li>
+							<li>
+								configurable
+							</li>
+						</ul>
+					</p>
+					<p>
+						<small>
+						* The UI is provided as part of Ampere. You may apply additional controls to the UI. Or even a custom master layout. Master layout use case : Suppose you want to write a wizard - in this case you tell the UI to use the "wizard" master layout. 
+						</small>
+					</p>
+				</section>
+
+				<section>
+					<h2>From Vaporware to Software</h2>
+					<p>
+						<ul>
+							<li>
+								First papers on Ampere were published in 2002.
+							</li>
+							<li>
+								Ampere technology has gotten reality with its first incarnation in 2003 using Java/Swing/<a href="https://developer.mozilla.org/de/docs/Rhino" target="_blank">Rhino JS Engine</a>.
+							</li>
+							<li>
+								a new prototype was created in 2007 using Eclipse technology SWT/JFace solving the databinding issue.
+							</li>
+							<li>
+								Todays cutting edge web technologies 
+								<a href="http://angularjs.org/" target="_blank">AngularJS</a>,
+								<a href="http://en.wikipedia.org/wiki/HTML5" target="_blank">HTML5</a>, 
+								<a href="http://jquery.com/" target="_blank">jQuery</a> and 
+								<a href="http://twitter.github.com/bootstrap/" target="_blank">Twitter Bootstrap</a>
+								gave a brand new shiny Ampere implementation birth:
+							</li>
+						</ul>
+					</p>
+					<p>
+						<center>
+							<a target="_blank" href="https://github.com/lgersman/jquery.orangevolt-ampere">jquery.orangevolt-ampere</a>
+						</center>
+					</p>
+				</section>
+
+				<section>
+					<h2>jquery.orangevolt-ampere</h2>
+						<p>
+							<a target="_blank" href="https://github.com/lgersman/jquery.orangevolt-ampere">jquery.orangevolt-ampere</a>
+							is a full fledged Ampere implementation for 
+							<ul>
+								<li>
+									<strong>browser</strong>
+								</li>
+								<li>
+									<strong>desktop</strong>
+								</li>
+								<li>
+									and <strong>mobile app</strong> development
+								</li>
+							</ul>
+						</p>
+				</section>
+
+				<section>
+					<h2>jquery.orangevolt-ampere</h2>
+						<blockquote cite="http://en.wikipedia.org/wiki/Write_once,_run_anywhere">
+						Write once, run anywhere
+						</blockquote>
+						Ähem ... Ok, almost anywhere :-)
+
+						<table>
+							<tr>
+								<td width="33%">	
+									<img border="0" src="images/crontab-browser.png">
+									<br>
+									<small><em>Browser (FF/Safari/Chrome/IE10/Opera)</em></small>
+								</td>
+								<td width="33%">	
+									<img border="0" src="images/crontab-nodewebkit.png">
+									<br>
+									<small><em>Desktop application packaged with <a target="_blank" href="https://github.com/rogerwang/node-webkit">node-webkit</a> (Win/OSX/Linux)</em></small>
+								</td>
+								<td width="33%">
+									<img border="0" src="images/crontab-android.png">
+									<small><em>Mobile app packaged with <a target="_blank" href="http://cordova.apache.org/">Apache Cordova / Phonegap</a> (iOS, Android, Blackberry, Windows Phone etc)</em></small>
+								</td>
+							</tr>
+						</table>
+				</section>
+
+				<section>
+					<h2>jquery.orangevolt-ampere</h2>
+					<p>
+						<a target="_blank" href="https://github.com/lgersman/jquery.orangevolt-ampere">jquery.orangevolt-ampere</a>
+						is based on 
+						<ul>
+							<li>
+								History/Validation : <a href="http://en.wikipedia.org/wiki/HTML5" target="_blank">HTML5</a>
+							</li>
+							<li>
+								Core : Javascript / <a href="http://jquery.com/" target="_blank">jQuery</a>
+							</li>
+							<li>
+								Templating/Databinding : <a href="http://angularjs.org/" target="_blank">AngularJS</a>
+							</li>
+							<li>
+								UI : 
+								<a href="http://twitter.github.com/bootstrap/" target="_blank">Twitter Bootstrap</a> /
+								<a href="http://fortawesome.github.com/Font-Awesome/" target="_blank">Font Awesome</a>
+							</li>
+							<li>
+								CSS : <a href="http://www.lesscss.org/" target="_blank">LessCSS</a>
+							</li>
+							<li>
+								Build system : <a href="http://gruntjs.com/" target="_blank">GruntJS</a>
+							</li>
+						</ul>
+					</p>
+				</section>
+
+				<section>
+					<h2>Stellar Links</h2>
+					<ul>
+						<li>
+							<a target="_blank" href="https://github.com/lgersman/jquery.orangevolt-ampere">
+								Source code on GitHub
+							</a>
+						</li>
+						<li>
+							<a target="_blank" href="http://lgersman.github.com/jquery.orangevolt-ampere/">
+								Website
+							</a>
+						</li>
+						<li>
+							<a target="_blank" href="https://github.com/lgersman/jquery.orangevolt-ampere/wiki">
+								Documentation
+							</a>
+						</li>
+						<li>
+							<a target="_blank" href="http://ampere.eu01.aws.af.cm/">
+								Live demo
+							</a>
+						</li>
+						<li>
+							<a target="_blank" href="http://www.orangevolt.com">Contact me</a>
+						</li>
+					</ul>
+				</section>
+
+				<section>
+					<h2>It's free</h2>
+
+					<h4>License</h4>
+					<p>
+						<a target="_blank" href="https://github.com/lgersman/jquery.orangevolt-ampere">
+							jquery.orangevolt-ampere
+						</a> is dual licensed under 
+						<a target="_blank" href="http://en.wikipedia.org/wiki/MIT_License">
+							MIT
+						</a> and 
+						<a target="_blank" href="http://en.wikipedia.org/wiki/GPL2#Version_2">
+						GPL2
+						</a>.
+					</p>
+
+					<h4>Donations</h4>
+					<p>
+						<a target="_blank" href="https://github.com/lgersman/jquery.orangevolt-ampere">
+							jquery.orangevolt-ampere
+						</a> is entirely free but if you'd like to support the project you can donate below.
+						Donations will go towards hosting and domain costs.
+					</p>
+					<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+						<input type="hidden" name="cmd" value="_s-xclick">
+						<input type="hidden" name="hosted_button_id" value="378Z7S9HVW8R4">
+						<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+						<img alt="" border="0" src="https://www.paypalobjects.com/de_DE/i/scr/pixel.gif" width="1" height="1">
+					</form>
+
+				</section>
+
+				<section>
+					<h1>THE END</h1>
+					<h3>BY <a href="mailto:lars.gersmann@gmail.com">Lars Gersmann</a> / <a href="http://www.orangevolt.com">orangevolt.com</a></h3>
+				</section>
+
+			</div>
+
+		</div>
+
+		<script src="reveal.js/lib/js/head.min.js"></script>
+		<script src="reveal.js/js/reveal.min.js"></script>
+
+		<script>
+
+			// Full list of configuration options available here:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+				rollingLinks:false,
+
+				theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+				transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+
+				// Optional libraries used to extend on reveal.js
+				dependencies: [
+					{ src: 'reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'reveal.js/plugin/markdown/showdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'reveal.js/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'reveal.js/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+					{ src: 'reveal.js/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+					// { src: 'plugin/search/search.js', async: true, condition: function() { return !!document.body.classList; } }
+					// { src: 'plugin/remotes/remotes.js', async: true, condition: function() { return !!document.body.classList; } }
+				]
+			});
+
+		</script>
+
+	</body>
+</html>

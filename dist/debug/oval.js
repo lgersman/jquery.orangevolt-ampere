@@ -2,7 +2,7 @@
  * jQuery Orangevolt Ampere
  *
  * version : 0.2.0
- * created : 2013-03-15
+ * created : 2013-04-12
  * source  : https://github.com/lgersman/jquery.orangevolt-ampere
  *
  * author  : Lars Gersmann (lars.gersmann@gmail.com)
@@ -39,7 +39,7 @@
 				document.writeln( '<link rel="stylesheet/less" href="' + baseUrl + LESS[i] + '">');
 			}
 			
-			var JS = ["libs/coffeescript-1.3.3.js","libs/lesscss-1.3.0.js","libs/jquery-1.9.1.js","libs/jquery-ui-sortable-1.10.0/jquery-ui-1.10.0.custom.min.js","libs/bootstrap-2.3.1/js/bootstrap.min.js","libs/datepicker/js/bootstrap-datepicker.js","libs/cache.js","libs/angular-1.1.2/angular.min.js","libs/angular-1.1.2/angular-cookies.min.js","libs/angular-1.1.2/angular-loader.min.js","libs/angular-1.1.2/angular-resource.min.js","compat.js","json.js","namespace.js","entity.js","jquery.upload.js","jquery.html5validation.js","ampere.js","ampere-util.js","ampere-crud.js","ampere-ui-twitterbootstrap.js","ampere-ui-hotkey.js"];
+			var JS = ["libs/coffeescript-1.3.3.js","libs/lesscss-1.3.3.js","libs/jquery-1.9.1.js","libs/jquery-ui-sortable-1.10.0/jquery-ui-1.10.0.custom.min.js","libs/bootstrap-2.3.1/js/bootstrap.min.js","libs/datepicker/js/bootstrap-datepicker.js","libs/cache.js","libs/angular-1.1.4/angular.min.js","libs/angular-1.1.4/angular-cookies.min.js","libs/angular-1.1.4/angular-loader.min.js","libs/angular-1.1.4/angular-resource.min.js","compat.js","json.js","namespace.js","entity.js","jquery.upload.js","jquery.html5validation.js","ampere.js","ampere-util.js","ampere-crud.js","ampere-ui-twitterbootstrap.js","ampere-ui-hotkey.js"];
 			for( var i in JS) {
 				var defer = (/coffeescript/.test( JS[i]) && 'defer') || '';
 				document.writeln( '<script type="text/javascript" ' + defer + ' src="' + baseUrl + JS[i] + '"></script>');
