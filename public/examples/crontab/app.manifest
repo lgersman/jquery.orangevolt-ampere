@@ -5,7 +5,7 @@ CACHE:
 index.html
 
 #style sheets
-crontab.less
+css/crontab.less
 favicon.ico
 ../../../dist/min/jquery.orangevolt-ampere.min.css
 ../../../dist/min/libs/Font-Awesome/css/font-awesome.css
@@ -15,6 +15,11 @@ favicon.ico
 
 #style sheet images
 ../../../dist/min/libs/Font-Awesome/font/fontawesome-webfont.ttf
+
+#templates
+tmpl/main.tmpl
+tmpl/help.tmpl
+tmpl/edit.tmpl
 
 #javascript files
 ../../../dist/min/oval.js
@@ -30,3 +35,7 @@ favicon.ico
 ../../../dist/min/libs/angular-1.1.4/angular-loader.min.js
 ../../../dist/min/libs/angular-1.1.4/angular-resource.min.js
 ../../../dist/min/jquery.orangevolt-ampere.min.js
+
+crontab.js
+
+

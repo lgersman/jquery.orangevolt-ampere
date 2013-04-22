@@ -1210,7 +1210,7 @@
 				delete scope[ toDelete[i]];
 			}
 
-			scope.$apply( $.noop);
+			scope.$$phase || scope.$apply( $.noop);
 		};
 
 		this.refresh = function() {
