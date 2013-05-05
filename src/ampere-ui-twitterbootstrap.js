@@ -155,6 +155,8 @@
 				scope		: 'isolate',
 				link		: function( scope, element, attrs) {
 					scope.$watch( '$ampere', function() {
+						scope.$ampere.scope = scope;
+
 							// execute & cleanup all disposable handlers
 						var disposables = element.closest( '.ampere-module').data( 'ampere.disposable');
 						while( disposables.length) {
@@ -358,7 +360,7 @@
 
 			return {
 				restrict   : 'A',
-								scope        : 'isolate',
+				scope        : 'isolate',
 				link: function(scope, element, attrs) {
 					scope.element = element;
 					scope.attrs = attrs;
@@ -1211,12 +1213,15 @@
 			}
 
 			scope.$$phase || scope.$apply( $.noop);
+
+				// broadcast ampere.view.changed event
+			controller.module.trigger( "ampere.view.updated", [ controller.module.current().view]);
 		};
 
 		this.refresh = function() {
 			this.renderState( controller.module.current().view);
 				// broadcast ampere.view.changed event
-			controller.module.trigger( "ampere.view.changed", [ controller.module.current().view]);
+			controller.module.trigger( "ampere.view.refreshed", [ controller.module.current().view]);
 		};
 
 		//var lastView = undefined;

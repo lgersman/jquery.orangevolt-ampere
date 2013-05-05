@@ -125,3 +125,11 @@ this event gets triggered whenever transition.enabled() gets called. if a event 
 
 * module event "ampere.view.changed" added to supported global event handlers. 
 this event gets triggered immediately after a new view was rendered (typically after stepping from one state to another) 
+
+* ui.update() triggers "ampere.view.updated" 
+
+* ui.refresh() triggers "ampere.view.refreshed"
+
+* twitter bootstrap renderer : global $ampere object is hosting also the state's scope via "$ampere.scope" (there exist some rare cases where you want to access the scope acting as state pendant directly).
+
+* crud table : double click on a header with a configured orderby will remove the orderby condition (->makes the table unordered aka items follow their natural order)

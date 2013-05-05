@@ -62,3 +62,6 @@ http://www.w3schools.com/cssref/sel_empty.asp
 * 'ampere.ui.uri' to be used by history to be displayed in browsers location  bar 
 
 * USE state events (list can reset its editingcontext using this event)
+
+* splash screen for android sample
+http://www.dzone.com/links/r/note_about_phonegap_build_and_splash_screens.html
