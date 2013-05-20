@@ -17,7 +17,7 @@
 
 	//check, if we can use the native method
 	//prevent to use prototype.js keys-method, because its crashes in ie7
-	if(Object.keys && Object.keys.toString().indexOf('[native code]') == -1 ) {
+	if(!Object.keys || Object.keys.toString().indexOf('[native code]') == -1 ) {
 		Object.keys=function( obj) {
 			var a = [];
 

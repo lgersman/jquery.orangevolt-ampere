@@ -31,7 +31,7 @@
 				'ng-ampere-sortable-nohandle'	: list.editable() && list.editable().item==item
 			}"
 			data-position="{{list.get() | indexof:item}}"
-			ng-ampere-dblclick="list.editable() && list.editable().transition || false"
+			ng-ampere-dblclick="list.options('list-item-dblclick').apply( list)"
 			ng-ampere-template="list.editable() && list.editable().item!=undefined && item==list.selection() && { replace : list.editable().template}"
 		>
 			<td ng-repeat="column in list.columns()" ng-ampere-template="column.template">

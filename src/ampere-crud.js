@@ -930,7 +930,10 @@
 	window.ov.ampere.crud.list.prototype = new window.ov.ampere.Component( 'window.ov.ampere.crud.list');
 	window.ov.ampere.crud.list.DEFAULTS = {
 		'list-empty.message'	: 'List is empty.',
-		'list-nomatches.message': 'No item matches filter.'
+		'list-nomatches.message': 'No item matches filter.',
+		'list-item-dblclick'    : function() {
+			return (this.editable() && this.editable().transition) || false;
+		}
 	};
 
 	window.ov.ampere.crud.list.angular = function( angularModule) {

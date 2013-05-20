@@ -83,6 +83,40 @@
 		overflow : auto;
 	}
 
+	.glow( @color: #005580) {
+		animation: glow 2s infinite;			
+		-moz-animation: glow 2s infinite;
+		-webkit-animation: glow 2s infinite;
+
+		@keyframes glow {
+			0% { text-shadow: none; }
+			50% { text-shadow: 0 0 2px saturate( @color, 50%), 0 0 8px @color; }
+			100% { text-shadow: none; }
+		}
+
+		@-moz-keyframes glow {
+			0% { text-shadow: none; }
+			50% { text-shadow: 0 0 2px saturate( @color, 50%), 0 0 8px @color; }
+			100% { text-shadow: none; }
+		}
+
+		@-webkit-keyframes glow {
+			0% { text-shadow: none; }
+			50% { text-shadow: 0 0 2px saturate( @color, 50%), 0 0 8px @color; }
+			100% { text-shadow: none; }
+		}
+	}
+
+	BUTTON.ampere-transition:not(.disabled),
+	A.ampere-transition:not(.disabled),
+	LI >A.ampere-transition:not(.disabled) {
+		&.glow {
+			.glow( #f89406)
+		}
+	}
+
+	
+
 		/* suppress margins on standalone elements in table cells */
 	TD >form:FIRST-CHILD:LAST-CHILD,
 	TD >dl:FIRST-CHILD:LAST-CHILD,

@@ -133,3 +133,31 @@ this event gets triggered immediately after a new view was rendered (typically a
 * twitter bootstrap renderer : global $ampere object is hosting also the state's scope via "$ampere.scope" (there exist some rare cases where you want to access the scope acting as state pendant directly).
 
 * crud table : double click on a header with a configured orderby will remove the orderby condition (->makes the table unordered aka items follow their natural order)
+
+* event arguments:
+** "ampere.view.changed" single argument containing previously active view or undefined when module was just started
+** "ampere.view.updated" no arguments
+** "ampere.view.refreshed" no arguments
+** "ampere.transition.enabled" single argument. the transition to approve to be enabled
+
+* crud table : new option "list-item-dblclick" added. this option can be overridden to control the dblclick behaviour of a data row. by default the edit action is executed. you can override it global
+
+window.ov.ampere.crud.list.DEFAULTS[ 'list-item-dblclick'] = (function( orig) {
+	return function() {
+			// return details transition if available
+		return (this.selection() && this.state().transitions.details) || orig.apply( this);
+	}
+})( window.ov.ampere.crud.list.DEFAULTS[ 'list-item-dblclick']);
+
+or for a concrete table instance 
+
+...
+state.list.options()['list-item-dblclick'] = (function( orig) {
+	return function() {
+			// return details transition if available
+		return (this.selection() && this.state().transitions.details) || orig.apply( this);
+	}
+})( state.list.options()[ 'list-item-dblclick']);
+...
+
+* glow css class added to support animated glowing of transition DOM elements (like "update")

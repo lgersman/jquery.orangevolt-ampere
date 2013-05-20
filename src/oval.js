@@ -46,8 +46,8 @@ for( var i=0; i<scripts.length; i++) {
 			'../libs/coffeescript-1.3.3.js',
 			//'../libs/modernizr-2.6.2.js',
 			'../libs/lesscss-1.3.3.js',
-			'../libs/jquery-1.9.1.js',
-			'../libs/jquery-ui-sortable-1.10.0/jquery-ui-1.10.0.custom.min.js',
+			'../libs/jquery-2.0.0.js',
+			'../libs/jquery-ui-sortable-1.10.3/jquery-ui-1.10.3.custom.min.js',
 			'../libs/cache.js',
 			'../libs/bootstrap-2.3.1/js/bootstrap.js',
 			//'../libs/jquery.sortable.js',
@@ -71,9 +71,9 @@ for( var i=0; i<scripts.length; i++) {
 			'ampere-ui-hotkey.js'
 		];
 
-		var less = {
-			env:"development",
-			dumpLineNumbers:'all'
+		window.less = window.less || {
+			env:"production",
+			dumpLineNumbers:false
 		};
 
 		for( var i in JS) {

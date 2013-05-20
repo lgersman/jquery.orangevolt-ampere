@@ -807,21 +807,30 @@
 		 *  http://stackoverflow.com/questions/9179708/replicating-bootstraps-main-nav-and-subnav
 		 */
 	function onBodyscroll() {
-		// If has not activated (has no attribute "data-top"
-		if( !$('.subnav').attr('data-top')) {
-				// If already fixed, then do nothing
-				if ($('.subnav').hasClass('subnav-fixed')) {
-						return;
-				}
-				// Remember top position
-				var offset = $('.subnav').offset() || {};
-				$('.subnav').attr('data-top', offset.top);
-		}
+		var subnav = $('.subnav');
+		if( !subnav.data( "inBodyScroll")) {
 
-		if( $(this).scrollTop() && $('.subnav').attr('data-top') - $('.subnav').outerHeight() <= $(this).scrollTop()) {
-				$('.subnav').addClass('subnav-fixed');
-		} else {
-				$('.subnav').removeClass('subnav-fixed');
+			subnav.data( "inBodyScroll", true);
+			// If was not activated (has no attribute "data-top"
+			if( !subnav.attr('data-top')) {
+					// If already fixed, then do nothing
+					if( subnav.hasClass('subnav-fixed')) {
+							return;
+					}
+					// Remember top position
+					var offset = subnav.offset() || {};
+					subnav.attr('data-top', offset.top);
+			}
+
+			if( $( this).scrollTop() && subnav.attr('data-top') - subnav.outerHeight() <= $(this).scrollTop()) {
+					subnav.addClass('subnav-fixed');
+			} else {
+					subnav.removeClass('subnav-fixed');
+			}
+
+			window.setTimeout( function() {
+				subnav.data( "inBodyScroll", false);
+			}, 300);
 		}
 	}
 
@@ -1215,13 +1224,13 @@
 			scope.$$phase || scope.$apply( $.noop);
 
 				// broadcast ampere.view.changed event
-			controller.module.trigger( "ampere.view.updated", [ controller.module.current().view]);
+			controller.module.trigger( "ampere.view.updated");
 		};
 
 		this.refresh = function() {
 			this.renderState( controller.module.current().view);
 				// broadcast ampere.view.changed event
-			controller.module.trigger( "ampere.view.refreshed", [ controller.module.current().view]);
+			controller.module.trigger( "ampere.view.refreshed");
 		};
 
 		//var lastView = undefined;
@@ -1393,6 +1402,10 @@
 					);
 
 					self.init();
+
+						// broadcast ampere.view.changed event
+					controller.module.trigger( "ampere.view.changed");
+
 					deferred.resolve();
 				});
 			});
