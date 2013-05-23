@@ -69,7 +69,7 @@
 				<button ng-switch-when="object" ng-ampere-transition="list.addable().transition"></button>
 			</span>
 			<br><br>
-			<div ng-ampere-crud-list="list" class="table-hover"></div>
+			<div ng-ampere-crud-list="list" class="table-hover table-bordered"></div>
 		</script>
 
 		<script id="note" type="text/template">
@@ -186,18 +186,14 @@
 								}).length;
 						})
 						.headers([
+
 							'#',
 							{ template : 'Name', orderBy : 'name'},
 							{ template : 'Relation', orderBy : function( item) {
 								return ePersons.projection().getRelation( item).name;
 							}},
 							'Languages'
-						])
-						.options({
-							"onTemplate" : function( jTable, list) {
-								jTable.addClass( "table-bordered");
-							}
-						});
+						]);
 
 						state.view( document.getElementById( 'main'));
 					},
@@ -218,14 +214,23 @@
 						.headers([
 							{ template : 'Name', orderBy : 'name'},
 							{ template : 'Relation', orderBy : 'id'}
-						])
-						.options({
-							"onTemplate" : function( jTable, list) {
-								jTable.addClass( "scrollable").css( 'max-height', '400px');
-							}
-						});
+						]);
 
 						state.view( document.getElementById( 'main'));
+
+						module.on( "ampere.view.changed", function( event, view) {
+							if( module.current().state===state) {
+								$('table')
+									// remove class defined in template
+								.removeClass( 'table-bordered')
+									// make table contents scrollable
+								.addClass( 'scrollable')
+								.css({
+									'max-height' : '400px'
+								});
+							}
+							// jTable.addClass( "scrollable").css( 'max-height', '400px');
+						});
 
 						state.options({
 							'ampere.ui.caption' : null

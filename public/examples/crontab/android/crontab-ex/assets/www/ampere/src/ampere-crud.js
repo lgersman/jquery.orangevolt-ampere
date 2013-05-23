@@ -972,11 +972,6 @@
 								.attr( 'title', listController.draggable().transition.options( 'ampere.ui.description'));
 							}
 
-							var onTemplate = listController.options( 'onTemplate');
-							if( $.isFunction( onTemplate)) {
-								onTemplate.call( listController, jTemplate, listController);
-							}
-
 							template = jTemplate[0].outerHTML;
 
 							var f = $compile( template);
@@ -1359,11 +1354,6 @@
 
 							jTemplate.addClass( element.attr( 'class'));
 							jTemplate.attr( 'style', element.attr( 'style'));
-
-							var onTemplate = paginatorController.options( 'onTemplate');
-							if( $.isFunction( onTemplate)) {
-								onTemplate.call( paginatorController, jTemplate, paginatorController);
-							}
 
 							template = jTemplate[0].outerHTML;
 
