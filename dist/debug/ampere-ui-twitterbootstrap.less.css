@@ -2,7 +2,7 @@
  * jQuery Orangevolt Ampere
  *
  * version : 0.2.0
- * created : 2013-04-12
+ * created : 2013-06-04
  * source  : https://github.com/lgersman/jquery.orangevolt-ampere
  *
  * author  : Lars Gersmann (lars.gersmann@gmail.com)
@@ -278,6 +278,46 @@
   padding: 2px 4px;
   overflow: auto;
 }
+.ampere-app BUTTON.ampere-transition:not(.disabled).glow,
+.ampere-app A.ampere-transition:not(.disabled).glow,
+.ampere-app LI > A.ampere-transition:not(.disabled).glow {
+  animation: glow 2s infinite;
+  -moz-animation: glow 2s infinite;
+  -webkit-animation: glow 2s infinite;
+}
+@keyframes glow {
+  0% {
+    text-shadow: none;
+  }
+  50% {
+    text-shadow: 0 0 2px #fe9500, 0 0 8px #f89406;
+  }
+  100% {
+    text-shadow: none;
+  }
+}
+@-moz-keyframes glow {
+  0% {
+    text-shadow: none;
+  }
+  50% {
+    text-shadow: 0 0 2px #fe9500, 0 0 8px #f89406;
+  }
+  100% {
+    text-shadow: none;
+  }
+}
+@-webkit-keyframes glow {
+  0% {
+    text-shadow: none;
+  }
+  50% {
+    text-shadow: 0 0 2px #fe9500, 0 0 8px #f89406;
+  }
+  100% {
+    text-shadow: none;
+  }
+}
 .ampere-app TD > form:FIRST-CHILD:LAST-CHILD,
 .ampere-app TD > dl:FIRST-CHILD:LAST-CHILD,
 .ampere-app TD > input:FIRST-CHILD:LAST-CHILD,
@@ -446,7 +486,7 @@
   padding-bottom: 0;
   margin: 0 0 10px;
 }
-.ampere-app .ampere-module .ampere-state .page-header a.icon-question-sign,
+.ampere-app .ampere-module .ampere-state .page-header a.icon-keyboard,
 .ampere-app .ampere-module .ampere-state .page-header .ampere-help a {
   font-size: small;
 }
@@ -464,6 +504,13 @@
 }
 .ampere-app .ampere-module .ampere-state .page-header .ampere-help {
   display: none;
+  column-width: 20em;
+  -moz-column-width: 20em;
+  /* Firefox */
+
+  -webkit-column-width: 20em;
+  /* Safari and Chrome */
+
 }
 .ampere-app .ampere-module .ampere-state .page-header .ampere-help ul.hotkeys {
   list-style-type: none;
@@ -473,6 +520,9 @@
 }
 .ampere-app .ampere-module .ampere-state .page-header .ampere-help ul.hotkeys li > .description {
   margin-left: 13px;
+}
+.ampere-app .ampere-module .ampere-state .page-header .ampere-help ul.hotkeys li + li {
+  margin-top: 1em;
 }
 .ampere-app .ampere-module .ampere-state .page-header .description:not(:empty) {
   margin-bottom: 4px;

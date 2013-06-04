@@ -2,7 +2,7 @@
  * jQuery Orangevolt Ampere
  *
  * version : 0.2.0
- * created : 2013-04-12
+ * created : 2013-06-04
  * source  : https://github.com/lgersman/jquery.orangevolt-ampere
  *
  * author  : Lars Gersmann (lars.gersmann@gmail.com)
@@ -158,6 +158,8 @@
 				scope		: 'isolate',
 				link		: function( scope, element, attrs) {
 					scope.$watch( '$ampere', function() {
+						scope.$ampere.scope = scope;
+
 							// execute & cleanup all disposable handlers
 						var disposables = element.closest( '.ampere-module').data( 'ampere.disposable');
 						while( disposables.length) {
@@ -275,7 +277,8 @@
  data-ampere-hotkey="{{attrs.ngAmpereHotkey}}"\
  title="{{attrs.title || $ampere.ui.getDescription( transition) | strip_tags}}{{hotkey && \' \' + hotkey}}">\
 <i ng-class="attrs.ngAmpereIcon || $ampere.ui.getIcon( transition)"></i>\
- {{$.trim( element.text()) || $ampere.ui.getCaption( transition)}}\
+{{(attrs.ngAmpereIcon || $ampere.ui.getIcon( transition)) && ($.trim( element.text()) || $ampere.ui.getCaption( transition)) && \'&nbsp;\' || \'\'}}\
+{{$.trim( element.text()) || $ampere.ui.getCaption( transition)}}\
 </a>',
 				'button' : '<button type="button"\
  ng-disabled="!transition.enabled()"\
@@ -289,7 +292,8 @@
  data-ampere-hotkey="{{attrs.ngAmpereHotkey}}"\
  title="{{attrs.title || $ampere.ui.getDescription( transition) | strip_tags}}{{hotkey && \' \' + hotkey}}">\
 <i ng-class="attrs.ngAmpereIcon || $ampere.ui.getIcon( transition)"></i>\
- {{$.trim( element.text()) || $ampere.ui.getCaption( transition)}}\
+{{(attrs.ngAmpereIcon || $ampere.ui.getIcon( transition)) && ($.trim( element.text()) || $ampere.ui.getCaption( transition)) && \'&nbsp;\' || \'\'}}\
+{{$.trim( element.text()) || $ampere.ui.getCaption( transition)}}\
 </button>',
 				'file' : '<button type="button"\
  onclick="$( this).next().click()"\
@@ -303,7 +307,8 @@
  data-ampere-hotkey="{{attrs.ngAmpereHotkey}}"\
  title="{{attrs.title || $ampere.ui.getDescription( transition) | strip_tags}}{{hotkey && \' \' + hotkey}}">\
 <i ng-class="attrs.ngAmpereIcon || $ampere.ui.getIcon( transition)"></i>\
- {{$.trim( element.text()) || $ampere.ui.getCaption( transition)}}\
+{{(attrs.ngAmpereIcon || $ampere.ui.getIcon( transition)) && ($.trim( element.text()) || $ampere.ui.getCaption( transition)) && \'&nbsp;\' || \'\'}}\
+{{$.trim( element.text()) || $ampere.ui.getCaption( transition)}}\
 </button>\
 <input\
  id="{{attrs.id}}"\
@@ -325,7 +330,8 @@
  data:ampere-hotkey="{{attrs.ngAmpereHotkey}}"\
  title="{{attrs.title || $ampere.ui.getDescription( transition) | strip_tags}}{{hotkey && \' \' + hotkey}}">\
 <i ng-class="attrs.ngAmpereIcon || $ampere.ui.getIcon( transition)"></i>\
- {{$.trim( element.text()) || $ampere.ui.getCaption( transition)}}\
+{{(attrs.ngAmpereIcon || $ampere.ui.getIcon( transition)) && ($.trim( element.text()) || $ampere.ui.getCaption( transition)) && \'&nbsp;\' || \'\'}}\
+{{$.trim( element.text()) || $ampere.ui.getCaption( transition)}}\
 </button>',
 				'reset' : '<button type="reset"\
  ng-disabled="!transition.enabled()"\
@@ -338,7 +344,8 @@
  data-ampere-hotkey="{{attrs.ngAmpereHotkey}}"\
  title="{{attrs.title || $ampere.ui.getDescription( transition) | strip_tags}}{{hotkey && \' \' + hotkey}}">\
 <i ng-class="attrs.ngAmpereIcon || $ampere.ui.getIcon( transition)"></i>\
- {{$.trim( element.text()) || $ampere.ui.getCaption( transition)}}\
+{{(attrs.ngAmpereIcon || $ampere.ui.getIcon( transition)) && ($.trim( element.text()) || $ampere.ui.getCaption( transition)) && \'&nbsp;\' || \'\'}}\
+{{$.trim( element.text()) || $ampere.ui.getCaption( transition)}}\
 </button>'
 			};
 
@@ -361,7 +368,7 @@
 
 			return {
 				restrict   : 'A',
-								scope        : 'isolate',
+				scope        : 'isolate',
 				link: function(scope, element, attrs) {
 					scope.element = element;
 					scope.attrs = attrs;
@@ -808,21 +815,30 @@
 		 *  http://stackoverflow.com/questions/9179708/replicating-bootstraps-main-nav-and-subnav
 		 */
 	function onBodyscroll() {
-		// If has not activated (has no attribute "data-top"
-		if( !$('.subnav').attr('data-top')) {
-				// If already fixed, then do nothing
-				if ($('.subnav').hasClass('subnav-fixed')) {
-						return;
-				}
-				// Remember top position
-				var offset = $('.subnav').offset() || {};
-				$('.subnav').attr('data-top', offset.top);
-		}
+		var subnav = $('.subnav');
+		if( !subnav.data( "inBodyScroll")) {
 
-		if( $(this).scrollTop() && $('.subnav').attr('data-top') - $('.subnav').outerHeight() <= $(this).scrollTop()) {
-				$('.subnav').addClass('subnav-fixed');
-		} else {
-				$('.subnav').removeClass('subnav-fixed');
+			subnav.data( "inBodyScroll", true);
+			// If was not activated (has no attribute "data-top"
+			if( !subnav.attr('data-top')) {
+					// If already fixed, then do nothing
+					if( subnav.hasClass('subnav-fixed')) {
+							return;
+					}
+					// Remember top position
+					var offset = subnav.offset() || {};
+					subnav.attr('data-top', offset.top);
+			}
+
+			if( $( this).scrollTop() && subnav.attr('data-top') - subnav.outerHeight() <= $(this).scrollTop()) {
+					subnav.addClass('subnav-fixed');
+			} else {
+					subnav.removeClass('subnav-fixed');
+			}
+
+			window.setTimeout( function() {
+				subnav.data( "inBodyScroll", false);
+			}, 300);
 		}
 	}
 
@@ -1213,13 +1229,16 @@
 				delete scope[ toDelete[i]];
 			}
 
-			scope.$apply( $.noop);
+			scope.$$phase || scope.$apply( $.noop);
+
+				// broadcast ampere.view.changed event
+			controller.module.trigger( "ampere.view.updated");
 		};
 
 		this.refresh = function() {
 			this.renderState( controller.module.current().view);
 				// broadcast ampere.view.changed event
-			controller.module.trigger( "ampere.view.changed", [ controller.module.current().view]);
+			controller.module.trigger( "ampere.view.refreshed");
 		};
 
 		//var lastView = undefined;
@@ -1391,6 +1410,10 @@
 					);
 
 					self.init();
+
+						// broadcast ampere.view.changed event
+					controller.module.trigger( "ampere.view.changed");
+
 					deferred.resolve();
 				});
 			});

@@ -2,7 +2,7 @@
  * jQuery Orangevolt Ampere
  *
  * version : 0.2.0
- * created : 2013-04-12
+ * created : 2013-06-04
  * source  : https://github.com/lgersman/jquery.orangevolt-ampere
  *
  * author  : Lars Gersmann (lars.gersmann@gmail.com)
@@ -44,7 +44,7 @@
 	function join() {
 		var message = "";
 		for( var i=0; i<arguments.length; i++) {
-			var arg = $.isFunction( arguments[i]) ? arguments[i]() : arguments[i];
+			var arg = $.isFunction( arguments[i]) ? arguments[i].name || "function() {...}" : arguments[i];
 
 			if( arg && arg.jquery) {
 				message += '<jQuery>';

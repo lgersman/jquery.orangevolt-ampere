@@ -2,7 +2,7 @@
  * jQuery Orangevolt Ampere
  *
  * version : 0.2.0
- * created : 2013-04-12
+ * created : 2013-06-04
  * source  : https://github.com/lgersman/jquery.orangevolt-ampere
  *
  * author  : Lars Gersmann (lars.gersmann@gmail.com)
@@ -20,7 +20,7 @@
 
 	//check, if we can use the native method
 	//prevent to use prototype.js keys-method, because its crashes in ie7
-	if(Object.keys && Object.keys.toString().indexOf('[native code]') == -1 ) {
+	if(!Object.keys || Object.keys.toString().indexOf('[native code]') == -1 ) {
 		Object.keys=function( obj) {
 			var a = [];
 

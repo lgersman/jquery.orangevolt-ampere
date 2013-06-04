@@ -2,7 +2,7 @@
  * jQuery Orangevolt Ampere
  *
  * version : 0.2.0
- * created : 2013-04-12
+ * created : 2013-06-04
  * source  : https://github.com/lgersman/jquery.orangevolt-ampere
  *
  * author  : Lars Gersmann (lars.gersmann@gmail.com)
@@ -552,10 +552,18 @@
 										// insert at index
 									self.splice().call( self.get(), oldPosition, 0, item);
 
-									return $.Deferred().resolve( transition.options( 'undo.message')).promise( redo);
+									var undoMessage = transition.options( 'undo.message');
+									if( $.isFunction( undoMessage)) {
+										undoMessage = undoMessage.call( self);
+									}
+									return $.Deferred().resolve( undoMessage).promise( redo);
 								}
 
-								return $.Deferred().resolve( transition.options( 'redo.message')).promise( undo);
+								var redoMessage = transition.options( 'redo.message');
+								if( $.isFunction( redoMessage)) {
+									redoMessage = redoMessage.call( self);
+								}
+								return $.Deferred().resolve( redoMessage).promise( undo);
 							};
 						})
 						.options( {
@@ -674,10 +682,18 @@
 									self.splice().call( self.get(), index, 1, selection);
 									self.selection( selection);
 
-									return $.Deferred().resolve( transition.options( 'undo.message')).promise( redo);
+									var undoMessage = transition.options( 'undo.message');
+									if( $.isFunction( undoMessage)) {
+										undoMessage = undoMessage.call( self);
+									}
+									return $.Deferred().resolve( undoMessage).promise( redo);
 								}
 
-								return $.Deferred().resolve( transition.options( 'redo.message')).promise( undo);
+								var redoMessage = transition.options( 'redo.message');
+								if( $.isFunction( redoMessage)) {
+									redoMessage = redoMessage.call( self);
+								}	
+								return $.Deferred().resolve( redoMessage).promise( undo);
 							};
 						}).options( {
 							'undo.message'			: 'Item update undoed.',
@@ -786,9 +802,18 @@
 									self.splice().call( self.get(), index, 1);
 									self.selection( selection);
 
-									return $.Deferred().resolve( transition.options( 'undo.message')).promise( redo);
+									var undoMessage = transition.options( 'undo.message');
+									if( $.isFunction( undoMessage)) {
+										undoMessage = undoMessage.call( self);
+									}
+
+									return $.Deferred().resolve( undoMessage).promise( redo);
 								}
 
+								var redoMessage = transition.options( 'redo.message');
+								if( $.isFunction( redoMessage)) {
+									redoMessage = redoMessage.call( self);
+								}
 								return $.Deferred().resolve( transition.options( 'redo.message')).promise( undo);
 							};
 						}).options( {
@@ -816,6 +841,10 @@
 						 })
 						.action( function( transition, ui, data) {
 							var confirmMessage = removable.transition.options( 'confirm.message');
+							if( $.isFunction( confirmMessage)) {
+								confirmMessage = confirmMessage.call( this);
+							}
+
 							if( !confirmMessage || window.confirm( confirmMessage)) {
 								var item = self.selection(), index = $.inArray( item, self.get());
 
@@ -825,10 +854,18 @@
 									function undo() {
 										self.splice().call( self.get(), index, 0, item);
 
-										return $.Deferred().resolve( transition.options( 'undo.message')).promise( redo);
+										var undoMessage = transition.options( 'undo.message');
+										if( $.isFunction( undoMessage)) {
+											undoMessage = undoMessage.call( self);
+										}
+										return $.Deferred().resolve( undoMessage).promise( redo);
 									}
 
-									return $.Deferred().resolve( transition.options( 'redo.message')).promise( undo);
+									var redoMessage = transition.options( 'redo.message');
+									if( $.isFunction( redoMessage)) {
+										redoMessage = redoMessage.call( self);
+									}
+									return $.Deferred().resolve( redoMessage).promise( undo);
 								};
 							}
 						}).options( {
@@ -933,7 +970,10 @@
 	window.ov.ampere.crud.list.prototype = new window.ov.ampere.Component( 'window.ov.ampere.crud.list');
 	window.ov.ampere.crud.list.DEFAULTS = {
 		'list-empty.message'	: 'List is empty.',
-		'list-nomatches.message': 'No item matches filter.'
+		'list-nomatches.message': 'No item matches filter.',
+		'list-item-dblclick'    : function() {
+			return (this.editable() && this.editable().transition) || false;
+		}
 	};
 
 	window.ov.ampere.crud.list.angular = function( angularModule) {
@@ -973,11 +1013,6 @@
 
 								jTemplate.find( 'TBODY ' + (handle ? listController.draggable().handle : 'TR.item'))
 								.attr( 'title', listController.draggable().transition.options( 'ampere.ui.description'));
-							}
-
-							var onTemplate = listController.options( 'onTemplate');
-							if( $.isFunction( onTemplate)) {
-								onTemplate.call( listController, jTemplate, listController);
 							}
 
 							template = jTemplate[0].outerHTML;
@@ -1362,11 +1397,6 @@
 
 							jTemplate.addClass( element.attr( 'class'));
 							jTemplate.attr( 'style', element.attr( 'style'));
-
-							var onTemplate = paginatorController.options( 'onTemplate');
-							if( $.isFunction( onTemplate)) {
-								onTemplate.call( paginatorController, jTemplate, paginatorController);
-							}
 
 							template = jTemplate[0].outerHTML;
 
