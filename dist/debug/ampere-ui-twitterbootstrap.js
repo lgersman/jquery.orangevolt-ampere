@@ -2,7 +2,7 @@
  * jQuery Orangevolt Ampere
  *
  * version : 0.2.0
- * created : 2013-06-04
+ * created : 2013-06-10
  * source  : https://github.com/lgersman/jquery.orangevolt-ampere
  *
  * author  : Lars Gersmann (lars.gersmann@gmail.com)
@@ -510,6 +510,7 @@
 						placeholder : element[0].tagName=='TBODY' && $('<tr><td>&nbsp;</td></tr>')
 					};
 					*/
+				
 					var OPTIONS = { /*options*/
 						helper			: function( e, tr) {
 							var $originals = tr.children();
@@ -580,6 +581,10 @@
 						}
 					});
 
+						// ATTENTION : $timeout is no more needed an may have side effects (scope.$apply is called at end of timeout) !!!
+					$timeout = function( f) {
+						f();
+					};
 					$timeout( function() {
 						if( typeof( options.items)=='string') {
 							//options.items = $( element.get()).children( options.items);
