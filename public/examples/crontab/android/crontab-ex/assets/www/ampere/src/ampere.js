@@ -211,8 +211,12 @@
 							history.position = history.stack.length;
 
 							html5_history_hash && historyReady.done( function() {
-								var hash = ++html5_history_hash;
-								window.history.pushState( hash, document.title, window.location.pathname);// + '#' + hash);
+								html5_history_hash++;
+								window.history.pushState( html5_history_hash, document.title, window.location.pathname);// + '#' + html5_history_hash);
+								
+								//var hash = 
+
+								//window.history.pushState( hash, document.title, window.location.pathname + '#' + hash);
 							});
 						} else if( history.canRedo()) {
 							html5_history_hash && historyReady.done( function() {
@@ -265,6 +269,7 @@
 					if( redo) {
 						html5_history_hash && historyReady.done( function() {
 							redo.hash = /*window.history.state*/undo.hash+1;
+							//window.history.replaceState( redo.hash, document.title, window.location.pathname + '#' + undo.hash);
 							//window.history.replaceState( redo.hash, document.title, window.location.pathname + '#' + undo.hash);
 						});
 						history.stack[ history.position] = redo;	// replace undo by its returned redo action
@@ -1546,6 +1551,10 @@
 
 							// wait for action to complete
 						actionDeferred.done( function( redo) {
+							if( arguments.length!==0 && !redo) {
+								return;
+							}
+
 							if( arguments.length===0 || !$.isFunction( redo)) {
 								redo = command;
 							}

@@ -86,20 +86,17 @@
 		    	<h2 ng-show="$ampere.ui.getCaption( ($ampere.view.name()!='main' && $ampere.view) || $ampere.view.state()) || $ampere.ui.getIcon( $ampere.view)">
 		    		<i ng-show="$ampere.ui.getIcon( $ampere.view)" ng-class="$ampere.ui.getIcon( $ampere.view)"></i>
 		    		{{$ampere.ui.getCaption( ($ampere.view.name()!='main' && $ampere.view) || $ampere.view.state())}}
-		    		<a ng-show="$ampere.ui.getTransitions( {'ampere.ui.hotkey' : $ampere.ui.regexp( '.+')}).length" ng-click="$ampere.ui.toggleHelp()" title="Help" class="icon-question-sign"></a>
+		    		<a ng-show="$ampere.ui.getTransitions( {'ampere.ui.hotkey' : $ampere.ui.regexp( '.+')}).length" ng-click="$ampere.ui.toggleHelp()" title="Toggle keyboard hotkey map" class="icon-keyboard"></a>
 		    	</h2>
 		    	<div class="ampere-help">
-		    		<div class="hotkeys">
-						<!--  <span>Available hotkeys:</span>  -->
-			    		<ul class="hotkeys">
-			    			<li ng-class="{disabled : !transition.enabled()}" ng-repeat="transition in $ampere.ui.getTransitions( {'ampere.ui.hotkey':$ampere.ui.regexp( '.+')})">
-						    	<kbd>{{$ampere.ui.getHotkey( transition)}}</kbd>
-						    	<i class=" icon-arrow-right"></i>
-						    	<a ng-ampere-transition="transition"></a>
-						    	<div class="description" ng-bind-html-unsafe="$ampere.ui.getDescription( transition)"></div>
-						    </li>
-			    		</ul>
-			    	</div>
+		    		<ul class="hotkeys">
+		    			<li ng-class="{disabled : !transition.enabled()}" ng-repeat="transition in $ampere.ui.getTransitions( {'ampere.ui.hotkey':$ampere.ui.regexp( '.+')})">
+					    	<kbd>{{$ampere.ui.getHotkey( transition)}}</kbd>
+					    	<i class=" icon-arrow-right"></i>
+					    	<a ng-ampere-transition="transition"></a>
+					    	<div class="description" ng-bind-html-unsafe="$ampere.ui.getDescription( transition)"></div>
+					    </li>
+		    		</ul>
 		    	</div>
 		    	<div class="description" ng-bind-html-unsafe="$ampere.ui.getDescription( $ampere.view)"></div>
 		  	</div>

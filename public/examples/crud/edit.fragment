@@ -21,7 +21,7 @@
 		<dt>
 			<button type="button" ng-ampere-transition="$ampere.view.state().transitions.reset">Reset</button>
 			<button type="reset" ng-ampere-transition="$ampere.view.state().transitions.cancel"></button>
-			<button ng-ampere-hotkey="Ctrl+S" type="submit" ng-ampere-transition="$ampere.view.state().transitions.save || $ampere.view.state().transitions.create"></button>
+			<button class="glow" ng-ampere-hotkey="Ctrl+S" type="submit" ng-ampere-transition="$ampere.view.state().transitions.save || $ampere.view.state().transitions.create"></button>
 		</dt>
 		<dd>
 		</dd>

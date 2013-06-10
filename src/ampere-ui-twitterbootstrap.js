@@ -274,7 +274,8 @@
  data-ampere-hotkey="{{attrs.ngAmpereHotkey}}"\
  title="{{attrs.title || $ampere.ui.getDescription( transition) | strip_tags}}{{hotkey && \' \' + hotkey}}">\
 <i ng-class="attrs.ngAmpereIcon || $ampere.ui.getIcon( transition)"></i>\
- {{$.trim( element.text()) || $ampere.ui.getCaption( transition)}}\
+{{(attrs.ngAmpereIcon || $ampere.ui.getIcon( transition)) && ($.trim( element.text()) || $ampere.ui.getCaption( transition)) && \'&nbsp;\' || \'\'}}\
+{{$.trim( element.text()) || $ampere.ui.getCaption( transition)}}\
 </a>',
 				'button' : '<button type="button"\
  ng-disabled="!transition.enabled()"\
@@ -288,7 +289,8 @@
  data-ampere-hotkey="{{attrs.ngAmpereHotkey}}"\
  title="{{attrs.title || $ampere.ui.getDescription( transition) | strip_tags}}{{hotkey && \' \' + hotkey}}">\
 <i ng-class="attrs.ngAmpereIcon || $ampere.ui.getIcon( transition)"></i>\
- {{$.trim( element.text()) || $ampere.ui.getCaption( transition)}}\
+{{(attrs.ngAmpereIcon || $ampere.ui.getIcon( transition)) && ($.trim( element.text()) || $ampere.ui.getCaption( transition)) && \'&nbsp;\' || \'\'}}\
+{{$.trim( element.text()) || $ampere.ui.getCaption( transition)}}\
 </button>',
 				'file' : '<button type="button"\
  onclick="$( this).next().click()"\
@@ -302,7 +304,8 @@
  data-ampere-hotkey="{{attrs.ngAmpereHotkey}}"\
  title="{{attrs.title || $ampere.ui.getDescription( transition) | strip_tags}}{{hotkey && \' \' + hotkey}}">\
 <i ng-class="attrs.ngAmpereIcon || $ampere.ui.getIcon( transition)"></i>\
- {{$.trim( element.text()) || $ampere.ui.getCaption( transition)}}\
+{{(attrs.ngAmpereIcon || $ampere.ui.getIcon( transition)) && ($.trim( element.text()) || $ampere.ui.getCaption( transition)) && \'&nbsp;\' || \'\'}}\
+{{$.trim( element.text()) || $ampere.ui.getCaption( transition)}}\
 </button>\
 <input\
  id="{{attrs.id}}"\
@@ -324,7 +327,8 @@
  data:ampere-hotkey="{{attrs.ngAmpereHotkey}}"\
  title="{{attrs.title || $ampere.ui.getDescription( transition) | strip_tags}}{{hotkey && \' \' + hotkey}}">\
 <i ng-class="attrs.ngAmpereIcon || $ampere.ui.getIcon( transition)"></i>\
- {{$.trim( element.text()) || $ampere.ui.getCaption( transition)}}\
+{{(attrs.ngAmpereIcon || $ampere.ui.getIcon( transition)) && ($.trim( element.text()) || $ampere.ui.getCaption( transition)) && \'&nbsp;\' || \'\'}}\
+{{$.trim( element.text()) || $ampere.ui.getCaption( transition)}}\
 </button>',
 				'reset' : '<button type="reset"\
  ng-disabled="!transition.enabled()"\
@@ -337,7 +341,8 @@
  data-ampere-hotkey="{{attrs.ngAmpereHotkey}}"\
  title="{{attrs.title || $ampere.ui.getDescription( transition) | strip_tags}}{{hotkey && \' \' + hotkey}}">\
 <i ng-class="attrs.ngAmpereIcon || $ampere.ui.getIcon( transition)"></i>\
- {{$.trim( element.text()) || $ampere.ui.getCaption( transition)}}\
+{{(attrs.ngAmpereIcon || $ampere.ui.getIcon( transition)) && ($.trim( element.text()) || $ampere.ui.getCaption( transition)) && \'&nbsp;\' || \'\'}}\
+{{$.trim( element.text()) || $ampere.ui.getCaption( transition)}}\
 </button>'
 			};
 
@@ -502,6 +507,7 @@
 						placeholder : element[0].tagName=='TBODY' && $('<tr><td>&nbsp;</td></tr>')
 					};
 					*/
+				
 					var OPTIONS = { /*options*/
 						helper			: function( e, tr) {
 							var $originals = tr.children();
@@ -572,6 +578,10 @@
 						}
 					});
 
+						// ATTENTION : $timeout is no more needed an may have side effects (scope.$apply is called at end of timeout) !!!
+					$timeout = function( f) {
+						f()
+					};
 					$timeout( function() {
 						if( typeof( options.items)=='string') {
 							//options.items = $( element.get()).children( options.items);

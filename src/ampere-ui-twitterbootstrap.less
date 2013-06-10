@@ -373,7 +373,7 @@
 				padding-bottom 	: 0;	
 				margin 			: 0 0 10px;
 
-				a.icon-question-sign, .ampere-help a {
+				a.icon-keyboard, .ampere-help a {
 					font-size 		: small;
 				}
 
@@ -393,15 +393,23 @@
 				.ampere-help {
 					display : none;
 
+					column-width		:20em;
+					-moz-column-width	:20em; /* Firefox */
+					-webkit-column-width:20em; /* Safari and Chrome */
+
 					ul.hotkeys {
 						list-style-type : none;
 
 						li.disabled >* {
-							color : #999999
+							color : #999999;
 						}
 
 						li >.description {
 							margin-left : 13px;
+						}
+
+						li + li {
+							margin-top : 1em;
 						}
 					}
 				}

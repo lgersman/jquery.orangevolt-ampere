@@ -549,10 +549,18 @@
 										// insert at index
 									self.splice().call( self.get(), oldPosition, 0, item);
 
-									return $.Deferred().resolve( transition.options( 'undo.message')).promise( redo);
+									var undoMessage = transition.options( 'undo.message');
+									if( $.isFunction( undoMessage)) {
+										undoMessage = undoMessage.call( self);
+									}
+									return $.Deferred().resolve( undoMessage).promise( redo);
 								}
 
-								return $.Deferred().resolve( transition.options( 'redo.message')).promise( undo);
+								var redoMessage = transition.options( 'redo.message');
+								if( $.isFunction( redoMessage)) {
+									redoMessage = redoMessage.call( self);
+								}
+								return $.Deferred().resolve( redoMessage).promise( undo);
 							};
 						})
 						.options( {
@@ -671,10 +679,18 @@
 									self.splice().call( self.get(), index, 1, selection);
 									self.selection( selection);
 
-									return $.Deferred().resolve( transition.options( 'undo.message')).promise( redo);
+									var undoMessage = transition.options( 'undo.message');
+									if( $.isFunction( undoMessage)) {
+										undoMessage = undoMessage.call( self);
+									}
+									return $.Deferred().resolve( undoMessage).promise( redo);
 								}
 
-								return $.Deferred().resolve( transition.options( 'redo.message')).promise( undo);
+								var redoMessage = transition.options( 'redo.message');
+								if( $.isFunction( redoMessage)) {
+									redoMessage = redoMessage.call( self);
+								}	
+								return $.Deferred().resolve( redoMessage).promise( undo);
 							};
 						}).options( {
 							'undo.message'			: 'Item update undoed.',
@@ -783,9 +799,18 @@
 									self.splice().call( self.get(), index, 1);
 									self.selection( selection);
 
-									return $.Deferred().resolve( transition.options( 'undo.message')).promise( redo);
+									var undoMessage = transition.options( 'undo.message');
+									if( $.isFunction( undoMessage)) {
+										undoMessage = undoMessage.call( self);
+									}
+
+									return $.Deferred().resolve( undoMessage).promise( redo);
 								}
 
+								var redoMessage = transition.options( 'redo.message');
+								if( $.isFunction( redoMessage)) {
+									redoMessage = redoMessage.call( self);
+								}
 								return $.Deferred().resolve( transition.options( 'redo.message')).promise( undo);
 							};
 						}).options( {
@@ -813,6 +838,10 @@
 						 })
 						.action( function( transition, ui, data) {
 							var confirmMessage = removable.transition.options( 'confirm.message');
+							if( $.isFunction( confirmMessage)) {
+								confirmMessage = confirmMessage.call( this);
+							}
+
 							if( !confirmMessage || window.confirm( confirmMessage)) {
 								var item = self.selection(), index = $.inArray( item, self.get());
 
@@ -822,10 +851,18 @@
 									function undo() {
 										self.splice().call( self.get(), index, 0, item);
 
-										return $.Deferred().resolve( transition.options( 'undo.message')).promise( redo);
+										var undoMessage = transition.options( 'undo.message');
+										if( $.isFunction( undoMessage)) {
+											undoMessage = undoMessage.call( self);
+										}
+										return $.Deferred().resolve( undoMessage).promise( redo);
 									}
 
-									return $.Deferred().resolve( transition.options( 'redo.message')).promise( undo);
+									var redoMessage = transition.options( 'redo.message');
+									if( $.isFunction( redoMessage)) {
+										redoMessage = redoMessage.call( self);
+									}
+									return $.Deferred().resolve( redoMessage).promise( undo);
 								};
 							}
 						}).options( {

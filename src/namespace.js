@@ -41,7 +41,7 @@
 	function join() {
 		var message = "";
 		for( var i=0; i<arguments.length; i++) {
-			var arg = $.isFunction( arguments[i]) ? arguments[i]() : arguments[i];
+			var arg = $.isFunction( arguments[i]) ? arguments[i].name || "function() {...}" : arguments[i];
 
 			if( arg && arg.jquery) {
 				message += '<jQuery>';

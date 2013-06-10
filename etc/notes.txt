@@ -161,3 +161,7 @@ state.list.options()['list-item-dblclick'] = (function( orig) {
 ...
 
 * glow css class added to support animated glowing of transition DOM elements (like "update")
+
+* crud table : 
+** remove action : option "confirm.message" can now also be a function (this===list instance) 
+** addable/removeable/editable transitions "redo.message", "undo.message" can now also be a function (this===list instance) 

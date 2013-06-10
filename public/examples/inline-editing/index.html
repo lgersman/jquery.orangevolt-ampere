@@ -91,7 +91,7 @@
 						</div>
 						<div class="pull-right btn-group">
 							<button ng-ampere-transition="list.getEditingContext().cancel"></button>
-							<button ng-ampere-transition="list.getEditingContext().commit"></button>
+							<button class="glow" ng-ampere-transition="list.getEditingContext().commit"></button>
 						</div>
 					</fieldset>
 				</form>
@@ -300,6 +300,15 @@
 						.editable({
 							template	: function() {
 								return $('#note-editor');
+							},
+							callback	: function( editable) {
+								editable.commit
+								.enabled( function() {
+									return state.list.getEditingContext()===state.list.editable() &&
+										$('form').checkValidity() &&
+										!angular.equals( state.list.selection(), editable.item) 
+									;
+								});
 							}
 						})
 						.removable( true)
@@ -310,16 +319,24 @@
 							callback	: function( addable) {
 								var action = addable.transition.action();
 
-								addable.transition.action( function( transition, ui, data) {
+								addable.transition
+								.action( function( transition, ui, data) {
 									var redo = action( transition, ui, data);
 										// configure
 									addable.item = {
 										author : 'lars.gersmann@gmail.com',
-										message: 'This is the default note.',
+										message: '',
 										date : $.now()
 									};
 									addable.index = 0;
 									return redo;
+								});
+
+								addable.commit
+								.enabled( function() {
+									return state.list.getEditingContext()===state.list.addable() &&
+										$('form').checkValidity()
+									;
 								});
 							}
 						})

@@ -31,15 +31,17 @@
 				'ng-ampere-sortable-nohandle'	: list.editable() && list.editable().item==item
 			}"
 			data-position="{{list.get() | indexof:item}}"
-			ng-ampere-dblclick="list.editable() && list.editable().transition || false"
+			ng-ampere-dblclick="list.options('list-item-dblclick').apply( list)"
 			ng-ampere-template="list.editable() && list.editable().item!=undefined && item==list.selection() && { replace : list.editable().template}"
 		>
 			<td ng-repeat="column in list.columns()" ng-ampere-template="column.template">
-				<span ng-hide="list.getEditingContext()" ng-switch on="$last && (list.removable() | type)">
-					<a ng-switch-when="object" class="hover pull-right" ng-ampere-transition="list.removable().transition"></a>
-				</span>
-				<span ng-hide="list.getEditingContext()" ng-switch on="$last && (list.editable() | type)">
-					<a ng-switch-when="object" class="hover pull-right" ng-ampere-transition="list.editable().transition"></a>
+				<span class="pull-right">	
+					<span ng-hide="list.getEditingContext()" ng-switch on="$last && (list.editable() | type)">
+						<a ng-switch-when="object" class="hover" ng-ampere-transition="list.editable().transition"></a>
+					</span>
+					<span ng-hide="list.getEditingContext()" ng-switch on="$last && (list.removable() | type)">
+						<a ng-switch-when="object" class="hover" ng-ampere-transition="list.removable().transition"></a>
+					</span>
 				</span>
 			</td>
 		</tr>
@@ -49,12 +51,12 @@
 		</tr>
 		<tr class="no-items" ng-hide="list.get().length">
 			<td class="ng-ampere-sortable-nohandle" colspan="{{list.columns().length}}">
-				{{list.options( 'list-empty.message')}}
+				{{list.options( 'list-empty.message') && ($.isFunction( list.options( 'list-empty.message')) && list.options( 'list-empty.message').call( list)) || list.options( 'list-empty.message')}}
 			</td>
 		</tr>
 		<tr class="no-matches" ng-show="list.get().length && !list.rows.length">
 			<td class="ng-ampere-sortable-nohandle" colspan="{{list.columns().length}}">
-				{{list.options( 'list-nomatches.message')}}
+				{{list.options( 'list-nomatches.message') && ($.isFunction( list.options( 'list-nomatches.message')) && list.options( 'list-nomatches.message').call( list)) || list.options( 'list-nomatches.message')}}
 			</td>
 		</tr>
 	</tbody>

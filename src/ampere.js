@@ -1551,6 +1551,10 @@
 
 							// wait for action to complete
 						actionDeferred.done( function( redo) {
+							if( arguments.length!==0 && !redo) {
+								return;
+							}
+
 							if( arguments.length===0 || !$.isFunction( redo)) {
 								redo = command;
 							}
