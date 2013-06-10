@@ -580,7 +580,7 @@
 
 						// ATTENTION : $timeout is no more needed an may have side effects (scope.$apply is called at end of timeout) !!!
 					$timeout = function( f) {
-						f()
+						f();
 					};
 					$timeout( function() {
 						if( typeof( options.items)=='string') {
