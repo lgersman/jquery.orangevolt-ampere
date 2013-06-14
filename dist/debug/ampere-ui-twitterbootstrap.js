@@ -2,7 +2,7 @@
  * jQuery Orangevolt Ampere
  *
  * version : 0.2.0
- * created : 2013-06-10
+ * created : 2013-06-14
  * source  : https://github.com/lgersman/jquery.orangevolt-ampere
  *
  * author  : Lars Gersmann (lars.gersmann@gmail.com)
@@ -601,7 +601,7 @@
 
 							// if transition is not just a function but a true transition
 							// suppress drag start if transition is disabled
-						(window.ov.ampere.type( transition)=='transition') && $( element.get()).on( 'mousedown', options.items, function() {
+						(window.ov.ampere.type( transition)=='transition') && $( element.get()).on( 'mousedown', options.items, function( event) {
 							if( !transition.enabled()) {
 								event.preventDefault();
 								event.stopPropagation();

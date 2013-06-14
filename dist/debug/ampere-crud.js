@@ -2,7 +2,7 @@
  * jQuery Orangevolt Ampere
  *
  * version : 0.2.0
- * created : 2013-06-10
+ * created : 2013-06-14
  * source  : https://github.com/lgersman/jquery.orangevolt-ampere
  *
  * author  : Lars Gersmann (lars.gersmann@gmail.com)
@@ -573,7 +573,9 @@
 						})
 						.enabled( function() {
 								// dragging is only enabled when rows are unsorted
-							return !self.sortable().orderBy; 
+							return !self.sortable().orderBy &&
+								// and 
+								!self.getEditingContext();
 						});
 
 						$.isFunction( draggable.callback) && draggable.callback.call( this, draggable);

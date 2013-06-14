@@ -2,7 +2,7 @@
  * jQuery Orangevolt Ampere
  *
  * version : 0.2.0
- * created : 2013-06-10
+ * created : 2013-06-14
  * source  : https://github.com/lgersman/jquery.orangevolt-ampere
  *
  * author  : Lars Gersmann (lars.gersmann@gmail.com)
@@ -51,8 +51,7 @@
 }
 .ampere-app .ampere-module TABLE.crud.table TBODY TR.item:hover a.hover.ampere-transition:not( .disabled):hover,
 .ampere-app .ampere-module TABLE.crud.table TBODY TR.item:hover a.hover.ampere-transition:not( .disabled):hover > * {
-  cursor: auto;
-  font-weight: bold;
+  cursor: pointer;
 }
 .ampere-app .ampere-module TABLE.crud.table TBODY TR.item:hover a.hover.ampere-transition.disabled:hover,
 .ampere-app .ampere-module TABLE.crud.table TBODY TR.item:hover a.hover.ampere-transition.disabled:hover > * {

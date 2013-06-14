@@ -2,7 +2,7 @@
  * jQuery Orangevolt Ampere
  *
  * version : 0.2.0
- * created : 2013-06-10
+ * created : 2013-06-14
  * source  : https://github.com/lgersman/jquery.orangevolt-ampere
  *
  * author  : Lars Gersmann (lars.gersmann@gmail.com)
@@ -39,7 +39,7 @@
 				document.writeln( '<link rel="stylesheet/less" href="' + baseUrl + LESS[i] + '">');
 			}
 			
-			var JS = ["libs/coffeescript-1.3.3.js","libs/lesscss-1.3.3.js","libs/jquery-2.0.0.js","libs/jquery-ui-sortable-1.10.3/jquery-ui-1.10.3.custom.min.js","libs/bootstrap-2.3.2/js/bootstrap.min.js","libs/datepicker/js/bootstrap-datepicker.js","libs/cache.js","libs/angular-1.1.4/angular.min.js","libs/angular-1.1.4/angular-cookies.min.js","libs/angular-1.1.4/angular-loader.min.js","libs/angular-1.1.4/angular-resource.min.js","jquery.orangevolt-ampere.min.js"];
+			var JS = ["libs/coffeescript-1.3.3.js","libs/lesscss-1.3.3.js","libs/jquery-2.0.2.js","libs/jquery-ui-sortable-1.10.3/jquery-ui-1.10.3.custom.min.js","libs/bootstrap-2.3.2/js/bootstrap.min.js","libs/datepicker/js/bootstrap-datepicker.js","libs/cache.js","libs/angular-1.1.5/angular.min.js","libs/angular-1.1.5/angular-cookies.min.js","libs/angular-1.1.5/angular-loader.min.js","libs/angular-1.1.5/angular-mobile.min.js","libs/angular-1.1.5/angular-resource.min.js","jquery.orangevolt-ampere.min.js"];
 			for( var i in JS) {
 				var defer = (/coffeescript/.test( JS[i]) && 'defer') || '';
 				document.writeln( '<script type="text/javascript" ' + defer + ' src="' + baseUrl + JS[i] + '"></script>');
