@@ -25,15 +25,16 @@ tmpl/edit.tmpl
 ../../../dist/min/oval.js
 ../../../dist/min/libs/coffeescript-1.3.3.js
 ../../../dist/min/libs/lesscss-1.3.3.js
-../../../dist/min/libs/jquery-2.0.0.js
+../../../dist/min/libs/jquery-2.0.2.js
 ../../../dist/min/libs/jquery-ui-sortable-1.10.3/jquery-ui-1.10.3.custom.min.js
 ../../../dist/min/libs/bootstrap-2.3.2/js/bootstrap.min.js
 ../../../dist/min/libs/datepicker/js/bootstrap-datepicker.js
 ../../../dist/min/libs/cache.js
-../../../dist/min/libs/angular-1.1.4/angular.min.js
-../../../dist/min/libs/angular-1.1.4/angular-cookies.min.js
-../../../dist/min/libs/angular-1.1.4/angular-loader.min.js
-../../../dist/min/libs/angular-1.1.4/angular-resource.min.js
+../../../dist/min/libs/angular-1.1.5/angular.min.js
+../../../dist/min/libs/angular-1.1.5/angular-cookies.min.js
+../../../dist/min/libs/angular-1.1.5/angular-loader.min.js
+../../../dist/min/libs/angular-1.1.5/angular-mobile.min.js
+../../../dist/min/libs/angular-1.1.5/angular-resource.min.js
 ../../../dist/min/jquery.orangevolt-ampere.min.js
 
 crontab.js

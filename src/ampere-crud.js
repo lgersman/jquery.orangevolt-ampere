@@ -570,7 +570,9 @@
 						})
 						.enabled( function() {
 								// dragging is only enabled when rows are unsorted
-							return !self.sortable().orderBy; 
+							return !self.sortable().orderBy &&
+								// and 
+								!self.getEditingContext();
 						});
 
 						$.isFunction( draggable.callback) && draggable.callback.call( this, draggable);

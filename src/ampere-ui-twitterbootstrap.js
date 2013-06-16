@@ -598,7 +598,7 @@
 
 							// if transition is not just a function but a true transition
 							// suppress drag start if transition is disabled
-						(window.ov.ampere.type( transition)=='transition') && $( element.get()).on( 'mousedown', options.items, function() {
+						(window.ov.ampere.type( transition)=='transition') && $( element.get()).on( 'mousedown', options.items, function( event) {
 							if( !transition.enabled()) {
 								event.preventDefault();
 								event.stopPropagation();

@@ -2,17 +2,18 @@
 module.exports = function(grunt) {
 	var js = {
 		libs  : [
-			'jquery-2.0.0.js',
+			'jquery-2.0.2.js',
 			'jquery-ui-sortable-1.10.3/jquery-ui-1.10.3.custom.min.js',
 			'bootstrap-2.3.2/js/bootstrap.min.js',
 			//'jquery.sortable.js',
 			'datepicker/js/bootstrap-datepicker.js',
 			'cache.js',
 
-			'angular-1.1.4/angular.min.js',
-			'angular-1.1.4/angular-cookies.min.js',
-			'angular-1.1.4/angular-loader.min.js',
-			'angular-1.1.4/angular-resource.min.js'
+			'angular-1.1.5/angular.min.js',
+			'angular-1.1.5/angular-cookies.min.js',
+			'angular-1.1.5/angular-loader.min.js',
+			'angular-1.1.5/angular-mobile.min.js',
+			'angular-1.1.5/angular-resource.min.js'
 		].map( function( item) {
 		return 'libs/' + item;
 	}),
@@ -98,7 +99,7 @@ module.exports = function(grunt) {
 				files : [
 					{ dest: 'dist/debug/', src : [
 						'libs/*.js', 
-						'libs/angular-1.1.4/**/*.min.*',
+						'libs/angular-1.1.5/**/*.min.*',
 						'libs/font-awesome-3.1.1/css/**', 
 						'libs/font-awesome-3.1.1/font/*',
 						'libs/bootstrap-2.3.2/**/*.min.*',

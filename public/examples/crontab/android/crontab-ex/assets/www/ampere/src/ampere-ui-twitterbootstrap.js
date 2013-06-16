@@ -507,6 +507,7 @@
 						placeholder : element[0].tagName=='TBODY' && $('<tr><td>&nbsp;</td></tr>')
 					};
 					*/
+				
 					var OPTIONS = { /*options*/
 						helper			: function( e, tr) {
 							var $originals = tr.children();
@@ -577,6 +578,10 @@
 						}
 					});
 
+						// ATTENTION : $timeout is no more needed an may have side effects (scope.$apply is called at end of timeout) !!!
+					$timeout = function( f) {
+						f();
+					};
 					$timeout( function() {
 						if( typeof( options.items)=='string') {
 							//options.items = $( element.get()).children( options.items);
@@ -593,7 +598,7 @@
 
 							// if transition is not just a function but a true transition
 							// suppress drag start if transition is disabled
-						(window.ov.ampere.type( transition)=='transition') && $( element.get()).on( 'mousedown', options.items, function() {
+						(window.ov.ampere.type( transition)=='transition') && $( element.get()).on( 'mousedown', options.items, function( event) {
 							if( !transition.enabled()) {
 								event.preventDefault();
 								event.stopPropagation();
