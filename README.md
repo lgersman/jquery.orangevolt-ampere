@@ -10,7 +10,7 @@ Live demo : http://ampere.eu01.aws.af.cm/
 
 Website : http://lgersman.github.com/jquery.orangevolt-ampere/
 
-Blog : <a href="https://plus.google.com/115194500003117065773" rel="publisher">Google+</a>
+Blog : <a href="https://plus.google.com/115194500003117065773" rel="publisher">Orangevolt Ampere Blog</a>
 
 [jquery.orangevolt-ampere](http://lgersman.github.com/jquery.orangevolt-ampere/) utilizes:
 
