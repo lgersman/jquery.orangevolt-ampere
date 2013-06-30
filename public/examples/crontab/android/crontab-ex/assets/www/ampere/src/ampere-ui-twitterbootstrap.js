@@ -1233,14 +1233,14 @@
 
 			scope.$$phase || scope.$apply( $.noop);
 
-				// broadcast ampere.view.changed event
-			controller.module.trigger( "ampere.view.updated");
+				// broadcast ampere.view-changed event
+			controller.module.trigger( "ampere.view-updated");
 		};
 
 		this.refresh = function() {
 			this.renderState( controller.module.current().view);
-				// broadcast ampere.view.changed event
-			controller.module.trigger( "ampere.view.refreshed");
+				// broadcast ampere.view-changed event
+			controller.module.trigger( "ampere.view-refreshed");
 		};
 
 		//var lastView = undefined;
@@ -1413,8 +1413,8 @@
 
 					self.init();
 
-						// broadcast ampere.view.changed event
-					controller.module.trigger( "ampere.view.changed");
+						// broadcast ampere.view-changed event
+					controller.module.trigger( "ampere.view-changed");
 
 					deferred.resolve();
 				});

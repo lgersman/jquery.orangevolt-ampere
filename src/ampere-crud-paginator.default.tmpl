@@ -9,7 +9,7 @@
 		<li ng-class="{disabled : !paginator.gotoPrevPage().enabled()}">
 			<a ng-ampere-transition="paginator.gotoPrevPage()"></a>
 		</li>
-		<li ng-repeat="page in paginator.getPageRange()" ng-class="{active : paginator.currentPageNumber()==page}">
+		<li ng-repeat="page in paginator.getPageRange()" ng-class="{active : paginator.currentPageNumber()==page, disabled : !paginator.gotoPage().enabled() && paginator.currentPageNumber()!=page}">
 			<a data-page="{{page}}" ng-ampere-transition="paginator.gotoPage()">{{page}}</a>
 		</li>
 		<li ng-class="{disabled : !paginator.gotoNextPage().enabled()}">

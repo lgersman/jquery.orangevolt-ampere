@@ -9,6 +9,10 @@
     <script src="../../../libs/bootstrap-2.3.2/js/bootstrap.js"></script>
 
     <style type="text/less">
+        @color      : gray;
+        @text-color : #555555;
+        @highlight-color : aliceblue;
+
         html, body, svg {
             width  : 100%;
             height : 100%;
@@ -25,8 +29,13 @@
         }
 
         svg {
+            .end-arrow {
+               fill            : @color;
+               stroke-width    : 1px;
+            }
+
             rect.selection {
-                stroke          : gray;
+                stroke          : @color;
                 stroke-dasharray: 2px;
                 stroke-opacity  : 0.5;
                 fill            : transparent;
@@ -34,157 +43,61 @@
 
             g.state {
                 circle {
-                    stroke  : gray;            
+                    stroke  : @color;            
                 }
 
                 circle.inner {
                     fill        : white;
                     transition  : fill 0.5s;
                     cursor      : move;
-                }
 
-                circle.inner.hover,
-                circle.outer.hover {
-                    fill : aliceblue;
-                }
-
-                circle.outer.hover {
-                    stroke-width    : 1px;
+                    &.hover {
+                        fill : @highlight-color;
+                    }
                 }
 
                 circle.outer {
                     stroke-width    : 0px;
                     stroke-dasharray: 2px;
-                    stroke-color    : gray;
+                    stroke-color    : @color;
                     fill            : transparent;
                     transition      : all 0.5s;
                     cursor          : pointer;
+
+                    &:hover {
+                        stroke-width    : 1px;
+                        fill            : @highlight-color;    
+                    }
                 }
 
                 &.selected circle.outer {
                     stroke-width    : 1px;
                 }
 
-                text.foreground {
-                    font-weight         : bold;
-                    pointer-events      : none;
-                    fill                : #555555;    
-                }
+                text {
+                    &.foreground {
+                        font-weight         : bold;
+                        pointer-events      : none;
+                        fill                : @text-color;
+                    }
 
-                text.background {
-                    font-weight         : bold;
-                    pointer-events      : none;
-                    fill                : white;
-                    stroke              : white;
-                    stroke-width        : 4px;
+                    &.background {
+                        font-weight         : bold;
+                        pointer-events      : none;
+                        fill                : white;
+                        stroke              : white;
+                        stroke-width        : 4px;
+                    }
                 }
             }
 
             g.transition path,
             path.dragline {
                 fill        : none;
-                stroke      : gray;
+                stroke      : @color;
                 stroke-width: 1px;
             }
 
-            g.transition path.foreground {
-                marker-end  : url(#end-arrow);
-            }
-
-            g.transition.hover path.background {
-                stroke-dasharray: none;
-                stroke : aliceblue;
-                stroke-opacity  : 1.0;
-                transition : all 0.5s;
-            }
-
-            g.transition path.background {
-                stroke-dasharray: none;
-                stroke-width: 8px;
-                stroke : transparent;
-            }
-
-            g.transition.selected path.foreground {
-                stroke-dasharray: 2px;
-                stroke-color    : gray;
-            }
-
-
-            g.transition path {
-                cursor : default;
-            }
-
-            g.transition text.label {
-                /* text overflow ellipsis seems not yet to work */
-                /*
-                white-space: nowrap;
-                overflow: hidden;
-                width       : 30px;
-                text-overflow   : ellipsis;
-                */
-                cursor          : default;
-
-                pointer-events : hover;
-
-                    /* these are overrides to override twitter bootstrap styles */
-                /*font-weight     : normal;*/
-                text-shadow     : none;            
-            }
-
-            g.transition text.label.foreground {
-                fill                : #555555;    
-                //filter            : url(#glow);
-            }
-
-            g.transition text.label.background {
-                fill                : rgba( 255,255,255,0.7);
-                stroke              : rgba( 255,255,255,0.7);
-                stroke-width        : 4px;
-                //filter            : url(#glow);
-            }
-
-            g.transition.hover text.label.background {
-                fill                : aliceblue;
-                stroke              : aliceblue;
-            }
-
-            .end-arrow {
-                fill            : gray;
-                stroke-width    : 1px;
-            }
-
-            g.transition circle.endpoint {
-                display         : none;
-                fill            : none;
-                cursor          : pointer;
-                stroke          : gray;
-                stroke-dasharray: 2px;
-            }
-
-            g.transition circle.point {
-                display         : none;
-                fill            : aliceblue;
-                cursor          : move;
-                stroke          : gray;
-            }
-
-            g.transition.selected circle.endpoint,
-            g.transition.selected circle.point {
-                display        : inline;
-                transition : all 0.5s;
-            }
-
-            g.transition:not( .selected).hover *,
-            path.dragline {
-                display         : inline;
-                
-            }
-            
-
-            g.transition:not( .selected).hover {
-                transition      : all 0.5s;
-            }
-            
             path.dragline {
                 pointer-events: none;
                 stroke-opacity  : 0.5;
@@ -193,6 +106,99 @@
 
             path.dragline.hidden {
                 stroke-width: 0;
+            }
+
+            g.transition {
+                path {
+                    cursor : default;
+
+                    &.foreground {
+                        marker-end  : url(#end-arrow);
+                    }
+
+                    &.background {
+                        stroke-dasharray: none;
+                        stroke-width: 8px;
+                        stroke : transparent;
+                    }
+                }
+
+                &.hover path.background {
+                    stroke-dasharray: none;
+                    stroke : @highlight-color;
+                    stroke-opacity  : 1.0;
+                    transition : all 0.5s;
+                }
+
+                &.selected path.foreground {
+                    stroke-dasharray: 2px;
+                    stroke-color    : @color;
+                }
+
+                text.label {
+                    /* text overflow ellipsis seems not yet to work */
+                    /*
+                    white-space: nowrap;
+                    overflow: hidden;
+                    width       : 30px;
+                    text-overflow   : ellipsis;
+                    */
+                    cursor          : default;
+
+                    pointer-events : hover;
+
+                        /* these are overrides to override twitter bootstrap styles */
+                    /*font-weight     : normal;*/
+                    text-shadow     : none;            
+
+                    &.foreground {
+                        fill                : @text-color;    
+                        //filter            : url(#glow);
+                    }
+
+                    &.background {
+                        fill                : rgba( 255,255,255,0.7);
+                        stroke              : rgba( 255,255,255,0.7);
+                        stroke-width        : 4px;
+                        //filter            : url(#glow);
+                    }
+                }
+
+                &.hover text.label.background {
+                    fill                : @highlight-color;
+                    stroke              : @highlight-color;
+                }
+
+                circle {
+                    display         : none;
+                    stroke          : @color;
+
+                    &.endpoint {
+                        fill            : none;
+                        cursor          : pointer;
+                        stroke-dasharray: 2px;
+                    }
+
+                    &.point {
+                        fill            : @highlight-color;
+                        cursor          : move;
+                    }
+                }
+
+                &.selected circle {
+                    display    : inline;
+                    transition : all 0.5s;
+                }
+
+                &:not( .selected).hover {
+                    transition      : all 0.5s;
+                }
+            }            
+
+            g.transition:not( .selected).hover *,
+            path.dragline {
+                display         : inline;
+                
             }
 
                 /* disable text selection */

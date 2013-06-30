@@ -129,7 +129,10 @@
 			html5_history_hash = parseInt( $.now() + '00', 10);
 
 				// push initial state
-			window.history.replaceState( html5_history_hash, document.title, window.location.pathname);// + '#' + html5_history_hash);
+			window.history.replaceState( 
+				html5_history_hash, 
+				document.title, 
+				window.location.pathname + window.location.hash);// + '#' + html5_history_hash);
 
 				// register history listener
 			$( window).on( 'popstate', function( event) {
@@ -164,8 +167,8 @@
 			var redoCommand;
 			if( arguments.length) {
 				if( !(arguments[0] instanceof jQuery.Event)) {
-					var ui = arguments.length && arguments[0].ui,
-						arg = arguments[0],
+					var	arg  = arguments[0],
+						ui   = arg.ui,
 						view = module.current().view,
 						undoCommand;
 
@@ -212,16 +215,24 @@
 
 							html5_history_hash && historyReady.done( function() {
 								html5_history_hash++;
-								window.history.pushState( html5_history_hash, document.title, window.location.pathname);// + '#' + html5_history_hash);
-								
-								//var hash = 
+								var uri = window.location.pathname;
 
+								var stateOptionHistoryHTML5Hash = module.current().state.options( 'ampere.history.html5.hash');
+								if( stateOptionHistoryHTML5Hash) {
+									if( $.isFunction( stateOptionHistoryHTML5Hash)) {
+										stateOptionHistoryHTML5Hash = stateOptionHistoryHTML5Hash.call( module.current().state);
+									}
+									uri += '#' + stateOptionHistoryHTML5Hash;
+								}
+
+								window.history.pushState( html5_history_hash, document.title, uri);
+								
 								//window.history.pushState( hash, document.title, window.location.pathname + '#' + hash);
 							});
 						} else if( history.canRedo()) {
 							html5_history_hash && historyReady.done( function() {
 								undo.hash = /*window.history.state*/redo.hash-1;
-								// window.history.replaceState( undo.hash, document.title, window.location.pathname + '#' + redo.hash);
+							// window.history.replaceState( undo.hash, document.title, window.location.pathname + '#' + redo.hash);
 							});
 							history.stack[ history.position++] = undo;// point to next redo action
 						}
@@ -389,7 +400,7 @@
 				} else {
 						// broadcast ampere state.enabled event
 						// debugger
-					var event = (state && state.module() || module).trigger( "ampere.transition.enabled", [ this]);
+					var event = (state && state.module() || module).trigger( "ampere.transition-enabled", [ this]);
 						// if a handler returned FALSE 
 						// -> skip enabled call and return undefined(==false)
 					if( event.result===undefined || event.result) {
@@ -801,6 +812,8 @@
 			};
 
 			this._transit = function( command, source, target, view, /* optional argument */ui, /* optional argument */historyReady) {
+				var transitionDeferred = $.Deferred();
+
 				var retryArgs = {
 					command	: command,
 					source	: source,
@@ -808,6 +821,8 @@
 					view	: view,
 					ui		: ui
 				};
+
+				module.trigger( 'ampere.transition', [ transitionDeferred, command, source, target, view]);
 
 				ui && ui.block();
 				var result;
@@ -846,34 +861,55 @@
 
 						ui && ui.unblock();
 							// render flash "user aborted transition"
-					} else if( ui) {
-						var onRetry = function() {
-							module.history().redo( retryArgs);
-						};
-							/*
-							 * the action failed for some unknown reason
-							 */
-						if( arguments.length==1 && typeof( arguments[0])=='string') {
-							ui.render( 'Error', arguments[0], onRetry);
-						} else if( arguments.length==1 && (arguments[0] instanceof Error)) {
-							ui.render( 'Error', arguments[0], onRetry);
-							throw arguments[0];
-						} else if( arguments.length==3 && ($.isFunction( arguments[0].statusCode))) {
-							ui.render( 'Error', 'Ajax request failed (' + arguments[0].status + ') : ' + arguments[0].statusText || arguments[0].responseText, onRetry);
-							//throw arguments[0].responseText;
-						} else {
-							ui.render( 'Error', $.ov.json.stringify( arguments, $.ov.json.stringify.COMPACT), onRetry);
+					} else {
+						transitionDeferred.rejectWith( module, arguments);
+
+						if( ui) {
+							var onRetry = function() {
+								module.history().redo( retryArgs);
+							};
+								/*
+								 * the action failed for some unknown reason
+								 */
+							if( arguments.length==1 && typeof( arguments[0])=='string') {
+								ui.render( 'Error', arguments[0], onRetry);
+							} else if( arguments.length==1 && (arguments[0] instanceof Error)) {
+								ui.render( 'Error', arguments[0], onRetry);
+								throw arguments[0];
+							} else if( arguments.length==3 && ($.isFunction( arguments[0].statusCode))) {
+								ui.render( 'Error', 'Ajax request failed (' + arguments[0].status + ') : ' + arguments[0].statusText || arguments[0].responseText, onRetry);
+								//throw arguments[0].responseText;
+							} else {
+								ui.render( 'Error', $.ov.json.stringify( arguments, $.ov.json.stringify.COMPACT), onRetry);
+							}
 						}
 					}
 				}
 
 				$.when( result, historyReady)
 				.done( function() {
-					var previousView = module.current().view;
+					var previous = module.current();
 					module.current( target, view);
 					var template = ui && ui.getTemplate( view);
 					template
 					.done( function( data) {
+							// adjust document.title if needed
+						if( module.options( 'ampere.history.html5') && ui) {
+							var stateOptions = module.current().state.options();
+							if( Object.hasOwnProperty.call( stateOptions, 'ampere.history.html5.title')) {
+								var historyHTML5Title = stateOptions['ampere.history.html5.title'];
+								document.title = $.isFunction( historyHTML5Title) 
+									? historyHTML5Title.call( module.current().state) 
+									: historyHTML5Title.toString()
+								;
+							} else {
+								document.title = ui.getCaption( module.current().state);
+							}
+						} else {
+							debugger
+						}
+
+							// render view
 						if( data instanceof HTMLElement) {
 							data = $( data);
 						}
@@ -881,8 +917,10 @@
 
 						ui && ui.render( 'State', view, template, result);
 
-							// broadcast ampere.view.changed event
-						self.trigger( "ampere.view.changed", [ previousView]);
+							// broadcast ampere.view-changed event
+						self.trigger( "ampere.view-changed", [ previous.view]);
+
+						transitionDeferred.resolveWith( module, [ previous.view]);
 
 						ui && ui.unblock();
 					})
@@ -912,7 +950,7 @@
 					};
 					module.on = $.proxy( jq.on, jq);
 					module.off = $.proxy( jq.off, jq);
-					module.once = $.proxy( jq.once, jq);
+					module.one = $.proxy( jq.one, jq);
 
 					module.destroy = (function( destroy) {
 							// cleanup jquery event queue for our module instance
@@ -1047,15 +1085,15 @@
 	}
 	Ampere.defaults = {
 			/* default state name */
-		'ampere.state'         : 'main',
-		'ampere.state.view' : 'main',
+		'ampere.state'         				: 'main',
+		'ampere.state.view' 				: 'main',
 			/* 'ui' : controller: foobarUI, */
-		'ampere.ui.options'		: {},
+		'ampere.ui.options'					: {},
 			/*
 			 * history is enabled by default
 			 * set Number.MAX_VALUE as value for infinite undo/redo stack
 			 */
-		'ampere.history.limit'	: Number.MAX_VALUE,
+		'ampere.history.limit'				: Number.MAX_VALUE,
 			/*
 			 * enable html5 history api support (if the browser supports it)
 			 * if enabled the browser back/forward buttons
@@ -1067,7 +1105,43 @@
 			 * ATTENTION : $.fn.ampere overrides this option
 			 * (if not defined) to true if the attached element is BODY
 			 */
-		'ampere.history.html5'	: false,
+		'ampere.history.html5'				: false,
+			/*
+			 *	deeplinking option (default is enabled). if ampere.history.html5 is true
+			 *	and the ampere widget element === document.body this function will be called at
+			 *	startup to resolve a state responsible for handling the hash fragment of 
+			 *	document.location (via state option 'ampere.history.html5').
+			 *	
+			 *	this option can be overridden with a custom function. 
+			 *	this context is the ampere controller. the given function may return
+			 *	a deferred tracking its progress.
+			 */
+		'ampere.history.html5.deeplinking' 	: function() {
+				// deeplinking : examine hash from document.location
+			var hash = document.location.hash, module = this.module;
+			if( hash) {
+					// strip # at the beginning
+				hash = hash.substr( 1);	
+				var handler;
+
+					// evaluate state matching hash
+				var names = Object.keys( module.states);
+				for( var i=0; i<names.length; i++) {
+					var state = module.states[ names[i]],
+						html5Hash = state.options( 'ampere.history.html5.hash') || $.noop;
+
+					if( handler = html5Hash.call( state, hash)) {
+						break;
+					}
+				}
+
+				var controller = this;
+				return $.when( handler && $.isFunction( handler) && handler.call( controller))
+				.done( function() {
+					controller.ui.update();
+				});
+			}
+		},
 			/*
 			 * baseurl defaults to the Orangevolt Ampere Loader baseurl
 			 * (i.e. path to oval.js)
@@ -1435,12 +1509,12 @@
 		}
 
 		var controller = this;
-
 		var _ns = $.ov.namespace( module.fullName() + '::UiController');
 
 		this.options = Options( options);
 		this.module = module;
 		this.element = element;
+		this.element.data( 'ampere.controller', this);
 
 			// reset history to potentially remove
 			// undo entries from previous usage
@@ -1451,6 +1525,9 @@
 			 */
 		this.element.addClass( 'ampere-app');
 
+		var deferred = $.Deferred();
+
+		deferred.promise( this);
 		$.when( module).done( function() {
 			// (1) state
 			var state = controller.options( 'ampere.state') || controller.module.current().state || module.options( 'ampere.state');
@@ -1495,9 +1572,32 @@
 			 */
 
 			module.current( state, view);
+			
+			$.when( controller.ui.render( 'Bootstrap'))
+			.done( function() {
+				var deeplinkingDeferred = $.noop;
+				if( module.options( 'ampere.history.html5') && controller.element[0]===document.body) {
+					var deeplinking = module.options( 'ampere.history.html5.deeplinking');
+					if( $.isFunction( deeplinking)) {
+						deeplinkingDeferred = deeplinking.call( controller);
+					}
+				}
 
-			controller.element.data( 'ampere.controller', controller);
-			controller.ui.render( 'Bootstrap');
+				$.when( deeplinkingDeferred)
+				.fail( function( msg) {
+						// show flash with deeplinking error as a "silent hint" that 
+						// deeplinking went wrong for some reason
+					controller.ui.flash.error( "Resolving deep link failed - " + msg, true);
+				})
+				.always( function() {
+					deferred.resolveWith( controller, [ module]);
+						// cleanup history
+					module.history().reset();
+				});
+			})
+			.fail( function() {
+				deferred.rejectWith( controller, arguments);	
+			});
 		});
 
 			/*
@@ -1505,9 +1605,18 @@
 			 */
 
 		this.proceed = function( transition, /*optional transition data from events*/data) {
+			var retVal = $.Deferred();
+
 				// if transistion is enabled und target state defined
 			var target;
 			if( transition.enabled() && (target=transition.target())) {
+					// track transition progress to be executed a few lines below
+				module.one( 'ampere.transition', function( event, transitionDeferred, command, source, target, view) {
+					transitionDeferred
+					.done( retVal.resolve)
+					.fail( retVal.reject);
+				});
+
 					// get action factory
 				var action = transition.action();
 					/*
@@ -1563,7 +1672,6 @@
 							var view = transition.options( 'ampere.state.view') || target.options( 'ampere.state.view');
 							if( typeof( view)=='string') {
 								var _view = target.views[ view];
-								_ns.assert( _view instanceof View, 'target view "', view, '" not found in ', target.fullName(), '.views');
 
 								view = _view;
 							} else if( !view) {
@@ -1613,10 +1721,11 @@
 						});
 					}
 				}
-				return true;
 			} else {
-				return false;
+				retVal.fail();
 			}
+
+			return retVal;
 		};
 
 		this.destroy = function() {

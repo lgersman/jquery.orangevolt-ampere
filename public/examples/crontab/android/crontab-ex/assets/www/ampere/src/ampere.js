@@ -389,7 +389,7 @@
 				} else {
 						// broadcast ampere state.enabled event
 						// debugger
-					var event = (state && state.module() || module).trigger( "ampere.transition.enabled", [ this]);
+					var event = (state && state.module() || module).trigger( "ampere.transition-enabled", [ this]);
 						// if a handler returned FALSE 
 						// -> skip enabled call and return undefined(==false)
 					if( event.result===undefined || event.result) {
@@ -881,8 +881,8 @@
 
 						ui && ui.render( 'State', view, template, result);
 
-							// broadcast ampere.view.changed event
-						self.trigger( "ampere.view.changed", [ previousView]);
+							// broadcast ampere.view-changed event
+						self.trigger( "ampere.view-changed", [ previousView]);
 
 						ui && ui.unblock();
 					})

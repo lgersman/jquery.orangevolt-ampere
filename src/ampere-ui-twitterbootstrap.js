@@ -536,7 +536,13 @@
 							} else {
 								transition( null, ui, [ event]);
 							}
-						}
+						}/*,
+						start : function( event, ui ) {
+							if( window.ov.ampere.type( transition)=='transition' && !transition.enabled()) {
+								$( element.get()).sortable( "disable" );								
+							}
+						} 
+						*/
 					};
 
 					var options = $.extend( {}, OPTIONS);
@@ -580,6 +586,9 @@
 
 						// ATTENTION : $timeout is no more needed an may have side effects (scope.$apply is called at end of timeout) !!!
 					$timeout = function( f) {
+						//scope.$ampere.module.once( 'ampere.view-changed', function() {
+						//	f();
+						//});
 						f();
 					};
 					$timeout( function() {
@@ -596,17 +605,21 @@
 							$( options.items, element.get()).addClass( 'draghandle');
 						}
 
+						
+							//THIS SEEMS TO BE NO MORE NEEDED						
+						
 							// if transition is not just a function but a true transition
 							// suppress drag start if transition is disabled
 						(window.ov.ampere.type( transition)=='transition') && $( element.get()).on( 'mousedown', options.items, function( event) {
 							if( !transition.enabled()) {
-								event.preventDefault();
-								event.stopPropagation();
+								//event.preventDefault();
+								//event.stopPropagation();
 								event.stopImmediatePropagation();
 
-								return false;
+								//return false;
 							}
 						});
+						
 
 						var sortable = $( element.get()).sortable( options);
 
@@ -671,21 +684,19 @@
 					function wrap( fn, property) {
 						return function( scope) {
 							var state = (arguments.length==1 ? scope : arguments[2]).$ampere.module.current().state;
-							var args = $.makeArray( arguments);
+							//var args = $.makeArray( arguments);
+							var args = [];
 							if( arguments.length==1) {
 									// watch all call
 
-									// replace scope argument by state
-								args[0] = state;
+								args.push( state);
 							} else {
 									// watch property call
-
-									// remove scope argument
-								args.pop();
-
-								args.unshift( property);
-								args.unshift( state);
+								args.push( state);
+								args.push( property);
 							}
+							args.push( element); 
+
 							fn.apply( scope, args);
 						};
 					}
@@ -817,25 +828,31 @@
 		 *  http://stackoverflow.com/questions/9179708/replicating-bootstraps-main-nav-and-subnav
 		 */
 	function onBodyscroll() {
-		var subnav = $('.subnav');
+		var subnav = $('.subnav:last');
 		if( !subnav.data( "inBodyScroll")) {
 
 			subnav.data( "inBodyScroll", true);
 			// If was not activated (has no attribute "data-top"
 			if( !subnav.attr('data-top')) {
-					// If already fixed, then do nothing
-					if( subnav.hasClass('subnav-fixed')) {
-							return;
-					}
-					// Remember top position
-					var offset = subnav.offset() || {};
-					subnav.attr('data-top', offset.top);
+				// If already fixed, then do nothing
+				if( subnav.hasClass('subnav-fixed')) {
+						return;
+				}
+				// Remember top position
+				var offset = subnav.offset() || {};
+				subnav.attr('data-top', offset.top);
 			}
 
 			if( $( this).scrollTop() && subnav.attr('data-top') - subnav.outerHeight() <= $(this).scrollTop()) {
-					subnav.addClass('subnav-fixed');
+				subnav.addClass('subnav-fixed');
+					// reset the individual css style to get the value from the css class
+				$( 'body').css( 'padding-top', '');
+				var paddingTop = parseInt( $( 'body').css( 'padding-top') || 0);
+				$( 'body').css( 'padding-top', paddingTop + subnav.height() + 'px');
 			} else {
-					subnav.removeClass('subnav-fixed');
+				subnav.removeClass('subnav-fixed');
+					// remove style
+				$( 'body').css( 'padding-top', '');
 			}
 
 			window.setTimeout( function() {
@@ -1085,10 +1102,10 @@
 
 						flash.find( '.message').text( 'Error occured : ' + message);
 						if( options.value) {
-							var retry = $('<button class="btn retry"><i class="icon-refresh"></i>Retry</button>');
+							retry = $('<button class="btn retry"><i class="' + ($.isFunction( options.value) && 'icon-refresh') + '"></i>' + ($.isFunction( options.value) ? 'Retry' : 'Ok') + '</button>');
 							retry.click( function() {
 								flash.hide();
-								options.value();
+								$.isFunction( options.value) && options.value();
 							});
 
 							var cancel = $('<button class="btn"><i></i>Cancel</button>');
@@ -1233,14 +1250,14 @@
 
 			scope.$$phase || scope.$apply( $.noop);
 
-				// broadcast ampere.view.changed event
-			controller.module.trigger( "ampere.view.updated");
+				// broadcast ampere.view-changed event
+			controller.module.trigger( "ampere.view-updated");
 		};
 
 		this.refresh = function() {
 			this.renderState( controller.module.current().view);
-				// broadcast ampere.view.changed event
-			controller.module.trigger( "ampere.view.refreshed");
+				// broadcast ampere.view-changed event
+			controller.module.trigger( "ampere.view-refreshed");
 		};
 
 		//var lastView = undefined;
@@ -1301,7 +1318,11 @@
 				//onBodyscroll();
 
 				if( /*arguments.length==1 &&*/ typeof( arguments[0])=='string') {
+						// display flash message
 					self.flash( arguments[0]);
+				} else {
+						// hide flash 
+					self.flash();
 				}
 			});
 		};
@@ -1368,7 +1389,6 @@
 			bar.text( 'Bootstrapping ' + controller.module.name() + ' ...');
 
 			var deferred = $.Deferred();
-
 			$.when( controller.module.current().view, controller.module.current().view.template, this.layout, controller.module)
 			.progress( function() {
 				_ns.debug( 'progress', this, arguments);
@@ -1386,6 +1406,7 @@
 					})
 				);
 				$( '.progress', controller.element).addClass( 'progress-danger');
+				deferred.resolveWith( controller.ui, self.layout.isRejected() ? self.layout.statusText + ' : ' + layout : arg);
 			}).done( function() {
 				eProgress.remove();
 
@@ -1413,10 +1434,10 @@
 
 					self.init();
 
-						// broadcast ampere.view.changed event
-					controller.module.trigger( "ampere.view.changed");
+						// broadcast ampere.view-changed event
+					controller.module.trigger( "ampere.view-changed");
 
-					deferred.resolve();
+					deferred.resolveWith( controller.ui, []);
 				});
 			});
 

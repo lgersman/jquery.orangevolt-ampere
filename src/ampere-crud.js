@@ -1020,6 +1020,8 @@
 							var replacement = f( scope);
 
 							element.replaceWith( replacement);
+
+							listController.$element = replacement;
 						}
 					});
 				}
@@ -1187,6 +1189,20 @@
 			this.gotoNextPageRange = propertyWrapper();
 			this.gotoLastPage = propertyWrapper();
 
+				// getter / setter for enablement
+			this.enabled = (function() {
+				var current = $.noop;
+
+				return function( value) {
+					if( arguments.length) {
+						current = value; 
+						return this;
+					} else {
+						return current;
+					}
+				};
+			})();
+
 			this.init = function( state) {
 				_ns.assert( window.ov.ampere.type( state)=='state', 'expected to be attached to a state but was attached to a "', window.ov.ampere.type( state), '"');
 
@@ -1214,7 +1230,8 @@
 						self.currentPageNumber( 1);
 					}) 
 					.enabled( function() {
-						return self.currentPageNumber()>1;
+						var enabled = self.enabled().call( self, transition);
+						return (enabled===undefined || enabled)  && self.currentPageNumber()>1;
 					})
 					.options({
 						'ampere.ui.caption'     : self.options( 'firstpage.caption'),
@@ -1233,7 +1250,8 @@
 						self.currentPageNumber( Math.max( self.currentPageNumber()-self.options( 'pageRange'), 1));
 					}) 
 					.enabled( function() {
-						return self.currentPageNumber()>1;
+						var enabled = self.enabled().call( self, transition);
+						return (enabled===undefined || enabled) && self.currentPageNumber()>1;
 					})
 					.options({
 						'ampere.ui.caption'     : self.options( 'prevpagerange.caption'),
@@ -1252,7 +1270,8 @@
 						 self.currentPageNumber( self.currentPageNumber()-1);
 					})
 					.enabled( function() {
-						return self.currentPageNumber()>1;
+						var enabled = self.enabled().call( self, transition);
+						return (enabled===undefined || enabled) && self.currentPageNumber()>1;
 					}) 
 					.options({
 						'ampere.ui.caption'     : self.options( 'prevpage.caption'),
@@ -1273,6 +1292,10 @@
 
 						self.currentPageNumber( page);	
 					})
+					.enabled( function() {
+						var enabled = self.enabled().call( self, transition);
+						return (enabled===undefined || enabled);
+					})
 					.options({
 						'ampere.ui.caption'     : self.options( 'page.caption'),
 						'ampere.ui.description' : self.options( 'page.description'),
@@ -1290,7 +1313,8 @@
 						self.currentPageNumber( self.currentPageNumber()+1);	
 					})
 					.enabled( function() {
-						return self.currentPageNumber() < self.getPageCount(); 
+						var enabled = self.enabled().call( self, transition);
+						return (enabled===undefined || enabled) && (self.currentPageNumber() < self.getPageCount()); 
 					}) 
 					.options({
 						'ampere.ui.caption'     : self.options( 'nextpage.caption'),
@@ -1314,7 +1338,8 @@
 						'ampere.ui.icon'        : self.options( 'nextpagerange.icon')
 					}) 
 					.enabled( function() {
-						return self.currentPageNumber() < self.getPageCount(); 
+						var enabled = self.enabled().call( self, transition);
+						return (enabled===undefined || enabled) && (self.currentPageNumber() < self.getPageCount()); 
 					});
 
 					cb.call( self, transition);
@@ -1333,7 +1358,8 @@
 						'ampere.ui.icon'		: self.options( 'lastpage.icon')
 					}) 
 					.enabled( function() {
-						return self.currentPageNumber() < self.getPageCount(); 
+						var enabled = self.enabled().call( self, transition);
+						return (enabled===undefined || enabled) && (self.currentPageNumber() < self.getPageCount()); 
 					});
 
 					cb.call( self, transition);
@@ -1403,6 +1429,8 @@
 							var replacement = f( scope);
 
 							element.replaceWith( replacement);
+
+							paginatorController.$element = replacement;
 						}
 					});
 				}
