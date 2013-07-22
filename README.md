@@ -14,6 +14,8 @@ Blog : <a href="https://plus.google.com/115194500003117065773" rel="publisher">O
 
 Documentation : <a href="https://github.com/lgersman/jquery.orangevolt-ampere/wiki/_pages">Orangevolt Ampere documentation</a>
 
+Slides : http://lgersman.github.io/jquery.orangevolt-ampere/slides
+
 [jquery.orangevolt-ampere](http://lgersman.github.com/jquery.orangevolt-ampere/) utilizes:
 
 * [AngularJS](http://angularjs.org/)
