@@ -903,15 +903,15 @@
 							var stateOptions = target.options();
 							if( Object.hasOwnProperty.call( stateOptions, 'ampere.history.html5.title')) {
 								var historyHTML5Title = stateOptions['ampere.history.html5.title'];
-								document.title = $.isFunction( historyHTML5Title) 
-									? historyHTML5Title.call( target) 
-									: historyHTML5Title.toString()
+								document.title = $.isFunction( historyHTML5Title) ?
+									historyHTML5Title.call( target) : 
+									historyHTML5Title.toString()
 								;
 							} else {
 								document.title = ui.getCaption( target);
 							}
 						} else {
-							debugger
+							debugger;
 						}
 						/*
 						if( previous.state===target && previous.view===view) {
@@ -1100,8 +1100,8 @@
 	}
 	Ampere.defaults = {
 			/* default state name */
-		'ampere.state'         				: 'main',
-		'ampere.state.view' 				: 'main',
+		'ampere.state'						: 'main',
+		'ampere.state.view'					: 'main',
 			/* 'ui' : controller: foobarUI, */
 		'ampere.ui.options'					: {},
 			/*
@@ -1131,7 +1131,7 @@
 			 *	this context is the ampere controller. the given function may return
 			 *	a deferred tracking its progress.
 			 */
-		'ampere.history.html5.deeplinking' 	: function() {
+		'ampere.history.html5.deeplinking'	: function() {
 				// deeplinking : examine hash from document.location
 			var hash = document.location.hash, module = this.module;
 			if( hash) {

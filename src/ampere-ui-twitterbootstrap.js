@@ -871,7 +871,7 @@
 				subnav.addClass('subnav-fixed');
 					// reset the individual css style to get the value from the css class
 				$( 'body').css( 'padding-top', '');
-				var paddingTop = parseInt( $( 'body').css( 'padding-top') || 0);
+				var paddingTop = parseInt( $( 'body').css( 'padding-top') || 0, 10);
 				$( 'body').css( 'padding-top', paddingTop + subnav.height() + 'px');
 			} else {
 				subnav.removeClass('subnav-fixed');
@@ -1133,7 +1133,7 @@
 
 						flash.find( '.message').text( 'Error occured : ' + message);
 						if( options.value) {
-							retry = $('<button class="btn retry"><i class="' + ($.isFunction( options.value) && 'icon-refresh') + '"></i>' + ($.isFunction( options.value) ? 'Retry' : 'Ok') + '</button>');
+							var retry = $('<button class="btn retry"><i class="' + ($.isFunction( options.value) && 'icon-refresh') + '"></i>' + ($.isFunction( options.value) ? 'Retry' : 'Ok') + '</button>');
 							retry.click( function() {
 								flash.hide();
 								$.isFunction( options.value) && options.value();

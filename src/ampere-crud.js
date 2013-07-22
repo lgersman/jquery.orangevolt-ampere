@@ -901,12 +901,12 @@
 					})
 					.action( function( transition, ui, data) {
 						var oldSelection = self.selection(),
-							position 	 = data[0] && $( data[0].currentTarget).data( 'position'), 
+							position     = data[0] && $( data[0].currentTarget).data( 'position'), 
 							newSelection = $.isNumeric( position) && self.get().length>position && self.get()[ position] || data.length==2 && data[1];
 
 							// doit nevertheless when the data are not provided as event
 						if( oldSelection!==newSelection || !data[0]) {
-							function redo() {
+							var redo = function() {
 								self.selection( newSelection);
 																
 								return function undo() {
@@ -914,7 +914,7 @@
 									
 									return redo;	
 								};
-							};						
+							};	
 
 							return selectAsTransition() ? redo : redo() && undefined;
 						}
@@ -937,7 +937,7 @@
 						ui.scrollIntoView( $( 'TR.active:first').next(), true);
 						*/
 						if( oldSelection!==newSelection) {
-							function redo() {
+							var redo = function() {
 								self.selection( newSelection);
 								ui.scrollIntoView( $( 'TR.active:first').next(), true);
 								
@@ -947,7 +947,7 @@
 
 									return redo;	
 								};
-							};						
+							};	
 							return selectAsTransition() ? redo : redo() && undefined;
 						}
 					}).options( {
@@ -971,7 +971,7 @@
 							ui.scrollIntoView( $( 'TR.active:first').prev());						
 						*/
 						if( oldSelection!==newSelection) {
-							function redo() {
+							var redo = function() {
 								self.selection( newSelection);
 								ui.scrollIntoView( $( 'TR.active:first').prev());
 								
@@ -981,7 +981,7 @@
 
 									return redo;	
 								};
-							};						
+							};	
 							return selectAsTransition() ? redo : redo() && undefined;
 						}
 					}).options( {
@@ -1005,7 +1005,7 @@
 							ui.scrollIntoView( $( 'TR.item:first'));
 						*/
 						if( oldSelection!==newSelection) {
-							function redo() {
+							var redo = function() {
 								self.selection( newSelection);
 								ui.scrollIntoView( $( 'TR.item:first'));
 								
@@ -1015,8 +1015,7 @@
 
 									return redo;	
 								};
-							};						
-
+							};
 							return selectAsTransition() ? redo : redo() && undefined;
 						}
 					}).options( {
@@ -1039,7 +1038,7 @@
 							ui.scrollIntoView( $( 'TR.item:last'));
 						*/
 						if( oldSelection!==newSelection) {
-							function redo() {
+							var redo = function() {
 								self.selection( newSelection);
 								ui.scrollIntoView( $( 'TR.item:last'));
 								
@@ -1049,8 +1048,7 @@
 
 									return redo;	
 								};
-							};						
-
+							};
 							return selectAsTransition() ? redo : redo() && undefined;
 						}
 					}).options({
