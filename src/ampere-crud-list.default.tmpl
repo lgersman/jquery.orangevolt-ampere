@@ -24,7 +24,8 @@
 		<tr
 			ng-init="$.inArray( list.selection(), list.get())!=-1 || list.selection( $window.ov.entity.first( list.get()))"
 			ng-repeat="item in (list.rows = (list.get() | filter:list.filter() | orderBy:(!list.sortable().delegated) && list.sortable().orderBy:list.sortable().reverse))"
-			ng-mousedown="(!list.addable() || list.addable().item==undefined) && (!list.editable() || list.editable().item==undefined) && list.selection( item)"
+			nng-mousedown="(!list.addable() || list.addable().item==undefined) && (!list.editable() || list.editable().item==undefined) && list.selection( item)"
+			ng-ampere-mousedown="list.transitions.select"
 			ng-class="{
 				item							: (!list.editable() || list.editable().item!=item) && (!list.addable() || list.addable().item!=item),
 				active							: list.selection()==item,

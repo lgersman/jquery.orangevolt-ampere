@@ -25,7 +25,7 @@
 		</form>
 		
 		<form class="navbar-form pull-right">
-			<select ng-disabled="list.getEditingContext()" onchange="this.blur()" tabindex="-1" style="width:6em" ng-model="paginator.options().itemCountPerPage" ng-options="(n || 'All (' + paginator.get().length + ')') for n in [ 5, 10, 20, 50, 100, 0]"></select>
+			<select ng-disabled="list.getEditingContext()" onchange="this.blur()" tabindex="-1" style="width:6em" ng-model="paginator.options().itemCountPerPage" ng-options="(n || 'All (' + paginator.getPageItems().length + ')') for n in [ 5, 10, 20, 50, 100, 0]"></select>
 			&nbsp;
 		</form>
 

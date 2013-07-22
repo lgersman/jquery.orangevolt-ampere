@@ -65,3 +65,7 @@ http://www.w3schools.com/cssref/sel_empty.asp
 
 * splash screen for android sample
 http://www.dzone.com/links/r/note_about_phonegap_build_and_splash_screens.html
+
+* deferred / promise identifier
+* exception -> deferred wrapper 
+* any2deferred

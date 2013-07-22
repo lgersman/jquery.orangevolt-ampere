@@ -164,7 +164,7 @@ state.list.options()['list-item-dblclick'] = (function( orig) {
 ** remove action : option "confirm.message" can now also be a function (this===list instance) 
 ** addable/removeable/editable transitions "redo.message", "undo.message" can now also be a function (this===list instance) 
 
-* crud table, crud paginator : both directives will write property "$element" to its models containing a query instance pointing to the real html view
+* crud table, crud paginator : both directives will write property "element" to its models containing a query instance pointing to the real html view
 
 * crud paginator : overall setter/getter "enabled" taking a function as argument or returning the current enabled getter function added. the given enabled function gets a paginator transition as argument returning if this transition is enabled or not when called. this context is the paginator.
 example usage : 
@@ -174,12 +174,12 @@ paginator.enabled( function( transition) {
 });
 ...
 
-* state option "ampere.history.html5.hash" added. 
+* state option "ampere.history.html5.route" added. 
 
 function value is expected to return the hash to append to the current document location. "this" context is the state.if function is called with an argument (a hash string) its expected to return either a function proceeding to the given state and data or false/undefined/null for signalling that this state is not responsible to handle this hash.
 
 ...
-state.option({ 'ampere.history.html5.hash' : function( hash) {
+state.option({ 'ampere.history.html5.route' : function( hash) {
 		if( arguments.length) {
 				// return function to proceed to state if has matches #person/<id>
 			var matches = hash.match( /^person(\/(\d+))?$/);
@@ -227,3 +227,23 @@ the event handler arguments are ( event, transitionDeferred, action, source, tar
 the transitionDeferred handler context is the module. in case the transition succeeds the success handler argument is the previous view. the error handler arguments are the error arguments (xhr, throwable, whatever)
 
 * controller.proceed( transition) now returns a deferred tracking the completeness of the state/view switching whenever a transition gets executed.  
+
+* crud table : all hotkey functions (up/down/home/end) are now true transitions. selection is now also backed by a true transition. all crud table transitions are now accessible by associative array table.transitions
+
+* crud table : option "list-select-as-transition" can be set to true or a function (returning the option value) to configure if select operations (up/down/home/end and mouse click on a row) should be executed as transition.
+
+* twitter bootstrap theme  : class "jiggle" can be applied to transition buttons/anchors to have the jiggle animation applied. animation gets only in action when the transition is enabled.
+
+* twitter bootstrap theme : new transition option "ampere.ui.class" added. Using this option you can apply css classes in an abstract way to the rendered transition representation. if value is a function it is called with this=transition and first argument=transition
+
+* event "ampere.angular-scope-changed" added. this event is triggered whenever angular reevaluated the DOM
+example usage:
+	// sync "filter-empty" css marker class in search inputs
+	// this is used to highlight filter inputs to signal that a filter is active
+module.on( "ampere.angular-scope-changed", function( event, scope) {
+	$(':text.search-query').each( function() { 
+		$( this)
+		[ this.value ? 'removeClass' : 'addClass']( 'filter-empty')
+		.attr( 'title', this.value ? 'List is filtered. Reset filter to see all items.' : null);
+	});
+});

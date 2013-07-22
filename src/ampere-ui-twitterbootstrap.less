@@ -83,35 +83,89 @@
 		overflow : auto;
 	}
 
-	.glow( @color: #005580) {
-		animation: glow 2s infinite;			
-		-moz-animation: glow 2s infinite;
-		-webkit-animation: glow 2s infinite;
-
+	.glow-keyframes( @glow_color) {
 		@keyframes glow {
 			0% { text-shadow: none; }
-			50% { text-shadow: 0 0 2px saturate( @color, 50%), 0 0 8px @color; }
+			50% { text-shadow: 0 0 2px saturate( @glow_color, 50%), 0 0 8px @glow_color; }
 			100% { text-shadow: none; }
 		}
 
 		@-moz-keyframes glow {
 			0% { text-shadow: none; }
-			50% { text-shadow: 0 0 2px saturate( @color, 50%), 0 0 8px @color; }
+			50% { text-shadow: 0 0 2px saturate( @glow_color, 50%), 0 0 8px @glow_color; }
 			100% { text-shadow: none; }
 		}
 
 		@-webkit-keyframes glow {
 			0% { text-shadow: none; }
-			50% { text-shadow: 0 0 2px saturate( @color, 50%), 0 0 8px @color; }
+			50% { text-shadow: 0 0 2px saturate( @glow_color, 50%), 0 0 8px @glow_color; }
 			100% { text-shadow: none; }
 		}
 	}
 
-	BUTTON.ampere-transition:not(.disabled),
-	A.ampere-transition:not(.disabled),
-	LI >A.ampere-transition:not(.disabled) {
+	.glow( @glow_color: #005580, @glow_duration : 2s) {
+		animation: glow @glow_duration infinite;			
+		-moz-animation: glow @glow_duration infinite;
+		-webkit-animation: glow @glow_duration infinite;
+
+		.glow-keyframes( @glow_color);
+	}
+
+	.jiggle-keyframes( @jiggle_degree) {
+		@keyframes jiggle {
+			0% { transform: rotate(0); } 
+			66% { transform: rotate(0); }
+    		83% { transform: rotate( -@jiggle_degree); }
+    		100% { transform: rotate( @jiggle_degree); }
+		}
+
+		@-moz-keyframes jiggle {
+			0% { -moz-transform: rotate(0); } 
+			66% { -moz-transform: rotate(0); }
+    		83% { -moz-transform: rotate( -@jiggle_degree); }
+    		100% { -moz-transform: rotate( @jiggle_degree); }
+		}
+
+		@-webkit-keyframes jiggle {
+			0% { -webkit-transform: rotate(0); } 
+			66% { -webkit-transform: rotate(0); }
+    		83% { -webkit-transform: rotate( -@jiggle_degree); }
+    		100% { -webkit-transform: rotate( @jiggle_degree); }
+		}
+	}
+
+	.jiggle( @jiggle_degree: 4deg, @jiggle_duration : 1s) {
+		animation: jiggle @jiggle_duration infinite alternate;			
+		-moz-animation: jiggle @jiggle_duration infinite alternate;
+		-webkit-animation: jiggle @jiggle_duration infinite alternate;
+
+		.jiggle-keyframes( @jiggle_degree);
+	}
+
+	.jiggle-glow( @jiggle_degree: 4deg, @jiggle_duration : 1s, @glow_color: #005580, @glow_duration : 2s) {
+		animation: jiggle @jiggle_duration infinite alternate, glow @glow_duration infinite;			
+		-moz-animation: jiggle @jiggle_duration infinite alternate, glow @glow_duration infinite;
+		-webkit-animation: jiggle @jiggle_duration infinite alternate, glow @glow_duration infinite;
+
+		.jiggle-keyframes( @jiggle_degree);
+		.glow-keyframes( @glow_color);
+	}
+
+	BUTTON.ampere-transition:not(.disabled):not(.active),
+	A.ampere-transition:not(.disabled):not(.active),
+	LI >A.ampere-transition:not(.disabled):not(.active)  {
 		&.glow {
-			.glow( #f89406)
+			.glow( #f89406);
+		}
+
+		&.jiggle {
+			display : inline-block;		// only needed for anchor to make rotate having an effect
+			.jiggle();
+		}
+
+		&.jiggle.glow {
+			display : inline-block;		// only needed for anchor to make rotate having an effect
+			.jiggle-glow( @glow_color : #f89406);
 		}
 	}
 

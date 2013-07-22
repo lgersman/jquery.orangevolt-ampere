@@ -217,12 +217,15 @@
 								html5_history_hash++;
 								var uri = window.location.pathname;
 
-								var stateOptionHistoryHTML5Hash = module.current().state.options( 'ampere.history.html5.hash');
-								if( stateOptionHistoryHTML5Hash) {
-									if( $.isFunction( stateOptionHistoryHTML5Hash)) {
-										stateOptionHistoryHTML5Hash = stateOptionHistoryHTML5Hash.call( module.current().state);
+								var route = module.current().state.options( 'ampere.history.html5.route');
+								if( route) {
+									if( $.isFunction( route)) {
+										route = route.call( module.current().state);
+										if( route===undefined && route===null) {
+											route = '';
+										}
 									}
-									uri += '#' + stateOptionHistoryHTML5Hash;
+									uri += '#' + route;
 								}
 
 								window.history.pushState( html5_history_hash, document.title, uri);
@@ -888,41 +891,53 @@
 
 				$.when( result, historyReady)
 				.done( function() {
-					var previous = module.current();
+						// ATTENTION : module.current returns always the same object (but with different values)
+						// -> thats why we clone it.
+					var previous = $.extend( {}, module.current());
 					module.current( target, view);
 					var template = ui && ui.getTemplate( view);
 					template
 					.done( function( data) {
 							// adjust document.title if needed
 						if( module.options( 'ampere.history.html5') && ui) {
-							var stateOptions = module.current().state.options();
+							var stateOptions = target.options();
 							if( Object.hasOwnProperty.call( stateOptions, 'ampere.history.html5.title')) {
 								var historyHTML5Title = stateOptions['ampere.history.html5.title'];
 								document.title = $.isFunction( historyHTML5Title) 
-									? historyHTML5Title.call( module.current().state) 
+									? historyHTML5Title.call( target) 
 									: historyHTML5Title.toString()
 								;
 							} else {
-								document.title = ui.getCaption( module.current().state);
+								document.title = ui.getCaption( target);
 							}
 						} else {
 							debugger
 						}
+						/*
+						if( previous.state===target && previous.view===view) {
+							ui.update();
+						} else*/ {
+								// render view
+							if( data instanceof HTMLElement) {
+								data = $( data);
+							}
+							template = data.jquery ? (data[0].tagName=='SCRIPT' ? data.text().replace( "<![CDATA[", "").replace("]]>", "") : data) : template.responseText || data;
 
-							// render view
-						if( data instanceof HTMLElement) {
-							data = $( data);
+							ui && ui.render( 'State', view, template, result);
 						}
-						template = data.jquery ? (data[0].tagName=='SCRIPT' ? data.text().replace( "<![CDATA[", "").replace("]]>", "") : data) : template.responseText || data;
 
-						ui && ui.render( 'State', view, template, result);
+							// we need to resolve the transition deferred 
+							// within a done handler to ensure that it is executed
+							// AFTER the done handler possibly attached by renderState
+							// (for rendering the flash as example)
+						$.when( result).done( function() {
+								// broadcast ampere.view-changed event
+							self.trigger( "ampere.view-changed", [ previous.view]);
 
-							// broadcast ampere.view-changed event
-						self.trigger( "ampere.view-changed", [ previous.view]);
+							transitionDeferred.resolveWith( module, [ previous.view]);
 
-						transitionDeferred.resolveWith( module, [ previous.view]);
-
-						ui && ui.unblock();
+							ui && ui.unblock();
+						});
 					})
 					.fail( errorHandler);
 				})
@@ -1128,15 +1143,21 @@
 				var names = Object.keys( module.states);
 				for( var i=0; i<names.length; i++) {
 					var state = module.states[ names[i]],
-						html5Hash = state.options( 'ampere.history.html5.hash') || $.noop;
+						html5Hash = state.options( 'ampere.history.html5.route') || $.noop;
 
 					if( handler = html5Hash.call( state, hash)) {
 						break;
 					}
 				}
 
-				var controller = this;
-				return $.when( handler && $.isFunction( handler) && handler.call( controller))
+				var controller = this, deferred = $.Deferred();
+				if( handler && $.isFunction( handler)) {
+					deferred = handler.call( controller);
+				} else {
+					deferred.reject( 'no matching deeplink route found.');
+				}
+
+				return $.when( deferred)
 				.done( function() {
 					controller.ui.update();
 				});
@@ -1641,7 +1662,7 @@
 					if( command===true || !command) {
 							// (heavyweight refresh) command == true forces a full template update
 							// (lightweight refresh) command == false reevaluates based on the current dom structure
-						this.ui.render( 'State', command===true && this.module.current().view);
+						command!==false && this.ui.render( 'State', command===true && this.module.current().view);
 					} else {
 							/*
 							 * when action returned a function -> wrap it within a deferred
