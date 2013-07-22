@@ -2,7 +2,7 @@
  * jQuery Orangevolt Ampere
  *
  * version : 0.2.0
- * created : 2013-06-14
+ * created : 2013-07-22
  * source  : https://github.com/lgersman/jquery.orangevolt-ampere
  *
  * author  : Lars Gersmann (lars.gersmann@gmail.com)
@@ -494,8 +494,9 @@
 				this.name = function() {
 					return prefix + '(' + state.name() + '.' + stateProperty + ')';
 				};
+				this.transitions = {};
 
-				var self = this;
+				var self = this;				
 
 					// install transitions if needed into state
 				if( this.draggable()) {
@@ -508,8 +509,8 @@
 					}
 
 					if( !draggable.transition) {
-						draggable.transition = state.transition( state.name() + '.' + stateProperty + '.list_move').
-						action( function( transition, ui, data) {
+						self.transitions.move = draggable.transition = state.transition( state.name() + '.' + stateProperty + '.list_move')
+						.action( function( transition, ui, data) {
 								// data[0] is the event
 							var event = data[0],
 								dTR = event.data.items[0],
@@ -594,7 +595,7 @@
 					}
 
 					if( !editable.transition) {
-						editable.transition = state.transition( state.name() + '.' + stateProperty + '.list_editable')
+						self.transitions.edit = editable.transition = state.transition( state.name() + '.' + stateProperty + '.list_editable')
 						.enabled( function() {
 							return self.selection()!==undefined && editable.item===undefined;
 						})
@@ -720,7 +721,7 @@
 					}
 
 					if( !addable.transition) {
-						addable.transition = state.transition( state.name() + '.' + stateProperty + '.list_addable')
+						self.transitions.add = addable.transition = state.transition( state.name() + '.' + stateProperty + '.list_addable')
 						.enabled( function() {
 							return addable.item===undefined;
 						})
@@ -836,7 +837,7 @@
 					var fn = removable.callback;
 
 					if( !removable.transition || $.isFunction( removable.transition)) {
-						removable.transition = state.transition( state.name() + '.' + stateProperty + '.list_remove')
+						self.transitions.remove = removable.transition = state.transition( state.name() + '.' + stateProperty + '.list_remove')
 						.enabled( function() {
 								// disabled if addable or editable active
 							 return (!self.addable() || self.addable().item===undefined) && (!self.editable() || self.editable().item===undefined) && self.selection()!==undefined;
@@ -886,8 +887,44 @@
 					$.isFunction( fn) && fn.call( removable, removable);
 				}
 
+				var selectAsTransition = function() {
+					var value = self.options( 'list-select-as-transition');
+					return $.isFunction( value) && value.call( self) || value;
+				};
+
 				if( this.selectable()) {
 					var selectable = this.selectable();
+
+					self.transitions.select = state.transition( state.name() + '.' + stateProperty + '.list_select')
+					.enabled( function() {
+							// disabled if addable or editable active
+							//(!list.addable() || list.addable().item==undefined) && (!list.editable() || list.editable().item==undefined)
+						return !self.getEditingContext();
+						//return (!list.addable() || list.addable().item==undefined) && (!list.editable() || list.editable().item==undefined);
+					})
+					.action( function( transition, ui, data) {
+						var oldSelection = self.selection(),
+							position     = data[0] && $( data[0].currentTarget).data( 'position'), 
+							newSelection = $.isNumeric( position) && self.get().length>position && self.get()[ position] || data.length==2 && data[1];
+
+							// doit nevertheless when the data are not provided as event
+						if( oldSelection!==newSelection || !data[0]) {
+							var redo = function() {
+								self.selection( newSelection);
+																
+								return function undo() {
+									self.selection( oldSelection);
+									
+									return redo;	
+								};
+							};	
+
+							return selectAsTransition() ? redo : redo() && undefined;
+						}
+					}).options( {
+						'ampere.ui.description' : 'Select item by mousedown',
+						'ampere.ui.caption'		: ''
+					});
 
 					state.transition( state.name() + '.' + stateProperty + '.list_down')
 					.enabled( function() {
@@ -895,12 +932,27 @@
 						return !(self.addable() && self.addable().item) && !(self.editable() && self.editable().item);
 					})
 					.action( function( transition, ui, data) {
+						var oldSelection = self.selection(),
+							newSelection = window.ov.entity.next( self.rows, self.selection()) || self.selection();
+
+						/*
 						self.selection( window.ov.entity.next( self.rows, self.selection()) || self.selection());
-
 						ui.scrollIntoView( $( 'TR.active:first').next(), true);
+						*/
+						if( oldSelection!==newSelection) {
+							var redo = function() {
+								self.selection( newSelection);
+								ui.scrollIntoView( $( 'TR.active:first').next(), true);
+								
+								return function undo() {
+									self.selection( oldSelection);
+									ui.scrollIntoView( $( 'TR.active:first').prev());
 
-							// force updating the view by returning true
-						return false;
+									return redo;	
+								};
+							};	
+							return selectAsTransition() ? redo : redo() && undefined;
+						}
 					}).options( {
 						'ampere.ui.description' : 'Next item',
 						'ampere.ui.icon'		: 'icon-down',
@@ -914,11 +966,27 @@
 						return !(self.addable() && self.addable().item) && !(self.editable() && self.editable().item);
 					})
 					.action( function( transition, ui, data) {
-						self.selection( window.ov.entity.prev( self.rows, self.selection()) || self.selection());
+						var oldSelection = self.selection(),
+							newSelection = window.ov.entity.prev( self.rows, self.selection()) || self.selection();
 
-						ui.scrollIntoView( $( 'TR.active:first').prev());
-							// force updating the view by returning true
-						return false;
+						/*
+							self.selection( window.ov.entity.prev( self.rows, self.selection()) || self.selection());
+							ui.scrollIntoView( $( 'TR.active:first').prev());						
+						*/
+						if( oldSelection!==newSelection) {
+							var redo = function() {
+								self.selection( newSelection);
+								ui.scrollIntoView( $( 'TR.active:first').prev());
+								
+								return function undo() {
+									self.selection( oldSelection);
+									ui.scrollIntoView( $( 'TR.active:first').next(), true);							
+
+									return redo;	
+								};
+							};	
+							return selectAsTransition() ? redo : redo() && undefined;
+						}
 					}).options( {
 						'ampere.ui.description' : 'Previous item',
 						'ampere.ui.icon'		: 'icon-down',
@@ -932,12 +1000,27 @@
 						return !(self.addable() && self.addable().item) && !(self.editable() && self.editable().item);
 					})
 					.action( function( transition, ui, data) {
-						self.selection( window.ov.entity.first( self.rows, self.selection()) || self.selection());
+						var oldSelection = self.selection(),
+							newSelection = window.ov.entity.first( self.rows, self.selection()) || self.selection();
 
-						ui.scrollIntoView( $( 'TR.item:first'));
+						/*
+							self.selection( window.ov.entity.first( self.rows, self.selection()) || self.selection());
+							ui.scrollIntoView( $( 'TR.item:first'));
+						*/
+						if( oldSelection!==newSelection) {
+							var redo = function() {
+								self.selection( newSelection);
+								ui.scrollIntoView( $( 'TR.item:first'));
+								
+								return function undo() {
+									self.selection( oldSelection);
+									ui.scrollIntoView( $( 'TR.active:first'), true);
 
-							// force updating the view by returning true
-						return false;
+									return redo;	
+								};
+							};
+							return selectAsTransition() ? redo : redo() && undefined;
+						}
 					}).options( {
 						'ampere.ui.description' : 'First item',
 						'ampere.ui.caption'		: 'Home',
@@ -950,12 +1033,27 @@
 						return !(self.addable() && self.addable().item) && !(self.editable() && self.editable().item);
 					})
 					.action( function( transition, ui, data) {
-						self.selection( window.ov.entity.last( self.rows, self.selection()) || self.selection());
+						var oldSelection = self.selection(),
+							newSelection = window.ov.entity.last( self.rows, self.selection()) || self.selection();
 
-						ui.scrollIntoView( $( 'TR.item:last'));
+						/*
+							self.selection( window.ov.entity.last( self.rows, self.selection()) || self.selection());
+							ui.scrollIntoView( $( 'TR.item:last'));
+						*/
+						if( oldSelection!==newSelection) {
+							var redo = function() {
+								self.selection( newSelection);
+								ui.scrollIntoView( $( 'TR.item:last'));
+								
+								return function undo() {
+									self.selection( oldSelection);
+									ui.scrollIntoView( $( 'TR.active:first'));
 
-							// force updating the view by returning true
-						return false;
+									return redo;	
+								};
+							};
+							return selectAsTransition() ? redo : redo() && undefined;
+						}
 					}).options({
 						'ampere.ui.description' : 'Last item',
 						'ampere.ui.caption'		: 'End',
@@ -975,7 +1073,11 @@
 		'list-nomatches.message': 'No item matches filter.',
 		'list-item-dblclick'    : function() {
 			return (this.editable() && this.editable().transition) || false;
-		}
+		},
+			// make list selections behave as transitions
+			// if value is a function it gets called and the 
+			// returned value is evaluated
+		'list-select-as-transition' : false
 	};
 
 	window.ov.ampere.crud.list.angular = function( angularModule) {
@@ -1023,6 +1125,8 @@
 							var replacement = f( scope);
 
 							element.replaceWith( replacement);
+
+							listController.element = replacement;
 						}
 					});
 				}
@@ -1130,7 +1234,7 @@
 				}
 
 					return filtered;
-				};
+			};
 
 				/**
 				 * @return return all items of the current page
@@ -1190,6 +1294,20 @@
 			this.gotoNextPageRange = propertyWrapper();
 			this.gotoLastPage = propertyWrapper();
 
+				// getter / setter for enablement
+			this.enabled = (function() {
+				var current = $.noop;
+
+				return function( value) {
+					if( arguments.length) {
+						current = value; 
+						return this;
+					} else {
+						return current;
+					}
+				};
+			})();
+
 			this.init = function( state) {
 				_ns.assert( window.ov.ampere.type( state)=='state', 'expected to be attached to a state but was attached to a "', window.ov.ampere.type( state), '"');
 
@@ -1217,7 +1335,8 @@
 						self.currentPageNumber( 1);
 					}) 
 					.enabled( function() {
-						return self.currentPageNumber()>1;
+						var enabled = self.enabled().call( self, transition);
+						return (enabled===undefined || enabled)  && self.currentPageNumber()>1;
 					})
 					.options({
 						'ampere.ui.caption'     : self.options( 'firstpage.caption'),
@@ -1236,7 +1355,8 @@
 						self.currentPageNumber( Math.max( self.currentPageNumber()-self.options( 'pageRange'), 1));
 					}) 
 					.enabled( function() {
-						return self.currentPageNumber()>1;
+						var enabled = self.enabled().call( self, transition);
+						return (enabled===undefined || enabled) && self.currentPageNumber()>1;
 					})
 					.options({
 						'ampere.ui.caption'     : self.options( 'prevpagerange.caption'),
@@ -1255,7 +1375,8 @@
 						 self.currentPageNumber( self.currentPageNumber()-1);
 					})
 					.enabled( function() {
-						return self.currentPageNumber()>1;
+						var enabled = self.enabled().call( self, transition);
+						return (enabled===undefined || enabled) && self.currentPageNumber()>1;
 					}) 
 					.options({
 						'ampere.ui.caption'     : self.options( 'prevpage.caption'),
@@ -1276,6 +1397,10 @@
 
 						self.currentPageNumber( page);	
 					})
+					.enabled( function() {
+						var enabled = self.enabled().call( self, transition);
+						return (enabled===undefined || enabled);
+					})
 					.options({
 						'ampere.ui.caption'     : self.options( 'page.caption'),
 						'ampere.ui.description' : self.options( 'page.description'),
@@ -1293,7 +1418,8 @@
 						self.currentPageNumber( self.currentPageNumber()+1);	
 					})
 					.enabled( function() {
-						return self.currentPageNumber() < self.getPageCount(); 
+						var enabled = self.enabled().call( self, transition);
+						return (enabled===undefined || enabled) && (self.currentPageNumber() < self.getPageCount()); 
 					}) 
 					.options({
 						'ampere.ui.caption'     : self.options( 'nextpage.caption'),
@@ -1317,7 +1443,8 @@
 						'ampere.ui.icon'        : self.options( 'nextpagerange.icon')
 					}) 
 					.enabled( function() {
-						return self.currentPageNumber() < self.getPageCount(); 
+						var enabled = self.enabled().call( self, transition);
+						return (enabled===undefined || enabled) && (self.currentPageNumber() < self.getPageCount()); 
 					});
 
 					cb.call( self, transition);
@@ -1336,7 +1463,8 @@
 						'ampere.ui.icon'		: self.options( 'lastpage.icon')
 					}) 
 					.enabled( function() {
-						return self.currentPageNumber() < self.getPageCount(); 
+						var enabled = self.enabled().call( self, transition);
+						return (enabled===undefined || enabled) && (self.currentPageNumber() < self.getPageCount()); 
 					});
 
 					cb.call( self, transition);
@@ -1406,6 +1534,8 @@
 							var replacement = f( scope);
 
 							element.replaceWith( replacement);
+
+							paginatorController.element = replacement;
 						}
 					});
 				}

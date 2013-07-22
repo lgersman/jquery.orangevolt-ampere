@@ -2,7 +2,7 @@
  * jQuery Orangevolt Ampere
  *
  * version : 0.2.0
- * created : 2013-06-14
+ * created : 2013-07-22
  * source  : https://github.com/lgersman/jquery.orangevolt-ampere
  *
  * author  : Lars Gersmann (lars.gersmann@gmail.com)
@@ -277,12 +277,145 @@
   padding: 2px 4px;
   overflow: auto;
 }
-.ampere-app BUTTON.ampere-transition:not(.disabled).glow,
-.ampere-app A.ampere-transition:not(.disabled).glow,
-.ampere-app LI > A.ampere-transition:not(.disabled).glow {
+.ampere-app BUTTON.ampere-transition:not(.disabled):not(.active).glow,
+.ampere-app A.ampere-transition:not(.disabled):not(.active).glow,
+.ampere-app LI > A.ampere-transition:not(.disabled):not(.active).glow {
   animation: glow 2s infinite;
   -moz-animation: glow 2s infinite;
   -webkit-animation: glow 2s infinite;
+}
+@keyframes glow {
+  0% {
+    text-shadow: none;
+  }
+  50% {
+    text-shadow: 0 0 2px #fe9500, 0 0 8px #f89406;
+  }
+  100% {
+    text-shadow: none;
+  }
+}
+@-moz-keyframes glow {
+  0% {
+    text-shadow: none;
+  }
+  50% {
+    text-shadow: 0 0 2px #fe9500, 0 0 8px #f89406;
+  }
+  100% {
+    text-shadow: none;
+  }
+}
+@-webkit-keyframes glow {
+  0% {
+    text-shadow: none;
+  }
+  50% {
+    text-shadow: 0 0 2px #fe9500, 0 0 8px #f89406;
+  }
+  100% {
+    text-shadow: none;
+  }
+}
+.ampere-app BUTTON.ampere-transition:not(.disabled):not(.active).jiggle,
+.ampere-app A.ampere-transition:not(.disabled):not(.active).jiggle,
+.ampere-app LI > A.ampere-transition:not(.disabled):not(.active).jiggle {
+  display: inline-block;
+  animation: jiggle 1s infinite alternate;
+  -moz-animation: jiggle 1s infinite alternate;
+  -webkit-animation: jiggle 1s infinite alternate;
+}
+@keyframes jiggle {
+  0% {
+    transform: rotate(0);
+  }
+  66% {
+    transform: rotate(0);
+  }
+  83% {
+    transform: rotate(-4deg);
+  }
+  100% {
+    transform: rotate(4deg);
+  }
+}
+@-moz-keyframes jiggle {
+  0% {
+    -moz-transform: rotate(0);
+  }
+  66% {
+    -moz-transform: rotate(0);
+  }
+  83% {
+    -moz-transform: rotate(-4deg);
+  }
+  100% {
+    -moz-transform: rotate(4deg);
+  }
+}
+@-webkit-keyframes jiggle {
+  0% {
+    -webkit-transform: rotate(0);
+  }
+  66% {
+    -webkit-transform: rotate(0);
+  }
+  83% {
+    -webkit-transform: rotate(-4deg);
+  }
+  100% {
+    -webkit-transform: rotate(4deg);
+  }
+}
+.ampere-app BUTTON.ampere-transition:not(.disabled):not(.active).jiggle.glow,
+.ampere-app A.ampere-transition:not(.disabled):not(.active).jiggle.glow,
+.ampere-app LI > A.ampere-transition:not(.disabled):not(.active).jiggle.glow {
+  display: inline-block;
+  animation: jiggle 1s infinite alternate, glow 2s infinite;
+  -moz-animation: jiggle 1s infinite alternate, glow 2s infinite;
+  -webkit-animation: jiggle 1s infinite alternate, glow 2s infinite;
+}
+@keyframes jiggle {
+  0% {
+    transform: rotate(0);
+  }
+  66% {
+    transform: rotate(0);
+  }
+  83% {
+    transform: rotate(-4deg);
+  }
+  100% {
+    transform: rotate(4deg);
+  }
+}
+@-moz-keyframes jiggle {
+  0% {
+    -moz-transform: rotate(0);
+  }
+  66% {
+    -moz-transform: rotate(0);
+  }
+  83% {
+    -moz-transform: rotate(-4deg);
+  }
+  100% {
+    -moz-transform: rotate(4deg);
+  }
+}
+@-webkit-keyframes jiggle {
+  0% {
+    -webkit-transform: rotate(0);
+  }
+  66% {
+    -webkit-transform: rotate(0);
+  }
+  83% {
+    -webkit-transform: rotate(-4deg);
+  }
+  100% {
+    -webkit-transform: rotate(4deg);
+  }
 }
 @keyframes glow {
   0% {

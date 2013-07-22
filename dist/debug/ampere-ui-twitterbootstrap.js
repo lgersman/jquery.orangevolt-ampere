@@ -2,7 +2,7 @@
  * jQuery Orangevolt Ampere
  *
  * version : 0.2.0
- * created : 2013-06-14
+ * created : 2013-07-22
  * source  : https://github.com/lgersman/jquery.orangevolt-ampere
  *
  * author  : Lars Gersmann (lars.gersmann@gmail.com)
@@ -114,6 +114,20 @@
 			return function( items, property) {
 				return Object.keys( items);
 			};
+		});
+
+			/**
+			 * decorate $exception handler
+			 * 
+			 * see http://stackoverflow.com/questions/13595469/how-to-override-exceptionhandler-implementation	
+			 */ 
+		ampere.config( function( $provide) {
+			$provide.decorator("$exceptionHandler", function($delegate) {
+				return function(exception, cause) {
+					$delegate( exception, cause);
+					// do your own stuff here
+				};
+			});
 		});
 
 		var ampereTwitterbootstrapController = function( $scope, $rootElement, $window, $http, $timeout,  $log, $resource, $cookies/*, $location*/) {
@@ -260,6 +274,8 @@
 							_ns.debug( 'broadcast ampere-model-changed ( ', changeset, ', ', toDelete, ')');
 							scope.$root.$broadcast( 'ampere-model-changed', changeset, toDelete);
 						}
+
+						scope.$ampere.module.trigger( "ampere.angular-scope-changed", [ scope]);
 					});
 				}
 			};
@@ -268,7 +284,7 @@
 		ampere.directive( 'ngAmpereTransition', [ '$compile', '$parse', '$window', function( $compile, $parse, $window) {
 			var templates = {
 				'a'     : '<a href="javascript:void(0)"\
- class="ampere-transition name-{{transition.name()}} {{attrs.class}}"\
+ class="ampere-transition name-{{transition.name()}} {{attrs.class}} {{$css()}}"\
  ng-class="{disabled : !transition.enabled(), active : transition.active(), \'ampere-hotkey\' : hotkey}"\
  accesskey="{{attrs.accesskey}}"\
  id="{{attrs.id}}"\
@@ -282,7 +298,7 @@
 </a>',
 				'button' : '<button type="button"\
  ng-disabled="!transition.enabled()"\
- class="ampere-transition name-{{transition.name()}} btn {{attrs.class}}"\
+ class="ampere-transition name-{{transition.name()}} btn {{attrs.class}} {{$css()}}"\
  ng-class="{disabled : !transition.enabled(), active : transition.active(), \'ampere-hotkey\' : hotkey}"\
  ng-disabled="!transition.enabled()"\
  id="{{attrs.id}}"\
@@ -298,7 +314,7 @@
 				'file' : '<button type="button"\
  onclick="$( this).next().click()"\
  ng-disabled="!transition.enabled()"\
- class="ampere-transition name-{{transition.name()}} btn ampere-transition-companion {{attrs.class}}"\
+ class="ampere-transition name-{{transition.name()}} btn ampere-transition-companion {{attrs.class}} {{$css()}}"\
  ng-class="{disabled : !transition.enabled(), active : transition.active(), \'ampere-hotkey\' : hotkey}"\
  ng-disabled="!transition.enabled()"\
  accesskey="{{attrs.accesskey}}"\
@@ -320,7 +336,7 @@
 >',
 				'submit' : '<button type="submit"\
  ng-disabled="!transition.enabled()"\
- class="ampere-transition name-{{transition.name()}} btn {{attrs.class}}"\
+ class="ampere-transition name-{{transition.name()}} btn {{attrs.class}}  {{$css()}}"\
  ng-class="{disabled : !transition.enabled(), active : transition.active(), \'ampere-hotkey\' : hotkey}"\
  ng-disabled="!transition.enabled()"\
  id="{{attrs.id}}"\
@@ -335,7 +351,7 @@
 </button>',
 				'reset' : '<button type="reset"\
  ng-disabled="!transition.enabled()"\
- class="ampere-transition name-{{transition.name()}} btn {{attrs.class}}"\
+ class="ampere-transition name-{{transition.name()}} btn {{attrs.class}}  {{$css()}}"\
  ng-class="{disabled : !transition.enabled(), active : transition.active(), \'ampere-hotkey\' : hotkey}"\
  ng-disabled="!transition.enabled()"\
  accesskey="{{attrs.accesskey}}"\
@@ -393,6 +409,11 @@
 
 						scope.transition = newValue;
 						scope.$enabled = scope.transition.enabled();
+						scope.$css = (function( value) {
+							return function() {
+								return $.isFunction( value) ? value.call( this, this) : value;
+							};
+						})( scope.transition.options( 'ampere.ui.class'));	
 
 						_ns.assert(
 							window.ov.ampere.type( scope.transition)=='transition',
@@ -455,9 +476,10 @@
 							} else if( transition!==false) {
 								_ns.error( 'attribute "ng-ampere-' + eventName + '" (=' +  attrs[ directive] + ') doesnt resolve to an ampere transition');
 							}
-							event.preventDefault();
-							event.stopPropagation();
-							event.stopImmediatePropagation();
+							//event.preventDefault();
+							//event.stopPropagation();
+							//event.stopImmediatePropagation();
+							
 						});
 					}
 				};
@@ -466,6 +488,8 @@
 		eventDirective( 'change');
 		eventDirective( 'click');
 		eventDirective( 'dblclick');
+		eventDirective( 'mousedown');
+		eventDirective( 'mouseup');
 
 		ampere.directive( 'ngAmpereDrop', [ function() {
 			var _ns = $.ov.namespace( 'ngAmpereDrop');
@@ -539,7 +563,13 @@
 							} else {
 								transition( null, ui, [ event]);
 							}
-						}
+						}/*,
+						start : function( event, ui ) {
+							if( window.ov.ampere.type( transition)=='transition' && !transition.enabled()) {
+								$( element.get()).sortable( "disable" );								
+							}
+						} 
+						*/
 					};
 
 					var options = $.extend( {}, OPTIONS);
@@ -583,6 +613,9 @@
 
 						// ATTENTION : $timeout is no more needed an may have side effects (scope.$apply is called at end of timeout) !!!
 					$timeout = function( f) {
+						//scope.$ampere.module.once( 'ampere.view-changed', function() {
+						//	f();
+						//});
 						f();
 					};
 					$timeout( function() {
@@ -599,17 +632,21 @@
 							$( options.items, element.get()).addClass( 'draghandle');
 						}
 
+						
+							//THIS SEEMS TO BE NO MORE NEEDED						
+						
 							// if transition is not just a function but a true transition
 							// suppress drag start if transition is disabled
 						(window.ov.ampere.type( transition)=='transition') && $( element.get()).on( 'mousedown', options.items, function( event) {
 							if( !transition.enabled()) {
-								event.preventDefault();
-								event.stopPropagation();
+								//event.preventDefault();
+								//event.stopPropagation();
 								event.stopImmediatePropagation();
 
-								return false;
+								//return false;
 							}
 						});
+						
 
 						var sortable = $( element.get()).sortable( options);
 
@@ -674,21 +711,19 @@
 					function wrap( fn, property) {
 						return function( scope) {
 							var state = (arguments.length==1 ? scope : arguments[2]).$ampere.module.current().state;
-							var args = $.makeArray( arguments);
+							//var args = $.makeArray( arguments);
+							var args = [];
 							if( arguments.length==1) {
 									// watch all call
 
-									// replace scope argument by state
-								args[0] = state;
+								args.push( state);
 							} else {
 									// watch property call
-
-									// remove scope argument
-								args.pop();
-
-								args.unshift( property);
-								args.unshift( state);
+								args.push( state);
+								args.push( property);
 							}
+							args.push( element); 
+
 							fn.apply( scope, args);
 						};
 					}
@@ -748,9 +783,9 @@
 				restrict	: 'A',
 				scope		: false,
 				link		: function( scope, element, attrs) {
-					var contents = element.contents();
+					var contents  = element.contents();
 
-					scope.$watch( attrs.ngAmpereTemplate, function( oldValue, newValue) {
+					scope.$watch( attrs.ngAmpereTemplate, function( newValue, oldValue) {
 						if( newValue) {
 							if( !$.isPlainObject( newValue)) {
 								newValue = {
@@ -758,8 +793,8 @@
 								};
 							}
 
-							element
-							.empty();
+							element.empty();
+
 							var content = window.ov.ampere.util.getTemplate(
 								$.isFunction( newValue.prepend) && newValue.prepend.call( window, window) || newValue.prepend || ''
 							);
@@ -820,25 +855,31 @@
 		 *  http://stackoverflow.com/questions/9179708/replicating-bootstraps-main-nav-and-subnav
 		 */
 	function onBodyscroll() {
-		var subnav = $('.subnav');
+		var subnav = $('.subnav:last');
 		if( !subnav.data( "inBodyScroll")) {
 
 			subnav.data( "inBodyScroll", true);
 			// If was not activated (has no attribute "data-top"
 			if( !subnav.attr('data-top')) {
-					// If already fixed, then do nothing
-					if( subnav.hasClass('subnav-fixed')) {
-							return;
-					}
-					// Remember top position
-					var offset = subnav.offset() || {};
-					subnav.attr('data-top', offset.top);
+				// If already fixed, then do nothing
+				if( subnav.hasClass('subnav-fixed')) {
+						return;
+				}
+				// Remember top position
+				var offset = subnav.offset() || {};
+				subnav.attr('data-top', offset.top);
 			}
 
 			if( $( this).scrollTop() && subnav.attr('data-top') - subnav.outerHeight() <= $(this).scrollTop()) {
-					subnav.addClass('subnav-fixed');
+				subnav.addClass('subnav-fixed');
+					// reset the individual css style to get the value from the css class
+				$( 'body').css( 'padding-top', '');
+				var paddingTop = parseInt( $( 'body').css( 'padding-top') || 0, 10);
+				$( 'body').css( 'padding-top', paddingTop + subnav.height() + 'px');
 			} else {
-					subnav.removeClass('subnav-fixed');
+				subnav.removeClass('subnav-fixed');
+					// remove style
+				$( 'body').css( 'padding-top', '');
 			}
 
 			window.setTimeout( function() {
@@ -962,9 +1003,16 @@
 		}
 
 		function onMessage( event) {
-			var location = event.originalEvent.source.location.href.match( /[^#]+/);
-			if( onMessage.handlers[ location]) {
-				onMessage.handlers[ location]( event.originalEvent.data, event.originalEvent.source);
+				// in case of a cross origin posted message an execptiopn may occur
+			if( !$.isEmptyObject( onMessage.handlers)) {
+				try {
+					var location = event.originalEvent.source.location.href.match( /[^#]+/);
+					if( onMessage.handlers[ location]) {
+						onMessage.handlers[ location]( event.originalEvent.data, event.originalEvent.source);
+					}
+				} catch( ex) {
+
+				}
 			}
 		}
 		onMessage.handlers = {};
@@ -1088,10 +1136,10 @@
 
 						flash.find( '.message').text( 'Error occured : ' + message);
 						if( options.value) {
-							var retry = $('<button class="btn retry"><i class="icon-refresh"></i>Retry</button>');
+							var retry = $('<button class="btn retry"><i class="' + ($.isFunction( options.value) && 'icon-refresh') + '"></i>' + ($.isFunction( options.value) ? 'Retry' : 'Ok') + '</button>');
 							retry.click( function() {
 								flash.hide();
-								options.value();
+								$.isFunction( options.value) && options.value();
 							});
 
 							var cancel = $('<button class="btn"><i></i>Cancel</button>');
@@ -1123,13 +1171,14 @@
 				this.flash.getElement().hide();
 			}
 
-			return  this.flash;
+			return this.flash;
 		};
 		this.flash.getElement = function() {
 			return controller.element.find( '.flash');
 		};
 		this.flash.progress = function( message, progress, deferred) {
-			return self.flash( message || 'Operation in progress ...', {
+				// hide flash if message is undefined
+			return message===undefined  ? self.flash() : self.flash( message || 'Operation in progress ...', {
 				type     : 'progress',
 				value    : progress || '100%',
 				deferred : deferred || self.flash.getElement().data( 'ampere.action-deferred')
@@ -1148,10 +1197,14 @@
 
 		this.block = function() {
 			this.controller.element.addClass( 'overlay').find( '.overlay').addClass( 'block');
+
+			return this;
 		};
 
 		this.unblock = function() {
 			this.controller.element.removeClass( 'overlay').find( '.overlay').removeClass( 'block');
+
+			return this;
 		};
 
 		this.getTemplate = function( view) {
@@ -1199,6 +1252,7 @@
 		};
 
 		this.renderError = function( message, onRetry) {
+			this.refresh();
 			this.flash.error( message, onRetry);
 		};
 
@@ -1236,14 +1290,18 @@
 
 			scope.$$phase || scope.$apply( $.noop);
 
-				// broadcast ampere.view.changed event
-			controller.module.trigger( "ampere.view.updated");
+				// broadcast ampere.view-changed event
+			controller.module.trigger( "ampere.view-updated");
+
+			return this;
 		};
 
 		this.refresh = function() {
 			this.renderState( controller.module.current().view);
-				// broadcast ampere.view.changed event
-			controller.module.trigger( "ampere.view.refreshed");
+				// broadcast ampere.view-changed event
+			controller.module.trigger( "ampere.view-refreshed");
+
+			return this;
 		};
 
 		//var lastView = undefined;
@@ -1264,6 +1322,10 @@
 					 * this case happens for history.reset
 					 */
 				if( view) {
+						// cleanup opened modals whenever a new view gets rendered
+					$('.modal:visible').hide();
+					$('.modal-backdrop').remove();
+
 					scope.$ampere = {
 						module	: controller.module,
 						ui		: controller.ui,
@@ -1304,7 +1366,11 @@
 				//onBodyscroll();
 
 				if( /*arguments.length==1 &&*/ typeof( arguments[0])=='string') {
+						// display flash message
 					self.flash( arguments[0]);
+				} else {
+						// hide flash 
+					self.flash();
 				}
 			});
 		};
@@ -1371,7 +1437,6 @@
 			bar.text( 'Bootstrapping ' + controller.module.name() + ' ...');
 
 			var deferred = $.Deferred();
-
 			$.when( controller.module.current().view, controller.module.current().view.template, this.layout, controller.module)
 			.progress( function() {
 				_ns.debug( 'progress', this, arguments);
@@ -1389,6 +1454,7 @@
 					})
 				);
 				$( '.progress', controller.element).addClass( 'progress-danger');
+				deferred.resolveWith( controller.ui, self.layout.isRejected() ? self.layout.statusText + ' : ' + layout : arg);
 			}).done( function() {
 				eProgress.remove();
 
@@ -1416,10 +1482,10 @@
 
 					self.init();
 
-						// broadcast ampere.view.changed event
-					controller.module.trigger( "ampere.view.changed");
+						// broadcast ampere.view-changed event
+					controller.module.trigger( "ampere.view-changed");
 
-					deferred.resolve();
+					deferred.resolveWith( controller.ui, []);
 				});
 			});
 
