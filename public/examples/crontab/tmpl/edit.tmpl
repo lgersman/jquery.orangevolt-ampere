@@ -1,0 +1,205 @@
+<div class="navbar subnav">
+	<div class="navbar-inner">
+		<ul class="nav">
+			<li ng-ampere-transition="$ampere.module.current().state.transitions.apply"></li>
+			<li class="divider-vertical"></li>
+			<li ng-ampere-transition="$ampere.module.current().state.transitions.preview"></li>
+			<li class="divider-vertical"></li>
+			<li ng-ampere-transition="list.addable().transition">Add</li>
+			<li ng-ampere-transition="list.editable().transition">Edit</li>
+			<li ng-ampere-transition="list.removable().transition">Remove</li>
+		</ul>
+	</div>
+</div>
+	
+<div ng-ampere-crud-list="list"></div>
+
+<div id="preview-dialog" class="modal hide fade" tabindex="-1">
+	<div class="modal-header">
+		<button type="button" class="close" ng-click="$('#preview-dialog').modal( 'hide')">×</button>
+		<h5>Preview Crontab</h5>
+	</div>
+	<div class="modal-body">
+		<textarea 
+			rows="10"
+			cols="60"
+			class="input-block-level"
+			style="white-space: nowrap;"
+		></textarea>
+	</div>
+	<div class="modal-footer">
+		<div class="btn-group">
+			<button 
+				class="btn"
+				ng-click="$ampere.view.state().transitions.preview.options().commit( $ampere.ui)"
+			>Ok</button>
+		</div>
+	</div>
+</div>
+
+<script id="entry-editor-minute_popover" type="text/template">
+	Minute can be some of <code>0..59</code> or all <code>*</code>
+</script>
+
+<script id="entry-editor-hour_popover" type="text/template">
+	Hour can be some of <code>0..23</code> or all <code>*</code>
+</script>
+
+<script id="entry-editor-day_of_month_popover" type="text/template">
+	Day can be some of <code>0..31</code> or all <code>*</code>
+</script>
+
+<script id="entry-editor-month_popover" type="text/template">
+	Month can be some of <code>1..12</code> or all <code>*</code>
+</script>
+
+<script id="entry-editor-day_of_week_popover" type="text/template">
+	Day can be some of <code>0..6</code> or all <code>*</code>
+</script>
+
+<script id="entry-editor-command_popover" type="text/template">
+	<div class="p">
+		Command is the <code>*nix</code> command to execute at this time.
+	</div>
+	<blockquote>A crontab command is prefixed with the name of the user executing the command.</em>
+</script>
+
+<script id="entry-editor" type="text/template">
+	<td>
+		<select 
+			class="input-block-level"
+			multiple 
+			ng-model="list.getEditingContext().item.minute"
+			ng-options="minute for minute in $ampere.module.MINUTES"
+			nng-ampere-data="{
+				content		: $( '#entry-editor-minute_popover').text(),
+				html		: true,
+				title		: 'Minute editing help',
+				trigger		: 'focus',
+				placement	: 'right'
+			}"
+			onfocus="$( this).popover( 'show')"
+		></select>
+		<label class="checkbox">	
+			<input 
+				type="checkbox" 
+				ng-click="list.getEditingContext().item.minute = list.getEditingContext().item.minute.length==60 && [ 0] || [].concat( $ampere.module.MINUTES)" 				
+				ng-checked="list.getEditingContext().item.minute.length==60"
+			>
+			Every minute
+		</label>
+	</td><td>
+		<select 
+			class="input-block-level"
+			multiple 
+			ng-model="list.getEditingContext().item.hour"
+			ng-options="hour for hour in $ampere.module.HOURS"
+			ng-ampere-data="{
+				content		: $( '#entry-editor-hour_popover').text(),
+				html		: true,
+				title		: 'Hour editing help',
+				trigger		: 'focus',
+				placement	: 'top'
+			}"
+			onfocus="$( this).popover( 'show')"
+		></select>
+		<label class="checkbox">	
+			<input 
+				type="checkbox" 
+				ng-click="list.getEditingContext().item.hour = list.getEditingContext().item.hour.length==24 && [ 0] || [].concat( $ampere.module.HOURS)" 				
+				ng-checked="list.getEditingContext().item.hour.length==24"
+			>
+			Every hour
+		</label>
+	</td><td>
+		<select 
+			class="input-block-level"
+			multiple 
+			ng-model="list.getEditingContext().item.day_of_month"
+			ng-options="day for day in $ampere.module.DAYS_OF_MONTH"
+			ng-ampere-data="{
+				content		: $( '#entry-editor-day_of_month_popover').text(),
+				html		: true,
+				title		: 'Day editing help',
+				trigger		: 'focus',
+				placement	: 'top'
+			}"
+			onfocus="$( this).popover( 'show')"
+		></select>
+		<label class="checkbox">	
+			<input 
+				type="checkbox" 
+				ng-click="list.getEditingContext().item.day_of_month = list.getEditingContext().item.day_of_month.length==31 && [ 1] || [].concat( $ampere.module.DAYS_OF_MONTH)" 				
+				ng-checked="list.getEditingContext().item.day_of_month.length==31"
+			>
+			Every day
+		</label>
+	</td><td>
+		<select 
+			class="input-block-level"
+			multiple 
+			ng-model="list.getEditingContext().item.month"
+			ng-options="$ampere.module.MONTH_NAMES[ month-1] for month in $ampere.module.MONTHS"
+			ng-ampere-data="{
+				content		: $( '#entry-editor-month_popover').text(),
+				html		: true,
+				title		: 'Month editing help',
+				trigger		: 'focus',
+				placement	: 'top'
+			}"
+			onfocus="$( this).popover( 'show')"
+		></select>
+		<label class="checkbox">	
+			<input 
+				type="checkbox" 
+				ng-click="list.getEditingContext().item.month = list.getEditingContext().item.month.length==12 && [ 1] || [].concat( $ampere.module.MONTHS)" 				
+				ng-checked="list.getEditingContext().item.month.length==12"
+			>
+			Every month
+		</label>
+	</td><td>
+		<select 
+			class="input-block-level"
+			multiple 
+			ng-model="list.getEditingContext().item.day_of_week"
+			ng-options="index as $ampere.module.DAY_NAMES[ index] for index in $ampere.module.DAY_NAMES | keys"
+			ng-ampere-data="{
+				content		: $( '#entry-editor-day_of_week_popover').text(),
+				html		: true,
+				title		: 'Day of week editing help',
+				trigger		: 'focus',
+				placement	: 'top'
+			}"
+			onfocus="$( this).popover( 'show')"
+		></select>
+		<label class="checkbox">	
+			<input 
+				type="checkbox" 
+				ng-click="list.getEditingContext().item.day_of_week = (list.getEditingContext().item.day_of_week.length==7 && [ '0']) || ($ampere.module.DAY_NAMES | keys)" 				
+				ng-checked="list.getEditingContext().item.day_of_week.length==7"
+			>
+			Every week day
+		</label>
+	</td><td>
+		<textarea 
+			class="input-block-level html5validation-title"
+			rows="5"
+			placeholder="Place your command here ..."
+			ng-model="list.getEditingContext().item.command"
+			required
+			ng-ampere-validate="validateCommand"
+			ng-ampere-data="{
+				content		: $( '#entry-editor-command_popover').text(),
+				html		: true,
+				title		: 'Command editing help',
+				trigger		: 'focus',
+				placement	: 'top'
+			}"
+			onclick="$( this).popover( 'show')"
+		></textarea>
+		<div class="btn-group pull-right">
+			<button type="button" ng-ampere-transition="list.getEditingContext().cancel"></button>
+			<button class="glow" type="submit" ng-ampere-transition="list.getEditingContext().commit"></button>
+		</div>
+	</td>
+</script>

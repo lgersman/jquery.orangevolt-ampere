@@ -1,0 +1,6 @@
+[
+	{ "id" : "lg", "name" : "lars",	"relation": "family", "locales" : [ "en_GB", "en_US", "de_DE"]},
+	{ "id" : "ms", "name" : "marta","relation": "office", "locales" : [ "en_GB", "es_ES"]},
+	{ "id" : "pl", "name" : "pam",	"relation": "family", "locales" : [ "de_DE", "en_GB"]},
+	{ "id" : "mp", "name" : "micha","relation": "friends", "locales" : [ "de_DE", "en_GB", "es_ES"]}
+]

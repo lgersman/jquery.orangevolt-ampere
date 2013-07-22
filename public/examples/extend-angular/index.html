@@ -1,0 +1,117 @@
+<!doctype html>
+<!--[if lt IE 10]> <html class="no-js lt-ie10 lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js lt-ie10 lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js lt-ie10 lt-ie9" lang="en"> <![endif]-->
+<!--[if IE 9]>    <html class="no-js lt-ie10" lang="en"> <![endif]-->
+<!--[if gt IE 9]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="icon" href="favicon.ico" type="image/x-icon">
+		<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+
+		<script type="text/javascript" src="../../../src/oval.js"></script>
+		<script type="text/_javascript" src="../../../dist/debug/oval.js"></script>
+		<script type="text/_javascript" src="../../../dist/min/oval.js"></script>
+
+		<script type="text/javascript">
+			var extend_angular = ov.ampere().module( function extend_angular( module) {
+				module.state( {
+					main : function( state) {
+						 this.view( document.getElementById( 'main'));
+
+						 state.options({
+							 'ampere.ui.description' : '<em>Hover over the link or &lt;code&gt; elements to see the custom directive usage result.</em>'
+						 });
+					}
+				})
+				.options({
+					'ampere.ui.about' 		: 'This is a sample <a target="_blank" href="https://github.com/lgersman/jquery.orangevolt-ampere">Ampere</a> application.',
+					'ampere.ui.about.url'	: 'https://github.com/lgersman/jquery.orangevolt-ampere',
+					'ampere.ui.caption'		: 'Extend Angular JS inside Orangevolt Ampere',
+					'ampere.ui.description'	: "This example shows how to inject angular directives/filters<br> in a ampere module utilizing the <code>ampere.ui.angular</code> directive",
+					'ampere.ui.angular'		: (function( ampere_ui_angular) {
+
+							/*
+							 * attach a angular module initialization callback function
+							 * to the set of existing angular module initialization callbacks
+							 */
+						ampere_ui_angular.push( function( angularModule) {
+
+								/*
+								 * define a custom directive "ngMyTooltip" utilizing the Twitter Bootstrap Tooltip
+								 */
+							angularModule.directive( 'ngMyTooltip', [ '$timeout', function( $timeout) {
+								var _ns = $.ov.namespace( 'ngMyTooltip');
+
+								return {
+									restrict   : 'A',
+									link: function( scope, element, attrs) {
+										$timeout( function() {
+											var options = scope.$eval( attrs.ngMyTooltip) || {};
+											$( element.get()).tooltip( options);
+										});
+									}
+								};
+							}]);
+
+								/*
+								 * define a custom filter called "jquery" taking its argument
+								 * (-> typically a css selector) and return a jquery collection
+								 */
+							angularModule.filter( 'jquery', function() {
+								return function( input, scope) {
+									return $( input);
+								};
+							});
+						});
+
+						return ampere_ui_angular;
+					})( window.ov.ampere.defaults[ 'ampere.ui.angular'] || [])
+				});
+			});
+
+			$( window).ready( function() {
+				$( 'body').ampere( extend_angular);
+			});
+		</script>
+		<script id="htmltooltip" type="text/template">
+			<h5>This is a <strong>html tooltip</strong> containing HTML.</h5>
+			the html is retrieved from a <code>&lt;script&gt;</code> element
+			utilizing a custom filter named "jquery".
+		</script>
+		<script id="main" type="text/template">
+			<a
+				href="#"
+				ng-my-tooltip
+				title="a simple tooltip"
+			>Here</a>
+			are
+			<code
+				ng-my-tooltip="{
+					title 		: 'Wow - a tooltip !',
+					placement	: 'right'
+				}"
+			>some</code>
+			tooltips.
+
+			<br>
+			<br>
+
+			Tooltips can also display
+			<code
+				ng-my-tooltip="{
+					html 	 : true,
+					title    : ('#htmltooltip' | jquery).text()
+				}"
+			>html</code>
+		</script>
+ 	</head>
+ 	<body>
+  		<!-- Prompt IE 6 users to install Chrome Frame. Remove this if you support IE 6.
+       		chromium.org/developers/how-tos/chrome-frame-getting-started -->
+  		<!--[if lt IE 10]><p class=chromeframe>Your browser is <em>ancient!</em> <a href="http://browsehappy.com/">Upgrade to a different browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to experience this site.</p><![endif]-->
+	</body>
+</html>

@@ -1,0 +1,145 @@
+/*
+ * Orangevolt Ampere Framework
+ *
+ * http://github.com/lgersman
+ * http://www.orangevolt.com
+ *
+ * Copyright 2012, Lars Gersmann <lars.gersmann@gmail.com>
+ * Dual licensed under the MIT or GPL Version 2 licenses.
+ */
+
+.ampere-app {
+	.ampere-module {
+		TABLE.crud.table {
+			>THEAD {
+				-webkit-touch-callout: none;
+				-webkit-user-select: none;
+				-khtml-user-select: none;
+				-moz-user-select: none;
+				-ms-user-select: none;
+				user-select: none;
+
+				TH.sortable {
+					cursor : pointer;
+
+					I.orderby {
+						color  : #888888;
+					}
+				}
+			}
+
+			TBODY {
+				TR {
+					 a.hover.ampere-transition {
+					 	visibility : hidden;
+					 	color 	   : black;
+					 }
+
+					 a.hover.hover.ampere-transition.disabled {
+					 	color 	   : #999999;
+					 }
+				}
+
+				TR.item:hover {
+					  a.hover.ampere-transition {
+					 	visibility  : inherit;
+					 }
+
+					 a.hover.ampere-transition:not( .disabled):hover,
+					 a.hover.ampere-transition:not( .disabled):hover >* {
+					 	cursor		: pointer;
+						//font-weight : bold;
+					}
+
+					a.hover.ampere-transition.disabled:hover,
+					a.hover.ampere-transition.disabled:hover >* {
+						cursor		: default;
+					}
+				}
+
+				TR.no-items,
+				TR.no-matches {
+					color  		: #888888;
+					font-style	: italic;
+				}
+			}
+
+				/* sortable */
+			TBODY[ng-ampere-sortable] {
+				TR.sortable-placeholder TD
+				TR.sortable-placeholder TH {
+					background-color : transparent;
+				}
+
+				TR.sortable-placeholder {
+					cursor 				: move;
+					//background-image 	: -webkit-linear-gradient(-45deg, #fff 50%, #ddd 100%);
+					//background-size	: 2px 2px;
+					background-color 	: rgba(0, 136, 204, 0.47);
+
+					>TD, >TH, >*.not( TD, TH) {
+						background-color : transparent;
+					}
+				}
+
+				TR:not( .ng-ampere-sortable-nohandle).draghandle:hover,
+				TR:not( .ng-ampere-sortable-nohandle):hover .draghandle {
+					cursor : move;
+					background: rgba(0, 0, 0, 0.02);
+				}
+
+/*
+				TR[draggable]:not( .ng-ampere-sortable-nohandle):hover,
+				TR[draggable]:not( .ng-ampere-sortable-nohandle):hover *,
+				TR[draggable]:not( .ng-ampere-sortable-nohandle):hover .draghandle,
+				TR.item:not( .ng-ampere-sortable-nohandle):hover,
+				TR.item:not( .ng-ampere-sortable-nohandle):hover *,
+				TR.item:not( .ng-ampere-sortable-nohandle):hover .draghandle {
+					cursor : move;
+
+					a:hover,
+					a:hover *,
+					.ampere-transition,
+					.ampere-transition * {
+						cursor : pointer;
+					}
+				}
+
+				TR[draggable]:not( .ng-ampere-sortable-nohandle):hover .draghandle,
+				TR.item:not( .ng-ampere-sortable-nohandle):hover .draghandle {
+					background: rgba(0, 0, 0, 0.02);
+				}
+
+				TR[draggable]:hover .ng-ampere-sortable-nohandle,
+				TR[draggable]:hover .ng-ampere-sortable-nohandle *,
+				TR.item:hover .ng-ampere-sortable-nohandle,
+				TR.item:hover .ng-ampere-sortable-nohandle * {
+					cursor : auto;
+				}
+					// this is a ff fix
+				TR[draggable]:hover a.ng-ampere-sortable-nohandle,
+				TR[draggable]:hover a.ng-ampere-sortable-nohandle >i,
+				TR[draggable]:hover .ng-ampere-sortable-nohandle a,
+				TR[draggable]:hover .ng-ampere-sortable-nohandle a >i,
+				TR.item:hover a.ng-ampere-sortable-nohandle,
+				TR.item:hover a.ng-ampere-sortable-nohandle >i,
+				TR.item:hover .ng-ampere-sortable-nohandle a,
+				TR.item:hover .ng-ampere-sortable-nohandle a >i {
+					cursor : pointer;
+				}
+				*/
+			}
+				/* -- */
+
+		}
+
+		TABLE.scrollable {
+			overflow : auto;
+			position : relative;
+			display	 : block;
+		}
+
+		UL.crud.paginator {
+		}
+	}
+}

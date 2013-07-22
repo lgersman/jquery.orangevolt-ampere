@@ -1,0 +1,47 @@
+.ampere-state.name-item_list {
+	TABLE.crud {
+		TH:nth-child(1), TD:nth-child(1) {
+			width : 10em;
+		}
+
+		TH:nth-child(2), TD:nth-child(2) {
+			width : 20em;
+		}
+
+		TH:nth-child(3), TD:nth-child(3) {
+			width : 7em;
+		}
+
+		TH:nth-child(4), TD:nth-child(4) {
+			width : 7em;
+		}
+
+			// price
+		#price {
+			width : 4em;
+		}
+	}
+}
+
+.ampere-state.name-item_edit {
+	.badge, .label {
+		margin-right 	: 4px;
+		margin-bottom 	: 4px;
+
+		font-weight 	: inherit;
+
+		a {
+			color : inherit;
+		}
+	}
+
+	#composition-dialog UL[ng-ampere-sortable] {
+		list-style-type : none;
+		margin 			: 0;
+		clear       	: both;
+		>LI {
+			float : left;
+			cursor : move;
+		}
+	}
+}

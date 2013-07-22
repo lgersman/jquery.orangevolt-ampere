@@ -1,0 +1,34 @@
+
+<div class="row">
+	<form class="span3">
+		<input tabIndex="-1" class="span3" type="search" ng-model="search" placeholder="Filter">
+		<br>
+		<select class="span3" ng-init="entry=entry || entries[0]" size="15" ng-model="entry" ng-options="e.name + ' ' + e.familyname for e in entries | filter:search"></select>
+	</form>
+	<dl class="span9" ng-show="entry">
+		<dt>
+			Name
+		</dt>
+		<dd>
+			{{entry.name}}
+		</dd>
+		<dt>
+			Familyname
+		</dt>
+		<dd>
+			{{entry.familyname}}
+		</dd>
+		<dt>
+			Email
+		</dt>
+		<dd>
+			{{entry.email}}
+		</dd>
+		<dt>
+			<button ng-ampere-transition="$ampere.view.state().transitions.edit"></button>
+			<button ng-ampere-transition="$ampere.view.state().transitions.remove"></button>
+		</dt>
+		<dd>
+		</dd>
+	</dl>
+</div>

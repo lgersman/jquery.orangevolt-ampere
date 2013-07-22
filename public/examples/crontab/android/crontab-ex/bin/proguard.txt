@@ -1,0 +1,3 @@
+# view AndroidManifest.xml #generated:52
+-keep class ampere.example.crontab.crontab { <init>(...); }
+

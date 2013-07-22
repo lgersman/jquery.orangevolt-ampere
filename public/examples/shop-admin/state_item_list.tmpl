@@ -1,0 +1,102 @@
+<div class="navbar subnav">
+	<div class="navbar-inner">
+		<ul class="nav">
+			<li ng-class="{disabled : !list.addable().transition.enabled(), active : list.addable().transition.active()}">
+				<a ng-ampere-transition="list.addable().transition">New</a>
+			</li>
+			<li ng-class="{disabled : !list.editable().transition.enabled(), active : list.editable().transition.active()}">
+				<a ng-ampere-transition="list.editable().transition">Edit</a>
+			</li>
+			<li ng-class="{disabled : !list.removable().transition.enabled(), active : list.removable().transition.active()}">
+				<a ng-ampere-transition="list.removable().transition">Remove</a>
+			</li>
+			<li class="divider-vertical"></li>
+		</ul>
+		
+		<form class="form-search navbar-search pull-right">
+			<span class="input-append">
+				<input tabIndex="-1" type="text" class="search-query" ng-disabled="list.getEditingContext()" ng-model="filter" placeholder="Filter">
+				 <button
+				 	class="btn"
+				 	ng-click="filter=''"
+					ng-disabled="!filter.length || list.getEditingContext()"
+				 ><i class="icon-remove"></i></button>
+			</span>
+		</form>
+		
+		<form class="navbar-form pull-right">
+			<select ng-disabled="list.getEditingContext()" onchange="this.blur()" tabindex="-1" style="width:6em" ng-model="paginator.options().itemCountPerPage" ng-options="(n || 'All (' + paginator.getPageItems().length + ')') for n in [ 5, 10, 20, 50, 100, 0]"></select>
+			&nbsp;
+		</form>
+
+		<div class="pull-right navbar-text">Items per page:&nbsp;</div>	
+
+		<span ng-show="paginator.getCurrentPageItems().length" class="navbar-text">Display 
+				{{(paginator.currentPageNumber()-1)*paginator.getItemCountPerPage() + 1}} 
+				- {{(paginator.currentPageNumber()-1)*paginator.getItemCountPerPage() + paginator.getCurrentPageItems().length}} of 
+				{{paginator.getPageItems().length}} items
+				&nbsp;
+		</span>
+	</div>
+</div>
+
+<div ng-ampere-crud-paginator="paginator" class="pagination-centered"></div>
+
+<div ng-ampere-crud-list="list" class="table-hover"></div>
+
+<div ng-ampere-crud-paginator="paginator" class="pagination-centered"></div>
+
+<script id="addable" type="text/template">
+	<td>
+		<input
+			type="text"
+			ng-model="list.addable().item.name"
+			required
+			class="input-block-level html5validation-title"
+			placeholder="Unique name"
+			ng-ampere-validate="list.addable().validateName"
+		>
+	</td><td>
+		<input
+			type="text"
+			ng-model="list.addable().item.caption"
+			required
+			class="input-block-level html5validation-title"
+			placeholder="Unique caption"
+			ng-ampere-validate="list.addable().validateCaption"
+		>
+	</td><td class="form-inline">
+		<input
+			type="text"
+			id="price"
+			pattern="\d+(\.\d{1,2})?"
+			ng-model="list.addable().item.price"
+			required
+			placeholder="20.43 or so"
+			ng-ampere-validate="list.addable().validatePrice"
+			class="html5validation-title"
+		><strong>&nbsp;€</strong>
+	</td><td>
+		<select 
+			ng-model="list.addable().item.shipping"
+			class="input-block-level html5validation-title"
+			ng-ampere-validate="validateShipping"
+			ng-options="size.name as (size.name | ucwords) for size in $ampere.module.data.preferences.shipping.size"
+			required
+		>
+		</select>
+	</td><td>
+		<textarea
+			type="text"
+			ng-model="list.addable().item.keywords"
+			required
+			rows="4"
+			class="input-block-level"
+			placeholder="Enter comma separated list of keywords"
+		></textarea>
+		<div class="btn-group pull-right">
+			<button type="button" ng-ampere-transition="list.addable().cancel"></button>
+			<button class="glow" type="submit" ng-ampere-transition="list.addable().commit"></button>
+		</div>
+	</td>
+</script>

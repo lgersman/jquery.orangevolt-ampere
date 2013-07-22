@@ -1,0 +1,39 @@
+<h4>crontab syntax</h4>
+	<div class="p">
+		Each line in a crontab file is a job and follows a particular format as a series of fields, separated by spaces or tabs(see example below). Each field can have a single value or a series of values.
+	</div>
+
+	<div class="p">
+		<h5>crontab operators</h5>
+		<div class="p">
+			There are multiple ways of specifying several date/time values in a field:
+			<ul>
+				<li>
+					The comma <code>,</code> specifies a list of values, for example: <code>1,3,4,7,8</code>
+				</li>
+				<li>
+					The dash <code>-</code> specifies a range. Example: <code>1-6</code>, which is equivalent to <code>1,2,3,4,5,6</code>
+				</li>
+				<li>
+					The asterisk <code>*</code> operator specifies all possible values for a field. For example, an asterisk <code>*</code> in the hour time field would be the same as <em>every hour</em>.
+				</li>
+				<li>
+					There is also an operator which some extended versions of cron support, the slash <code>/</code> operator, which can be used to skip a given number of values. For example, <code>*/3</code> in the hour time field is equivalent to <code>0,3,6,9,12,15,18,21</code>. So <code>*</code> specifies <em>every hour</em> but the <code>*/3</code> means only those hours divisible by <code>3</code>.
+				</li>
+			</ul>	
+			<div class="p">
+				Example: the following will clear the Apache error log at one minute past midnight each day.
+<pre style="line-height: 14px;">
+01 00 * * * echo "" &gt; /www/apache/logs/error_log
+Fields
+╭──────────────── minute (0 - 59) 
+│  ╭───────────── hour (0 - 23)
+│  │  ╭────────── day of month (1 - 31)
+│  │  │  ╭─────── month (1 - 12) OR jan,feb,mar,apr ... 
+│  │  │  │  ╭──── day of week (0 - 6) (Sunday=0 or 7)  OR sun,mon,tue,wed,thu,fri,sat 
+│  │  │  │  │
+*  *  *  *  *     &lt;command to be executed&gt;
+</pre>
+For more information about the cron and crontab, run the command <code>man cron</code> and <code>man crontab</code>.
+	</div>	
+</div>

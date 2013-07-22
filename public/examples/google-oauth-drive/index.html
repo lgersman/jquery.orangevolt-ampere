@@ -1,0 +1,454 @@
+<!doctype html>
+<!--[if lt IE 10]> <html class="no-js lt-ie10 lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js lt-ie10 lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js lt-ie10 lt-ie9" lang="en"> <![endif]-->
+<!--[if IE 9]>    <html class="no-js lt-ie10" lang="en"> <![endif]-->
+<!--[if gt IE 9]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="icon" href="favicon.ico" type="image/x-icon">
+		<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+	
+		<script type="text/javascript" src="../../../src/oval.js"></script>
+		<script type="text/javascript" nsrc="../../../dist/debug/oval.js"></script>
+		<script type="text/javascript" nsrc="../../../dist/min/oval.js"></script>
+		<script src="http://www.google.com/jsapi"></script>
+
+		<script type="text/javascript">
+			var AUTH_DATA = {
+				immediate   : false,
+				client_id	: "501010860029-eqjjs5ti5ggj3i4us5mo667pjfab4hua.apps.googleusercontent.com",
+				scope		: [
+					"https://www.googleapis.com/auth/userinfo.profile",
+					"https://www.googleapis.com/auth/drive", 
+					"https://www.googleapis.com/auth/drive.file"
+				]
+			};
+
+			var googleoauth2drive = ov.ampere().module( function googleoauth2drive( module) {
+				module.state( {
+					main : function( state) {
+						this.options({
+							'ampere.ui.caption' : false
+						});
+
+						this.transition( 'reset')
+						.action( function( transition, ui, data) {
+							return function redo() {
+								module.document.value = module.document.content;
+
+								return $.Deferred().resolve( "Editor contents was reset.");
+							};
+						})
+						.enabled( function() {
+							return module.document && module.document.content!=module.document.value; 	
+						});
+
+						this.transition( 'save')
+						.action( function( transition, ui, data) {
+							function redo() {
+								var deferred = $.Deferred()
+								.notify( "Saving document to Google Drive ...");
+
+								// taken from https://developers.google.com/drive/v2/reference/files/update
+								var boundary = '-------314159265358979323846',
+									delimiter = "\r\n--" + boundary + "\r\n",
+								  	close_delim = "\r\n--" + boundary + "--";
+
+								var multipartRequestBody =
+									delimiter +
+									'Content-Type: application/json\r\n\r\n' +
+									JSON.stringify({
+										mimeType: 'text/plain',
+					                    title: module.document.meta.name,
+					                    parents: null,
+					                    userPermission: null
+									}) +
+									delimiter +
+									'Content-Type: text/plain\r\n' +
+									'Content-Transfer-Encoding: base64\r\n' +
+									'\r\n' +
+									btoa( module.document.value) +
+									close_delim
+								;
+
+							    request = gapi.client.request({
+							        path	: '/upload/drive/v2/files/' + module.document.meta[ google.picker.Document.ID],
+							        method	: 'PUT',
+							        params	: {'uploadType': 'multipart', 'alt': 'json'},
+							        headers	: {
+							          'Content-Type': 'multipart/mixed; boundary="' + boundary + '"'
+							        },
+							        body 	: multipartRequestBody
+							    });
+							    request.execute( function( res) {
+							    	if( res.error) {
+							    		debugger
+							    		deferred.reject( "Saving document failed - " + res.error.message);
+							    	} else {
+							    		module.document.content = module.document.value;
+							    		//module.document.meta = res;
+							    		deferred.resolve( "Document saved");
+							    	}
+							    });
+
+							    return deferred;
+							}; 
+
+							var transitionDeferred = $.Deferred();
+
+								// ensure login is active 
+							gapi.auth.authorize( $.extend( {}, AUTH_DATA, { immediate : true}), function( token) {
+								if( token) {
+									transitionDeferred.resolve(); 
+								} else {
+									$.Deferred().reject( "Cannot save - you're session timed out. Please reload");
+								}
+							});
+
+							return transitionDeferred.promise( redo);
+						})
+						.enabled( function() {
+							return module.document && module.document.content!=module.document.value; 	
+						})
+						.options({
+							'ampere.ui.icon'  : 'icon-save',
+							'ampere.ui.class' : 'jiggle glow'
+						});
+
+							//geht auch ncht richtig !!
+						// .target( module.states.main);
+
+							/* make this work !!!! */
+							/*
+						this.transition({ 
+							foo : function( t) {
+
+							},
+							bar : function( t) {
+
+							}
+						});
+							*/
+						
+						this.view( document.getElementById( 'main'));
+					},
+					about : function( state) {
+						state.transition( 'back', module.states.main)
+						.options( {
+							'ampere.ui.type' 	: 'primary',
+							'ampere.ui.icon'    : 'icon-level-up',
+							'ampere.ui.caption' : 'Back'
+						});
+
+						state.view( document.getElementById( 'about'));
+					}
+				});
+
+				var getUserInfo = function( deferred) {
+						// obtain user profile data
+						// https://developers.google.com/accounts/docs/OAuth2Login#obtaininguserprofileinformation
+					$.ajax({
+						url 		: 'https://www.googleapis.com/oauth2/v3/userinfo',
+						crossDomain : true,
+						headers 	: {
+							'Authorization' : 'Bearer ' + gapi.auth.getToken().access_token
+						}
+					})
+					.done( function( data) {
+						module.options( 'user', data);
+						deferred.resolve();						
+					})
+					.fail( function( ) {
+						debugger
+						deferred.rejectWith( this, arguments);
+					});
+				};
+
+				module.transition( 'authorize', function() {
+					return module.current().state;
+				})
+				.action( function( transition, ui, data) {
+					return function() {
+						var d = $.Deferred().notify( 'Google OAuth2 authorization in progress ...');
+
+						gapi.auth.authorize( AUTH_DATA, function( token) {
+							if( token) {
+								getUserInfo( d);
+							} else {
+								d.reject( "Authorization failed");
+							}
+						});
+
+						return d;
+					};
+				})
+				.enabled( function() {
+					return !gapi.auth.getToken();
+				})
+				.options({
+					'ampere.ui.caption' : 'Sign in',
+					'ampere.ui.icon'  : 'icon-unlock',
+					'ampere.ui.class' : 'jiggle glow'
+				});
+
+				module.transition( 'load', function() {
+					return module.current().state;
+				})
+				.action( function( transition, ui, data) {
+					if( module.document && module.document.value!=module.document.content) {
+						if( !confirm( "You have unsaved changes to document '" + module.document.meta.name + "' - do you want to continue ?")) {
+							return;
+						}
+					}
+
+					var createPicker = function( cb) {
+						return function() {
+							var picker = transition.options().picker = new google.picker.PickerBuilder()
+				            //addView(( new google.picker.ImageSearchView).setLicense(google.picker.ImageSearchView.License.REUSE)).
+				            .addView( google.picker.ViewId.DOCS)
+				            .addView( new google.picker.DocsUploadView())
+				            //addView( google.picker.ViewId.WEBCAM).
+				            //addView( google.picker.ViewId.VIDEO_SEARCH).
+				            //addView( google.picker.ViewId.YOUTUBE).
+				            //addView( google.picker.ViewId.MAPS).
+				            .setCallback( cb)
+
+							.setAppId( '501010860029-eqjjs5ti5ggj3i4us5mo667pjfab4hua.apps.googleusercontent.com')
+								//Optional: The auth token used in the current Drive API session.
+								
+          					//.setOAuthToken( gapi.auth.getToken())
+
+				            .build();
+
+				        	picker.setVisible( true);	
+						}
+					};
+
+					var transitionDeferred = $.Deferred().notify( 'Loading Google picker ...'),
+						redoDeferred = $.Deferred()
+							// notify without arguments tells ampere ui renderer to hide the flash
+						.notify()
+						.always( function() {
+							delete transition.options().picker;	
+								// google picker doesnt cleanup the DOM 
+								// (i.e. makes the picker invisible but leaves it within the DOM)
+							$('.picker').remove();
+						});
+
+					var pickerCallback = function( data) {
+						if( data[ google.picker.Response.ACTION]=='loaded') {
+							transitionDeferred.resolve( function redo() {
+									// by default the ui is blocked by ampere when a deferred
+									// gets returned.
+									// thus we need to manually unblock the ui to make the picker available
+									// for user input
+								ui
+								.unblock()
+									// tell ui to refresh the ui -> angular update the transitions 
+									// so that the "load" transition is now rendered disabled
+								.refresh();
+
+								return redoDeferred;
+							});
+						} else if( data[ google.picker.Response.ACTION] == google.picker.Action.PICKED) {
+							delete transition.options().picker;
+
+							var doc = data[ google.picker.Response.DOCUMENTS][0];
+							ui.flash.progress( 
+								"Reading '" + doc[ google.picker.Document.NAME] + '" from Google Drive ...'
+							);
+
+							gapi.client.drive.files.get( { fileId : doc[ google.picker.Document.ID]})
+							.execute( function( res) {
+
+								if( res.error) {
+									redoDeferred.reject( 
+										"Google Drive says '" + res.error.code + " : " + res.error. message + "'"
+									);
+								} else if( !res.editable){
+									redoDeferred.reject( 
+										"Document '" + doc[ google.picker.Document.NAME] + "' is not editable.Please select another one."
+									);
+								} else if( !res.exportLinks || !res.exportLinks[ 'text/plain']) {
+									redoDeferred.reject( 
+										"Document '" + doc[ google.picker.Document.NAME] + "' cannot be downloaded as plain/text. Please select another one."
+									);
+								} else {
+									redoDeferred.notify( "Downloading " + res.exportLinks[ 'text/plain']);
+
+										// https://developers.google.com/drive/manage-downloads
+										// http://stackoverflow.com/questions/13434704/google-drive-and-cors-cross-domain-requests
+									$.ajax({
+										url : res.exportLinks[ 'text/plain'],
+										crossDomain: true,
+										headers : {
+											'Authorization' : 'Bearer ' + gapi.auth.getToken().access_token
+										}
+									})
+									.done( function( data) {
+											// for some reason single linebreaks are always doubled
+											// so we fix that here ...
+										data = data.replace( /(\r\n\r\n)/g, '\r\n');
+										
+										module.document = {
+											meta 	: doc,
+											content : data,
+											value   : data
+										};
+										redoDeferred.resolve( "Document downloaded");
+									})
+									.fail( function( ) {
+										redoDeferred.rejectWith( this, arguments);
+									});
+								}
+							});
+						} else {													
+							redoDeferred.resolve();
+						}
+					};
+
+					google.load( 'picker', '1', { 
+						callback : createPicker( pickerCallback)
+					});
+
+					return transitionDeferred;
+				})
+				.enabled( function() {
+					return gapi.auth.getToken() && !this.options().picker;
+				})
+				.active( function() {
+					return !!this.options().picker;
+				})
+				.options({
+					'ampere.ui.caption' : 'Load',
+					'ampere.ui.class'   : function() {
+						return !module.document && 'jiggle glow';
+					}
+				});
+
+					/*
+					 * this transition is exclusively used as
+					 * value for option 'ampere.ui.about.url'
+					 */
+				var aboutUrl = module.transition( 'about', function() {
+					return module.options('user') && module.states.about || module.current().state;
+				});
+				
+				aboutUrl.action( (function( action) {
+					return function( transition, ui, data) {
+						if( !gapi.auth.getToken()) {
+							window.open( 'https://github.com/lgersman/jquery.orangevolt-ampere');
+						} else {
+							return action( transition, ui, data);	
+						}
+					};
+				})( aboutUrl.action()))
+				.options({
+					'ampere.ui.caption'			: function() {
+						return gapi.auth.getToken() ? module.options( 'user').name : 'Ampere Google oAuth2 Drive integration';
+					},
+					'ampere.ui.description'		: function() {
+						return gapi.auth.getToken() ? module.options( 'user').name : "This is a sample <a target='_blank' href='https://github.com/lgersman/jquery.orangevolt-ampere'>Ampere</a> application";
+					},
+					'ampere.ui.type'			: null,			// null prevents this state from being rendering somewhere automatically
+					'ampere.ui.icon'			: function() {
+						return gapi.auth.getToken() ? 'icon-key' : null; 
+					}
+				});
+
+				module.options({
+					'ampere.ui.caption'		: 'Ampere Google oAuth2 Drive integration',
+					'ampere.ui.about' 		: null,
+					'ampere.ui.about.url'	: aboutUrl,
+					'ampere.ui.description' : "This is a sample <a target='_blank' href='https://github.com/lgersman/jquery.orangevolt-ampere'>Ampere</a> application.<br>This example uses various Google API's for <a target='_blank' href='https://developers.google.com/api-client-library/javascript/features/authentication'>oAuth2 Authentication</a> and <a target='_blank' href='https://developers.google.com/drive/v2/reference/'>Google Drive API</a> in <a target='_blank' href='https://github.com/lgersman/jquery.orangevolt-ampere'>Ampere</a>.<br><strong>The whole application is running on the client - no server side coding is required.</strong><br> This application makes heavy use of the excellent Gem called <code>jQuery.Deferred</code> for integrating the asynchronous Google API's into Ampere."
+				});
+
+				var userInfoDeferred = $.Deferred();
+				if( gapi.auth.getToken()) {
+					getUserInfo( userInfoDeferred);
+				} else {
+					userInfoDeferred.resolve();
+				}
+
+					// module ready === google drive api loaded and (optional) user info retrieved
+				var driveDeferred = (function( d) {
+					gapi.client.load('drive', 'v2', d.resolve);
+					return d;
+				})( $.Deferred());
+
+				return $.when( userInfoDeferred, driveDeferred);
+			});
+			
+			function bootstrap() {
+				$( window).ready( function() {
+					gapi.auth.authorize( $.extend( {}, AUTH_DATA, { immediate : true}), function( token) {
+	    				$( 'body').ampere( googleoauth2drive);
+	    			});
+				});
+			}
+		</script>
+
+		<script type="text/javascript" src="//apis.google.com/js/client.js?onload=bootstrap"></script>
+
+		<script id="main" type="text/template">
+			<div ng-show="!$window.gapi.auth.getToken()" class="alert alert-error">
+				<center>You are not yet authorized.</center>
+
+				<center>
+					<button 
+						class="btn-large" 
+						ng-ampere-transition="$ampere.module.transitions.authorize">
+					</button>
+				</center>
+			</div>
+			<div ng-show="$window.gapi.auth.getToken() && !$ampere.module.document" class="alert">
+				<center>Load a document from Google Drive.</center>
+
+				<center>
+					<button 
+						class="btn-large" 
+						ng-ampere-transition="$ampere.module.transitions.load">
+					</button>
+				</center>
+			</div>
+			<form ng-show="$ampere.module.document">
+				<div class="navbar">
+					<div class="navbar-inner">
+						<a class="brand" target="_blank" href="{{$ampere.module.document.meta.url}}">
+							<img src="{{$ampere.module.document.meta.iconUrl || $ampere.module.document.meta.iconLink}}">
+							{{$ampere.module.document.meta.name || $ampere.module.document.meta.title}}
+							{{$ampere.module.document.content!=$ampere.module.document.value && '*' || ''}}
+						</a>
+						<ul class="nav">
+							<li ng-ampere-transition="$ampere.view.state().transitions.save"></li>
+							<li ng-ampere-transition="$ampere.view.state().transitions.reset"></li>
+						</ul>
+					</div>
+				</div>
+				<textarea 
+					rows 	="10"
+					class   ="input-block-level" 
+					ng-model="$ampere.module.document.value"
+				></textarea>
+			</form>
+		</script>
+
+		<script id="about" type="text/template">
+			<div>
+				<pre>Auth Info = {{$window.gapi.auth.getToken() | json}}</pre>
+			</div>
+			<div>
+				<pre>User Info = {{$ampere.module.options( "user") | json}}</pre>
+			</div>
+		</script>
+ 	</head>
+ 	<body>
+  		<!-- Prompt IE 6 users to install Chrome Frame. Remove this if you support IE 6.
+       		chromium.org/developers/how-tos/chrome-frame-getting-started -->
+  		<!--[if lt IE 10]><p class=chromeframe>Your browser is <em>ancient!</em> <a href="http://browsehappy.com/">Upgrade to a different browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to experience this site.</p><![endif]-->
+	</body>
+</html>

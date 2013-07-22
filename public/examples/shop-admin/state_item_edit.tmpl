@@ -1,0 +1,290 @@
+<div class="navbar subnav">
+	<div class="navbar-inner">
+		<ul class="nav">
+			<li ng-class="{disabled : !$ampere.view.state().transitions.cancel.enabled(), active : $ampere.view.state().transitions.cancel.active()}">
+				<a ng-ampere-transition="$ampere.view.state().transitions.cancel"></a>
+			</li>
+			<li ng-class="{disabled : !$ampere.view.state().transitions.reset.enabled(), active : $ampere.view.state().transitions.reset.active()}">
+				<a ng-ampere-transition="$ampere.view.state().transitions.reset"></a>
+			</li>
+			<li ng-class="{disabled : !$ampere.view.state().transitions.update.enabled(), active : $ampere.view.state().transitions.update.active()}">
+				<a class="glow" ng-ampere-transition="$ampere.view.state().transitions.update"></a>
+			</li>
+		</ul>
+	</div>
+</div>
+
+<div class="row">
+	<dl class="span6">
+		<dt>
+			Name
+		</dt>
+		<dd>
+			<input
+				type="text"
+				required
+				class="html5validation-title"
+				ng-model="item.name"
+				placeholder="Unique name"
+				ng-ampere-validate="validateName"
+			>
+		</dd>
+		<dt>
+			Caption
+		</dt>
+		<dd>
+			<input
+				type="text"
+				required
+				class="span6 html5validation-title"
+				ng-model="item.caption"				
+				placeholder="Unique caption"
+				ng-ampere-validate="validateCaption"
+			>
+		</dd>
+		<dt>
+			Description
+		</dt>
+		<dd>
+			<textarea
+				type="text"
+				required
+				class="span6 html5validation-title"
+				rows="5"
+				ng-model="item.description"
+				placeholder="Enter a short description"
+			></textarea>
+		</dd>
+		<dt>
+			Price
+		</dt>
+		<dd class="form-inline">
+			<input
+				type="text"
+				required
+				class="html5validation-title"
+				ng-model="item.price"
+				placeholder="Enter price in EUR"
+				pattern="\d+(\.\d{1,2})?"
+				ng-ampere-validate="validatePrice"
+			><strong>&nbsp;€</strong>
+		</dd>
+		<dt>
+			Shipping
+		</dt>
+		<dd>
+			<select 
+				ng-model="item.shipping"
+				class="html5validation-title"
+				ng-ampere-validate="validateShipping"
+				ng-options="size.name as (size.name | ucwords) for size in $ampere.module.data.preferences.shipping.size"
+				required
+			>
+			</select>
+		</dd>
+		<dt>
+			Keywords
+		</dt>
+		<dd>
+			<textarea
+				type="text"
+				required
+				class="span6 html5validation-title"
+				rows="3"
+				ng-model="item.keywords"
+				placeholder="Enter comma separated list of search engine relevant keywords"
+			></textarea>
+		</dd>	
+	</dl>
+	<dl class="span6">
+		<dt>
+			Status
+
+			<div class="btn-group">
+				<button
+		    		class="btn btn-mini dropdown-toggle"
+		    		data-toggle="dropdown"
+		    		ng-class="{disabled : !getAddableStatus().length}"
+		    	>
+		    		Add status
+		    		<span class="caret"></span>
+		    	</button>
+		    	<ul class="dropdown-menu">
+			      <li ng-repeat="status in getAddableStatus()">
+			      	<a href="#" ng-click="item.status.push( status)">{{$ampere.module.data.preferences.status[ status].caption}}</a>
+			      </li>
+		    	</ul>
+		    </div>
+		</dt>
+		<dd>
+			<span
+				ng-repeat="status in item.status"
+				class="badge"
+			>
+				{{$ampere.module.data.preferences.status[ status].caption}}
+				<a href="#" title="Remove status" class="icon-trash" ng-click="item.status.splice( $index, 1)"></a>
+			</span>
+		</dd>	
+		<dt>
+			<a ng-ampere-transition="$ampere.view.state().transitions.editCareInstructions" ng-ampere-icon="null"></a>
+			<button class="btn-mini" ng-ampere-transition="$ampere.view.state().transitions.editCareInstructions">Edit</button>
+		</dt>
+		<dd>
+			<span
+				ng-repeat="option in item.careinstructions.options"
+				class="label"
+			>
+				{{$ampere.module.data.preferences.careinstructions[ option].caption}}
+			</span>
+			<div>{{item.careinstructions.description}}</div>	
+			<div ng-hide="item.careinstructions">
+				<em>No care instructions.</em>
+			</div>
+		</dd>	
+		<dt>
+			<a ng-ampere-transition="$ampere.view.state().transitions.editComposition" ng-ampere-icon="null"></a>
+			<button class="btn-mini" ng-ampere-transition="$ampere.view.state().transitions.editComposition">Edit</button>
+		</dt>
+		<dd>
+			<span
+				ng-repeat="option in item.composition.options"
+				class="label"
+			>
+				{{option}}
+			</span>
+			<div>{{item.composition.description}}</div>	
+			<div ng-hide="item.composition">
+				<em>No care instructions.</em>
+			</div>
+		</dd>
+	</dl>
+</form>
+<div style="display:none" class="btn-group">
+	<button type="button" ng-ampere-transition="$ampere.view.state().transitions.reset"></button>
+	<button type="reset" ng-ampere-transition="$ampere.view.state().transitions.cancel"></button>
+	<button type="submit" ng-ampere-transition="$ampere.view.state().transitions.update"></button>
+</div>
+
+<div id="careinstructions-dialog" class="modal hide fade" tabindex="-1">
+  <div class="modal-header">
+    <button type="button" class="close" ng-click="$('#careinstructions-dialog').modal( 'hide')">×</button>
+    <h5>Care instructions</h5>
+  </div>
+  <div class="modal-body">
+	<form>
+		<dl>
+			<dt>
+				Options
+
+				<div class="btn-group">
+					<button
+			    		class="btn btn-mini dropdown-toggle"
+			    		data-toggle="dropdown"
+			    		ng-class="{disabled : !getAddableCareInstructionOptions().length}"
+			    	>
+			    		Add option
+			    		<span class="caret"></span>
+			    	</button>
+			    	<ul class="dropdown-menu">
+				      <li ng-repeat="option in getAddableCareInstructionOptions()">
+				      	<a href="#" ng-click="$ampere.view.state().transitions.editCareInstructions.options().data.options.push( option)">{{$ampere.module.data.preferences.careinstructions[ option].caption}}</a>
+				      </li>
+			    	</ul>
+			    </div>
+			</dt>
+			<dd>
+				<span
+					ng-repeat="option in $ampere.view.state().transitions.editCareInstructions.options().data.options"
+					class="badge"
+				>
+					{{$ampere.module.data.preferences.careinstructions[ option].caption}}
+					<a href="#" title="Remove option" class="icon-trash" ng-click="$ampere.view.state().transitions.editCareInstructions.options().data.options.splice( $index, 1)"></a>
+				</span>
+			</dd>
+			<dt>
+				Description	
+			</dt>
+			<dd>
+				<textarea
+					type="text"
+					class="input-block-level html5validation-title"
+					rows="10"
+					ng-model="$ampere.view.state().transitions.editCareInstructions.options().data.description"
+					placeholder="Enter additional careinstructions"
+				></textarea>
+			</dd>
+		</dl>	
+	</form>		
+  </div>
+  <div class="modal-footer">
+  	<div class="btn-group">
+    	<button class="btn" ng-click="$('#careinstructions-dialog').modal( 'hide')">Cancel</button>
+    	<button class="btn" ng-disabled="!$('#careinstructions-dialog form').checkValidity()" ng-click="$ampere.view.state().transitions.editCareInstructions.options().commit( $ampere.ui)">Ok</button>
+    </div>
+  </div>
+</div>
+
+<div id="composition-dialog" class="modal hide fade" tabindex="-1">
+  <div class="modal-header">
+    <button type="button" class="close" ng-click="$('#composition-dialog').modal( 'hide')">×</button>
+    <h5>Composition</h5>
+  </div>
+  <div class="modal-body">
+	<form>
+		<dl>
+			<dt>
+				Options
+			</dt>
+			<dd>
+				<div class="form-inline" style="margin-bottom:4px"> 	
+					<div class="input-append">
+						<input 
+							autofocus
+							placeholder="Enter composition part"
+							type="text" 
+							id="option"
+						>
+						<button 
+							class="btn"
+							ng-click="!$.trim( $('#option').val()).length || $ampere.view.state().transitions.editComposition.options().data.options.push( $('#option').val()) && $('#option').val('')"
+						>Add</button>
+					</div>				
+					<span class="help-inline">Example input : <code>15% Cotton</code></span>
+				</div>						
+				<ul class="clearfix" ng-ampere-sortable="$ampere.view.state().transitions.editComposition.options().reorder">	
+					<li 
+						class="badge"
+						data-position="{{$index}}" 
+						ng-repeat="option in $ampere.view.state().transitions.editComposition.options().data.options"
+						title="Drag and drop to reorder options."
+					>
+						{{option}}
+						<a href="#" title="Remove option" class="icon-trash" ng-click="$ampere.view.state().transitions.editComposition.options().data.options.splice( $index, 1)"></a>
+					</li>
+				</ul>
+				<div class="help-block" ng-show="$ampere.view.state().transitions.editComposition.options().data.options.length">
+					Drag and drop options to reorder	
+				</div>
+			</dd>
+			<dt>
+				Description	
+			</dt>
+			<dd>
+				<textarea
+					type="text"
+					class="input-block-level html5validation-title"
+					rows="10"
+					ng-model="$ampere.view.state().transitions.editComposition.options().data.description"
+					placeholder="Enter additional composition"
+				></textarea>
+			</dd>
+		</dl>	
+	</form>		
+  </div>
+  <div class="modal-footer">
+  	<div class="btn-group">
+    	<button class="btn" ng-click="$('#composition-dialog').modal( 'hide')">Cancel</button>
+    	<button class="btn" ng-disabled="!$('#composition-dialog form').checkValidity()" ng-click="$ampere.view.state().transitions.editComposition.options().commit( $ampere.ui)">Ok</button>
+    </div>
+  </div>
+</div>

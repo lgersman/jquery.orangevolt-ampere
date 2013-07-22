@@ -1,0 +1,827 @@
+/*
+ * Orangevolt Ampere Framework
+ *
+ * http://github.com/lgersman
+ * http://www.orangevolt.com
+ *
+ * Copyright 2012, Lars Gersmann <lars.gersmann@gmail.com>
+ * Dual licensed under the MIT or GPL Version 2 licenses.
+ */
+
+@import url("ampere-ui-twitterbootstrap-crud.less");
+
+.ampere-app {
+	@fs : 13px;
+
+	font-size: @fs;
+
+	.btn, select, textarea, input[type="text"], input[type="password"], input[type="datetime"], input[type="datetime-local"], input[type="date"], input[type="month"], input[type="time"], input[type="week"], input[type="number"], input[type="email"], input[type="url"], input[type="search"], input[type="tel"], input[type="color"], .uneditable-input {
+		font-size: @fs;
+	}
+
+	label, input, button, select, textarea {
+		font-size: @fs;
+	}
+
+	.btn-group > .btn, .btn-group > .dropdown-menu {
+		font-size: @fs;
+	}
+
+	.navbar {
+		margin-bottom : 10px;
+
+		.brand {
+			font-size : 16px;
+		}
+	}
+
+	.navbar.navbar-fixed-bottom {
+		margin-bottom : 0;
+	}
+
+	h1 {
+		font-size : 30px;
+	}
+
+	h2 {
+		font-size : 22px;
+	}
+
+	hr {
+		margin : 4px 0;
+	}
+
+	legend {
+		font-size : @fs;
+		padding-bottom: 4px;
+		margin-bottom : 8px;
+		font-weight : bold;
+		line-height : 22px;
+	}
+
+	.lead {
+		font-size : @fs;
+		margin-bottom : inherit;
+	}
+
+		/* textile output */
+	pre>code {
+		display : block;
+		//border  : 1px solid #e1e1e8;
+		padding : 2px 4px;
+		background-color: #f5f5f5;
+		white-space: pre;
+		word-wrap:normal;
+	}
+
+	code, pre {
+		color : rgb(36, 95, 20);
+	}
+
+	pre {
+		padding: 2px 4px;
+		overflow : auto;
+	}
+
+	.glow-keyframes( @glow_color) {
+		@keyframes glow {
+			0% { text-shadow: none; }
+			50% { text-shadow: 0 0 2px saturate( @glow_color, 50%), 0 0 8px @glow_color; }
+			100% { text-shadow: none; }
+		}
+
+		@-moz-keyframes glow {
+			0% { text-shadow: none; }
+			50% { text-shadow: 0 0 2px saturate( @glow_color, 50%), 0 0 8px @glow_color; }
+			100% { text-shadow: none; }
+		}
+
+		@-webkit-keyframes glow {
+			0% { text-shadow: none; }
+			50% { text-shadow: 0 0 2px saturate( @glow_color, 50%), 0 0 8px @glow_color; }
+			100% { text-shadow: none; }
+		}
+	}
+
+	.glow( @glow_color: #005580, @glow_duration : 2s) {
+		animation: glow @glow_duration infinite;			
+		-moz-animation: glow @glow_duration infinite;
+		-webkit-animation: glow @glow_duration infinite;
+
+		.glow-keyframes( @glow_color);
+	}
+
+	.jiggle-keyframes( @jiggle_degree) {
+		@keyframes jiggle {
+			0% { transform: rotate(0); } 
+			66% { transform: rotate(0); }
+    		83% { transform: rotate( -@jiggle_degree); }
+    		100% { transform: rotate( @jiggle_degree); }
+		}
+
+		@-moz-keyframes jiggle {
+			0% { -moz-transform: rotate(0); } 
+			66% { -moz-transform: rotate(0); }
+    		83% { -moz-transform: rotate( -@jiggle_degree); }
+    		100% { -moz-transform: rotate( @jiggle_degree); }
+		}
+
+		@-webkit-keyframes jiggle {
+			0% { -webkit-transform: rotate(0); } 
+			66% { -webkit-transform: rotate(0); }
+    		83% { -webkit-transform: rotate( -@jiggle_degree); }
+    		100% { -webkit-transform: rotate( @jiggle_degree); }
+		}
+	}
+
+	.jiggle( @jiggle_degree: 4deg, @jiggle_duration : 1s) {
+		animation: jiggle @jiggle_duration infinite alternate;			
+		-moz-animation: jiggle @jiggle_duration infinite alternate;
+		-webkit-animation: jiggle @jiggle_duration infinite alternate;
+
+		.jiggle-keyframes( @jiggle_degree);
+	}
+
+	.jiggle-glow( @jiggle_degree: 4deg, @jiggle_duration : 1s, @glow_color: #005580, @glow_duration : 2s) {
+		animation: jiggle @jiggle_duration infinite alternate, glow @glow_duration infinite;			
+		-moz-animation: jiggle @jiggle_duration infinite alternate, glow @glow_duration infinite;
+		-webkit-animation: jiggle @jiggle_duration infinite alternate, glow @glow_duration infinite;
+
+		.jiggle-keyframes( @jiggle_degree);
+		.glow-keyframes( @glow_color);
+	}
+
+	BUTTON.ampere-transition:not(.disabled):not(.active),
+	A.ampere-transition:not(.disabled):not(.active),
+	LI >A.ampere-transition:not(.disabled):not(.active)  {
+		&.glow {
+			.glow( #f89406);
+		}
+
+		&.jiggle {
+			display : inline-block;		// only needed for anchor to make rotate having an effect
+			.jiggle();
+		}
+
+		&.jiggle.glow {
+			display : inline-block;		// only needed for anchor to make rotate having an effect
+			.jiggle-glow( @glow_color : #f89406);
+		}
+	}
+
+	
+
+		/* suppress margins on standalone elements in table cells */
+	TD >form:FIRST-CHILD:LAST-CHILD,
+	TD >dl:FIRST-CHILD:LAST-CHILD,
+	TD >input:FIRST-CHILD:LAST-CHILD,
+	TD >select:FIRST-CHILD:LAST-CHILD {
+		margin : 0;
+	}
+
+	dd >TABLE:FIRST-CHILD:LAST-CHILD {
+		margin : 0;
+	}
+
+	/*
+	TD textarea.fullwidth {
+		// Firefox
+		width: -moz-calc( ~"100% - 14px");
+		// WebKit
+		width: -webkit-calc( ~"100% - 14px");
+		// Opera
+		width: -o-calc( ~"100% - 14px");
+		// Standard
+		width: calc( ~"100% - 14px");
+	}
+	*/
+
+		// support table selections
+	TR.active,
+	.table-hover TBODY TR.active:hover td,
+	.table-striped TBODY TR:nth-child(odd).active td,
+	.table-striped TBODY TR:nth-child(odd).active th {
+		background-color : /*#f5f5f5*/ rgba(82, 168, 236, 0.2);
+	}
+
+		/* sortable */
+	/*
+	.table-striped tbody tr.sortable-placeholder td, .table-striped tbody tr.sortable-placeholder th {
+		background-color : transparent;
+	}
+
+	tr.sortable-placeholder {
+		cursor 				: move;
+		//background-image 	: -webkit-linear-gradient(-45deg, #fff 50%, #ddd 100%);
+		//background-size	: 2px 2px;
+		background-color 	: rgba(0, 136, 204, 0.47);
+
+		>td, >th, >*.not( td, th) {
+			background-color : transparent;
+		}
+	}
+
+	[ng-ampere-sortable] >[draggable]:not( .ng-ampere-sortable-nohandle):hover,
+	[ng-ampere-sortable] >[draggable]:not( .ng-ampere-sortable-nohandle):hover *,
+	[ng-ampere-sortable] >[draggable]:not( .ng-ampere-sortable-nohandle):hover .draghandle,
+	[ng-ampere-sortable] >:not( .ng-ampere-sortable-nohandle):hover,
+	[ng-ampere-sortable] >:not( .ng-ampere-sortable-nohandle):hover *,
+	[ng-ampere-sortable] >:not( .ng-ampere-sortable-nohandle):hover .draghandle {
+		cursor : move;
+	}
+
+	[ng-ampere-sortable] >[draggable]:not( .ng-ampere-sortable-nohandle):hover .draghandle,
+	[ng-ampere-sortable] >:not( .ng-ampere-sortable-nohandle):hover .draghandle {
+		background: rgba(0, 0, 0, 0.02);
+	}
+
+	[ng-ampere-sortable] >[draggable]:hover .ng-ampere-sortable-nohandle,
+	[ng-ampere-sortable] >[draggable]:hover .ng-ampere-sortable-nohandle *,
+	[ng-ampere-sortable] >:hover .ng-ampere-sortable-nohandle,
+	[ng-ampere-sortable] >:hover .ng-ampere-sortable-nohandle * {
+		cursor : auto;
+	}
+		// this is a ff fix
+	[ng-ampere-sortable] >[draggable]:hover a.ng-ampere-sortable-nohandle,
+	[ng-ampere-sortable] >[draggable]:hover a.ng-ampere-sortable-nohandle >i,
+	[ng-ampere-sortable] >[draggable]:hover .ng-ampere-sortable-nohandle a,
+	[ng-ampere-sortable] >[draggable]:hover .ng-ampere-sortable-nohandle a >i,
+	[ng-ampere-sortable] >:hover a.ng-ampere-sortable-nohandle,
+	[ng-ampere-sortable] >:hover a.ng-ampere-sortable-nohandle >i,
+	[ng-ampere-sortable] >:hover .ng-ampere-sortable-nohandle a,
+	[ng-ampere-sortable] >:hover .ng-ampere-sortable-nohandle a >i {
+		cursor : pointer;
+	}
+	*/
+		/* -- */
+
+	overflow-x : auto;
+	overflow-y : scroll;
+
+	.ampere-module {
+		position : relative;
+		//overflow : hidden;
+
+		header {
+			>H1:not( .yes):FIRST-CHILD {
+				margin-top : 10px;
+			}
+
+				/* crunch bootstrap default space */
+			.breadcrumb, .navbar {
+				margin-bottom: 0;
+			}
+
+			.breadcrumb:empty {
+				padding : 0;
+				margin  : 0;
+			}
+
+			.breadcrumb:not(:empty) + .navbar {
+				margin-top: 10px;
+			}
+
+			.breadcrumb + .navbar.subnav-fixed {
+				margin-top: 0;
+			}
+
+			H1 {
+				i[class^="icon-"], [class*=" icon-"] {
+					width      : inherit;
+					line-height: 33px;
+				}
+				margin-top : 0px;
+				margin-bottom : 0px;
+			}
+		}
+
+		dt {
+			.btn-mini {
+				margin-bottom : 6px;
+				margin-top 	  : 4px;
+				margin-left	  : 4px;
+			}
+		}
+
+		dd {
+			margin-bottom : 10px;
+		}
+
+		// prevent underlined icons within links
+		a [class^="icon-"], a [class*=" icon-"] {
+			text-decoration: none;
+				// this is a patch to fix font awesome 3.0 which makes width:auto which compresses the icons
+			width: 14px;
+		}
+
+
+		input:invalid, textarea:invalid, select:invalid,
+		input.invalid, textarea.invalid, select.invalid,
+		.invalid input, .invalid textarea, .invalid select {
+			border-color: #e9322d;
+		}
+
+		input.invalid:focus,
+		textarea.invalid:focus,
+		select.invalid:focus,
+		.invalid input:focus,
+		.invalid textarea.invalid:focus,
+		.invalid select.invalid:focus {
+			 -webkit-box-shadow: 0 0 6px #f8b9b7;
+     		-moz-box-shadow: 0 0 6px #f8b9b7;
+          	box-shadow: 0 0 6px #f8b9b7;
+		}
+
+		.inline-help.description,
+		.help-block.description {
+			color : #5A5A5A;
+		}
+
+
+			/*
+			* hide error help by default
+			*/
+		.inline-help.invalid,
+		.help-block.invalid {
+			visibility:hidden;
+		}
+
+			/*
+			* show error help when its sibling input/textarea/select has errors
+			*/
+		*:invalid~.inline-help.invalid,
+		*:invalid~.help-block.invalid,
+		.invalid~.inline-help.invalid,
+		.invalid~.help-block.invalid,
+
+		.inline-help.error,
+		.help-block.error {
+			visibility  : visible;
+			color		: #e9322d;
+		}
+
+		/* css for input[file] declared with ng-ampere-transition */
+		.ampere-transition + input[type="file"].ampere-transition-companion {
+			visibility	: hidden;
+			position	: absolute;
+			top			: -50px;
+			right		: 0;
+			opacity		: 0;
+			filter		: alpha(opacity=0);
+			font-size	: 100px;
+		}
+
+		.nav > li.disabled > a {
+			color: #999999;
+		}
+
+		 .breadcrumb > li.disabled > a {
+		 	text-decoration : none;
+			cursor : default;
+		 }
+
+		> .navbar-inverse {
+			.brand {
+			  padding-right: 0;
+			  padding-left: 0;
+			  margin-left: 20px;
+			  float: right;
+			  font-weight: bold;
+			  //color: #333;
+			  //text-shadow: 1px 1px 0 rgba(255,255,255,.4), 0 0 30px rgba(255,255,255,.125);
+			  -webkit-transition: all .2s linear;
+			     -moz-transition: all .2s linear;
+			          transition: all .2s linear;
+			    /*
+				i[class^="icon-"], [class*=" icon-"] {
+					width      : inherit;
+					line-height: 21px;
+			  	}
+			  	*/
+			}
+
+			.brand:hover {
+			  color: #ffffff;
+			  text-decoration: none;
+			  text-shadow: 1px 1px 0 rgba(255,255,255,.4), 0 0 30px rgba(255,255,255,.4);
+			}
+		}
+
+		/* overwrite bootstrap responsive layout seeting for this */
+		@media (max-width: 979px) {
+	  		.navbar-fixed-bottom {
+	    		position: fixed;
+	  		}
+	  	}
+
+		.alert-block {
+			padding-bottom: 7px;
+		}
+
+		SECTION {
+			padding-top: 4px;
+		}
+
+		.ampere-state {
+			.page-header {
+				padding-bottom 	: 0;	
+				margin 			: 0 0 10px;
+
+				a.icon-keyboard, .ampere-help a {
+					font-size 		: small;
+				}
+
+				H2 {
+					i[class^="icon-"], [class*=" icon-"] {
+						width      : inherit;
+						line-height: 28px;
+					}
+					margin-top : 0px;
+					margin-bottom : 0px;
+				}
+
+				a.disabled {
+					color : #555555;
+				}
+
+				.ampere-help {
+					display : none;
+
+					column-width		:20em;
+					-moz-column-width	:20em; /* Firefox */
+					-webkit-column-width:20em; /* Safari and Chrome */
+
+					ul.hotkeys {
+						list-style-type : none;
+
+						li.disabled >* {
+							color : #999999;
+						}
+
+						li >.description {
+							margin-left : 13px;
+						}
+
+						li + li {
+							margin-top : 1em;
+						}
+					}
+				}
+
+				.description:not(:empty) {
+					margin-bottom : 4px;
+				}
+			}
+
+			.ampere-view >section:FIRST-CHILD {
+				padding-top : 0;
+			}
+
+
+			.page-header.view-empty {
+				border : 0;
+			}
+
+				// potentially used in twitter bootstrap modals (the header)
+			H1, H2,  H3,  H4, H5 {
+				i[class^="icon-"], [class*=" icon-"] {
+					width      : inherit;
+					line-height: inherit;
+				}
+			}
+		}
+
+		/* gray out disabled anchors in navbars */
+		.navbar-inverse .nav > li.disabled > a {
+			color: #555555;
+		}
+
+		FOOTER {
+				/* this is required to prevent flickering by the moving toolbar */
+			>DIV.description {	
+				min-height: 80px;
+			}
+		}
+
+		>.overlay {
+			/*
+			opacity	: 0.8;
+			filter	: alpha(opacity=80);
+			*/
+			position: fixed;
+			top		: 0;
+			left	: 0;
+			bottom	: 0;
+			right	: 0;
+			z-index	: 1040;
+		  	background-color: #000000;
+
+		  	visibility:hidden;
+		  	opacity	:0;
+		  	-webkit-transition	: opacity 0.6s ease;
+	     	-moz-transition		: opacity 0.6s ease;
+	       	-o-transition		: opacity 0.6s ease;
+	          transition		: opacity 0.6s ease;
+		}
+
+		>.overlay.block {
+			visibility	: visible;
+	  		opacity		: 0.2;
+	  		transition	: opacity 0.8s linear;
+	  		cursor  	: wait;
+		}
+
+		>.flash {
+			display : none;
+			position: fixed;
+			top		: 20px;
+			left	: 47px;
+			bottom	: 40px;
+			right	: 47px;
+			z-index	: 1041;
+			//cursor 	: wait;
+
+			-webkit-transition	: opacity 0.6s ease;
+	     	-moz-transition		: opacity 0.6s ease;
+	       	-o-transition		: opacity 0.6s ease;
+	          transition		: opacity 0.6s ease;
+
+			.message {
+				text-align		: center;
+				padding-bottom  : 8px;
+
+				.retry {
+					margin-left : 20px;
+				}
+			}
+		}
+
+		>.flash.wait {
+			cursor 	: wait;
+		}
+
+		.tooltip.in {
+			opacity: 1;
+ 			filter: alpha(opacity=100);
+		}
+
+			/* Fixed subnav on scroll, but only for 980px and up (sorry IE!) */
+		@media (min-width: 980px) {
+		  .subnav-fixed {
+		    position: fixed;
+		    top: 40px;
+		    left: 0;
+		    right: 0;
+		    z-index: 1020; /* 10 less than .navbar-fixed to prevent any overlap */
+		    border-color: #d5d5d5;
+		    border-width: 0 0 1px; /* drop the border on the fixed edges */
+		    -webkit-border-radius: 0;
+		       -moz-border-radius: 0;
+		            border-radius: 0;
+		    -webkit-box-shadow: inset 0 1px 0 #fff, 0 1px 5px rgba(0,0,0,.1);
+		       -moz-box-shadow: inset 0 1px 0 #fff, 0 1px 5px rgba(0,0,0,.1);
+		            box-shadow: inset 0 1px 0 #fff, 0 1px 5px rgba(0,0,0,.1);
+		    filter: progid:DXImageTransform.Microsoft.gradient(enabled=false); /* IE6-9 */
+
+		    >.navbar-inner {
+		    	border-width: 0 0 1px; /* drop the border on the fixed edges */
+
+  			    -webkit-border-radius: 0;
+		       -moz-border-radius: 0;
+	            border-radius: 0;
+		    }
+		  }
+		  .subnav-fixed .nav {
+		    //width: 938px;
+		    margin: 0 auto;
+		    padding: 0 1px;
+		  }
+		  .subnav .nav > li:first-child > a,
+		  .subnav .nav > li:first-child > a:hover {
+		    -webkit-border-radius: 0;
+		       -moz-border-radius: 0;
+		            border-radius: 0;
+		  }
+		}
+	}
+}
+
+/*
+ * wizard template specific
+ */
+.ampere-app.layout-name-wizard {
+	padding-bottom: 40px;
+
+		// hide disabled left oriented transitions
+		// (typically the back button)
+	.navbar.navbar-fixed-bottom {
+		.navbar-inner {
+			.nav:not( .pull-right) {
+				li.disabled {
+					display : none;
+				}
+			}
+		}
+	}
+}
+
+/* class overlay is applied if an popup is currently overlaying it */
+.ampere-app.overlay {
+	>.ampere-module {
+		>.navbar-fixed-top, >.navbar-fixed-bottom, >.container:not( .modal-popup) {
+		//	-webkit-filter	: blur(1px);
+		//	-moz-filter		: blur(1px);
+		//	-ms-filter		: blur(1px);
+		//	-o-filter		: blur(1px);
+		//	filter			: blur(1px);
+		}
+	}
+}
+
+/* class popup is applied if an popup is currently overlaying it */
+.ampere-app.modal-popup {
+	overflow 		: hidden;
+
+	>.ampere-module {
+		/*
+		>.navbar-fixed-top, >.navbar-fixed-bottom, >.container:not(.modal-popup) {
+			-webkit-filter	: blur(1px);
+			-moz-filter		: blur(1px);
+			-ms-filter		: blur(1px);
+			-o-filter		: blur(1px);
+			filter			: blur(1px);
+		}
+		*/
+
+		.modal-popup {
+			position: fixed;
+			top		: 19px;
+			left	: 19px;
+			bottom	: 19px;
+			right	: 19px;
+			z-index	: 1042;
+			cursor 	: auto;
+			background-color : transparent;
+
+		       iframe {
+		       	overflow 	: auto;
+
+		       	/*
+		       	border: 2px solid #ffffff;
+				-webkit-border-radius: 4px;
+				-moz-border-radius: 4px;
+				border-radius: 4px;
+				*/
+
+				background-color: #ffffff;
+				border: 1px solid #999;
+				border: 1px solid rgba(0, 0, 0, 0.3);
+				*border: 1px solid #999;
+				-webkit-border-radius: 6px;
+				   -moz-border-radius: 6px;
+				        border-radius: 6px;
+				-webkit-box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+				   -moz-box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+				        box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+				-webkit-background-clip: padding-box;
+				   -moz-background-clip: padding-box;
+				        background-clip: padding-box;
+				padding : 1px;
+		       }
+		}
+	}
+}
+
+/* class modal-embed is applied if an popup is currently overlaying it */
+.ampere-app.modal-embed {
+	overflow 		: hidden;
+
+	>.ampere-module {
+		/*
+		>.navbar-fixed-top, >.navbar-fixed-bottom, >.container:not(.modal-embed) {
+			-webkit-filter	: blur(1px);
+			-moz-filter		: blur(1px);
+			-ms-filter		: blur(1px);
+			-o-filter		: blur(1px);
+			filter			: blur(1px);
+		}
+		*/
+
+		>.overlay.block, >.flash {
+			display : none !important;
+		}
+
+		.modal-embed-container {
+			position : relative;
+
+			.modal-embed-backdrop {
+				position: fixed;
+				top		: 0;
+				left	: 0;
+				bottom	: 0;
+				right	: 0;
+				z-index	: 1040;
+			  	background-color: #000000;
+		  		opacity		: 0.2;
+		  		cursor  	: wait;
+			}
+
+			.modal-embed {
+				position: absolute;
+				top		: 0;
+				left	: 0;
+				width   : 100%;
+				height  : 100%;
+				z-index	: 1042;
+				cursor 	: auto;
+				min-height : 300px;
+				background-color: #ffffff;
+				border: 2px inset #ffffff;
+
+			-webkit-border-radius: 6px;
+			   -moz-border-radius: 6px;
+			   border-radius: 6px;
+
+		        iframe {
+		        	overflow 	: auto;
+		        	width		: 100%;
+		        	height		: 100%;
+					border		: 0;
+					min-height : 300px;
+		        }
+			}
+		}
+	}
+}
+
+/* fixes font awesome */
+.btn [class^="icon-"], .btn [class*=" icon-"] {
+	line-height: 1em;
+	display : inline-block;
+	width: 14px;
+}
+
+/* fixes bootstrap.css */
+
+.lead code, pre {
+	font-size : inherit;
+}
+
+/* fixes bootstrap-responsive.css */
+@media (max-width: 767px) {
+  body.ampere-app {
+	padding-right: 0;
+	padding-left: 0;
+
+		/* this fixes the wizard top/bottom navigation bars */
+	.navbar-fixed-top,
+	 	.navbar-fixed-bottom,
+	 	.navbar-static-top {
+	   	margin-right: inherit;
+	   	margin-left: inherit;
+  	}
+  }
+}
+
+@media (max-width: 979px) {
+	.navbar-fixed-top {
+		margin-bottom: inherit;
+	}
+}
+
+/* fixes twitter bootstrap */
+input:focus:invalid,
+textarea:focus:invalid,
+select:focus:invalid {
+  color: #b94a48;
+  border-color: #ee5f5b;
+}
+
+input:focus:invalid:focus,
+textarea:focus:invalid:focus,
+select:focus:invalid:focus {
+  border-color: #e9322d;
+  -webkit-box-shadow: 0 0 6px #f8b9b7;
+     -moz-box-shadow: 0 0 6px #f8b9b7;
+          box-shadow: 0 0 6px #f8b9b7;
+}
+
+.modal-backdrop,
+.modal-backdrop.fade.in {
+  opacity: 0.3;
+  filter: alpha(opacity=30);
+}
+
+	// default is 50% but we have an additional offset of 40px caused by the fixed top menu
+	/*
+.modal.fade.in {
+	// Firefox 
+	top: -moz-calc( 50% + 20px);
+	// WebKit 
+	top: -webkit-calc( 50% + 20px);
+	// Opera 
+	top: -o-calc( 50% + 20px);
+	// Standard 
+	top: calc( 50% + 20px);
+}
+*/
