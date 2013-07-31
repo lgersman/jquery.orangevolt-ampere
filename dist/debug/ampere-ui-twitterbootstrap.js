@@ -121,6 +121,7 @@
 			 * 
 			 * see http://stackoverflow.com/questions/13595469/how-to-override-exceptionhandler-implementation	
 			 */ 
+		/*
 		ampere.config( function( $provide) {
 			$provide.decorator("$exceptionHandler", function($delegate) {
 				return function(exception, cause) {
@@ -129,6 +130,7 @@
 				};
 			});
 		});
+		*/
 
 		var ampereTwitterbootstrapController = function( $scope, $rootElement, $window, $http, $timeout,  $log, $resource, $cookies/*, $location*/) {
 			var controller = $rootElement.parent().data( 'ampere.controller');
