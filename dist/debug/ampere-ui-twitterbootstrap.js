@@ -2,7 +2,7 @@
  * jQuery Orangevolt Ampere
  *
  * version : 0.2.0
- * created : 2013-07-22
+ * created : 2013-07-31
  * source  : https://github.com/lgersman/jquery.orangevolt-ampere
  *
  * author  : Lars Gersmann (lars.gersmann@gmail.com)
@@ -783,9 +783,9 @@
 				restrict	: 'A',
 				scope		: false,
 				link		: function( scope, element, attrs) {
-					var contents  = element.contents();
-
 					scope.$watch( attrs.ngAmpereTemplate, function( newValue, oldValue) {
+						var contents  = element.contents();
+						
 						if( newValue) {
 							if( !$.isPlainObject( newValue)) {
 								newValue = {

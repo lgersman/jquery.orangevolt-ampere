@@ -2,7 +2,7 @@
  * jQuery Orangevolt Ampere
  *
  * version : 0.2.0
- * created : 2013-07-22
+ * created : 2013-07-31
  * source  : https://github.com/lgersman/jquery.orangevolt-ampere
  *
  * author  : Lars Gersmann (lars.gersmann@gmail.com)
@@ -232,6 +232,10 @@
 .ampere-app .btn-group > .btn,
 .ampere-app .btn-group > .dropdown-menu {
   font-size: 13px;
+}
+.ampere-app ul.nav li.dropdown.auto:hover > ul.dropdown-menu {
+  margin: 0;
+  display: block;
 }
 .ampere-app .navbar {
   margin-bottom: 10px;
@@ -477,8 +481,6 @@
 
   /* css for input[file] declared with ng-ampere-transition */
 
-  /* overwrite bootstrap responsive layout seeting for this */
-
   /* gray out disabled anchors in navbars */
 
   /* Fixed subnav on scroll, but only for 980px and up (sorry IE!) */
@@ -504,6 +506,10 @@
 }
 .ampere-app .ampere-module header .breadcrumb + .navbar.subnav-fixed {
   margin-top: 0;
+}
+.ampere-app .ampere-module header .breadcrumb + .navbar > .navbar-inner > .nav,
+.ampere-app .ampere-module header .breadcrumb + .navbar > .navbar-inner * > .nav {
+  margin: 0;
 }
 .ampere-app .ampere-module header H1 {
   margin-top: 0px;
@@ -581,15 +587,15 @@
   text-decoration: none;
   cursor: default;
 }
-.ampere-app .ampere-module > .navbar-inverse .brand {
+.ampere-app .ampere-module > .navbar-inverse A.brand {
   padding-right: 0;
   padding-left: 0;
-  margin-left: 20px;
+  margin-left: 0px;
   float: right;
   font-weight: bold;
-  -webkit-transition: all .2s linear;
-  -moz-transition: all .2s linear;
-  transition: all .2s linear;
+  -webkit-transition: color text-shadow 0.2s linear;
+  -moz-transition: color text-shadow 0.2s linear;
+  transition: color text-shadow 0.2s linear;
   /*
 				i[class^="icon-"], [class*=" icon-"] {
 					width      : inherit;
@@ -598,15 +604,21 @@
 			  	*/
 
 }
-.ampere-app .ampere-module > .navbar-inverse .brand:hover {
+.ampere-app .ampere-module > .navbar-inverse A.brand:hover {
   color: #ffffff;
   text-decoration: none;
   text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.4), 0 0 30px rgba(255, 255, 255, 0.4);
 }
-@media (max-width: 979px) {
-  .ampere-app .ampere-module .navbar-fixed-bottom {
-    position: fixed;
-  }
+.ampere-app .ampere-module > .navbar-inverse .brand-prepend,
+.ampere-app .ampere-module > .navbar-inverse .brand-append {
+  float: right;
+}
+.ampere-app .ampere-module > .navbar-inverse .brand-prepend > UL.nav,
+.ampere-app .ampere-module > .navbar-inverse .brand-append > UL.nav {
+  margin-right: 0;
+}
+.ampere-app .ampere-module > .navbar-inverse .nav-collapse .nav {
+  margin: 0;
 }
 .ampere-app .ampere-module .alert-block {
   padding-bottom: 7px;
@@ -927,8 +939,17 @@ pre {
   }
 }
 @media (max-width: 979px) {
-  .navbar-fixed-top {
-    margin-bottom: inherit;
+  /*
+  	.navbar-fixed-top {
+  		margin-bottom: inherit;
+  	}
+  	*/
+  .navbar-fixed-bottom {
+    position: fixed;
+  }
+  .navbar-fixed-top .navbar-inner,
+  .navbar-fixed-bottom .navbar-inner {
+    padding: 0;
   }
 }
 /* fixes twitter bootstrap */
