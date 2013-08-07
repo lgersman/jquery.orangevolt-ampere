@@ -2,7 +2,7 @@
  * jQuery Orangevolt Ampere
  *
  * version : 0.2.0
- * created : 2013-07-31
+ * created : 2013-08-07
  * source  : https://github.com/lgersman/jquery.orangevolt-ampere
  *
  * author  : Lars Gersmann (lars.gersmann@gmail.com)
@@ -1239,7 +1239,13 @@
 
 					var module = self.controller.module;
 
-					var proceedTransitionHotkey = function( transition, ngAmpereHotkey, domElement) {
+					var proceedTransitionHotkey = function( value, ngAmpereHotkey, domElement) {
+						var transition = value, transitionArguments = [];
+						if( $.isPlainObject( value)) {
+							transition = value.transition;
+							$.isArray( transitionArguments) && (transitionArguments = value.transitionArguments);
+						}
+
 						var hotkey = ngAmpereHotkey || transition.options( 'ampere.ui.hotkey');
 
 						if( transition.enabled() && hotkey) {
@@ -1254,7 +1260,7 @@
 									// patch matching hotkey element into event
 								event.currentTarget = event.delegateTarget = event.srcElement = event.target = domElement;
 									// provide patched event to transition action
-								self.controller.proceed( transition, [event]);
+								self.controller.proceed( transition, [event].concat( transitionArguments));
 
 								return true;
 							}
@@ -1276,12 +1282,20 @@
 									// prevent any other hotkey handler to be invoked
 								event.stopImmediatePropagation();
 
-								var value = hotkeys[ hotkey];
-								if( value instanceof Transition) {
+								var value				= hotkeys[ hotkey], 
+									transition			= value,
+									transitionArguments	= [];
+
+								if( $.isPlainObject( transition)) {
+									transition = value.transition;
+									$.isArray( value.transitionArguments) && (transitionArguments = value.transitionArguments);
+								}
+
+								if( transition instanceof Transition) {
 										// patch matching hotkey element into event
 									event.currentTarget = event.delegateTarget = event.srcElement = event.target = element[0];
 										// provide patched event to transition action
-									self.controller.proceed( value, [event]);
+									self.controller.proceed( value, [event].concat( transitionArguments));
 								} else {
 									var scope = angular.element( element).scope();
 									scope.$apply( value);
@@ -1297,8 +1311,8 @@
 					for( i in elements) {
 						element = $( elements[i]);
 						if( element.hasClass( 'ampere-transition')) {
-							var transition = element.data( 'ampereTransition');
-							if( transition && proceedTransitionHotkey( transition, undefined, element.data( 'ampere-hotkey', self.controller.element), element[0])) {
+							var t = element.data( 'ampereTransition');
+							if( t && proceedTransitionHotkey( t, undefined, element.data( 'ampere-hotkey', self.controller.element), element[0])) {
 								return;
 							}
 						}

@@ -2,7 +2,7 @@
  * jQuery Orangevolt Ampere
  *
  * version : 0.2.0
- * created : 2013-07-31
+ * created : 2013-08-07
  * source  : https://github.com/lgersman/jquery.orangevolt-ampere
  *
  * author  : Lars Gersmann (lars.gersmann@gmail.com)
@@ -281,9 +281,9 @@
   padding: 2px 4px;
   overflow: auto;
 }
-.ampere-app BUTTON.ampere-transition:not(.disabled):not(.active).glow,
-.ampere-app A.ampere-transition:not(.disabled):not(.active).glow,
-.ampere-app LI > A.ampere-transition:not(.disabled):not(.active).glow {
+.ampere-app BUTTON:not(.disabled):not(.active).glow,
+.ampere-app A:not(.disabled):not(.active).glow,
+.ampere-app LI > A:not(.disabled):not(.active).glow {
   animation: glow 2s infinite;
   -moz-animation: glow 2s infinite;
   -webkit-animation: glow 2s infinite;
@@ -321,9 +321,9 @@
     text-shadow: none;
   }
 }
-.ampere-app BUTTON.ampere-transition:not(.disabled):not(.active).jiggle,
-.ampere-app A.ampere-transition:not(.disabled):not(.active).jiggle,
-.ampere-app LI > A.ampere-transition:not(.disabled):not(.active).jiggle {
+.ampere-app BUTTON:not(.disabled):not(.active).jiggle,
+.ampere-app A:not(.disabled):not(.active).jiggle,
+.ampere-app LI > A:not(.disabled):not(.active).jiggle {
   display: inline-block;
   animation: jiggle 1s infinite alternate;
   -moz-animation: jiggle 1s infinite alternate;
@@ -371,9 +371,9 @@
     -webkit-transform: rotate(4deg);
   }
 }
-.ampere-app BUTTON.ampere-transition:not(.disabled):not(.active).jiggle.glow,
-.ampere-app A.ampere-transition:not(.disabled):not(.active).jiggle.glow,
-.ampere-app LI > A.ampere-transition:not(.disabled):not(.active).jiggle.glow {
+.ampere-app BUTTON:not(.disabled):not(.active).jiggle.glow,
+.ampere-app A:not(.disabled):not(.active).jiggle.glow,
+.ampere-app LI > A:not(.disabled):not(.active).jiggle.glow {
   display: inline-block;
   animation: jiggle 1s infinite alternate, glow 2s infinite;
   -moz-animation: jiggle 1s infinite alternate, glow 2s infinite;
