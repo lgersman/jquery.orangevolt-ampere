@@ -3,7 +3,7 @@ module.exports = function(grunt) {
 	var js = {
 		libs  : [
 			'jquery-2.0.2.js',
-			'jquery-ui-sortable-1.10.3/jquery-ui-1.10.3.custom.min.js',
+			'jquery-ui-1.10.3.custom/jquery-ui-1.10.3.custom.min.js',
 			'bootstrap-2.3.2/js/bootstrap.min.js',
 			//'jquery.sortable.js',
 			'datepicker/js/bootstrap-datepicker.js',
@@ -103,7 +103,7 @@ module.exports = function(grunt) {
 						'libs/font-awesome-3.1.1/css/**', 
 						'libs/font-awesome-3.1.1/font/*',
 						'libs/bootstrap-2.3.2/**/*.min.*',
-						'libs/jquery-ui-sortable-1.10.0/**/*.min.*',
+						'libs/jquery-ui-1.10.3.custom/**',
 						'libs/datepicker/css/**', 'libs/datepicker/js/**'
 					]},
 					{ dest: 'dist/debug/', expand : true, flatten:true, src : [ js.src]}
@@ -209,6 +209,7 @@ module.exports = function(grunt) {
 			oval_js({
 				banner    : banner,
 				css       : [
+					'libs/jquery-ui-1.10.3.custom/jquery-ui-1.10.3.custom.min.css',
 					'libs/bootstrap-2.3.2/css/bootstrap.min.css',
 					'libs/bootstrap-2.3.2/css/bootstrap-responsive.min.css',
 					'libs/font-awesome-3.1.1/css/font-awesome.css',

@@ -9,42 +9,83 @@
             @text-color : #555555;
             @highlight-color : aliceblue;
 
-           
-            body, body *,
-                // override bootstrap popover title default
-            .popover-title {
-               font-size : 13px;
-
-            }
-
-            body {
+            body.ampere-app {
+                min-width : 768px;
                 position: static;
-                overflow: hidden;
+                overflow-x: hidden;
+                overflow-y: hidden;
             }
 
             .amperator {
                 position: absolute;
                 right: 0;
                 left: 0;
-                top: 40px;
-                bottom: 40px;
-
-                >.row {
+                top : 41px;
+                bottom : 40px;
+                background-image: url(http://gdj.gdj.netdna-cdn.com/wp-content/uploads/2012/08/minimal-background-pattern-wordpress-1.jpg);
+                >* {
                     height : 100%;
+                    float: left;
+                }
 
-                    >.amperator-help {
-                        overflow : auto;
-                        height : 100%;
-                        padding : 8px;
-                        color: #c09853;
-                        background-color: #fcf8e3;
-                        border-right: 1px solid #fbeed5
+                >.amperator-help {
+                    box-sizing : border-box;
+                    -moz-box-sizing : border-box;
+                    width : 240px;
+                    padding : 8px;
+                    color: #c09853;
+                    background-color: #fcf8e3;
+                    border-right: 1px solid #fbeed5;
+
+                    >.content {
+                        height : calc( ~'100% - 40px');
+                        overflow: auto;
+
+                        LI {
+                            list-style-type: circle; 
+                        }
+
+                        .filter {
+                            LI[ng-class] {
+                                list-style-type: disc; 
+
+                                &:not( .visible) {
+                                    display : none;                                
+                                }
+                            }
+                        }
                     }
-                }    
+                }
+
+                >.amperator-properties {
+                    box-sizing : border-box;
+                    -moz-box-sizing : border-box;
+                    width : 240px;
+                    float : right;
+                    padding : 8px;
+                    //color : #3a87ad;
+                    //color: darken( @highlight-color, 55%);
+                    background-color: @highlight-color;
+                    border-left: 1px solid darken( @highlight-color, 3%);
+
+                    >.content {
+                        height : calc( ~'100% - 40px');
+                        overflow: auto;
+                    }
+                }
+
+                /*
+                >.amperator-canvas {
+                    width : 580px;
+                    overflow : auto;
+                }
+                */
             }
 
             svg {
-                height : 100%;
+                min-height : 200px;
+                min-width  : 200px;
+                font-size : 13px;
 
                 .end-arrow {
                    fill            : @color;
@@ -311,7 +352,12 @@
 
                 window.states[1].transitions.push( { label : 'waaa!', points : [ { x : 250, y : 30}], target : window.states[ 2]})
 
-                window.svg = d3.select( 'svg')
+                var svg = d3.select( 'svg');
+                //.attr("viewBox", "0 0 " + 1000 + " " + 1000 )
+                //.attr("preserveAspectRatio", "xMidYMid meet")
+                //.attr("pointer-events", "all")
+                //.call(d3.behavior.zoom().scaleExtent([.1, 3]).on("zoom", update));
+
                 //.attr("viewBox", "0 0 " + 1000 + " " + 1000 )
                 //.attr("preserveAspectRatio", "xMinYMin")
                 //.attr("width", "100%")
@@ -327,16 +373,33 @@
                 svg.call( zoom);
                 */
                 
+                var selectionAccessor = (function() {
+                    var _selected = undefined;
+
+                    return function( selected) {
+                        if( arguments.length) {
+                            var doTrigger = !angular.equals( selected, _selected);
+                            _selected = selected;
+                            doTrigger && $( svg.node()).trigger( 'd3.selection', [ _selected]);                            
+                        } else {
+                            return _selected;
+                        }
+                    };
+                })();
+
+                    // this is needed to be able to apply scale/transform at once
+                var group = svg.append( 'g');
+
                     // line displayed when dragging new nodes
-                var drag_line = svg.append('svg:path')
+                var drag_line = group.append('svg:path')
                     .attr({
                         'class' : 'dragline hidden',
                         'd'     : 'M0,0L0,0'
                     })
                 ;
                 
-                var gTransitions = svg.append( 'g').selectAll( "path.transition");
-                var gStates = svg.append("g").selectAll( "g.state");
+                var gTransitions = group.append( 'g').selectAll( "path.transition");
+                var gStates = group.append("g").selectAll( "g.state");
 
                 var transitions = function() {
                     return states.reduce( function( initial, state) {
@@ -473,6 +536,11 @@
                     });
 
                     d3.event.sourceEvent.stopPropagation();
+                })
+                .on( "dragend", function( d) {
+                    console.log( "transitionmidpoint dragend");
+
+                    adjustSVGSize();
                 });
 
                 var renderTransitionMidPoints = function( gTransition) {
@@ -596,13 +664,15 @@
                             'class'     : 'transition' 
                         })
                         .on({
-                            click : function() {
+                            click : function( data) {
                                 console.log( "transition click");
                                 d3.selectAll( 'g.state.selection').classed( "selection", false);
                                 d3.selectAll( 'g.selected').classed( "selected", false);
 
                                 d3.select( this).classed( "selected", true);
                                 d3.event.stopPropagation();
+
+                                selectionAccessor( data);
                             },
                             mouseover : function() {
                                 svg.select( "rect.selection").empty() && d3.select( this).classed( "hover", true);
@@ -637,6 +707,8 @@
                                     gTransitions.selectAll( "text.label").attr({
                                         transform : transformTransitionLabel
                                     });
+
+                                    selectionAccessor( d);
                                 } else {
                                     var gTransition = d3.select( d3.event.target.parentElement),
                                     transition = gTransition.datum(),
@@ -785,6 +857,13 @@
                                     // so that its stays on top 
                                 g.parentNode.appendChild( g);
                                 //d3.event.stopPropagation();
+                                
+                                var _selection = d3.selectAll( 'g.selected').data(); 
+                                if( _selection.length) {
+                                    selectionAccessor( _selection.length==1 && _selection[0] || _selection);
+                                } else {
+                                    selectionAccessor( undefined);
+                                }
                             },
                             mouseover : function() {
                                 svg.select( "rect.selection").empty() && d3.select( this).classed( "hover", true);
@@ -812,7 +891,7 @@
                                 $( this).popover( 'hide');
                             },
                             dblclick : function() {
-                                console.log( "state circle outer dblclick");
+                                console.log( "state circle inner dblclick");
                                 var d = d3.select( this.parentNode).datum();
 
                                 var index = states.indexOf( d);
@@ -831,6 +910,8 @@
 
                                 //d3.select( this.parentNode).remove();
                                 update();
+
+                                selectionAccessor( undefined);
                             }
                         })
                         .each( function( d, i){ 
@@ -887,7 +968,7 @@
                         // if dragged state is not in current selection
                         // mark it selected and deselect all others
                     if( selection[0].indexOf( this)==-1) {
-                        selection.classed( "selected", false);
+                        selection.classed( "selected", false);                        
                         selection = d3.select( this);
                         selection.classed( "selected", true);
                     } 
@@ -940,6 +1021,13 @@
                     });
 
                     d3.event.sourceEvent.stopPropagation();
+
+                    var _selection = d3.selectAll( 'g.state.selected').data();
+                    if( _selection.length) {
+                        selectionAccessor( _selection.length==1 ? _selection[0] : _selection);
+                    } else {
+                        selectionAccessor( undefined);
+                    }
                 })
                 .on( "dragend", function( d) {
                     console.log( "dragend");
@@ -952,8 +1040,16 @@
                     ;
 
                     if( startState && endState) {
-                        startState.transitions.push( { label : "transition label 1", points : [], target : endState});
+                            // deselect selected states
+                        d3.selectAll( '.selected').classed( "selected", false);
+
+                        var transition = { label : "transition label 1", points : [], target : endState};
+                        startState.transitions.push( transition);
                         update();
+
+                        selectionAccessor( transition);
+                    } else {
+                        adjustSVGSize();
                     }
 
                     startState = undefined;
@@ -966,12 +1062,17 @@
                         if( d3.event.target.tagName=='svg') {
 
                             if( !d3.event.ctrlKey) {
+                                var _selection = d3.selectAll( 'g.selected').data();
                                 d3.selectAll( 'g.selected').classed( "selected", false);
+                                _selection.length && selectionAccessor( undefined);
                             }
+                            
+                            var scale = $( '.amperator-canvas').data( 'controller').zoom.value,
+                                p = d3.mouse( this);
+                            p[0] /= scale;
+                            p[1] /= scale;
 
-                            var p = d3.mouse( this);
-
-                            svg.append( "rect")
+                            group.append( "rect")
                             .attr({
                                 rx      : 6,
                                 ry      : 6,
@@ -986,14 +1087,19 @@
                     mousemove : function() {
                         //console.log( "mousemove");
                         var p = d3.mouse( this),
-                            s = svg.select( "rect.selection");
+                            s = group.select( "rect.selection");
+
+                        var scale = $( '.amperator-canvas').data( 'controller').zoom.value,
+                            p = d3.mouse( this);
+                        p[0] /= scale;
+                        p[1] /= scale;
 
                         if( !s.empty()) {
                             var d = {
-                                    x       : parseInt( s.attr( "x"), 10),
-                                    y       : parseInt( s.attr( "y"), 10),
-                                    width   : parseInt( s.attr( "width"), 10),
-                                    height  : parseInt( s.attr( "height"), 10)
+                                    x       : parseFloat( s.attr( "x"), 10),
+                                    y       : parseFloat( s.attr( "y"), 10),
+                                    width   : parseFloat( s.attr( "width"), 10),
+                                    height  : parseFloat( s.attr( "height"), 10)
                                 },
                                 move = {
                                     x : p[0] - d.x,
@@ -1044,15 +1150,22 @@
                     mouseup : function() {
                         console.log( "mouseup");
                             // remove selection frame
-                        svg.selectAll( "rect.selection").remove();
+                        d3.selectAll( "rect.selection").remove();
 
                             // remove temporary selection marker class
                         d3.selectAll( 'g.state.selection').classed( "selection", false);
+
+                        var _selection = d3.selectAll( 'g.state.selected').data();
+                        if( _selection.length) {
+                            selectionAccessor( _selection.length==1 && _selection[0] || _selection);
+                        } else {
+                            selectionAccessor( undefined);
+                        }
                     },
                     mouseout : function() {
                         if( !d3.event.relatedTarget || d3.event.relatedTarget.tagName=='HTML') {
                                 // remove selection frame
-                            svg.selectAll( "rect.selection").remove();
+                            d3.selectAll( "rect.selection").remove();
 
                                 // remove temporary selection marker class
                             d3.selectAll( 'g.state.selection').classed( "selection", false);
@@ -1060,11 +1173,17 @@
                     },
                     dblclick : function() {
                         console.log( "dblclick");
-                        var p = d3.mouse( this);
+                        var scale = $( '.amperator-canvas').data( 'controller').zoom.value,
+                            p = d3.mouse( this);
+                        p[0] /= scale;
+                        p[1] /= scale;
 
                         if( d3.event.target.tagName=='svg') {
-                            states.push( { point : { x : p[0], y : p[1]}, label : "tst", transitions : [] });
+                            var state = { point : { x : p[0], y : p[1]}, label : "tst", transitions : [] };
+                            states.push( state);
                             update();
+
+                            selectionAccessor( state);
                         } 
                     }
                 });
@@ -1080,110 +1199,297 @@
                         return _transitions.indexOf( d);
                     });
                     renderTransitions();
+
+                    adjustSVGSize();
                 };
 
+                function adjustSVGSize() {
+                    var bbox = svg.node().getBBox(),
+                        container = $( svg.node()).parent();
+
+                        // apply zoon
+                    var zoom = container.data( 'controller').zoom;
+                    $( group.node()).attr( 'transform', "scale( " + zoom.value + ")");
+
+                        // add a padding around the border box
+                    bbox.x -= 10;
+                    bbox.y -= 10;
+                    bbox.width +=20;
+                    bbox.height +=20;
+
+                    //svg.attr("viewBox",bbox.x+" "+bbox.y+" "+bbox.width+" "+bbox.height)
+                    svg
+                    .style({
+                        width        : Math.max( bbox.width, container.width()) + 'px',
+                        height       : Math.max( bbox.height, container.height()) + 'px'
+                    })
+                    //.attr( "transform", "translate(" + [ -bbox.x, -bbox.y ] + ")")
+                    .attr( "viewBox", bbox.x+" "+bbox.y+" "+Math.max( bbox.width, container.width())+" "+Math.max( bbox.height, container.height()))
+                    .attr("preserveAspectRatio", "xMidYMid")
+                    ;
+
+                    container.css({
+                        'overflow-x' : bbox.width>container.width() ? 'scroll' : 'hidden',
+                        'overflow-y' : bbox.height>container.height() ? 'scroll' : 'hidden'
+                    });
+                }
+
+                function onResize() {
+                    var qCanvas = $( '.amperator-canvas'),
+                        qHelp = $( '.amperator-help'),
+                        qProperties = $( '.amperator-properties');
+
+                    qCanvas.css({
+                        width : qCanvas.parent().width() - 
+                                (qHelp.is(':visible') ? qHelp.outerWidth() : 0) -
+                                (qProperties.is(':visible') ? qProperties.outerWidth() : 0) +
+                                'px'
+                    });
+
+                    adjustSVGSize();
+                }
+
+                var controller = $( '.amperator-canvas').data( 'controller');
+                $.extend( controller, {
+                    'onResize' : onResize,
+                    'update' : update,
+                    'adjustSVGSize' : adjustSVGSize,
+                    'selection'     : selectionAccessor
+                });
+                $( window).on( 'resize', onResize);
+
                 update();
+                onResize();
             }
 
             $( window).ready( function() {
                 render();
+
+                $( '.amperator-help').resizable({
+                    handles : 'e',
+                    minWidth: 100,
+                    start : function( event, ui) {
+                            // ensure maxWidth less than parent.width - properties.width
+                        $( '.amperator-help').resizable( 'option', 'maxWidth', $( '.amperator').width()/2);
+                    }
+                });
+                $( '.amperator-properties').resizable({
+                    handles : 'w',
+                    minWidth: 100,
+                    resize : function( event, ui) {
+                            // left is set by the resizable but breaks the layout 
+                        $( '.amperator-properties').css( 'left', '');
+                    },
+                    start : function( event, ui) {
+                            // ensure maxWidth less than parent.width - properties.width
+                        $( '.amperator-properties').resizable( 'option', 'maxWidth', $( '.amperator').width()/2);
+                    }
+                });
             });
 
             function AmperatorCtrl( $scope) {
                 $scope.qHelp = $( '.amperator-help');
                 $scope.qCanvas = $( '.amperator-canvas');
+                $scope.qCanvas.data( 'controller', $scope.canvasController = {});
+                $scope.qProperties = $( '.amperator-properties');
                 $scope.$ = jQuery;
+                $scope.zoomOptions = [ 
+                    { value : 0.33, label : '33%' },
+                    { value : 0.66, label : '66%' }, 
+                    { value : 1.0, label : '100%' },
+                    { value : 1.33, label : '133%' },
+                    { value : 1.66, label : '166%' }, 
+                ];
+                $scope.canvasController.zoom = $scope.zoomOptions[2];
+
+                $scope.helpShowAll = true;
+
+                $scope.qCanvas
+                .on( "d3.selection", function( event, selection) {
+                    $scope.$apply();
+                });
+
+                $scope.getContextType = function() {
+                    var selection = $scope.canvasController.selection; 
+                    selection = $.isFunction( selection) && selection();
+                    if( !selection)  {
+                        return "Module";
+                    } else if( $.isArray( selection)) {
+                        return "States";
+                    } else if( selection.source) {
+                        return "Transition";
+                    } else {
+                        return "State";
+                    }
+                };
 
                 $scope.toggleHelp = function() {
-                    var visible = $scope.qHelp.is( ':visible');
-                    $scope.qHelp.animate({width: 'toggle'}, function() {
-                        if( visible) {
-                            $scope.qCanvas.addClass( 'span9');
-                        } else {
-                            $scope.qCanvas.removeClass( 'span9');
-                        }
-                        $scope.$apply();
-                    });
-                }
+                    $scope.qHelp.toggle();
+                    $scope.canvasController.onResize();
+                };
+
+                $scope.toggleProperties = function() {
+                    $scope.qProperties.toggle();
+                    $scope.canvasController.onResize();
+                };
+
+                $scope.onZoomChanged = function( zoom) {
+                    $scope.canvasController.zoom = zoom;
+                    $scope.canvasController.adjustSVGSize();
+                    $scope.canvasController.update();
+                };
             }
         </script>
     </head>
-    <body ng-app ng-controller="AmperatorCtrl">
+    <body class="ampere-app" ng-app ng-controller="AmperatorCtrl">
         <div class="navbar navbar-inverse navbar-fixed-top">
           <div class="navbar-inner">
             <a class="brand" target="_blank" href="https://github.com/lgersman/jquery.orangevolt-ampere">Orangevolt Amperator</a>
             
             <ul class="nav">
-              <li><a href="#">New</a></li>
-              <li><a href="#">Load</a></li>
-              <li><a href="#">Save</a></li>
+                <li><a href="#">New</a></li>
+                <li><a href="#">Load</a></li>
+                <li><a href="#">Save</a></li>
+                <li class="divider-vertical"></li>
+                <li class="dropdown auto">
+                    <a href="#" class="dropdown-toggle" >
+                        Zoom
+                        <i class="caret"></i>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li 
+                            ng-repeat="zoomOption in zoomOptions"
+                        > 
+                            <a href="#" ng-click="onZoomChanged( zoomOption)">
+                                <i class="icon-ok" ng-style="zoomOption!=canvasController.zoom && {  visibility:'hidden'}"></i>
+                                {{zoomOption.label}}
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="dropdown auto">
+                    <a href="#" class="dropdown-toggle" >
+                        Views
+                        <i class="caret"></i>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a ng-click="toggleProperties()" href="#">
+                                <i class="icon-ok" ng-style="!qProperties.is( ':visible') && {  visibility:'hidden'}"></i>
+                                Properties
+                            </a>
+                        </li>
+                        <li>
+                            <a ng-click="toggleHelp()" href="#">
+                                <i class="icon-ok" ng-style="!qHelp.is( ':visible') &&  {visibility:'hidden'}"></i>
+                                Help
+                            </a>
+                        </li>
+                    </ul>
+                </li>
             </ul>
 
-             <ul class="nav pull-right">
-                <li ng-class="{ active : qHelp.is( ':visible')}">
-                    <a ng-click="toggleHelp()" href="#">
-                        <i class="icon-question-sign"></i>
-                        Help
-                    </a>
-                </li>
+            <ul class="nav pull-right">                
+                
             </ul>
           </div>
         </div>
         <div class="amperator">
-            <div class="row">
-                <div class="amperator-help span3">
-                    <button type="button" class="pull-right close" ng-click="toggleHelp()">&times;</button>
-                    <div>
-                        <h2>Help</h2>
-                        <div class="contents">
-                            <ul>
-                                <li>
-                                    <strong>Double click on canvas</strong>
-                                    create new state
-                                </li>
-                                <li>
-                                    <strong>Click on canvas and drag cursor</strong>
-                                    will open up a selection frame selecting all states within
-                                </li>
-                                <li>
-                                    <strong>Drag selected states</strong>
-                                    to move them around including all transitions
-                                </li>
-                                <li>
-                                    <strong>Click on state</strong>
-                                    will select the state
-                                </li>
-                                <li>
-                                    <strong>CTRL &amp; Click on state</strong>
-                                    will add/remove the state from selected states
-                                </li>
-                                <li>
-                                    <strong>Click on state border &amp; drag mouse to another state</strong>
-                                     will create a transition
-                                </li>
-                                <li>
-                                    <strong>Double click on state / transition</strong>
-                                     to remove.
-                                </li>
-                                <li>
-                                    <strong>Ctrl &amp; double click on transition</strong>
-                                     will add a transition helper point.
-                                </li>
-                                <li>
-                                    <strong>Ctrl &amp; double click on transition hlper point</strong>
-                                     will remove a transition helper point.
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
+            <div class="amperator-help">
+                <button type="button" class="pull-right close" ng-click="toggleHelp()">&times;</button>
+                <label class="checkbox pull-right">    
+                    <input ng-model="helpShowAll" type="checkbox">
+                    Show all &nbsp;
+                </label>
+                <h5>Help</h5>
+                <div class="content">
+                    <ul ng-class="!helpShowAll && 'filter'">
+                        <li ng-class="{visible : helpShowAll || $.inArray( getContextType(), ['State', 'States'])!=-1}">
+                            <strong>Click on state border &amp; drag mouse to another state</strong>
+                             will create a transition
+                        </li>
+                        <li  ng-class="{visible : helpShowAll || $.inArray( getContextType(), ['Transition', 'State', 'States'])!=-1}">
+                            <strong>Double click on state / transition</strong>
+                             to remove.
+                        </li>
+                        <li ng-class="{visible : helpShowAll || $.inArray( getContextType(), ['Transition'])!=-1}">
+                            <strong>Ctrl &amp; double click on transition</strong>
+                             will add a transition helper point.
+                        </li>
+                        <li ng-class="{visible : helpShowAll || $.inArray( getContextType(), ['Transition'])!=-1}">
+                            <strong>Ctrl &amp; double click on transition helper point</strong>
+                             will remove a transition helper point.
+                        </li>
+                        <li>
+                            <strong>Double click on canvas</strong>
+                            create new state
+                        </li>
+                        <li>
+                            <strong>Click on canvas and drag cursor</strong>
+                            will open up a selection frame selecting all states within
+                        </li>
+                        <li>
+                            <strong>Drag selected states</strong>
+                            to move them around including all transitions
+                        </li>
+                        <li>
+                            <strong>Click on state</strong>
+                            will select the state
+                        </li>
+                        <li>
+                            <strong>CTRL &amp; Click on state</strong>
+                            will add/remove the state from selected states
+                        </li>
+                    </ul>
                 </div>
-                <svg class="amperator-canvas span9" xmlns="http://www.w3.org/2000/svg" version="1.1">
+            </div>
+            <div class="amperator-canvas">
+                <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
                     <defs>
                         <marker id="end-arrow" viewBox="0 -5 10 10" refX="4" markerWidth="8" markerHeight="8" orient="auto">
                             <path d="M0,-5L10,0L0,5" class="end-arrow"/>
                         </marker>
                     </defs>
                 </svg>
+            </div>
+            <div class="amperator-properties">
+                <button type="button" class="pull-right close" ng-click="toggleProperties()">&times;</button>
+                <h5>
+                    {{getContextType()}} properties
+                </h5>
+                <div class="content" ng-switch="getContextType()">
+                    <div ng-switch-when="Module">
+                        module
+                        <form>
+                            <label>
+                                Name:
+                                <input type="text" ng-model="canvasController.selection().label">
+                            </label>
+                        </form>
+                    </div>
+                    <div ng-switch-when="State">
+state
+                        <form>
+                            <label>
+                                Name:
+                                <input type="text" ng-model="canvasController.selection().label">
+                            </label>
+                        </form>
+                    </div>
+                    <div ng-switch-when="States">
+states
+                    </div>
+                    <div ng-switch-when="Transition">
+transition
+                        <form>
+                            <label>
+                                Name:
+                                <input type="text" ng-model="canvasController.selection().transition.label">
+                            </label>
+                        </form>
+
+                    </div>
+                </div>
             </div>
         </div>
         <div class="navbar navbar-fixed-bottom">

@@ -371,14 +371,14 @@
 		 * @return first item of array
 		 */
 	window.ov.entity.first = function first( array) {
-		return array.length && array[ 0] || undefined;
+		return array && array.length && array[ 0] || undefined;
 	};
 
 		/**
 		 * @return last item of array
 		 */
 	window.ov.entity.last = function last( array) {
-		return array.length && array[ array.length-1] || undefined;
+		return array && array.length && array[ array.length-1] || undefined;
 	};
 
 

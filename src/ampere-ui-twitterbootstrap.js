@@ -71,6 +71,16 @@
 				return window.ov.ampere.type( input);
 			};
 		});
+		ampere.filter( 'first', function() {
+			return function( array) {
+				return window.ov.entity.first( array);
+			};
+		});
+		ampere.filter( 'last', function() {
+			return function( array) {
+				return window.ov.entity.last( array);
+			};
+		});
 		ampere.filter( 'match', function() {
 			return function( items, value, property) {
 				property = property!==undefined || 'id';
@@ -118,6 +128,7 @@
 			 * 
 			 * see http://stackoverflow.com/questions/13595469/how-to-override-exceptionhandler-implementation	
 			 */ 
+		/*
 		ampere.config( function( $provide) {
 			$provide.decorator("$exceptionHandler", function($delegate) {
 				return function(exception, cause) {
@@ -126,6 +137,7 @@
 				};
 			});
 		});
+		*/
 
 		var ampereTwitterbootstrapController = function( $scope, $rootElement, $window, $http, $timeout,  $log, $resource, $cookies/*, $location*/) {
 			var controller = $rootElement.parent().data( 'ampere.controller');
@@ -400,11 +412,24 @@
 							return;
 						}
 
-						_ns = $.ov.namespace('ngAmpereTransition(' + newValue.fullName() + ')');
+						var transition = newValue, transitionArguments = [];
+						if( $.isPlainObject( newValue)) {
+							transition = newValue.transition;
 
-						var type = attrs.type || newValue.options( 'ampere-ui-input-type') || ($.inArray( element[0].tagName.toLowerCase(), Object.keys( templates))!=-1 ? element[0].tagName.toLowerCase() : 'button');
+							_ns = $.ov.namespace('ngAmpereTransition(' + transition.fullName() + ')');
+							_ns.assert( 
+								newValue['arguments']===undefined || $.isArray( newValue['arguments']), 
+								'property "arguments" expected to be undefined or array but is ' + $.ov.json.stringify( newValue['arguments'], $.ov.json.stringify.COMPACT)
+							);
+							$.isArray( newValue['arguments']) && (transitionArguments = newValue['arguments']);
+						}
 
-						scope.transition = newValue;
+						!_ns || (_ns = $.ov.namespace('ngAmpereTransition(' + transition.fullName() + ')'));
+
+						var type = attrs.type || transition.options( 'ampere-ui-input-type') || ($.inArray( element[0].tagName.toLowerCase(), Object.keys( templates))!=-1 ? element[0].tagName.toLowerCase() : 'button');
+
+						scope.transition = transition;
+						scope.transitionArguments = transitionArguments;
 						scope.$enabled = scope.transition.enabled();
 						scope.$css = (function( value) {
 							return function() {
@@ -414,7 +439,7 @@
 
 						_ns.assert(
 							window.ov.ampere.type( scope.transition)=='transition',
-							'attribute "ng-ampere-transition" (="', attrs.ngAmpereTransition, '") does not resolve to a ampere transition'
+							'attribute "ng-ampere-transition" (="', attrs.ngAmpereTransition, '") does not resolve to a ampere transition or object containting a transition { transition : ..., ...}'
 						);
 
 						if( templates[ type]) {
@@ -444,11 +469,11 @@
 							if( hotkey) {
 								scope.hotkey = ' (' + window.ov.ampere.util.ucwords( hotkey) + ')';
 							}
-							replacement.data( 'ampereTransition', newValue);
+							replacement.data( 'ampereTransition', transition);
 						} else {
 							_ns.raise( 'type "', type, '" is unknown');
 						}
-					});
+					}, true);
 				}
 			};
 		}]);
@@ -463,15 +488,21 @@
 					restrict   : 'A',
 					link: function( scope, element, attrs) {
 						$( element).on( eventName, function( event) {
-							var transition = scope.$eval( attrs[ directive]);
+							var value = scope.$eval( attrs[ directive]);
+
+							var transition = value, transitionArguments = [];
+							if( $.isPlainObject( value)) {
+								transition = value.transition;
+								$.isArray( value['arguments']) && (transitionArguments = value['arguments']);
+							}
 
 							if( transition) {
 								var ui = scope.$ampere.ui;
 								var controller = ui.controller;
 
-								!ui.isBlocked() && controller.proceed( transition, [event]);
+								!ui.isBlocked() && controller.proceed( transition, [event].concat( transitionArguments));
 							} else if( transition!==false) {
-								_ns.error( 'attribute "ng-ampere-' + eventName + '" (=' +  attrs[ directive] + ') doesnt resolve to an ampere transition');
+								_ns.error( 'attribute "ng-ampere-' + eventName + '" (=' +  attrs[ directive] + ') doesnt resolve to an ampere transition or object containting a transition { transition : ..., ...}');
 							}
 							//event.preventDefault();
 							//event.stopPropagation();
@@ -495,13 +526,19 @@
 				restrict   : 'A',
 				link: function( scope, element, attrs) {
 					$( element).on( 'drop', function( event) {
-						var transition = scope.$eval( attrs.ngAmpereDrop);
+						var value = scope.$eval( attrs.ngAmpereDrop);
+
+						var transition = value, transitionArguments = [];
+						if( $.isPlainObject( value)) {
+							transition = value.transition;
+							$.isArray( value['arguments']) && (transitionArguments = value['arguments']);
+						}
 
 						if( transition) {
 							var ui = scope.$ampere.ui;
 							var controller = ui.controller;
 
-							!ui.isBlocked() && controller.proceed( transition, [ event]);
+							!ui.isBlocked() && controller.proceed( transition, [event].concat( transitionArguments));
 						} else {
 							_ns.error( 'attribute "ngAmpereDrop" (=' +  attrs.ngAmpereDrop + ') doesnt resolve to an ampere transition');
 						}
@@ -558,7 +595,7 @@
 								//event.stopImmediatePropagation();
 								//return false;
 							} else {
-								transition( null, ui, [ event]);
+								transition( null, ui, [event].concat( transitionArguments));
 							}
 						}/*,
 						start : function( event, ui ) {
@@ -570,7 +607,7 @@
 					};
 
 					var options = $.extend( {}, OPTIONS);
-					var transition;
+					var transition, transitionArguments = [];
 					var value = scope.$eval( attrs.ngAmpereSortable);
 
 					if( $.isPlainObject( value)) {
@@ -585,6 +622,7 @@
 						*/
 
 						transition = value['ng-ampere-transition'] || value.transition || transition;
+						$.isArray( value['arguments']) && (transitionArguments=value['arguments']);
 
 						$.extend( options, value);
 					} else if( value) {
@@ -672,7 +710,7 @@
 				restrict   : 'A',
 				link: function( scope, element, attrs) {
 						/*
-						 * it the ng-ampere-hotkey attribute is not
+						 * if the ng-ampere-hotkey attribute is not
 						 * used in combination with ng-ampere-transition
 						 */
 					if( !attrs.ngAmpereTransition) {
@@ -780,9 +818,9 @@
 				restrict	: 'A',
 				scope		: false,
 				link		: function( scope, element, attrs) {
-					var contents  = element.contents();
-
 					scope.$watch( attrs.ngAmpereTemplate, function( newValue, oldValue) {
+						var contents  = element.contents();
+						
 						if( newValue) {
 							if( !$.isPlainObject( newValue)) {
 								newValue = {
@@ -832,12 +870,18 @@
 						if( attrs.ngModel) {
 							scope.$watch( attrs.ngModel, function( oldValue, newValue) {
 								element.setCustomValidity( '');
-								fn.call( element.get(), element, state);
+								var result = fn.call( element.get(), element, state);
+								if( typeof( result)=='string') {
+									element.setCustomValidity( result);
+								}
 							}, true);
 						} else {
 							element.on( 'input', function() {
 								element.setCustomValidity( '');
-								fn.call( element, element, state);
+								var result = fn.call( element, element, state);
+								if( typeof( result)=='string') {
+									element.setCustomValidity( result);
+								}
 							});
 						}
 					}
@@ -889,10 +933,10 @@
 		 * a transition was clicked
 		 */
 	function onTransitionClicked( event) {
-		var transition = angular.element( this).scope().transition;
-		var controller = $( this).closest( '.ampere-app').ampere();
+		var scope = angular.element( this).scope(),
+			controller = $( this).closest( '.ampere-app').ampere();
 
-		!controller.ui.isBlocked() && controller.proceed( transition, [event]);
+		!controller.ui.isBlocked() && controller.proceed( scope.transition, [event].concat( scope.transitionArguments));
 
 		event.preventDefault();
 			// prevent any other hotkey handler to be invoked

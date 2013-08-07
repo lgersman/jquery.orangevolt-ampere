@@ -47,7 +47,7 @@ for( var i=0; i<scripts.length; i++) {
 			//'../libs/modernizr-2.6.2.js',
 			'../libs/lesscss-1.3.3.js',
 			'../libs/jquery-2.0.2.js',
-			'../libs/jquery-ui-sortable-1.10.3/jquery-ui-1.10.3.custom.min.js',
+			'../libs/jquery-ui-1.10.3.custom/jquery-ui-1.10.3.custom.min.js',
 			'../libs/cache.js',
 			'../libs/bootstrap-2.3.2/js/bootstrap.js',
 			//'../libs/jquery.sortable.js',

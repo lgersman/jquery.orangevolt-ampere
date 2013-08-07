@@ -17,21 +17,26 @@
            			<span class="icon-bar"></span>
          		</a>
 
-         		<span ng-switch on="$ampere.module.options( 'ampere.ui.about.url') | type">
+         		<div class="brand-append" ng-ampere-template="$ampere.view.state().options( 'ampere.ui.brand.append') || $ampere.module.options( 'ampere.ui.brand.append')"></div>
+	         	<span ng-switch on="$ampere.module.options( 'ampere.ui.about.url') | type">
          			<a ng-switch-when="transition" class="brand" ng-ampere-transition="$ampere.module.options( 'ampere.ui.about.url')"></a>
 
 			        <a ng-switch-default class="brand" href="{{$ampere.module.options( 'ampere.ui.about.url')}}" target="_blank">
 			        	{{$ampere.ui.getCaption( $ampere.module) || $window.ov.ampere.util.ucwords( $ampere.module.options( 'ampere.ui.about.caption'))}}
 			        </a>
 				</span>
+				<div class="brand-prepend" ng-ampere-template="$ampere.view.state().options( 'ampere.ui.brand.prepend') || $ampere.module.options( 'ampere.ui.brand.prepend')"></div>
+					
 
        		 	<div class="nav-collapse">
+       		 		<div ng-ampere-template="$ampere.view.state().options( 'ampere.ui.global.prepend') || $ampere.module.options( 'ampere.ui.global.prepend')"></div>
 	           		<ul class="nav">
 	           			<li ng-class="{disabled : !transition.enabled(), active : transition.active()}"
 	           				ng-repeat="transition in $ampere.ui.getTransitions({ 'ampere.ui.type':'global'})">
 	           				<a ng-ampere-transition="transition"></a>
 	           			</li>
 	           		</ul>
+	           		<div ng-ampere-template="$ampere.view.state().options( 'ampere.ui.global.append') || $ampere.module.options( 'ampere.ui.global.append')"></div>
 	         	</div>
     	   </div>
 		</div>
@@ -62,22 +67,24 @@
 					|| $ampere.ui.getTransitions({ 'ampere.ui.type':'secondary'}).length"
 			>
 				<div class="navbar-inner">
-			          <ul class="nav">
-			          	<li ng-repeat="transition in $ampere.ui.getTransitions({ 'ampere.ui.type':'primary'})" ng-class="{disabled : !transition.enabled(), active : transition.active()}">
-			          		<a ng-ampere-transition="transition"></a>
-			          	</li>
-			          	<li class="dropdown" ng-show="$ampere.ui.getTransitions({ 'ampere.ui.type':'secondary'}).length">
-						    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-						      {{$ampere.ui.getCaption( $ampere.view.state())}}
-						      <b class="caret"></b>
-						    </a>
-						    <ul class="dropdown-menu">
-						    	<li ng-repeat="transition in $ampere.ui.getTransitions({ 'ampere.ui.type':'secondary'})" ng-class="{disabled : !transition.enabled(), active : transition.active()}">
-					          		<a ng-ampere-transition="transition"></a>
-					          	</li>
-						    </ul>
-						  </li>
-			          </ul>
+					<div ng-ampere-template="$ampere.view.state().options( 'ampere.ui.primary.prepend') || $ampere.module.options( 'ampere.ui.primary.prepend')"></div>
+					<ul class="nav">
+						<li ng-repeat="transition in $ampere.ui.getTransitions({ 'ampere.ui.type':'primary'})" ng-class="{disabled : !transition.enabled(), active : transition.active()}">
+							<a ng-ampere-transition="transition"></a>
+						</li>
+						<li class="dropdown" ng-show="$ampere.ui.getTransitions({ 'ampere.ui.type':'secondary'}).length">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+							  {{$ampere.ui.getCaption( $ampere.view.state())}}
+							  <b class="caret"></b>
+							</a>
+							<ul class="dropdown-menu">
+								<li ng-repeat="transition in $ampere.ui.getTransitions({ 'ampere.ui.type':'secondary'})" ng-class="{disabled : !transition.enabled(), active : transition.active()}">
+							  		<a ng-ampere-transition="transition"></a>
+							  	</li>
+							</ul>
+						</li>
+					 </ul>
+					 <div ng-ampere-template="$ampere.view.state().options( 'ampere.ui.primary.append') || $ampere.module.options( 'ampere.ui.primary.append')"></div>
 			    </div>
 	        </div>
 		</header>

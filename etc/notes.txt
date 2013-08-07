@@ -247,3 +247,39 @@ module.on( "ampere.angular-scope-changed", function( event, scope) {
 		.attr( 'title', this.value ? 'List is filtered. Reset filter to see all items.' : null);
 	});
 });
+
+* twitter bootstrap theme  : class "auto" can be applied to dropdowns appearing automagically on mouse over
+- remove data-toggle="dropdown" from the LI child to disable toggle by mouse click
+- edit element LI.dropdown and add class "auto" 
+
+* new ui options for default and wizard template : 
+- ampere.ui.global.prepend (prepends before the global action bar)
+- ampere.ui.global.append (prepends before the global action bar)
+- ampere.ui.brand.append (appends after the brand element)
+- ampere.ui.brand.prepend (prepends before the brand element)
+- ampere.ui.primary.prepend (prepends brefore the primary actions bar)
+- ampere.ui.primary.append (appends after the primary actions bar)
+
+using these options you can inject custom angular spiced html snippets into the default and wizard tenmplate of ampere. the value can be either a template, function returning the template, jquery collection containing the template or dom element. the options are taken from the state or module (in that order).
+
+* twitter bootstrap renderer : angular filter "first" and "last" added
+
+* event driven angular directives now support not only taking an transition argument but also an plain object
+transporting the transition in property "transition" and transition arguments in property "arguments". supported directives :
+- ng-ampere-transition
+- ng-ampere-change
+- ng-ampere-click
+- ng-ampere-mousedown
+- ng-ampere-mouseup
+- ng-ampere-dblclick
+- ng-ampere-drop
+- ng-ampere-sortable
+
+example use : 
+<button ng-ampere-transition="{ transition : $ampere.view.state().transitions.foo, arguments : [ 'me', 'too']}"
+
+state.transition( 'foo')
+.action( function( transition, ui, data) {
+	var event = data[0],
+		arguments = data.slice( 1); // will be [ 'me', 'too']
+});

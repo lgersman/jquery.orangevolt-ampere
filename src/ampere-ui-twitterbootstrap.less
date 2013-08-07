@@ -27,6 +27,14 @@
 		font-size: @fs;
 	}
 
+		// feature !! this makes dropdown automagically appear on mouse over
+		// just remove class="dropdown-toggle" data-toggle="dropdown" from the 
+		// LI.dropdown and add clas auto to get this behaviour
+	ul.nav li.dropdown.auto:hover >ul.dropdown-menu {
+		margin  : 0;
+        display : block;    
+    }
+
 	.navbar {
 		margin-bottom : 10px;
 
@@ -151,9 +159,9 @@
 		.glow-keyframes( @glow_color);
 	}
 
-	BUTTON.ampere-transition:not(.disabled):not(.active),
-	A.ampere-transition:not(.disabled):not(.active),
-	LI >A.ampere-transition:not(.disabled):not(.active)  {
+	BUTTON:not(.disabled):not(.active),
+	A:not(.disabled):not(.active),
+	LI >A:not(.disabled):not(.active)  {
 		&.glow {
 			.glow( #f89406);
 		}
@@ -285,6 +293,14 @@
 				margin-top: 0;
 			}
 
+			.breadcrumb + .navbar {
+				>.navbar-inner {
+					>.nav, * >.nav {
+						margin : 0;
+					}
+				}
+			}
+
 			H1 {
 				i[class^="icon-"], [class*=" icon-"] {
 					width      : inherit;
@@ -381,17 +397,17 @@
 		 }
 
 		> .navbar-inverse {
-			.brand {
+			A.brand {
 			  padding-right: 0;
 			  padding-left: 0;
-			  margin-left: 20px;
+			  margin-left: 0px;
 			  float: right;
 			  font-weight: bold;
 			  //color: #333;
 			  //text-shadow: 1px 1px 0 rgba(255,255,255,.4), 0 0 30px rgba(255,255,255,.125);
-			  -webkit-transition: all .2s linear;
-			     -moz-transition: all .2s linear;
-			          transition: all .2s linear;
+			  -webkit-transition: color text-shadow .2s linear;
+			     -moz-transition: color text-shadow .2s linear;
+			          transition: color text-shadow .2s linear;
 			    /*
 				i[class^="icon-"], [class*=" icon-"] {
 					width      : inherit;
@@ -400,19 +416,27 @@
 			  	*/
 			}
 
-			.brand:hover {
+			A.brand:hover {
 			  color: #ffffff;
 			  text-decoration: none;
 			  text-shadow: 1px 1px 0 rgba(255,255,255,.4), 0 0 30px rgba(255,255,255,.4);
 			}
-		}
 
-		/* overwrite bootstrap responsive layout seeting for this */
-		@media (max-width: 979px) {
-	  		.navbar-fixed-bottom {
-	    		position: fixed;
-	  		}
-	  	}
+			.brand-prepend,
+			.brand-append {
+				float : right;
+
+				>UL.nav {
+					margin-right : 0;
+				}
+			}
+
+			.nav-collapse {
+				.nav {
+					margin : 0;
+				}
+			}
+		}
 
 		.alert-block {
 			padding-bottom: 7px;
@@ -784,8 +808,19 @@
 }
 
 @media (max-width: 979px) {
+	/*
 	.navbar-fixed-top {
 		margin-bottom: inherit;
+	}
+	*/
+
+	.navbar-fixed-bottom {
+		position: fixed;
+	}
+
+	.navbar-fixed-top .navbar-inner,
+	.navbar-fixed-bottom .navbar-inner {
+		padding: 0;
 	}
 }
 

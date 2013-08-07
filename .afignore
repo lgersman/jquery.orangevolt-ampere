@@ -1,0 +1,16 @@
+node_modules/.bin/
+node_modules/grunt-contrib/
+node_modules/grunt-contrib-copy/
+node_modules/grunt-contrib-jasmine/
+node_modules/grunt-contrib-less/
+node_modules/grunt-contrib-watch/
+node_modules/grunt/
+node_modules/grunt-contrib-clean/
+node_modules/grunt-contrib-cssmin/
+node_modules/grunt-contrib-jshint/  
+node_modules/grunt-contrib-uglify/ 
+node_modules/jasmine-node/
+dist/
+.git/
+.gitignore/
+test/

@@ -25,6 +25,7 @@ for( var i=0; i<scripts.length; i++) {
 		var baseUrl = matches[ 1];
 
 		var CSS = [
+			'../libs/jquery-ui-1.10.3.custom/jquery-ui-1.10.3.custom.min.css',
 			'../libs/bootstrap-2.3.2/css/bootstrap.css',
 			'../libs/font-awesome-3.1.1/css/font-awesome.css',
 			'../libs/bootstrap-2.3.2/css/bootstrap-responsive.css',
@@ -47,7 +48,7 @@ for( var i=0; i<scripts.length; i++) {
 			//'../libs/modernizr-2.6.2.js',
 			'../libs/lesscss-1.3.3.js',
 			'../libs/jquery-2.0.2.js',
-			'../libs/jquery-ui-sortable-1.10.3/jquery-ui-1.10.3.custom.min.js',
+			'../libs/jquery-ui-1.10.3.custom/jquery-ui-1.10.3.custom.min.js',
 			'../libs/cache.js',
 			'../libs/bootstrap-2.3.2/js/bootstrap.js',
 			//'../libs/jquery.sortable.js',
