@@ -2,7 +2,7 @@
  * jQuery Orangevolt Ampere
  *
  * version : 0.2.0
- * created : 2013-08-07
+ * created : 2013-08-19
  * source  : https://github.com/lgersman/jquery.orangevolt-ampere
  *
  * author  : Lars Gersmann (lars.gersmann@gmail.com)
@@ -463,6 +463,9 @@
 .ampere-app dd > TABLE:FIRST-CHILD:LAST-CHILD {
   margin: 0;
 }
+.ampere-app dt .popover {
+  font-weight: normal;
+}
 .ampere-app TR.active,
 .ampere-app .table-hover TBODY TR.active:hover td,
 .ampere-app .table-striped TBODY TR:nth-child(odd).active td,
@@ -582,6 +585,9 @@
 }
 .ampere-app .ampere-module .nav > li.disabled > a {
   color: #999999;
+}
+.ampere-app .ampere-module .nav-tabs > li > a {
+  color: #555555;
 }
 .ampere-app .ampere-module .breadcrumb > li.disabled > a {
   text-decoration: none;
@@ -971,6 +977,13 @@ select:focus:invalid:focus {
 .modal-backdrop.fade.in {
   opacity: 0.3;
   filter: alpha(opacity=30);
+}
+.truncate {
+  text-overflow: ellipsis;
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  width: 100%;
 }
 /*
 .modal.fade.in {
