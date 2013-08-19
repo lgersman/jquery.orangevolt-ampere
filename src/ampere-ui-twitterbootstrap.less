@@ -191,6 +191,10 @@
 		margin : 0;
 	}
 
+	dt .popover {
+		font-weight : normal;
+	}
+
 	/*
 	TD textarea.fullwidth {
 		// Firefox
@@ -389,6 +393,10 @@
 
 		.nav > li.disabled > a {
 			color: #999999;
+		}
+
+		.nav-tabs > li > a {
+			color: #555555;
 		}
 
 		 .breadcrumb > li.disabled > a {
@@ -845,6 +853,14 @@ select:focus:invalid:focus {
 .modal-backdrop.fade.in {
   opacity: 0.3;
   filter: alpha(opacity=30);
+}
+
+.truncate {
+   text-overflow: ellipsis;
+   display 		: inline-block;
+   white-space  :  nowrap;
+   overflow 	: hidden;
+   width 		: 100%;
 }
 
 	// default is 50% but we have an additional offset of 40px caused by the fixed top menu

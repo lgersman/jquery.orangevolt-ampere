@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.0"
+   width="23mm"
+   height="17mm"
+   id="svg2"
+   inkscape:version="0.48.3.1 r9886"
+   sodipodi:docname="ampere2.svg"
+   inkscape:export-filename="/home/lgersman/public_html/cmag-db/public/libs/ampere/etc/ampere2.png"
+   inkscape:export-xdpi="415.70438"
+   inkscape:export-ydpi="415.70438">
+  <metadata
+     id="metadata17">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs15" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1680"
+     inkscape:window-height="1025"
+     id="namedview13"
+     showgrid="false"
+     inkscape:zoom="3.5461836"
+     inkscape:cx="-7.4728224"
+     inkscape:cy="30.118111"
+     inkscape:window-x="1280"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg2" />
+  <path
+     sodipodi:type="arc"
+     style="fill:#ffffff;fill-opacity:1;stroke:none"
+     id="path2994"
+     sodipodi:cx="10.433752"
+     sodipodi:cy="19.065199"
+     sodipodi:rx="22.27747"
+     sodipodi:ry="22.27747"
+     d="m 32.711222,19.065199 a 22.27747,22.27747 0 1 1 -44.55494,0 22.27747,22.27747 0 1 1 44.55494,0 z"
+     transform="matrix(1.1202532,0,0,1.1202532,29.341582,8.5640914)"
+     inkscape:export-xdpi="415.70438"
+     inkscape:export-ydpi="415.70438" />
+  <g
+     fill="none"
+     stroke="black"
+     stroke-width="1mm"
+     stroke-linecap="square"
+     id="g3">
+    <circle
+       cx="41"
+       cy="30"
+       r="25.3"
+       id="circle5" />
+    <line
+       x1="67"
+       y1="30"
+       x2="80"
+       y2="30"
+       id="line7" />
+    <line
+       x1="2"
+       y1="30"
+       x2="15.5"
+       y2="30"
+       id="line9" />
+    <path
+       d="M 31.4 36.6 L 39.4 16.4 L 42.2 16.4 L 50.1 36.6 L 47.0 36.6 L 44.8 31.0 L 36.3 31.0 L 34.0 36.6 L 31.4 36.6 z M 37.1 28.9 L 44.0 28.9 L 40.5 20.2 L 37.1 28.9 z"
+       fill="black"
+       stroke="none"
+       id="path11" />
+  </g>
+</svg>

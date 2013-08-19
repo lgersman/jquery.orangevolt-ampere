@@ -31,7 +31,7 @@
 			} else if( arguments.length==1) {
 				var arg = arguments[0];
 				if( $.isPlainObject( arg)) {
-					angular.extend( _, arg);
+					$.extend( _, arg);
 					return this;
 				} else {
 					return _[ arg];

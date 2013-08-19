@@ -283,3 +283,32 @@ state.transition( 'foo')
 	var event = data[0],
 		arguments = data.slice( 1); // will be [ 'me', 'too']
 });
+
+* general purpose css class "truncate" added. applying this class to elements will make overflowing text appear with appended ellipsis ('...')
+
+* directive ng-ampere-debounce added. this directive allows debouncing/throttling of any kind of events and (as a result of that) also ng-model updates. you can use it also for regular ng-[event] and non angular [event] throttling/debouncing
+
+example usage : 
+
+<input type="text" ng-model="mymodel" ng-ampere-debounce> 
+		will debounce updating mymodel with 1000ms delay
+
+<input type="text" ng-model="mymodel" ng-ampere-debounce="leading"> 
+		will updating mymodel initial but suppress all further updates within 1000ms delay 
+
+<input type="text" ng-model="mymodel" ng-ampere-debounce="{ timeout : 500}"> 
+		will debounce updating mymodel with 500ms delay
+		
+<input type="text" ng-model="mymodel" ng-ampere-debounce="{ leading : true }"> 
+		will updating mymodel initial but suppress all further updates within 1000ms delay
+		
+<input type="text" ng-model="mymodel" ng-ampere-debounce="{ timeout  : 500, leading : true }"> 
+		will updating mymodel initial but suppress all further updates within 500ms delay
+
+<input type="checkbox" ng-change="myhandler" ng-ampere-debounce="{ timeout  : 500, leading : true }"> 
+		will call myhandler on first change event but suppress all further change event within 500ms delay
+
+* lodash 1.3.1 added
+
+* directive ng-ampere-dataset added. this directive allows one-directional binding of an object to the DOM elements dataset property (useful for Holder.js support) 
+

@@ -119,7 +119,12 @@
 		});
 		ampere.filter( 'keys', function() {
 			return function( items, property) {
-				return Object.keys( items);
+					// Object.keys will throw an exception on string,array/number etc.
+				try {
+					return Object.keys( items);
+				} catch( ex) {
+					return [];
+				}
 			};
 		});
 
@@ -376,7 +381,7 @@
 
 				// add LI creation support (convenience method for easier twitter bootstrap toolbar  creation)
 			templates.li = '<li\
- class="ampere-transition name-{{transition.name()}}"\
+ class="ampere-transition name-{{transition.name()}} {{attrs.class}}  {{$css()}}"\
  ng-class="{disabled : !transition.enabled(), active : transition.active()}">' + templates.a + '</li>'
 			;
 
@@ -399,12 +404,15 @@
 					scope.attrs = attrs;
 					scope.$ = $window.jQuery;
 
-					scope.$on( 'ampere-model-changed' ,function( /*object*/changeset, /*array<string>*/deleted) {
+					//scope.$on( 'ampere-model-changed' ,function( /*object*/changeset, /*array<string>*/deleted) {
 						// _ns.debug( scope.transition.fullName(),' ampere-model-changed (', changeset, ', ', deleted, ')');
+						/*
 						if( scope.transition){
 							scope.$enabled = scope.transition.enabled();
 						}
-					});
+						*/
+					//});
+
 
 					scope.$watch( attrs.ngAmpereTransition, function( oldValue, newValue) {
 						if( !newValue) {
@@ -430,7 +438,8 @@
 
 						scope.transition = transition;
 						scope.transitionArguments = transitionArguments;
-						scope.$enabled = scope.transition.enabled();
+						//scope.$enabled = scope.transition.enabled();
+						//
 						scope.$css = (function( value) {
 							return function() {
 								return $.isFunction( value) ? value.call( this, this) : value;
@@ -729,10 +738,117 @@
 			return {
 				restrict   : 'A',
 				link: function( scope, element, attrs) {
-					var data = scope.$eval( attrs.ngAmpereData);
-					_ns.assert( $.isPlainObject( data), 'attribute "ng-ampere-data"(="' + attrs.ngAmpereData + '") expected to evaluate to an object');
+					scope.$watch( attrs.ngAmpereData, function( _new, old) {
+						_ns.assert( $.isPlainObject( _new), 'attribute "ng-ampere-data"(="' + _new + '") expected to evaluate to an object');
 
-					angular.extend( element.data(), data);
+						angular.extend( element.data(), _new);
+					}, true);
+				}
+			};
+		}]);
+
+		ampere.directive( 'ngAmpereDataset', [ function() {
+			var _ns = $.ov.namespace( 'ngAmpereDataset');
+
+			return {
+				restrict   : 'A',
+				link: function( scope, element, attrs) {
+					scope.$watch( attrs.ngAmpereDataset, function( _new, old) {
+						_ns.assert( !_new || $.isPlainObject( _new), 'attribute "ng-ampere-dataset"(="' + _new + '") expected to evaluate to an object');
+
+						if( _new) {
+							var keys = Object.keys( _new), dataset = element.prop( 'dataset');
+							for( var i=0; i<keys.length; i++) {
+								dataset[ keys[i]] = $.isPlainObject( _new[keys[i]]) && JSON.stringify( _new[keys[i]]) || _new[keys[i]];
+							}
+						}
+					}, true);
+				}
+			};
+		}]);
+
+			/**
+			* ng-ampere-debounce directive allows debouncing/throttling of any kind of events 
+			*
+			* you can use it also for non angular model updates 
+			* (.i.e. for regular ng-[event]/[event] throttling/debouncing)
+			* 
+			* example usage : 
+			*
+			* <input type="text" ng-model="mymodel" ng-ampere-debounce> 
+			*		will debounce updating mymodel with 1000ms delay
+			*
+			* <input type="text" ng-model="mymodel" ng-ampere-debounce="leading"> 
+			*		will updating mymodel initial but suppress all further updates within 1000ms delay 
+			*
+			* <input type="text" ng-model="mymodel" ng-ampere-debounce="{ timeout : 500}"> 
+			*		will debounce updating mymodel with 500ms delay
+			*
+			* <input type="text" ng-model="mymodel" ng-ampere-debounce="{ leading : true }"> 
+			*		will updating mymodel initial but suppress all further updates within 1000ms delay
+			*
+			* <input type="text" ng-model="mymodel" ng-ampere-debounce="{ timeout  : 500, leading : true }"> 
+			*		will updating mymodel initial but suppress all further updates within 500ms delay
+			* 
+			* <input type="checkbox" ng-change="myhandler" ng-ampere-debounce="{ timeout  : 500, leading : true }"> 
+			*		will call myhandler on first change event but suppress all further change event within 500ms delay
+			*/
+		ampere.directive( 'ngAmpereDebounce', [ function() {
+			var _ns = $.ov.namespace( 'ngAmpereDebounce'),
+				DEFAULTS = {
+					timeout : 1000
+				}
+			;
+
+			return {
+				restrict    : 'A',
+				//require		: '?ngModel',	
+				link		: function( scope, element, attrs) {
+						// normalize directive options
+					var options = scope.$eval( attrs.ngAmpereDebounce) || $.extend( {}, DEFAULTS);
+					if( options==='leading') {
+						options = $.extend( { leading : true}, DEFAULTS);
+					} else {
+						options.leading = !!options.leading;	// make it a real boolean
+					}
+					
+					var map = $._data( element[0], 'events'),
+						events = $.each( Object.keys( map), function( index, eventName) {
+								// ensure only real events are handled
+							if( eventName.charAt( 0)!='$') {
+									// install debounce mechanism
+								var debounced = _.debounce( function( event) {
+									//console.log( 'debounce called');
+									
+										// iterate over all event handlers registered before ourself
+										// (remember : we moved ourself at first position while installing)
+									for( var i=$.inArray( debounce_handlerobj, map[eventName])+1; i<map[eventName].length; i++) {
+										var handlerobj = map[eventName][i];
+											
+											// call original event handler
+										handlerobj.handler.apply( this, arguments);
+											// emulate regular event dispatching by 
+											// aborting further propagation when event 
+											// has state immediatePropagationStopped
+										if( event.isImmediatePropagationStopped()) {
+											break;
+										}
+									}
+								}, options.timeout, options);
+
+								element.on( eventName, function( event) {
+									debounced.apply( this, arguments);
+										// tell jquery to suppress further propagation of this event
+									event.stopImmediatePropagation();
+								});
+
+									// move our debounce handler at first position
+									// to be called before any other
+								var debounce_handlerobj = map.input.pop();
+								map.input.unshift( debounce_handlerobj);
+							}
+						})
+					;
 				}
 			};
 		}]);
@@ -743,6 +859,13 @@
 			return {
 				restrict   : 'A',
 				link: function( scope, element, attrs) {
+						// TODO : for some reason element.closest( '.ampere-module') is in seldom cases empty
+						// (WHICH MUST BE WRONG and probably is a timing issue of angular !!)
+						// thats why abort linking here in case no valid parent is available
+					if( !element.closest( '.ampere-module').length) {
+						return;
+					}
+
 					function wrap( fn, property) {
 						return function( scope) {
 							var state = (arguments.length==1 ? scope : arguments[2]).$ampere.module.current().state;
