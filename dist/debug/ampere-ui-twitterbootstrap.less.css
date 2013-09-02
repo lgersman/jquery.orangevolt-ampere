@@ -2,7 +2,7 @@
  * jQuery Orangevolt Ampere
  *
  * version : 0.2.0
- * created : 2013-08-19
+ * created : 2013-09-02
  * source  : https://github.com/lgersman/jquery.orangevolt-ampere
  *
  * author  : Lars Gersmann (lars.gersmann@gmail.com)
@@ -227,6 +227,10 @@
 .ampere-app button,
 .ampere-app select,
 .ampere-app textarea {
+  font-size: 13px;
+}
+.ampere-app .popover,
+.ampere-app .popover-title {
   font-size: 13px;
 }
 .ampere-app .btn-group > .btn,
@@ -465,6 +469,44 @@
 }
 .ampere-app dt .popover {
   font-weight: normal;
+}
+.ampere-app INPUT.search-query:not( .filter-empty) {
+  animation: input-empty 2s infinite;
+  -moz-animation: input-empty 2s infinite;
+  -webkit-animation: input-empty 2s infinite;
+}
+@keyframes input-empty {
+  0% {
+    background-color: #fcf8e3;
+  }
+  50% {
+    background-color: inherit;
+  }
+  100% {
+    background-color: #fcf8e3;
+  }
+}
+@-moz-keyframes input-empty {
+  0% {
+    background-color: #fcf8e3;
+  }
+  50% {
+    background-color: inherit;
+  }
+  100% {
+    background-color: #fcf8e3;
+  }
+}
+@-webkit-keyframes input-empty {
+  0% {
+    background-color: #fcf8e3;
+  }
+  50% {
+    background-color: inherit;
+  }
+  100% {
+    background-color: #fcf8e3;
+  }
 }
 .ampere-app TR.active,
 .ampere-app .table-hover TBODY TR.active:hover td,

@@ -2,7 +2,7 @@
  * jQuery Orangevolt Ampere
  *
  * version : 0.2.0
- * created : 2013-08-19
+ * created : 2013-09-02
  * source  : https://github.com/lgersman/jquery.orangevolt-ampere
  *
  * author  : Lars Gersmann (lars.gersmann@gmail.com)
@@ -175,9 +175,11 @@
 				/*
 				 * prepare general purpose ampere structures
 				 */
+			/*
 				// ampere.disposable is a array of functions executed everytime
 				// the view changes
 			$rootElement.data( 'ampere.disposable', []);
+			*/
 		};
 		ampereTwitterbootstrapController.$inject = ['$scope', '$rootElement', '$window', '$http', '$timeout',  '$log', '$resource', '$cookies'/*, '$location'*/];
 
@@ -191,11 +193,16 @@
 					scope.$watch( '$ampere', function() {
 						scope.$ampere.scope = scope;
 
+							// tell directives to dispose its custom watchers
+						scope.$root.$broadcast( 'ampere-dispose');
+
+						/*
 							// execute & cleanup all disposable handlers
 						var disposables = element.closest( '.ampere-module').data( 'ampere.disposable');
 						while( disposables.length) {
 							disposables.pop()();
 						}
+						*/
 
 							// destroy all child scopes (->transitions)
 						while( scope.$$childHead) {
@@ -288,11 +295,11 @@
 								_ns.debug( 'delete ', scope.$ampere.module.current().state.fullName(), '.', toDelete[i]);
 							}
 
-							_ns.debug( 'broadcast ampere-model-changed ( ', changeset, ', ', toDelete, ')');
-							scope.$root.$broadcast( 'ampere-model-changed', changeset, toDelete);
+							//_ns.debug( 'broadcast ampere-model-changed ( ', changeset, ', ', toDelete, ')');
+							//scope.$root.$broadcast( 'ampere-model-changed', changeset, toDelete);
 						}
 
-						scope.$ampere.module.trigger( "ampere.angular-scope-changed", [ scope]);
+						//scope.$ampere.module.trigger( "ampere.angular-scope-changed", [ scope]);
 					});
 				}
 			};
@@ -530,6 +537,86 @@
 		eventDirective( 'dblclick');
 		eventDirective( 'mousedown');
 		eventDirective( 'mouseup');
+
+		ampere.directive( 'ngAmpereEvent', [ function() {
+			var _ns = $.ov.namespace( 'ngAmpereEvent');
+
+			return {
+				restrict   : 'A',
+				link: function( scope, element, attrs) {
+					var events = {};
+
+					scope.$watch( attrs.ngAmpereEvent, function( options, oldoptions) {
+							// unregister old events
+						var eventNames = Object.keys( events);
+						for( var i=0; i<eventNames.length; i++) {
+							var listeners = events[ eventNames[i]];
+							for( var r=0; r<listeners.length; r++) {
+								element.off( eventNames[i], listeners[r]);
+							}
+						}
+							// register new events
+						if( $.isPlainObject( options)) {
+							options = [ options];
+						}
+
+						$.each( options, function( index, option) {
+							_ns.assert( 
+								$.isPlainObject( option), 
+								'expected argument value is object { event : string, transition : (transition || {transition : transition (, [arguments])})?} or array of these objects'
+							);
+
+							events[ option.event] = events[ option.event] || [];
+							var handler = function( event) {
+									
+								var transition = option.transition, 
+									transitionArguments = option['arguments'] || [];
+
+								if( window.ov.ampere.type( transition)=='transition') {
+									var ui = scope.$ampere.ui;
+									var controller = ui.controller;
+
+									!ui.isBlocked() && controller.proceed( transition, [event].concat( transitionArguments));
+								} else if( $.isFunction( transition)) {
+									scope.$apply( function() {
+										transition( null, scope.$ampere.ui, [event].concat( transitionArguments));
+									});								
+								} else if( transition!==false) {
+									_ns.error( 'attribute "ng-ampere-event (=' +  attrs.ngAmpereEvent + ') doesnt resolve to an ampere transition or object containting a transition { transition : ..., ...}');
+								}
+							};
+							events[ option.event].push( handler);
+
+							$( element).on( option.event, handler);
+						});
+					}, true);
+				}
+			};
+		}]);
+
+		ampere.directive( 'ngAmpereLink', [ '$parse', function( $parse) {
+			var _ns = $.ov.namespace( 'ngAmpereLink');
+
+			return {
+				restrict   : 'A',
+				scope      : 'isolate',
+				link: function( scope, element, attrs) {
+					var fn;
+					try {
+						fn = $parse( attrs.ngAmpereLink); //scope.$eval( attrs.ngAmpereLink);
+					} catch( ex) {
+						_ns.error( 'Failed to parse "', attrs.ngAmpereLink, '" : ' + ex.message);
+						throw ex;
+					}
+
+					var result = fn( scope, { $element : element});
+					if( $.isFunction( result)) {
+						var ui = scope.$ampere.ui;
+						result.call( scope.$ampere.module.current().state, element, ui);
+					}
+				}
+			};
+		}]);
 
 		ampere.directive( 'ngAmpereDrop', [ function() {
 			var _ns = $.ov.namespace( 'ngAmpereDrop');
@@ -889,12 +976,15 @@
 						};
 					}
 
-					var disposables = element.closest( '.ampere-module').data( 'ampere.disposable');
+					//var disposables = element.closest( '.ampere-module').data( 'ampere.disposable');
+					//var disposables = [];
+
 					var watcher = scope.$eval( attrs.ngAmpereWatch);
 					if( $.isFunction( watcher)) {
 						_ns.debug( 'activate watch(*) ', window.ov.ampere.util.functionName( watcher) || 'function', '()');
 
-						disposables.push( scope.$watch( wrap( watcher)));
+						//disposables.push( scope.$watch( wrap( watcher)));
+						scope.$on( 'ampere-dispose', scope.$watch( wrap( watcher)));
 					} else if( $.isPlainObject( watcher)) {
 						for( var key in watcher) {
 							var f = watcher[ key];
@@ -905,10 +995,12 @@
 								var property = watchedProperties[i];
 								if( property==='' || property==='*') {
 									_ns.debug( 'activate watch(*) ', window.ov.ampere.util.functionName( f) || 'function', '()');
-									disposables.push( scope.$watch( wrap( f)));
+									//disposables.push( scope.$watch( wrap( f)));
+									scope.$on( 'ampere-dispose', scope.$watch( wrap( f)));
 								} else {
 									_ns.debug( 'activate watch(', property, ') ', window.ov.ampere.util.functionName( f) || 'function', '()');
-									disposables.push( scope.$watch( property, wrap( f, property)));
+									//disposables.push( scope.$watch( property, wrap( f, property)));
+									scope.$on( 'ampere-dispose', scope.$watch( property, wrap( f, property)));
 								}
 							}
 						}
@@ -930,11 +1022,12 @@
 						return $.isFunction( deferred.abort) && deferred.abort || $.isFunction( deferred.reject) && deferred.reject || $.noop;
 					}
 
-					var disposables = element.closest( '.ampere-module').data( 'ampere.disposable');
+					//var disposables = element.closest( '.ampere-module').data( 'ampere.disposable');
 					var deferredFn = scope.$eval( attrs.ngAmpereDeferred);
 					_ns.assert( $.isFunction( deferredFn), 'Argument ngAmpereDeferred(=', element.attr( 'ng-ampere-deferred'), ') expected to be a function<Deferred>');
 
-					disposables.push( wrap( deferredFn));
+					//disposables.push( wrap( deferredFn));
+					scope.$on( 'ampere-dispose', wrap( deferredFn));
 				}
 			};
 		}]);

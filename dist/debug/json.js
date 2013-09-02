@@ -2,7 +2,7 @@
  * jQuery Orangevolt Ampere
  *
  * version : 0.2.0
- * created : 2013-08-19
+ * created : 2013-09-02
  * source  : https://github.com/lgersman/jquery.orangevolt-ampere
  *
  * author  : Lars Gersmann (lars.gersmann@gmail.com)
