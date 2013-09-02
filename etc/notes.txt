@@ -236,18 +236,6 @@ the transitionDeferred handler context is the module. in case the transition suc
 
 * twitter bootstrap theme : new transition option "ampere.ui.class" added. Using this option you can apply css classes in an abstract way to the rendered transition representation. if value is a function it is called with this=transition and first argument=transition
 
-* event "ampere.angular-scope-changed" added. this event is triggered whenever angular reevaluated the DOM
-example usage:
-	// sync "filter-empty" css marker class in search inputs
-	// this is used to highlight filter inputs to signal that a filter is active
-module.on( "ampere.angular-scope-changed", function( event, scope) {
-	$(':text.search-query').each( function() { 
-		$( this)
-		[ this.value ? 'removeClass' : 'addClass']( 'filter-empty')
-		.attr( 'title', this.value ? 'List is filtered. Reset filter to see all items.' : null);
-	});
-});
-
 * twitter bootstrap theme  : class "auto" can be applied to dropdowns appearing automagically on mouse over
 - remove data-toggle="dropdown" from the LI child to disable toggle by mouse click
 - edit element LI.dropdown and add class "auto" 
@@ -312,3 +300,54 @@ example usage :
 
 * directive ng-ampere-dataset added. this directive allows one-directional binding of an object to the DOM elements dataset property (useful for Holder.js support) 
 
+* directive ng-ampere-event : using this directive you can listen to any event (including namespaced jquery  events)
+
+example usage listenting to boostrap 2.3.2 carousel : 
+	<div id="myCarousel" class="carousel slide" data-interval="false" ng-ampere-event="{ event : 'slid', transition : mySlidEventHandler}">
+	...
+	</div>
+
+	state.mySlidHandler = function( transition, ui, data) {
+		var event = data[0];
+	}
+
+same example as above with additional arguments : 
+	<div id="myCarousel" class="carousel slide" data-interval="false" ng-ampere-event="{ event : 'slid', transition : mySlidEventHandler, arguments : [ foo, 'bar']}">
+	...
+	</div>
+
+	state.mySlidHandler = function( transition, ui, data) {
+		var event = data[0],	// = the event
+			arg0  = data[1],	// = value of state.foo
+			arg1  = data[2];	// = 'bar'
+	}
+
+* directive ng-ampere-link : using this directive you can easily use/initialize any jquery/jquery ui plugin, twitter bootstrap control or anything else you want to use. writing custom directives for special controls like the twitter boostrap is just writing unneeded boilerplate code.
+
+$element provides access to the current wrapped DOM element (aka jquery collection if you use jquery). this directive doesnt watch changes of the provided value (which would be nonsense because control will be initialized once). 
+
+example usage : 
+	<div 
+		id="thumbnailCarousel" 
+		ng-ampere-link="$element.carousel({ 
+			interval : false
+		})" 
+		class="carousel slide"
+	>
+	...
+
+same but in combination wit directive ng-ampere-event : 
+	<div 
+		id="thumbnailCarousel" 
+		ng-ampere-link="$element.carousel({ 
+			interval : false
+		})" 
+		class="carousel slide"		
+		ng-ampere-event="[
+			{ event : 'slide', transition : onSlidingStart},
+			{ event : 'slid', transition : onSlidingDone}
+		]"
+	>
+	...
+
+* css class "filter-empty" supports highlighting of an active filter. can only be applied to INPUT.search-query elements (see shop-admin example)

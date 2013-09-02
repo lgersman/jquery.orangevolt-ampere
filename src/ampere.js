@@ -1396,7 +1396,7 @@
 		this.modal = function( url, /* function */ initializer, /*optional */ options) {};
 
 			/**
-			 * filter may be an object (filter by example, like { type : 'global'}) or function argument
+			 * filter may be an object (filter by example, like { 'ampere.ui.type' : 'global'}) or function argument
 			 */
 		this.getTransitions = function( filter) {
 			var filterFn = filter || $.noop;
@@ -1429,7 +1429,7 @@
 				filterFn.call( transition) && transitions.push( transition);
 			}
 
-			return transitions;
+			return transitions;	
 		};
 
 		this.regexp = function( pattern,modifiers) {

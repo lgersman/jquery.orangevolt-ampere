@@ -23,6 +23,10 @@
 		font-size: @fs;
 	}
 
+	.popover, .popover-title {
+		font-size: @fs;
+	}
+
 	.btn-group > .btn, .btn-group > .dropdown-menu {
 		font-size: @fs;
 	}
@@ -195,6 +199,33 @@
 		font-weight : normal;
 	}
 
+		// this rule is used to make filters in the gui appear yellow(same color as the flash) if something was entered
+	INPUT.search-query:not( .filter-empty) {
+			// make background yellow if something was entered to signal 
+			// filter is active
+		animation 			: input-empty 2s infinite;
+		-moz-animation		: input-empty 2s infinite;
+		-webkit-animation	: input-empty 2s infinite;
+
+		@keyframes input-empty {
+			0% 		{ background-color : #fcf8e3; }
+			50%		{ background-color : inherit; }
+			100% 	{ background-color : #fcf8e3; }
+		}
+
+		@-moz-keyframes input-empty {
+			0% 		{ background-color : #fcf8e3; }
+			50%		{ background-color : inherit; }
+			100% 	{ background-color : #fcf8e3; }
+		}
+
+		@-webkit-keyframes input-empty {
+			0% 		{ background-color : #fcf8e3; }
+			50%		{ background-color : inherit; }
+			100% 	{ background-color : #fcf8e3; }
+		}
+	}
+
 	/*
 	TD textarea.fullwidth {
 		// Firefox
@@ -333,7 +364,6 @@
 				// this is a patch to fix font awesome 3.0 which makes width:auto which compresses the icons
 			width: 14px;
 		}
-
 
 		input:invalid, textarea:invalid, select:invalid,
 		input.invalid, textarea.invalid, select.invalid,

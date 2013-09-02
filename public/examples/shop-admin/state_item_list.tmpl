@@ -15,7 +15,8 @@
 		
 		<form class="form-search navbar-search pull-right">
 			<span class="input-append">
-				<input tabIndex="-1" type="text" class="search-query" ng-disabled="list.getEditingContext()" ng-model="filter" placeholder="Filter">
+				<input tabIndex="-1" type="text" class="search-query" ng-disabled="list.getEditingContext()" ng-model="filter" placeholder="Filter" ng-class="{ 'filter-empty' : !filter }"
+				 	title = "{{ filter && 'List is filtered. Reset filter to see all items.'}}">
 				 <button
 				 	class="btn"
 				 	ng-click="filter=''"

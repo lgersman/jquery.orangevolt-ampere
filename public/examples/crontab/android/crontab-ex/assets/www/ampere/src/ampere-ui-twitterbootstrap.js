@@ -135,7 +135,7 @@
 			$scope.$log = $log;
 			$scope.$resource = $resource;
 			$scope.$cookies = $cookies;
-			$scope.$ = $;
+			$scope.$ = jQuery;
 //			$scope.$location = $location;
 
 				/*
@@ -371,12 +371,14 @@
 					scope.attrs = attrs;
 					scope.$ = $window.jQuery;
 
-					scope.$on( 'ampere-model-changed' ,function( /*object*/changeset, /*array<string>*/deleted) {
+					/*
+					scope.$on( 'ampere-model-changed' ,function( changeset, deleted) {
 						// _ns.debug( scope.transition.fullName(),' ampere-model-changed (', changeset, ', ', deleted, ')');
 						if( scope.transition){
 							scope.$enabled = scope.transition.enabled();
 						}
 					});
+					*/
 
 					scope.$watch( attrs.ngAmpereTransition, function( oldValue, newValue) {
 						if( !newValue) {
@@ -389,7 +391,7 @@
 						var type = attrs.type || newValue.options( 'ampere-ui-input-type') || ($.inArray( element[0].tagName.toLowerCase(), Object.keys( templates))!=-1 ? element[0].tagName.toLowerCase() : 'button');
 
 						scope.transition = newValue;
-						scope.$enabled = scope.transition.enabled();
+						//scope.$enabled = scope.transition.enabled();
 
 						_ns.assert(
 							window.ov.ampere.type( scope.transition)=='transition',

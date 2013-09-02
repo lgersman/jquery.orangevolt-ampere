@@ -62,7 +62,7 @@
 
 			var source;
 			if( o && o.jquery) {
-				$.ov.namespace( 'window.ov.ampere.util.getTemplate()').assert( o.length, 'jQuery collection is empty');
+				$.ov.namespace( 'window.ov.ampere.util.getTemplate()').assert( o.length, 'jQuery collection ' + (o.selector && '"' + o.selector +  '"' || '') + ' is empty');
 				if( o[0].tagName=='SCRIPT') {
 					source = o.text().replace( "<![CDATA[", "").replace("]]>", "");
 						// check if a converter for the given template type is associated
