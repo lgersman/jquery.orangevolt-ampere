@@ -351,3 +351,23 @@ same but in combination wit directive ng-ampere-event :
 	...
 
 * css class "filter-empty" supports highlighting of an active filter. can only be applied to INPUT.search-query elements (see shop-admin example)
+
+* angular filter "map" (:property?:default?) added : map can map a property of the right side array items to a object from another array.
+the map filter can take 2 arguments. 1st argument is expected to be the property to return from the item. 
+2nd argument can be a default value return in case the given item doesnt have the property.
+if no default argument is given items doesnt having the property will be filtered out.
+
+example usage:
+data = [ { id : 0, category : 'a'}, { id : 0, name : 'b'}];
+...
+<div ng-repeat="c in data | map:'category'">{{c}}</div>
+-> <div>a</div>
+   <div>b</div>
+
+more complex example:
+categories  = [ { id : 'a', caption : 'Alpha'}, { id : 'b', caption : 'Beta'}];
+data 		= [ { id : 0, category : 'a'}, { id : 0, name : 'b'}];
+...
+<div ng-repeat="category in categories | find( data | map:'category')">{{category.caption}}</div>
+-> <div>Alpha</div>
+   <div>Beta</div>

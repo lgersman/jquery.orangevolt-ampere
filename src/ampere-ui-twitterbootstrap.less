@@ -181,7 +181,9 @@
 		}
 	}
 
-	
+	DD > DL {
+		margin : 0;
+	}
 
 		/* suppress margins on standalone elements in table cells */
 	TD >form:FIRST-CHILD:LAST-CHILD,
@@ -824,6 +826,10 @@
 }
 
 /* fixes bootstrap.css */
+
+.btn-group > .btn.btn-mini + .btn.btn-mini {
+	margin-left: 0;
+}
 
 .lead code, pre {
 	font-size : inherit;

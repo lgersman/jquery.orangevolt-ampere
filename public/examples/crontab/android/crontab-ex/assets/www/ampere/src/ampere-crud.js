@@ -139,6 +139,7 @@
 			};
 
 			var header = function ( header) {
+				debugger
 				if( typeof( header)=='string' || (header instanceof HTMLElement) || header.jquery) {
 					return {
 						template : { prepend : window.ov.ampere.util.getTemplate( header) }
