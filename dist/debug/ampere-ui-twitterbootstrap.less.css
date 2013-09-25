@@ -2,7 +2,7 @@
  * jQuery Orangevolt Ampere
  *
  * version : 0.2.0
- * created : 2013-09-02
+ * created : 2013-09-25
  * source  : https://github.com/lgersman/jquery.orangevolt-ampere
  *
  * author  : Lars Gersmann (lars.gersmann@gmail.com)
@@ -457,6 +457,9 @@
   100% {
     text-shadow: none;
   }
+}
+.ampere-app DD > DL {
+  margin: 0;
 }
 .ampere-app TD > form:FIRST-CHILD:LAST-CHILD,
 .ampere-app TD > dl:FIRST-CHILD:LAST-CHILD,
@@ -967,6 +970,9 @@
   width: 14px;
 }
 /* fixes bootstrap.css */
+.btn-group > .btn.btn-mini + .btn.btn-mini {
+  margin-left: 0;
+}
 .lead code,
 pre {
   font-size: inherit;

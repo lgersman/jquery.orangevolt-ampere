@@ -2,7 +2,7 @@
  * jQuery Orangevolt Ampere
  *
  * version : 0.2.0
- * created : 2013-09-02
+ * created : 2013-09-25
  * source  : https://github.com/lgersman/jquery.orangevolt-ampere
  *
  * author  : Lars Gersmann (lars.gersmann@gmail.com)
@@ -102,6 +102,7 @@
 		});
 		ampere.filter( 'find', function() {
 			return function( items, value, property) {
+				var hits = $.isArray( value) && [];
 				property = property!==undefined && property || 'id';
 				if( !$.isArray( value)) {
 					value = [ value];
@@ -109,10 +110,33 @@
 
 				var hit;
 				for( var i in value) {
-					if( hit = window.ov.entity.find( items, value[i], property)) {
+					hit = window.ov.entity.find( items, value[i], property);
+
+					if( !hits) {
 						return hit;
+					} else {
+						hits.push( hit);
 					}
 				}
+
+				return hits;
+			};
+		});
+		ampere.filter( 'map', function() {
+			return function( items, property, _default) {
+				items = ($.isArray( items) && items || []);
+
+					// filter out objects not having the property
+				if( arguments.length==2 ) {
+					items  = items.filter( function( item) {
+						return item && Object.prototype.hasOwnProperty.call( item, property);
+					});
+				}
+				
+				return items.map( function( item) {
+					var value = item[ property];
+					return value===undefined ? _default : value;
+				});
 			};
 		});
 		ampere.filter( 'sort', function() {
@@ -1035,18 +1059,17 @@
 		ampere.directive( 'ngAmpereTemplate', [ '$compile', function( $compile) {
 			return {
 				restrict	: 'A',
-				scope		: false,
+				//scope		: false,
 				link		: function( scope, element, attrs) {
 					scope.$watch( attrs.ngAmpereTemplate, function( newValue, oldValue) {
 						var contents  = element.contents();
-						
+										
 						if( newValue) {
 							if( !$.isPlainObject( newValue)) {
 								newValue = {
 									replace : newValue
 								};
 							}
-
 							element.empty();
 
 							var content = window.ov.ampere.util.getTemplate(
