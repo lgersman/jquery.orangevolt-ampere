@@ -29,6 +29,13 @@
 
 	.btn-group > .btn, .btn-group > .dropdown-menu {
 		font-size: @fs;
+
+		max-height: 200px;
+		overflow: visible;
+
+		>LI.dropdown-submenu >UL.dropdown-menu {
+			overflow:auto;	
+		}	
 	}
 
 		// feature !! this makes dropdown automagically appear on mouse over
@@ -431,7 +438,23 @@
 			color: #555555;
 		}
 
-		 .breadcrumb > li.disabled > a {
+		.nav-tabs LI.invalid {
+			-webkit-box-shadow	: inherit;
+			box-shadow			: inherit;
+
+			> A {
+			  color: #b94a48;			  
+		 	}
+
+		 	/*
+		 	&.active > A {
+		 		border: 1px solid #b94a48;
+			  	border-bottom-color: transparent;
+		 	}
+		 	*/
+		}	
+
+		.breadcrumb > li.disabled > a {
 		 	text-decoration : none;
 			cursor : default;
 		 }
@@ -871,14 +894,16 @@
 /* fixes twitter bootstrap */
 input:focus:invalid,
 textarea:focus:invalid,
-select:focus:invalid {
+select:focus:invalid,
+.invalid {
   color: #b94a48;
   border-color: #ee5f5b;
 }
 
 input:focus:invalid:focus,
 textarea:focus:invalid:focus,
-select:focus:invalid:focus {
+select:focus:invalid:focus,
+.invalid {
   border-color: #e9322d;
   -webkit-box-shadow: 0 0 6px #f8b9b7;
      -moz-box-shadow: 0 0 6px #f8b9b7;

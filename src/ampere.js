@@ -1695,10 +1695,13 @@
 
 							// wait for action to complete
 						actionDeferred.done( function( redo) {
+								// watt macht das ???
 							if( arguments.length!==0 && !redo) {
+								self.ui.update();
 								return;
 							}
 
+								// watt macht das ???
 							if( arguments.length===0 || !$.isFunction( redo)) {
 								redo = command;
 							}

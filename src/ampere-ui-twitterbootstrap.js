@@ -1470,7 +1470,7 @@
 				value    : onRetry
 			});
 		};
-
+		
 		this.isBlocked = function() {
 			return this.controller.element.find( '.overlay').hasClass( 'block');
 		};
