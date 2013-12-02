@@ -1,8 +1,8 @@
 {
   "name": "jquery.orangevolt-ampere",
   "version": "0.2.0",
-  "dependencies":{
-    "express":""
+  "dependencies": {
+    "express": ""
   },
   "engines": {
     "node": ">= 0.8.0"
@@ -23,6 +23,7 @@
     "grunt-contrib-less": "~0.5.0",
     "grunt-contrib-uglify": "~0.1.2",
     "grunt-contrib-watch": "~0.3.1",
-    "grunt-contrib-cssmin": "~0.4.1"
+    "grunt-contrib-cssmin": "~0.4.1",
+    "grunt-lib-phantomjs": "~0.4.0"
   }
 }

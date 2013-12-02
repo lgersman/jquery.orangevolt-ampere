@@ -3,7 +3,7 @@ module.exports = function(grunt) {
 	var js = {
 		libs  : [
 			'jquery-2.0.2.js',
-			'lodash-1.3.1/lodash.min.js',
+			'lodash-2.4.0/lodash.min.js',
 			'jquery-ui-1.10.3.custom/jquery-ui-1.10.3.custom.min.js',
 			'bootstrap-2.3.2/js/bootstrap.min.js',
 			//'jquery.sortable.js',
@@ -101,7 +101,7 @@ module.exports = function(grunt) {
 				files : [
 					{ dest: 'dist/debug/', src : [
 						'libs/*.js', 
-						'libs/lodash-1.3.1/*.min.*',
+						'libs/lodash-2.4.0/*.min.*',
 						'libs/angular-1.1.5/**/*.min.*',
 						'libs/font-awesome-3.1.1/css/**', 
 						'libs/font-awesome-3.1.1/font/*',
