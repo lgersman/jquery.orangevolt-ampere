@@ -43,3 +43,7 @@ The engine should also run well in any Webkit based browser engine. Your help is
 
 * [MIT](http://www.opensource.org/licenses/MIT)
 * [GPL2](http://www.opensource.org/licenses/GPL-2.0)
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/lgersman/jquery.orangevolt-ampere/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
