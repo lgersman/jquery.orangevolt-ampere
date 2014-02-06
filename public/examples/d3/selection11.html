@@ -473,18 +473,19 @@
                             normY = deltaY / dist,
                             sourcePadding = radius + 4,//d.left ? 17 : 12,
                             sourceX = source.x + (sourcePadding * normX),
-                            sourceY = source.y + (sourcePadding * normY);
+                            sourceY = source.y + (sourcePadding * normY)
+                        ;
 
-                            source = d.transition.points.length && d.transition.points[ d.transition.points.length-1] || d.source.point;
-                            target = d.transition.target.point;
-                            deltaX = target.x - source.x;
-                            deltaY = target.y - source.y;
-                            dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-                            normX = deltaX / dist;
-                            normY = deltaY / dist;
-                            targetPadding = radius + 8;//d.right ? 17 : 12,
-                            targetX = target.x - (targetPadding * normX);
-                            targetY = target.y - (targetPadding * normY);    
+                        source = d.transition.points.length && d.transition.points[ d.transition.points.length-1] || d.source.point;
+                        target = d.transition.target.point;
+                        deltaX = target.x - source.x;
+                        deltaY = target.y - source.y;
+                        dist = Math.sqrt( deltaX * deltaX + deltaY * deltaY);
+                        normX = deltaX / dist;
+                        normY = deltaY / dist;
+                        targetPadding = radius + 8;//d.right ? 17 : 12,
+                        targetX = target.x - (targetPadding * normX);
+                        targetY = target.y - (targetPadding * normY);    
 
                         var points = 
                             [ /*{ x : d.source.x, y : d.source.y},*/ { x : sourceX, y : sourceY}].concat( 
@@ -492,7 +493,11 @@
                                 [{ x : targetX, y : targetY}/*, { x : d.transition.target.x, y : d.transition.target.y}*/]
                             )
                         ;
-                        
+
+                        if( !d.transition.points.length && d.source===d.transition.target){
+                            console.log( "transition links to itself  !", points);
+                        }
+
                         var l = line( points);
 
                         /*    
@@ -1044,6 +1049,15 @@
                         d3.selectAll( '.selected').classed( "selected", false);
 
                         var transition = { label : "transition label 1", points : [], target : endState};
+
+                            // preset 2 transition points for transitions having source===target
+                        if( startState===endState) {
+                            
+                            transition.points.push(
+                                { x : 50, y : 50}, { x : 100, y : 100}
+                            );
+                        }
+
                         startState.transitions.push( transition);
                         update();
 
@@ -1140,11 +1154,65 @@
                                 }
                             });
                         } else if( startState) {
-                                // update drag line
-                            drag_line.attr('d', 'M' + startState.point.x + ',' + startState.point.y + 'L' + p[0] + ',' + p[1]);
+                            var data = data = 'M' + startState.point.x + ',' + startState.point.y + 'L' + p[0] + ',' + p[1];
 
                             var state = d3.select( 'g.state .inner.hover');
                             endState = (!state.empty() && state.data()[0]) || undefined;
+
+                                // transition to itself
+                            if( startState===endState) {
+                                    // to remove !!
+                                var angle = Math.atan2( p[1] - startState.point.y, p[0] - startState.point.x);
+                                var norm_angle = angle < 0 ? Math.abs( angle) : 2*Math.PI - angle;
+                                norm_angle = norm_angle * (180 / Math.PI);
+                                console.log(
+                                    "winkel = " + norm_angle,
+                                    JSON.stringify( startState.point),
+                                    JSON.stringify( { x : p[0], y : p[1]})
+                                );
+
+                                var angle_diff = 0.4;
+
+                                var points = [
+                                    startState.point,
+                                    {
+                                        x : startState.point.x + ((3 * radius) * Math.cos( angle - angle_diff)),
+                                        y : startState.point.y + ((3 * radius) * Math.sin( angle - angle_diff))
+                                    },
+                                    {
+                                        x : startState.point.x + ((3 * radius) * Math.cos( angle + angle_diff)),
+                                        y : startState.point.y + ((3 * radius) * Math.sin( angle + angle_diff))
+                                    },
+                                    /*
+                                    {
+                                        x : p[0],
+                                        y : p[1]
+                                    }
+                                    */
+                                    startState.point
+                                ];
+
+                                var line = d3.svg.line()
+                                .x( function( d, i){
+                                   return d.x;
+                                })
+                                .y( function(d, i){
+                                    return d.y;
+                                })
+                                .interpolate("cardinal");
+
+                                data = line( points);
+                                /*    
+                                data = 'M' + startState.point.x + ',' + startState.point.y + 
+                                    'L' + helper[0].x + ',' + helper[0].y + 
+                                    'L' + helper[1].x + ',' + helper[1].y + 
+                                    'L' + p[0] + ',' + p[1]
+                                ;
+                                */
+                            }
+                            
+                                // update drag line
+                            drag_line.attr('d', data);
                         }
                     },
                     mouseup : function() {
