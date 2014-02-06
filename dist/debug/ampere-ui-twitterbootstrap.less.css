@@ -2,13 +2,13 @@
  * jQuery Orangevolt Ampere
  *
  * version : 0.2.0
- * created : 2013-09-25
+ * created : 2014-02-06
  * source  : https://github.com/lgersman/jquery.orangevolt-ampere
  *
  * author  : Lars Gersmann (lars.gersmann@gmail.com)
  * homepage: http://www.orangevolt.com
  *
- * Copyright (c) 2013 Lars Gersmann; Licensed MIT, GPL
+ * Copyright (c) 2014 Lars Gersmann; Licensed MIT, GPL
  */
 /*
  * Orangevolt Ampere Framework
@@ -236,6 +236,12 @@
 .ampere-app .btn-group > .btn,
 .ampere-app .btn-group > .dropdown-menu {
   font-size: 13px;
+  max-height: 200px;
+  overflow: auto;
+}
+.ampere-app .btn-group > .btn > LI.dropdown-submenu > UL.dropdown-menu,
+.ampere-app .btn-group > .dropdown-menu > LI.dropdown-submenu > UL.dropdown-menu {
+  overflow: auto;
 }
 .ampere-app ul.nav li.dropdown.auto:hover > ul.dropdown-menu {
   margin: 0;
@@ -634,6 +640,20 @@
 .ampere-app .ampere-module .nav-tabs > li > a {
   color: #555555;
 }
+.ampere-app .ampere-module .nav-tabs LI.invalid {
+  -webkit-box-shadow: inherit;
+  box-shadow: inherit;
+  /*
+		 	&.active > A {
+		 		border: 1px solid #b94a48;
+			  	border-bottom-color: transparent;
+		 	}
+		 	*/
+
+}
+.ampere-app .ampere-module .nav-tabs LI.invalid > A {
+  color: #b94a48;
+}
 .ampere-app .ampere-module .breadcrumb > li.disabled > a {
   text-decoration: none;
   cursor: default;
@@ -1009,13 +1029,15 @@ pre {
 /* fixes twitter bootstrap */
 input:focus:invalid,
 textarea:focus:invalid,
-select:focus:invalid {
+select:focus:invalid,
+.invalid {
   color: #b94a48;
   border-color: #ee5f5b;
 }
 input:focus:invalid:focus,
 textarea:focus:invalid:focus,
-select:focus:invalid:focus {
+select:focus:invalid:focus,
+.invalid {
   border-color: #e9322d;
   -webkit-box-shadow: 0 0 6px #f8b9b7;
   -moz-box-shadow: 0 0 6px #f8b9b7;

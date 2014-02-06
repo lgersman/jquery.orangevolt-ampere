@@ -2,13 +2,13 @@
  * jQuery Orangevolt Ampere
  *
  * version : 0.2.0
- * created : 2013-09-25
+ * created : 2014-02-06
  * source  : https://github.com/lgersman/jquery.orangevolt-ampere
  *
  * author  : Lars Gersmann (lars.gersmann@gmail.com)
  * homepage: http://www.orangevolt.com
  *
- * Copyright (c) 2013 Lars Gersmann; Licensed MIT, GPL
+ * Copyright (c) 2014 Lars Gersmann; Licensed MIT, GPL
  */
 
 /**
@@ -1473,7 +1473,7 @@
 				value    : onRetry
 			});
 		};
-
+		
 		this.isBlocked = function() {
 			return this.controller.element.find( '.overlay').hasClass( 'block');
 		};
