@@ -1,0 +1,1627 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script type="text/javascript" src="../../../src/oval.js"></script>
+        <script type="text/javascript" src="d3.js"></script>            
+        
+        <style type="text/less">
+            @color      : gray;
+            @text-color : #555555;
+            @highlight-color : aliceblue;
+
+            body.ampere-app {
+                min-width : 768px;
+                position: static;
+                overflow-x: hidden;
+                overflow-y: hidden;
+            }
+
+            .amperator {
+                position: absolute;
+                right: 0;
+                left: 0;
+                top : 41px;
+                bottom : 40px;
+                background-image: url(http://gdj.gdj.netdna-cdn.com/wp-content/uploads/2012/08/minimal-background-pattern-wordpress-1.jpg);
+                >* {
+                    height : 100%;
+                    float: left;
+                }
+
+                >.amperator-help {
+                    box-sizing : border-box;
+                    -moz-box-sizing : border-box;
+                    width : 240px;
+                    padding : 8px;
+                    color: #c09853;
+                    background-color: #fcf8e3;
+                    border-right: 1px solid #fbeed5;
+
+                    >.content {
+                        height : calc( ~'100% - 40px');
+                        overflow: auto;
+
+                        LI {
+                            list-style-type: circle; 
+                        }
+
+                        .filter {
+                            LI[ng-class] {
+                                list-style-type: disc; 
+
+                                &:not( .visible) {
+                                    display : none;                                
+                                }
+                            }
+                        }
+                    }
+                }
+
+                >.amperator-properties {
+                    box-sizing : border-box;
+                    -moz-box-sizing : border-box;
+                    width : 240px;
+                    float : right;
+                    padding : 8px;
+                    //color : #3a87ad;
+                    //color: darken( @highlight-color, 55%);
+                    background-color: @highlight-color;
+                    border-left: 1px solid darken( @highlight-color, 3%);
+
+                    >.content {
+                        height : calc( ~'100% - 40px');
+                        overflow: auto;
+                    }
+                }
+
+                /*
+                >.amperator-canvas {
+                    width : 580px;
+                    overflow : auto;
+                }
+                */
+            }
+
+            svg {
+                min-height : 200px;
+                min-width  : 200px;
+                font-size : 13px;
+
+                .end-arrow {
+                   fill            : @color;
+                   stroke-width    : 1px;
+                }
+
+                rect.selection {
+                    stroke          : @color;
+                    stroke-dasharray: 2px;
+                    stroke-opacity  : 0.5;
+                    fill            : transparent;
+                }
+
+                g.state {
+                    circle {
+                        stroke  : @color;            
+                    }
+
+                    circle.inner {
+                        fill        : white;
+                        transition  : fill 0.5s;
+                        cursor      : move;
+
+                        &.hover {
+                            fill : @highlight-color;
+                        }
+                    }
+
+                    circle.outer {
+                        stroke-width    : 0px;
+                        stroke-dasharray: 2px;
+                        stroke-color    : @color;
+                        fill            : transparent;
+                        transition      : all 0.5s;
+                        cursor          : pointer;
+
+                        &:hover {
+                            stroke-width    : 1px;
+                            fill            : @highlight-color;    
+                        }
+                    }
+
+                    &.selected circle.outer {
+                        stroke-width    : 1px;
+                    }
+
+                    text {
+                        &.foreground {
+                            font-weight         : bold;
+                            pointer-events      : none;
+                            fill                : @text-color;
+                        }
+
+                        &.background {
+                            font-weight         : bold;
+                            pointer-events      : none;
+                            fill                : white;
+                            stroke              : white;
+                            stroke-width        : 4px;
+                        }
+                    }
+                }
+
+                g.transition path,
+                path.dragline {
+                    fill        : none;
+                    stroke      : @color;
+                    stroke-width: 1px;
+                }
+
+                path.dragline {
+                    pointer-events: none;
+                    stroke-opacity  : 0.5;
+                    stroke-dasharray: 2px;
+                }
+
+                path.dragline.hidden {
+                    stroke-width: 0;
+                }
+
+                g.transition {
+                    path {
+                        cursor : default;
+
+                        &.foreground {
+                            marker-end  : url(#end-arrow);
+                        }
+
+                        &.background {
+                            stroke-dasharray: none;
+                            stroke-width: 8px;
+                            stroke : transparent;
+                        }
+                    }
+
+                    &.hover path.background {
+                        stroke-dasharray: none;
+                        stroke : @highlight-color;
+                        stroke-opacity  : 1.0;
+                        transition : all 0.5s;
+                    }
+
+                    &.selected path.foreground {
+                        stroke-dasharray: 2px;
+                        stroke-color    : @color;
+                    }
+
+                    text.label {
+                        /* text overflow ellipsis seems not yet to work */
+                        /*
+                        white-space: nowrap;
+                        overflow: hidden;
+                        width       : 30px;
+                        text-overflow   : ellipsis;
+                        */
+                        cursor          : default;
+
+                        pointer-events : hover;
+
+                            /* these are overrides to override twitter bootstrap styles */
+                        /*font-weight     : normal;*/
+                        text-shadow     : none;            
+
+                        &.foreground {
+                            fill                : @text-color;    
+                            //filter            : url(#glow);
+                        }
+
+                        &.background {
+                            fill                : rgba( 255,255,255,0.7);
+                            stroke              : rgba( 255,255,255,0.7);
+                            stroke-width        : 4px;
+                            //filter            : url(#glow);
+                        }
+                    }
+
+                    &.hover text.label.background {
+                        fill                : @highlight-color;
+                        stroke              : @highlight-color;
+                    }
+
+                    circle {
+                        display         : none;
+                        stroke          : @color;
+
+                        &.endpoint {
+                            fill            : none;
+                            cursor          : pointer;
+                            stroke-dasharray: 2px;
+                        }
+
+                        &.point {
+                            fill            : @highlight-color;
+                            cursor          : move;
+                        }
+                    }
+
+                    &.selected circle {
+                        display    : inline;
+                        transition : all 0.5s;
+                    }
+
+                    &:not( .selected).hover {
+                        transition      : all 0.5s;
+                    }
+                }            
+
+                g.transition:not( .selected).hover *,
+                path.dragline {
+                    display         : inline;
+                    
+                }
+
+                    /* disable text selection */
+                *::selection {
+                    background : transparent;
+                }
+
+                *::-moz-selection {
+                    background:transparent;
+                }
+
+                *::-webkit-selection {
+                    background:transparent;
+                }
+            }
+        </style>
+
+        <script type="text/javascript" src="../../../libs/lesscss-1.3.3.js"></script>
+
+        <script type="text/javascript">
+                // http://stackoverflow.com/questions/10238089/how-can-you-ensure-twitter-bootstrap-popover-windows-are-visible
+            $.fn.popover.defaults.placement = function(tip, element) {
+                var isWithinBounds = function(elementPosition) {
+                        return boundTop < elementPosition.top && boundLeft < elementPosition.left && boundRight > (elementPosition.left + actualWidth) && boundBottom > (elementPosition.top + actualHeight);
+                    },
+                    $element = $( element),
+                    pos = $.extend({}, $element.offset(), {
+                      width: element.offsetWidth,
+                      height: element.offsetHeight
+                    }),
+                    actualWidth = 283,
+                    actualHeight = 117,
+                    boundTop = $(document).scrollTop(),
+                    boundLeft = $(document).scrollLeft(),
+                    boundRight = boundLeft + $(window).width(),
+                    boundBottom = boundTop + $(window).height(),
+                    elementAbove = {
+                      top: pos.top - actualHeight,
+                      left: pos.left + pos.width / 2 - actualWidth / 2
+                    },
+                    elementBelow = {
+                      top: pos.top + pos.height,
+                      left: pos.left + pos.width / 2 - actualWidth / 2
+                    },
+                    elementLeft = {
+                      top: pos.top + pos.height / 2 - actualHeight / 2,
+                      left: pos.left - actualWidth
+                    },
+                    elementRight = {
+                      top: pos.top + pos.height / 2 - actualHeight / 2,
+                      left: pos.left + pos.width
+                    },
+                    above = isWithinBounds(elementAbove),
+                    below = isWithinBounds(elementBelow),
+                    left = isWithinBounds(elementLeft),
+                    right = isWithinBounds(elementRight)
+                ;
+
+                if (above) {
+                    return "top";
+                } else {
+                    if (below) {
+                        return "bottom";
+                    } else {
+                        if (left) {
+                            return "left";
+                        } else {
+                            if (right) {
+                                return "right";
+                            } else {
+                                return "right";
+                            }
+                        }
+                    }
+                }
+            };
+        </script>
+
+        <script type="text/javascript">
+            function render() {
+                    // state radius
+                var radius = 36;
+                    // snap factor (set to 1 to disable snap behaviour)
+                var snapToGrid = function( v) {
+                    return Math.floor( v/10)*10;
+                }
+                    // intial degree distance for generic points (bogenmaß) at transitions targeting its source
+                var angle_diff = 0.4;
+
+                window.states = [
+                    { point : { x : 43, y : 67}, label : "first sadsad sadsada", transitions : [] },
+                    { point : { x : 340, y : 150}, label : "second", transitions : [] },
+                    { point : { x : 200, y : 250}, label : "third", transitions : [] },
+                    { point : { x : 300, y : 320}, label : "fourth", transitions : [] },
+                    { point : { x : 50, y : 250}, label : "fifth", transitions : [] },
+                    { point : { x : 90, y : 170}, label : "last", transitions : [] }
+                ];
+
+                window.states[0].transitions.push( { label : 'whooo', points : [ { x : 150, y : 50}, { x : 200, y : 30}], target : window.states[ 1]})
+
+                window.states[1].transitions.push( { label : 'waaa!', points : [ { x : 250, y : 30}], target : window.states[ 2]})
+
+                var svg = d3.select( 'svg');
+                //.attr("viewBox", "0 0 " + 1000 + " " + 1000 )
+                //.attr("preserveAspectRatio", "xMidYMid meet")
+                //.attr("pointer-events", "all")
+                //.call(d3.behavior.zoom().scaleExtent([.1, 3]).on("zoom", update));
+
+                //.attr("viewBox", "0 0 " + 1000 + " " + 1000 )
+                //.attr("preserveAspectRatio", "xMinYMin")
+                //.attr("width", "100%")
+                //.attr("height", "100%");    
+                
+                /*
+                var zoom = d3.behavior.zoom()
+                    .x( d3.scale.linear().domain([ 0, 800]).range([0, 800]))
+                    .y( d3.scale.linear().domain([ 0, 600]).range([0, 600]))
+                    //.scaleExtent([1, 10])
+                ;
+
+                svg.call( zoom);
+                */
+                
+                var selectionAccessor = (function() {
+                    var _selected = undefined;
+
+                    return function( selected) {
+                        if( arguments.length) {
+                            var doTrigger = !angular.equals( selected, _selected);
+                            _selected = selected;
+                            doTrigger && $( svg.node()).trigger( 'd3.selection', [ _selected]);                            
+                        } else {
+                            return _selected;
+                        }
+                    };
+                })();
+
+                    // this is needed to be able to apply scale/transform at once
+                var group = svg.append( 'g');
+
+                    // line displayed when dragging new nodes
+                var drag_line = group.append('svg:path')
+                    .attr({
+                        'class' : 'dragline hidden',
+                        'd'     : 'M0,0L0,0'
+                    })
+                ;
+                
+                var gTransitions = group.append( 'g').selectAll( "path.transition");
+                var gStates = group.append("g").selectAll( "g.state");
+
+                var transitions = function() {
+                    return states.reduce( function( initial, state) {
+                        return initial.concat( 
+                            state.transitions.map( function( transition) {
+                                return { source : state, transition : transition};
+                            })
+                        );
+                    }, []);
+                };
+
+                var transformTransitionEndpoints = function( d, i) {
+                    var endPoints = d.endPoints();
+
+                    var point = [ 
+                        d.type=='start' ? endPoints[0].x : endPoints[1].x, 
+                        d.type=='start' ? endPoints[0].y : endPoints[1].y
+                    ];
+                    
+                    return "translate("+ point + ")";
+                }
+
+                var transformTransitionLabel = function( d) {
+                    var transition = d.transition;
+
+                        // create point array including source and target transition positions
+                    var points = [ { x : d.source.point.x, y : d.source.point.y}].concat( transition.points);
+                    points.push( { x : transition.target.point.x, y : transition.target.point.y});
+
+                        // do we have an odd count of points ? 
+                    var point;
+                    if( points.length % 2) {
+                        point = points[ Math.floor( points.length/2)];
+                            // fix : adjust label to stay above the point
+                        point = { x : point.x, y : point.y - 6};
+                    } else {
+                            // compute point between the 2 points nearest to middle
+                        var start = points[ points.length/2-1],
+                            end = points[ points.length/2];
+
+                        point = { 
+                            x : Math.abs( end.x-start.x)/2 + Math.min( start.x, end.x),
+                            y : Math.abs( end.y-start.y)/2 + Math.min( start.y, end.y)
+                        };
+                    }
+
+                    return "translate("+ [ point.x, point.y] + ")";
+                };
+
+                var transformTransitionPoints = function( d, i) {
+                    return "translate("+ [d.x,d.y] + ")";
+                }
+                
+                var computeTransitionPath = (function() {
+                    var line = d3.svg.line()
+                    .x( function( d, i){
+                       return d.x;
+                    })
+                    .y( function(d, i){
+                        return d.y;
+                    })
+                    .interpolate("cardinal");
+
+                    return function( d) {
+                        var source = d.source.point,
+                            target = d.transition.points.length && d.transition.points[0] || d.transition.target.point,
+                            deltaX = target.x - source.x,
+                            deltaY = target.y - source.y,
+                            dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY),
+                            normX = deltaX / dist,
+                            normY = deltaY / dist,
+                            sourcePadding = radius + 4,//d.left ? 17 : 12,
+                            sourceX = source.x + (sourcePadding * normX),
+                            sourceY = source.y + (sourcePadding * normY)
+                        ;
+
+                        source = d.transition.points.length && d.transition.points[ d.transition.points.length-1] || d.source.point;
+                        target = d.transition.target.point;
+                        deltaX = target.x - source.x;
+                        deltaY = target.y - source.y;
+                        dist = Math.sqrt( deltaX * deltaX + deltaY * deltaY);
+                        normX = deltaX / dist;
+                        normY = deltaY / dist;
+                        targetPadding = radius + 8;//d.right ? 17 : 12,
+                        targetX = target.x - (targetPadding * normX);
+                        targetY = target.y - (targetPadding * normY);    
+
+                        var points = 
+                            [ /*{ x : d.source.x, y : d.source.y},*/ { x : sourceX, y : sourceY}].concat( 
+                                d.transition.points, 
+                                [{ x : targetX, y : targetY}/*, { x : d.transition.target.x, y : d.transition.target.y}*/]
+                            )
+                        ;
+
+                        var l = line( points);
+
+                        /*    
+                        l = l
+                            // remove first 3 comma separated values
+                        .replace( /M[^,]+,[^,]+,[^,]+,/, 'M')
+                            // remove last point
+                        .replace( /,[^,]+,[^,]+$/, '');
+                        */
+
+                        return l;
+                    };
+                })();
+
+                var dragPoint = d3.behavior.drag()
+                .on("drag", function( d, i) {
+                    console.log( "transitionmidpoint drag");
+                    var gTransitionPoint = d3.select( this);
+
+                    gTransitionPoint.attr( "transform", function( d, i) {
+                        /*
+                        d.x += d3.event.dx;
+                        d.y += d3.event.dy;
+                        */
+
+                        d.x = snapToGrid( d3.event.x);
+                        d.y = snapToGrid( d3.event.y);
+
+                        return "translate(" + [ d.x,d.y ] + ")"
+                    });
+
+                        // refresh transition path
+                    gTransitions.selectAll( "path").attr( 'd', computeTransitionPath);
+                        // refresh transition endpoints
+                    gTransitions.selectAll( "circle.endpoint").attr({
+                        transform : transformTransitionEndpoints
+                    }); 
+
+                      // refresh transition points
+                    gTransitions.selectAll( "circle.point").attr({
+                        transform : transformTransitionPoints
+                    });
+
+                        // refresh transition label
+                    gTransitions.selectAll( "text.label").attr({
+                        transform : transformTransitionLabel
+                    });
+
+                    d3.event.sourceEvent.stopPropagation();
+                })
+                .on( "dragend", function( d) {
+                    console.log( "transitionmidpoint dragend");
+
+                    adjustSVGSize();
+                });
+
+                var renderTransitionMidPoints = function( gTransition) {
+                    gTransition.each( function( transition) {
+                        var transitionPoints = d3.select( this).selectAll('circle.point').data( transition.transition.points, function( d) {
+                            return transition.transition.points.indexOf( d);
+                        });
+                        
+                        transitionPoints.enter().append( "circle")
+                            .attr({
+                                'class'         : 'point',
+                                r               : 4,
+                                transform       : transformTransitionPoints
+                            })
+                            .on({
+                                dblclick : function( d) {
+                                    console.log( "transitionmidpoint dblclick");
+
+                                    var gTransition = d3.select( d3.event.target.parentElement),
+                                        transition  = gTransition.datum(),
+                                        index       = transition.transition.points.indexOf( d);
+
+                                    if( gTransition.classed( "selected")) {
+                                        transition.transition.points.splice( index, 1);
+
+                                        gTransition.selectAll( 'path').attr({
+                                            d     : computeTransitionPath
+                                        });
+
+                                        renderTransitionMidPoints( gTransition);
+
+                                        //renderTransitionPoints( gTransition);
+                                        gTransition.selectAll( "circle.endpoint").attr({
+                                            transform : transformTransitionEndpoints
+                                        });
+
+                                            // refresh transition label
+                                        gTransitions.selectAll( "text.label").attr({
+                                            transform : transformTransitionLabel
+                                        });
+
+                                    }    
+                                    d3.event.stopPropagation();
+                                }
+                            })
+                            .call( dragPoint)
+                        ;
+                        transitionPoints.exit().remove();
+                    });
+                };
+
+                var renderTransitionPoints = function( gTransition) {
+                    gTransition.each( function( d) {
+                        var endPoints = function() {
+                            /*
+                            var deltaX = d.transition.target.x - d.source.x,
+                            deltaY = d.transition.target.y - d.source.y,
+                            dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY),
+                            normX = deltaX / dist,
+                            normY = deltaY / dist,
+                            padding = radius;
+
+                            return [
+                                { x : d.source.x + (padding * normX), y : d.source.y + (padding * normY)},
+                                { x : d.transition.target.x - (padding * normX), y : d.transition.target.y - (padding * normY)}
+                            ];
+                            */
+                           
+                            var source = d.source.point,
+                            target = d.transition.points.length && d.transition.points[0] || d.transition.target.point,
+                            deltaX = target.x - source.x,
+                            deltaY = target.y - source.y,
+                            dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY),
+                            normX = deltaX / dist,
+                            normY = deltaY / dist,
+                            sourceX = source.x + (radius * normX),
+                            sourceY = source.y + (radius * normY);
+
+                            source = d.transition.points.length && d.transition.points[ d.transition.points.length-1] || d.source.point;
+                            target = d.transition.target.point;
+                            deltaX = target.x - source.x;
+                            deltaY = target.y - source.y;
+                            dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+                            normX = deltaX / dist;
+                            normY = deltaY / dist;
+                            targetPadding = radius + 8;//d.right ? 17 : 12,
+                            targetX = target.x - (radius * normX);
+                            targetY = target.y - (radius * normY);
+
+                            return [ { x : sourceX, y : sourceY}, { x : targetX, y : targetY}];
+                        };
+
+                        var transitionEndpoints = d3.select( this).selectAll('circle.endpoint').data( [
+                            { endPoints : endPoints, type : 'start' },
+                            { endPoints : endPoints, type : 'end' }
+                        ]);
+
+                        transitionEndpoints.enter().append( "circle")
+                            .attr({
+                                'class'         : function( d) {
+                                    return 'endpoint ' + d.type;
+                                },
+                                r               : 4,
+                                transform       : transformTransitionEndpoints
+                            })
+                        ;
+                        transitionEndpoints.exit().remove();
+                    });
+                };
+
+                var getTransitionId = function( d) {
+                    var transitionIndex = d.source.transitions.indexOf( d.transition);
+                    var stateIndex = states.indexOf( d.source);
+
+                    return stateIndex + '-' + transitionIndex;
+                }
+
+                var renderTransitions = function() {
+                    gTransition = gTransitions.enter().append( 'g')
+                        .attr({
+                            'class'     : 'transition' 
+                        })
+                        .on({
+                            click : function( data) {
+                                console.log( "transition click");
+                                d3.selectAll( 'g.state.selection').classed( "selection", false);
+                                d3.selectAll( 'g.selected').classed( "selected", false);
+
+                                d3.select( this).classed( "selected", true);
+                                d3.event.stopPropagation();
+
+                                selectionAccessor( data);
+                            },
+                            mouseover : function() {
+                                svg.select( "rect.selection").empty() && d3.select( this).classed( "hover", true);
+                            }, 
+                            mouseout : function() { 
+                                svg.select( "rect.selection").empty() && d3.select( this).classed( "hover", false);
+                            }
+                        });
+                    ;   
+
+                    gTransition.append( 'path')
+                        .attr({
+                            d     : computeTransitionPath,
+                            class : 'background',
+                            id    : getTransitionId
+                        })
+                        .on({
+                            dblclick : function( d, i) {
+                                gTransition = d3.select( d3.event.target.parentElement);
+                                if( d3.event.ctrlKey) {
+                                    var p = d3.mouse( this);
+                                    
+                                    gTransition.classed( 'selected', true);
+                                    d.transition.points.push( { x : p[0], y : p[1]});
+                                    
+                                    renderTransitionMidPoints( gTransition, d);
+                                    gTransition.selectAll( 'path').attr({
+                                        d     : computeTransitionPath
+                                    });
+
+                                        // refresh transition label
+                                    gTransitions.selectAll( "text.label").attr({
+                                        transform : transformTransitionLabel
+                                    });
+
+                                    selectionAccessor( d);
+                                } else {
+                                    var gTransition = d3.select( d3.event.target.parentElement),
+                                    transition = gTransition.datum(),
+                                    index = transition.source.transitions.indexOf( transition.transition);
+                                    
+                                    transition.source.transitions.splice( index, 1)
+                                    gTransition.remove();
+
+                                    d3.event.stopPropagation();
+                                }
+                            }
+                        })
+                    ;  
+
+                    gTransition.append( 'path')
+                        .attr({
+                            d     : computeTransitionPath,
+                            class : 'foreground'
+                        })
+                    ;
+
+                    /*
+                    gTransition.append( 'text')
+                        .append( 'textPath')
+                        .attr({
+                            'xlink:href' : function( d) {
+                                return '#' + getTransitionId( d);
+                            },
+                            'startOffset' : 50
+                        })
+                        .text( function( d) {
+                            return "sample transition name";
+                        })
+                    ; 
+                    */
+
+                    /*               
+                    gTransition.append( 'text')
+                        .attr({
+                            'text-anchor' : 'middle',
+                            'class'       :  'test'
+                        })
+                        .text( function( d) {
+                            return "sample transition name";
+                        })
+                    ;
+                    */
+
+
+                    renderTransitionPoints( gTransition);
+                    renderTransitionMidPoints( gTransition);
+
+                    var text = gTransition.append( "text")                
+                    .attr({
+                        'text-anchor'  : 'middle',
+                        'class'        : 'label background',
+                        'transform'    : transformTransitionLabel
+                    })
+                    .text( function( d) {
+                        return d.transition.label;
+                    });
+
+                    gTransition.append( "text")                
+                    .attr({
+                        'text-anchor'  : 'middle',
+                        'class'        : 'label foreground',
+                        'transform'    : transformTransitionLabel
+                    })
+                    .text( function( d) {
+                        return d.transition.label;
+                    })
+                    .each( function( d) {
+                        $( this).popover({
+                            'container' : 'body',
+                            'title'     : 'Transition ' + d.transition.label,
+                            'content'   : 'Description of the transition ' + d.transition.label,
+                            'delay'     : 500,
+                            'trigger'   : 'hover'
+                        }).popover()
+                    });
+
+                    gTransitions.exit().remove();
+                };
+
+                var renderStates = function() {
+                    var gState = gStates.enter()
+                        .append( "g")
+                        .attr({
+                            "transform" : function( d) {
+                                return "translate("+ [ d.point.x, d.point.y] + ")";
+                            },
+                            'class'     : 'state' 
+                        })
+                        .call( drag);
+                    
+                    gState.append( "circle")
+                        .attr({
+                            r       : radius + 4,
+                            class   : 'outer'
+                        })
+                        .on({
+                            mousedown : function( d) {
+                                console.log( "state circle outer mousedown");
+                                startState = d, endState = undefined;
+
+                                    // reposition drag line
+                                drag_line
+                                    .style('marker-end', 'url(#end-arrow)')
+                                    .classed('hidden', false)
+                                    .attr('d', 'M' + d.point.x + ',' + d.point.y + 'L' + d.point.x + ',' + d.point.y)
+                                ;
+
+                                    // force element to be an top
+                                this.parentNode.parentNode.appendChild( this.parentNode);
+                                //d3.event.stopPropagation();
+                            },
+                            mouseover : function() {
+                                svg.select( "rect.selection").empty() && d3.select( this).classed( "hover", true);
+                            },
+                            mouseout : function() { 
+                                svg.select( "rect.selection").empty() && d3.select( this).classed( "hover", false);
+                            }
+                        });
+                    ;
+              
+                    gState.append( "circle")
+                        .attr({
+                            r       : radius,
+                            class   : 'inner'
+                        })
+                        .on({
+                            click : function( d, i) {
+                                console.log( "state circle inner mousedown");
+
+                                var e = d3.event,
+                                    g = this.parentNode,
+                                    isSelected = d3.select( g).classed( "selected");
+
+                                if( !e.ctrlKey) {
+                                    d3.selectAll( 'g.selected').classed( "selected", false);
+                                }
+                                
+                                d3.select( g).classed( "selected", !isSelected);
+
+                                    // reappend dragged element as last 
+                                    // so that its stays on top 
+                                g.parentNode.appendChild( g);
+                                //d3.event.stopPropagation();
+                                
+                                var _selection = d3.selectAll( 'g.selected').data(); 
+                                if( _selection.length) {
+                                    selectionAccessor( _selection.length==1 && _selection[0] || _selection);
+                                } else {
+                                    selectionAccessor( undefined);
+                                }
+                            },
+                            mouseover : function() {
+                                svg.select( "rect.selection").empty() && d3.select( this).classed( "hover", true);
+                                /*
+                                var x; var y;
+                                if (d3.event.pageX != undefined && d3.event.pageY != undefined) {
+                                    x = d3.event.pageX;
+                                    y = d3.event.pageY;
+                                } else {
+                                    x = d3.event.clientX + document.body.scrollLeft +
+                                    document.documentElement.scrollLeft;
+                                    y = d3.event.clientY + document.body.scrollTop +
+                                    document.documentElement.scrollTop;
+                                }
+                                */
+                                    // show popover if no mouse button is clicked
+                                    // otherwise hide it 
+                                d3.event.which && $( this).popover( 'hide');
+                            },
+                            mousedown : function() {
+                                 $( this).popover( 'hide');
+                            },
+                            mouseout : function() { 
+                                svg.select( "rect.selection").empty() && d3.select( this).classed( "hover", false);
+                                $( this).popover( 'hide');
+                            },
+                            dblclick : function() {
+                                console.log( "state circle inner dblclick");
+                                var d = d3.select( this.parentNode).datum();
+
+                                var index = states.indexOf( d);
+                                states.splice( index, 1);
+
+                                    // remove transitions targeting the removed state
+                                states.forEach( function( state) {
+                                    state.transitions.forEach( function( transition, index) {
+                                        if( transition.target===d) {
+                                            state.transitions.splice( index, 1);
+                                        }
+                                    });
+                                });
+
+                                //console.log( "removed state " + d.label);
+
+                                //d3.select( this.parentNode).remove();
+                                update();
+
+                                selectionAccessor( undefined);
+                            }
+                        })
+                        .each( function( d, i){ 
+                            $( this).popover({
+                                'container' : 'body',
+                                'title'     : 'State ' + d.label,
+                                'content'   : 'Description of the '+i+'th state',
+                                'delay'     : 500,
+                                'trigger'   : 'hover'
+                            }).popover()
+                        });
+                    ;
+
+                    gState.append( "text")
+                        .attr({
+                            'text-anchor'   : 'middle',
+                            y               : 4,
+                            class           : 'background'
+                        })
+                        .text( function( d) {
+                            return d.label;
+                        })
+                    ;
+
+                    gState.append( "text")
+                        .attr({
+                            'text-anchor'   : 'middle',
+                            y               : 4,
+                            class           : 'foreground'
+                        })
+                        .text( function( d) {
+                            return d.label;
+                        })
+                    ;
+
+                    gState.append( "title")
+                        .text( function( d) {
+                            return d.label;
+                        })
+                    ;
+                    gStates.exit().remove();
+                };  
+
+                var startState, endState, snap_d;
+                var drag = d3.behavior.drag()
+                .on("dragstart", function( d, i) {
+                        // reset snaptogrid modulo
+                    snap_d = { 
+                        x : 0, y : 0 
+                    };
+                })
+                .on("drag", function( d, i) {
+                    console.log( "drag");
+                    if( startState) {
+                        return;
+                    }
+
+                    var selection = d3.selectAll( '.selected');
+
+                        // if dragged state is not in current selection
+                        // mark it selected and deselect all others
+                    if( selection[0].indexOf( this)==-1) {
+                        selection.classed( "selected", false);                        
+                        selection = d3.select( this);
+                        selection.classed( "selected", true);
+                    } 
+
+                        // update snap_diff
+                    snap_d.x += d3.event.dx;
+                    snap_d.y += d3.event.dy;
+
+                        // patch remembered diff into dx,dy
+                    d3.event.dx = snapToGrid( snap_d.x);
+                    d3.event.dy = snapToGrid( snap_d.y);
+
+                    snap_d.x -= d3.event.dx;
+                    snap_d.y -= d3.event.dy;
+
+                        // move states
+                    selection.attr("transform", function( d, i) {
+                        d.point.x += d3.event.dx;
+                        d.point.y += d3.event.dy;
+
+                            // adjust snap to grid 
+                        d.point.x = snapToGrid( d.point.x);
+                        d.point.y = snapToGrid( d.point.y);
+
+                        return "translate(" + [ d.point.x, d.point.y] + ")"
+                    });
+
+                        // move transistion points of each transition 
+                        // where transition target is also in selection
+                    var selectedStates = d3.selectAll( 'g.state.selected').data();
+                    var affectedTransitions = selectedStates.reduce( function( array, state) {
+                        return array.concat( state.transitions);
+                    }, [])
+                    .filter( function( transition) {
+                        return selectedStates.indexOf( transition.target)!=-1;
+                    });
+                    affectedTransitions.forEach( function( transition) {
+                        for( var i = transition.points.length - 1; i >= 0; i--) {
+                            var point = transition.points[i];
+
+                            point.x += d3.event.dx;
+                            point.y += d3.event.dy;
+
+                                 // adjust snap to grid 
+                            point.x = snapToGrid( point.x);
+                            point.y = snapToGrid( point.y);
+                        }
+                    });
+
+                        // reappend dragged element as last 
+                        // so that its stays on top 
+                    selection.each( function() {
+                        this.parentNode.appendChild( this);
+                    });             
+
+                        // refresh transition path
+                    gTransitions.selectAll( "path").attr( 'd', computeTransitionPath);
+
+                        // refresh transition endpoints
+                    gTransitions.selectAll( "circle.endpoint").attr({
+                        transform : transformTransitionEndpoints
+                    }); 
+                      // refresh transition points
+                    gTransitions.selectAll( "circle.point").attr({
+                        transform : transformTransitionPoints
+                    }); 
+
+                        // refresh transition label
+                    gTransitions.selectAll( "text.label").attr({
+                        transform : transformTransitionLabel
+                    });
+
+                    d3.event.sourceEvent.stopPropagation();
+
+                    var _selection = d3.selectAll( 'g.state.selected').data();
+                    if( _selection.length) {
+                        selectionAccessor( _selection.length==1 ? _selection[0] : _selection);
+                    } else {
+                        selectionAccessor( undefined);
+                    }
+                })
+                .on( "dragend", function( d) {
+                    console.log( "dragend");
+                    // TODO : http://stackoverflow.com/questions/14667401/click-event-not-firing-after-drag-sometimes-in-d3-js
+
+                    // needed by FF
+                    drag_line
+                        .classed('hidden', true)
+                        .style('marker-end', '')
+                    ;
+
+                    if( startState && endState) {
+                            // deselect selected states
+                        d3.selectAll( '.selected').classed( "selected", false);
+
+                        var transition = { label : "transition label 1", points : [], target : endState};
+
+                            // preset 2 transition points for transitions having source===target
+                        if( startState===endState) {
+                            var scale = $( '.amperator-canvas').data( 'controller').zoom.value,
+                                p = d3.mouse( this.parentNode)
+                            ;
+                            
+
+                            var angle = Math.atan2( 
+                                p[1] - startState.point.y, 
+                                p[0] - startState.point.x
+                            );
+
+                            var norm_angle = angle < 0 ? Math.abs( angle) : 2*Math.PI - angle;
+                            norm_angle = norm_angle * (180 / Math.PI);
+                            console.log(
+                                "WINKEL = " + norm_angle,
+                                JSON.stringify( startState.point),
+                                JSON.stringify( { x : p[0], y : p[1]})
+                            );                            
+                            transition.points.push(
+                                {
+                                    x : snapToGrid( startState.point.x + ((3 * radius) * Math.cos( angle - angle_diff))),
+                                    y : snapToGrid( startState.point.y + ((3 * radius) * Math.sin( angle - angle_diff)))
+                                },
+                                {
+                                    x : snapToGrid( startState.point.x + ((3 * radius) * Math.cos( angle + angle_diff))),
+                                    y : snapToGrid( startState.point.y + ((3 * radius) * Math.sin( angle + angle_diff)))
+                                }
+                            );
+                        }
+
+                        startState.transitions.push( transition);
+                        update();
+
+                        selectionAccessor( transition);
+                    } else {
+                        adjustSVGSize();
+                    }
+
+                    startState = undefined;
+                    d3.event.sourceEvent.stopPropagation();
+                });
+                
+                svg.on({
+                    mousedown : function() {
+                        console.log( "mousedown", d3.event.target);
+                        if( d3.event.target.tagName=='svg') {
+
+                            if( !d3.event.ctrlKey) {
+                                var _selection = d3.selectAll( 'g.selected').data();
+                                d3.selectAll( 'g.selected').classed( "selected", false);
+                                _selection.length && selectionAccessor( undefined);
+                            }
+                            
+                            var scale = $( '.amperator-canvas').data( 'controller').zoom.value,
+                                p = d3.mouse( this);
+                            p[0] /= scale;
+                            p[1] /= scale;
+
+                            group.append( "rect")
+                            .attr({
+                                rx      : 6,
+                                ry      : 6,
+                                class   : "selection",
+                                x       : p[0],
+                                y       : p[1],
+                                width   : 0,
+                                height  : 0
+                            });
+                        }
+                    },
+                    mousemove : function() {
+                        //console.log( "mousemove");
+                        var p = d3.mouse( this),
+                            s = group.select( "rect.selection");
+
+                        var scale = $( '.amperator-canvas').data( 'controller').zoom.value,
+                            p = d3.mouse( this);
+                        p[0] /= scale;
+                        p[1] /= scale;
+
+                        if( !s.empty()) {
+                            var d = {
+                                    x       : parseFloat( s.attr( "x"), 10),
+                                    y       : parseFloat( s.attr( "y"), 10),
+                                    width   : parseFloat( s.attr( "width"), 10),
+                                    height  : parseFloat( s.attr( "height"), 10)
+                                },
+                                move = {
+                                    x : p[0] - d.x,
+                                    y : p[1] - d.y
+                                }
+                            ;
+
+                            if( move.x < 1 || (move.x*2<d.width)) {
+                                d.x = p[0];
+                                d.width -= move.x;
+                            } else {
+                                d.width = move.x;       
+                            }
+             
+                            if( move.y < 1 || (move.y*2<d.height)) {
+                                d.y = p[1];
+                                d.height -= move.y;
+                            } else {
+                                d.height = move.y;       
+                            }
+                           
+                            s.attr( d);
+
+                                // deselect all temporary selected state objects
+                            d3.selectAll( 'g.state.selection.selected').classed( "selected", false);
+
+                            d3.selectAll( 'g.state >circle.inner').each( function( state_data, i) {
+                                if( 
+                                    !d3.select( this).classed( "selected") && 
+                                        // inner circle inside selection frame
+                                    state_data.point.x-radius>=d.x && state_data.point.x+radius<=d.x+d.width && 
+                                    state_data.point.y-radius>=d.y && state_data.point.y+radius<=d.y+d.height
+                                ) {
+
+                                    d3.select( this.parentNode)
+                                    .classed( "selection", true)
+                                    .classed( "selected", true);
+                                }
+                            });
+                        } else if( startState) {
+                            p[0] = snapToGrid( p[0]);
+                            p[1] = snapToGrid( p[1]);
+
+                            var data = data = 'M' + startState.point.x + ',' + startState.point.y + 'L' + p[0] + ',' + p[1];
+
+                            var state = d3.select( 'g.state .inner.hover'),
+                                data
+                            ;
+
+                            endState = (!state.empty() && state.data()[0]) || undefined;
+
+                                // transition to itself
+                            if( startState===endState) {
+                                    
+                                var angle = Math.atan2( p[1] - startState.point.y, p[0] - startState.point.x);
+                                /*
+                                var norm_angle = angle < 0 ? Math.abs( angle) : 2*Math.PI - angle;
+                                norm_angle = norm_angle * (180 / Math.PI);
+                                console.log(
+                                    "winkel = " + norm_angle,
+                                    JSON.stringify( startState.point),
+                                    JSON.stringify( { x : p[0], y : p[1]})
+                                );
+                                */
+                                var points = [
+                                    {
+                                        x : snapToGrid( startState.point.x + ((3 * radius) * Math.cos( angle - angle_diff))),
+                                        y : snapToGrid( startState.point.y + ((3 * radius) * Math.sin( angle - angle_diff)))
+                                    },
+                                    {
+                                        x : snapToGrid( startState.point.x + ((3 * radius) * Math.cos( angle + angle_diff))),
+                                        y : snapToGrid( startState.point.y + ((3 * radius) * Math.sin( angle + angle_diff)))
+                                    }
+                                ];
+
+                                data = computeTransitionPath({
+                                    source      : startState,
+                                    transition  : { 
+                                        points : points, 
+                                        target : endState
+                                    }
+                                });
+
+                                drag_line.data( [ points]);
+                            } else if( endState) {
+                                data = computeTransitionPath({
+                                    source      : startState,
+                                    transition  : { 
+                                        points : [], 
+                                        target : endState
+                                    }
+                                });
+                            }
+                            
+                                // update drag line
+                            drag_line.attr('d', data);
+                        }
+                    },
+                    mouseup : function() {
+                        console.log( "mouseup");
+                            // remove selection frame
+                        d3.selectAll( "rect.selection").remove();
+
+                            // remove temporary selection marker class
+                        d3.selectAll( 'g.state.selection').classed( "selection", false);
+
+                        var _selection = d3.selectAll( 'g.state.selected').data();
+                        if( _selection.length) {
+                            selectionAccessor( _selection.length==1 && _selection[0] || _selection);
+                        } else {
+                            selectionAccessor( undefined);
+                        }
+                    },
+                    mouseout : function() {
+                        if( !d3.event.relatedTarget || d3.event.relatedTarget.tagName=='HTML') {
+                                // remove selection frame
+                            d3.selectAll( "rect.selection").remove();
+
+                                // remove temporary selection marker class
+                            d3.selectAll( 'g.state.selection').classed( "selection", false);
+                        }
+                    },
+                    dblclick : function() {
+                        console.log( "dblclick");
+                        var scale = $( '.amperator-canvas').data( 'controller').zoom.value,
+                            p = d3.mouse( this);
+                        p[0] /= scale;
+                        p[1] /= scale;
+
+                        if( d3.event.target.tagName=='svg') {
+                            var state = { point : { x : p[0], y : p[1]}, label : "tst", transitions : [] };
+                            states.push( state);
+                            update();
+
+                            selectionAccessor( state);
+                        } 
+                    }
+                });
+
+                function update() {
+                    gStates = gStates.data( states, function( d) { 
+                        return states.indexOf( d);
+                    });
+                    renderStates();
+                    
+                    var _transitions = transitions();
+                    gTransitions = gTransitions.data( _transitions, function( d) { 
+                        return _transitions.indexOf( d);
+                    });
+                    renderTransitions();
+
+                    adjustSVGSize();
+                };
+
+                function adjustSVGSize() {
+                    var bbox = svg.node().getBBox(),
+                        container = $( svg.node()).parent();
+
+                        // apply zoon
+                    var zoom = container.data( 'controller').zoom;
+                    $( group.node()).attr( 'transform', "scale( " + zoom.value + ")");
+
+                        // add a padding around the border box
+                    bbox.x -= 10;
+                    bbox.y -= 10;
+                    bbox.width +=20;
+                    bbox.height +=20;
+
+                    //svg.attr("viewBox",bbox.x+" "+bbox.y+" "+bbox.width+" "+bbox.height)
+                    svg
+                    .style({
+                        width        : Math.max( bbox.width, container.width()) + 'px',
+                        height       : Math.max( bbox.height, container.height()) + 'px'
+                    })
+                    //.attr( "transform", "translate(" + [ -bbox.x, -bbox.y ] + ")")
+                    .attr( "viewBox", bbox.x+" "+bbox.y+" "+Math.max( bbox.width, container.width())+" "+Math.max( bbox.height, container.height()))
+                    .attr("preserveAspectRatio", "xMidYMid")
+                    ;
+
+                    container.css({
+                        'overflow-x' : bbox.width>container.width() ? 'scroll' : 'hidden',
+                        'overflow-y' : bbox.height>container.height() ? 'scroll' : 'hidden'
+                    });
+                }
+
+                function onResize() {
+                    var qCanvas = $( '.amperator-canvas'),
+                        qHelp = $( '.amperator-help'),
+                        qProperties = $( '.amperator-properties');
+
+                    qCanvas.css({
+                        width : qCanvas.parent().width() - 
+                                (qHelp.is(':visible') ? qHelp.outerWidth() : 0) -
+                                (qProperties.is(':visible') ? qProperties.outerWidth() : 0) +
+                                'px'
+                    });
+
+                    adjustSVGSize();
+                }
+
+                var controller = $( '.amperator-canvas').data( 'controller');
+                $.extend( controller, {
+                    'onResize' : onResize,
+                    'update' : update,
+                    'adjustSVGSize' : adjustSVGSize,
+                    'selection'     : selectionAccessor
+                });
+                $( window).on( 'resize', onResize);
+
+                update();
+                onResize();
+            }
+
+            $( window).ready( function() {
+                render();
+
+                $( '.amperator-help').resizable({
+                    handles : 'e',
+                    minWidth: 100,
+                    start : function( event, ui) {
+                            // ensure maxWidth less than parent.width - properties.width
+                        $( '.amperator-help').resizable( 'option', 'maxWidth', $( '.amperator').width()/2);
+                    }
+                });
+                $( '.amperator-properties').resizable({
+                    handles : 'w',
+                    minWidth: 100,
+                    resize : function( event, ui) {
+                            // left is set by the resizable but breaks the layout 
+                        $( '.amperator-properties').css( 'left', '');
+                    },
+                    start : function( event, ui) {
+                            // ensure maxWidth less than parent.width - properties.width
+                        $( '.amperator-properties').resizable( 'option', 'maxWidth', $( '.amperator').width()/2);
+                    }
+                });
+            });
+
+            function AmperatorCtrl( $scope) {
+                $scope.qHelp = $( '.amperator-help');
+                $scope.qCanvas = $( '.amperator-canvas');
+                $scope.qCanvas.data( 'controller', $scope.canvasController = {});
+                $scope.qProperties = $( '.amperator-properties');
+                $scope.$ = jQuery;
+                $scope.zoomOptions = [ 
+                    { value : 0.33, label : '33%' },
+                    { value : 0.66, label : '66%' }, 
+                    { value : 1.0, label : '100%' },
+                    { value : 1.33, label : '133%' },
+                    { value : 1.66, label : '166%' }, 
+                ];
+                $scope.canvasController.zoom = $scope.zoomOptions[2];
+
+                $scope.helpShowAll = true;
+
+                $scope.qCanvas
+                .on( "d3.selection", function( event, selection) {
+                    $scope.$apply();
+                });
+
+                $scope.getContextType = function() {
+                    var selection = $scope.canvasController.selection; 
+                    selection = $.isFunction( selection) && selection();
+                    if( !selection)  {
+                        return "Module";
+                    } else if( $.isArray( selection)) {
+                        return "States";
+                    } else if( selection.source) {
+                        return "Transition";
+                    } else {
+                        return "State";
+                    }
+                };
+
+                $scope.toggleHelp = function() {
+                    $scope.qHelp.toggle();
+                    $scope.canvasController.onResize();
+                };
+
+                $scope.toggleProperties = function() {
+                    $scope.qProperties.toggle();
+                    $scope.canvasController.onResize();
+                };
+
+                $scope.onZoomChanged = function( zoom) {
+                    $scope.canvasController.zoom = zoom;
+                    $scope.canvasController.adjustSVGSize();
+                    $scope.canvasController.update();
+                };
+            }
+        </script>
+    </head>
+    <body class="ampere-app" ng-app ng-controller="AmperatorCtrl">
+        <div class="navbar navbar-inverse navbar-fixed-top">
+          <div class="navbar-inner">
+            <a class="brand" target="_blank" href="https://github.com/lgersman/jquery.orangevolt-ampere">Orangevolt Amperator</a>
+            
+            <ul class="nav">
+                <li><a href="#">New</a></li>
+                <li><a href="#">Load</a></li>
+                <li><a href="#">Save</a></li>
+                <li class="divider-vertical"></li>
+                <li class="dropdown auto">
+                    <a href="#" class="dropdown-toggle" >
+                        Zoom
+                        <i class="caret"></i>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li 
+                            ng-repeat="zoomOption in zoomOptions"
+                        > 
+                            <a href="#" ng-click="onZoomChanged( zoomOption)">
+                                <i class="icon-ok" ng-style="zoomOption!=canvasController.zoom && {  visibility:'hidden'}"></i>
+                                {{zoomOption.label}}
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="dropdown auto">
+                    <a href="#" class="dropdown-toggle" >
+                        Views
+                        <i class="caret"></i>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a ng-click="toggleProperties()" href="#">
+                                <i class="icon-ok" ng-style="!qProperties.is( ':visible') && {  visibility:'hidden'}"></i>
+                                Properties
+                            </a>
+                        </li>
+                        <li>
+                            <a ng-click="toggleHelp()" href="#">
+                                <i class="icon-ok" ng-style="!qHelp.is( ':visible') &&  {visibility:'hidden'}"></i>
+                                Help
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+
+            <ul class="nav pull-right">                
+                
+            </ul>
+          </div>
+        </div>
+        <div class="amperator">
+            <div class="amperator-help">
+                <button type="button" class="pull-right close" ng-click="toggleHelp()">&times;</button>
+                <label class="checkbox pull-right">    
+                    <input ng-model="helpShowAll" type="checkbox">
+                    Show all &nbsp;
+                </label>
+                <h5>Help</h5>
+                <div class="content">
+                    <ul ng-class="!helpShowAll && 'filter'">
+                        <li ng-class="{visible : helpShowAll || $.inArray( getContextType(), ['State', 'States'])!=-1}">
+                            <strong>Click on state border &amp; drag mouse to another state</strong>
+                             will create a transition
+                        </li>
+                        <li  ng-class="{visible : helpShowAll || $.inArray( getContextType(), ['Transition', 'State', 'States'])!=-1}">
+                            <strong>Double click on state / transition</strong>
+                             to remove.
+                        </li>
+                        <li ng-class="{visible : helpShowAll || $.inArray( getContextType(), ['Transition'])!=-1}">
+                            <strong>Ctrl &amp; double click on transition</strong>
+                             will add a transition helper point.
+                        </li>
+                        <li ng-class="{visible : helpShowAll || $.inArray( getContextType(), ['Transition'])!=-1}">
+                            <strong>Ctrl &amp; double click on transition helper point</strong>
+                             will remove a transition helper point.
+                        </li>
+                        <li>
+                            <strong>Double click on canvas</strong>
+                            create new state
+                        </li>
+                        <li>
+                            <strong>Click on canvas and drag cursor</strong>
+                            will open up a selection frame selecting all states within
+                        </li>
+                        <li>
+                            <strong>Drag selected states</strong>
+                            to move them around including all transitions
+                        </li>
+                        <li>
+                            <strong>Click on state</strong>
+                            will select the state
+                        </li>
+                        <li>
+                            <strong>CTRL &amp; Click on state</strong>
+                            will add/remove the state from selected states
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="amperator-canvas">
+                <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+                    <defs>
+                        <marker id="end-arrow" viewBox="0 -5 10 10" refX="4" markerWidth="8" markerHeight="8" orient="auto">
+                            <path d="M0,-5L10,0L0,5" class="end-arrow"/>
+                        </marker>
+                    </defs>
+                </svg>
+            </div>
+            <div class="amperator-properties">
+                <button type="button" class="pull-right close" ng-click="toggleProperties()">&times;</button>
+                <h5>
+                    {{getContextType()}} properties
+                </h5>
+                <div class="content" ng-switch="getContextType()">
+                    <div ng-switch-when="Module">
+                        module
+                        <form>
+                            <label>
+                                Name:
+                                <input type="text" ng-model="canvasController.selection().label">
+                            </label>
+                        </form>
+                    </div>
+                    <div ng-switch-when="State">
+state
+                        <form>
+                            <label>
+                                Name:
+                                <input type="text" ng-model="canvasController.selection().label">
+                            </label>
+                        </form>
+                    </div>
+                    <div ng-switch-when="States">
+states
+                    </div>
+                    <div ng-switch-when="Transition">
+transition
+                        <form>
+                            <label>
+                                Name:
+                                <input type="text" ng-model="canvasController.selection().transition.label">
+                            </label>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="navbar navbar-fixed-bottom">
+            <div class="navbar-inner">
+                <center class="navbar-text"> 
+                    Orangevolt Amperator lets you create <a target="_blank" href="https://github.com/lgersman/jquery.orangevolt-ampere">Ampere</a> application skeletons interactively.
+                </center>
+            </div>
+        </div>
+    </body>
+</html>

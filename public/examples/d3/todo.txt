@@ -1,0 +1,5 @@
+* snap to grid funzt noch nicht überall (states z.b.)
+
+* from self referencing transition states :
+** ensure at least 2 points exist
+** prevent these points being movend behind the state circle
