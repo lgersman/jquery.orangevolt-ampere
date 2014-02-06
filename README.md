@@ -1,3 +1,5 @@
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/lgersman/orangevolt-ampere/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
 ## [Orangevolt Ampere](http://lgersman.github.com/jquery.orangevolt-ampere/) is a technology do define programs by modeling your application as a state machine.
 
 ### About
