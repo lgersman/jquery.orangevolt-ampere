@@ -180,7 +180,7 @@
 								undoCommand = function UndoCommand( historyReady) {
 									var undoResult = module._transit( redoResult, arg.target, arg.source, view, arg.ui, historyReady);
 									redoCommand.promise = $.when( undoResult).promise;
-									return $.isFunction( undoResult) ? redoCommand : undefined;
+									return $.isFunction( undoResult) ? redoCommand : undoResult;
 								};
 
 								undoCommand.target = arg.source;
@@ -188,7 +188,7 @@
 							}
 						}
 						undoCommand && (undoCommand.promise = $.when( redoResult).promise);
-						return $.isFunction( redoResult) ? undoCommand : undefined;
+						return $.isFunction( redoResult) ? undoCommand : redoResult;
 					};
 					redoCommand.target = arg.target;
 					redoCommand.view = arg.view;
@@ -205,33 +205,37 @@
 
 			$.when( undo)
 			.done( function() {
+				var done = function( forward) {
+					html5_history_hash && historyReady.done( function() {
+						forward && html5_history_hash++;
+						var uri = window.location.pathname;
+
+						var route = module.current().state.options( 'ampere.history.html5.route');
+						if( route) {
+							if( $.isFunction( route)) {
+								route = route.call( module.current().state);
+								if( route===undefined && route===null) {
+									route = '';
+								}
+							}
+							uri += '#' + route;
+						}
+
+						window.history[ forward ? 'pushState' : 'replaceState']( html5_history_hash, document.title, uri);
+						
+						//window.history.pushState( hash, document.title, window.location.pathname + '#' + hash);
+					});
+				};
+				
 				if( size>0) {
-					if( undo) {
+					if( $.isFunction( undo)) {
 						undo.hash = window.history.state;
-						if( redoCommand) {
+						if( $.isFunction( redoCommand)) {
 							history.stack.splice( history.position);     // cleanup recent redo actions
 							history.stack.push( undo);
 							history.position = history.stack.length;
 
-							html5_history_hash && historyReady.done( function() {
-								html5_history_hash++;
-								var uri = window.location.pathname;
-
-								var route = module.current().state.options( 'ampere.history.html5.route');
-								if( route) {
-									if( $.isFunction( route)) {
-										route = route.call( module.current().state);
-										if( route===undefined && route===null) {
-											route = '';
-										}
-									}
-									uri += '#' + route;
-								}
-
-								window.history.pushState( html5_history_hash, document.title, uri);
-								
-								//window.history.pushState( hash, document.title, window.location.pathname + '#' + hash);
-							});
+							done( true);
 						} else if( history.canRedo()) {
 							html5_history_hash && historyReady.done( function() {
 								undo.hash = /*window.history.state*/redo.hash-1;
@@ -242,12 +246,16 @@
 					} else if( redo) {							// cleanup recent undo actions
 						history.stack.splice( 0, history.position);
 						history.position = history.stack.length;
+
+						done();
 					}
 
 					if( history.stack.length>size) {
 						history.stack.shift();
 						history.position = history.stack.length;
 					}
+
+
 				} else {
 				}
 			})
