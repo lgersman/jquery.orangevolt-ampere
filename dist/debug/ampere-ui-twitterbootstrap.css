@@ -1,14 +1,14 @@
 /*!
  * jQuery Orangevolt Ampere
  *
- * version : 0.2.0
- * created : 2014-02-06
+ * version : 0.1.0
+ * created : 2012-10-15
  * source  : https://github.com/lgersman/jquery.orangevolt-ampere
  *
  * author  : Lars Gersmann (lars.gersmann@gmail.com)
  * homepage: http://www.orangevolt.com
  *
- * Copyright (c) 2014 Lars Gersmann; Licensed MIT, GPL
+ * Copyright (c) 2012 Lars Gersmann; Licensed MIT, GPL
  */
 /* Add additional stylesheets below
 -------------------------------------------------- */
@@ -65,22 +65,13 @@ body > .navbar .brand {
   padding-right: 0;
   padding-left: 0;
   margin-left: 20px;
-  margin-right: 20px;
   float: right;
   font-weight: bold;
   color: #000;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.1), 0 0 30px rgba(255, 255, 255, 0.125);
-  -webkit-transition: color text-shadow 0.2s linear;
-  -moz-transition: color text-shadow 0.2s linear;
-  transition: color text-shadow 0.2s linear;
-}
-body > .navbar.navbar-inverse .brand {
-  color: #999999;
-}
-body > .navbar.navbar-inverse .brand:hover {
-  color: #ffffff;
-  text-decoration: none;
-  text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.4), 0 0 30px rgba(255, 255, 255, 0.4);
+  -webkit-transition: all .2s linear;
+  -moz-transition: all .2s linear;
+  transition: all .2s linear;
 }
 body > .navbar .brand:hover {
   text-decoration: none;
@@ -144,7 +135,7 @@ hr.soften {
   background: linear-gradient(45deg, #020031 0%, #6d3353 100%);
   /* W3C */
 
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#020031', endColorstr='#6d3353', GradientType=1);
+  filter: progid:dximagetransform.microsoft.gradient(startColorstr='#020031', endColorstr='#6d3353', GradientType=1);
   /* IE6-9 fallback on horizontal gradient */
 
   -webkit-box-shadow: inset 0 3px 7px rgba(0, 0, 0, 0.2), inset 0 -3px 7px rgba(0, 0, 0, 0.2);

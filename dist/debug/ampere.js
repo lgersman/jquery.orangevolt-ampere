@@ -1,16 +1,15 @@
 /*!
  * jQuery Orangevolt Ampere
  *
- * version : 0.2.0
- * created : 2014-02-06
+ * version : 0.1.0
+ * created : 2012-10-15
  * source  : https://github.com/lgersman/jquery.orangevolt-ampere
  *
  * author  : Lars Gersmann (lars.gersmann@gmail.com)
  * homepage: http://www.orangevolt.com
  *
- * Copyright (c) 2014 Lars Gersmann; Licensed MIT, GPL
+ * Copyright (c) 2012 Lars Gersmann; Licensed MIT, GPL
  */
-
 /**
  * Ampere Core
  */
@@ -34,7 +33,7 @@
 			} else if( arguments.length==1) {
 				var arg = arguments[0];
 				if( $.isPlainObject( arg)) {
-					$.extend( _, arg);
+					angular.extend( _, arg);
 					return this;
 				} else {
 					return _[ arg];
@@ -132,10 +131,7 @@
 			html5_history_hash = parseInt( $.now() + '00', 10);
 
 				// push initial state
-			window.history.replaceState( 
-				html5_history_hash, 
-				document.title, 
-				window.location.pathname + window.location.hash);// + '#' + html5_history_hash);
+			window.history.replaceState( html5_history_hash, document.title, window.location.pathname);// + '#' + html5_history_hash);
 
 				// register history listener
 			$( window).on( 'popstate', function( event) {
@@ -170,10 +166,10 @@
 			var redoCommand;
 			if( arguments.length) {
 				if( !(arguments[0] instanceof jQuery.Event)) {
-					var	arg  = arguments[0],
-						ui   = arg.ui,
-						view = module.current().view,
-						undoCommand;
+					var ui = arguments.length && arguments[0].ui;
+					var arg = arguments[0];
+					var view = module.current().view;
+					var undoCommand;
 
 					redoCommand = function RedoCommand( historyReady) {
 						var redoResult = module._transit( arg.command, arg.source, arg.target, arg.view, arg.ui, historyReady);
@@ -185,7 +181,6 @@
 									redoCommand.promise = $.when( undoResult).promise;
 									return $.isFunction( undoResult) ? redoCommand : undefined;
 								};
-
 								undoCommand.target = arg.source;
 								undoCommand.view = view;
 							}
@@ -217,28 +212,13 @@
 							history.position = history.stack.length;
 
 							html5_history_hash && historyReady.done( function() {
-								html5_history_hash++;
-								var uri = window.location.pathname;
-
-								var route = module.current().state.options( 'ampere.history.html5.route');
-								if( route) {
-									if( $.isFunction( route)) {
-										route = route.call( module.current().state);
-										if( route===undefined && route===null) {
-											route = '';
-										}
-									}
-									uri += '#' + route;
-								}
-
-								window.history.pushState( html5_history_hash, document.title, uri);
-								
-								//window.history.pushState( hash, document.title, window.location.pathname + '#' + hash);
+								var hash = ++html5_history_hash;
+								window.history.pushState( hash, document.title, window.location.pathname);// + '#' + hash);
 							});
 						} else if( history.canRedo()) {
 							html5_history_hash && historyReady.done( function() {
 								undo.hash = /*window.history.state*/redo.hash-1;
-							// window.history.replaceState( undo.hash, document.title, window.location.pathname + '#' + redo.hash);
+								// window.history.replaceState( undo.hash, document.title, window.location.pathname + '#' + redo.hash);
 							});
 							history.stack[ history.position++] = undo;// point to next redo action
 						}
@@ -286,7 +266,6 @@
 					if( redo) {
 						html5_history_hash && historyReady.done( function() {
 							redo.hash = /*window.history.state*/undo.hash+1;
-							//window.history.replaceState( redo.hash, document.title, window.location.pathname + '#' + undo.hash);
 							//window.history.replaceState( redo.hash, document.title, window.location.pathname + '#' + undo.hash);
 						});
 						history.stack[ history.position] = redo;	// replace undo by its returned redo action
@@ -343,7 +322,7 @@
 
 		this.state = function () {
 				// return state or (in case this is a module transition) current state
-			return state /*|| module.current().state*/;
+			return state || module.current().state;
 		};
 
 		//this.transitionName = transitionName;
@@ -404,15 +383,8 @@
 					delegate = fn;
 					return this;
 				} else {
-						// broadcast ampere state.enabled event
-						// debugger
-					var event = (state && state.module() || module).trigger( "ampere.transition-enabled", [ this]);
-						// if a handler returned FALSE 
-						// -> skip enabled call and return undefined(==false)
-					if( event.result===undefined || event.result) {
-						var enabled = delegate.call( this, this);
-						return enabled;
-					}
+					var enabled = delegate.call( this, this);
+					return enabled;
 				}
 			};
 		})();
@@ -491,95 +463,95 @@
 		};
 
 		var prototype = this;
+		this._super = function( deferred) {
+
+		};
 
 		this.transitions = {};
-		this.views = {};
+		/**
+		 * <state>.transition( myState)
+		 *	registers a new transition targeting myState without any action
+		 * <module>.transition( name, myState)
+		 *	registers a new transition targeting myState with name "name"
+		 */
+		this.transition = function() {
+			var _ns = $.ov.namespace( this.fullName() + '.transition()');
 
-		this._super = function() {
-			/**
-			 * <state>.transition( myState)
-			 *	registers a new transition targeting myState without any action
-			 * <module>.transition( name, myState)
-			 *	registers a new transition targeting myState with name "name"
-			 */
-			this.transition = function() {
-				var _ns = $.ov.namespace( this.fullName() + '.transition()');
-
-				var targetState;
-				var transitionName;
-				if( arguments.length) {
-					if( arguments.length==1) {
-						if( typeof( arguments[0])=='string') {
-							targetState = this;
-							transitionName = arguments[0];
-						} else if( arguments[0] instanceof State) {
-							targetState = arguments[0];
-							transitionName = targetState.name();
-						} else if( $.isFunction( arguments[0])) {
-							targetState = arguments[0];
-							transitionName = window.ov.ampere.util.functionName( targetState) ? window.ov.ampere.util.functionName( targetState) : 'main';
-						} else {
-							_ns.raise( 'dont know how to handle arguments ', arguments);
-						}
-					} else if( arguments.length==2) {
-						transitionName = arguments[0];
-						targetState = arguments[1];
-					} else {
-						_ns.raise( 'too much arguments ', arguments);
-					}
-				} else {
-					targetState = this;
-					transitionName = targetState.name();
-				}
-
-				_ns
-				//.assert( targetState instanceof State, 'argument targetState expected to be a state, but it is ', targetState)
-				//.assert( $.inArray( targetState, object_values( module.states))!=-1, 'argument targetState expected to be a state of same module')
-				.assert( $.isFunction( targetState) || targetState instanceof State, 'argument targetState expected to be a state or function returning a state, but it is ', targetState)
-				.assert( $.isFunction( targetState) || $.inArray( targetState, object_values( module.states))!=-1, 'argument targetState expected to be a state of same module')
-				.assert( !this.transitions[ transitionName], 'transition "', transitionName, '" already exists');
-
-				this.transitions[ transitionName] = Transition( this, targetState, transitionName);
-				return this.transitions[ transitionName];
-			};
-
-			/**
-			 * <state>.view( 'foo')
-			 *	registers a new view foo
-			 * <state>.view( function foo() { ...})
-			 *	registers function as new view 'foo'
-			 * <state>.view( 'foo', function() { ...})
-			 *	registers function as new view foo
-			 */
-			this.view = function() {
-				var _ns = $.ov.namespace( this.fullName() + '.view()')
-				.assert( arguments.length, 'no arguments given');
-
-				var viewName = arguments.length>1 ? arguments[0] : undefined;
-				var template = arguments[ arguments.length>1 ? 1 : 0];
-
-				if( !viewName) {
-					if( $.isFunction( template)) {
-						viewName = window.ov.ampere.util.functionName( template);
-					} else if( (template||{}).jquery) {
-						viewName = template.selector;
-					}
-
-					viewName = viewName || 'main';
-				}
-
-				_ns.assert( !this.views[ viewName], 'view "' + viewName + '" already exists');
-				_ns.assert( template || template==='' || template==null, 'view "' + viewName + '" : template argument missing');
-
-				return this.views[ viewName] = new View( this, viewName, template);
-			};
-			this.view.load = $.proxy( function( name , url) {
+			var targetState;
+			var transitionName;
+			if( arguments.length) {
 				if( arguments.length==1) {
-					return this.view( 'main', $.get( arguments[0]));
+					if( typeof( arguments[0])=='string') {
+						targetState = this;
+						transitionName = arguments[0];
+					} else if( arguments[0] instanceof State) {
+						targetState = arguments[0];
+						transitionName = targetState.name();
+					} else if( $.isFunction( arguments[0])) {
+						targetState = arguments[0];
+						transitionName = window.ov.ampere.util.functionName( targetState) ? window.ov.ampere.util.functionName( targetState) : 'main';
+					} else {
+						_ns.raise( 'dont know how to handle arguments ', arguments);
+					}
+				} else if( arguments.length==2) {
+					transitionName = arguments[0];
+					targetState = arguments[1];
 				} else {
-					return this.view( name || 'main', $.get( url));
+					_ns.raise( 'too much arguments ', arguments);
 				}
-			}, this);
+			} else {
+				targetState = this;
+				transitionName = targetState.name();
+			}
+
+			_ns
+			//.assert( targetState instanceof State, 'argument targetState expected to be a state, but it is ', targetState)
+			//.assert( $.inArray( targetState, object_values( module.states))!=-1, 'argument targetState expected to be a state of same module')
+			.assert( $.isFunction( targetState) || targetState instanceof State, 'argument targetState expected to be a state or function returning a state, but it is ', targetState)
+			.assert( $.isFunction( targetState) || $.inArray( targetState, object_values( module.states))!=-1, 'argument targetState expected to be a state of same module')
+			.assert( !this.transitions[ transitionName], 'transition "', transitionName, '" already exists');
+
+			this.transitions[ transitionName] = Transition( this, targetState, transitionName);
+			return this.transitions[ transitionName];
+		};
+
+		this.views = {};
+		/**
+		 * <state>.view( 'foo')
+		 *	registers a new view foo
+		 * <state>.view( function foo() { ...})
+		 *	registers function as new view 'foo'
+		 * <state>.view( 'foo', function() { ...})
+		 *	registers function as new view foo
+		 */
+		this.view = function() {
+			var _ns = $.ov.namespace( this.fullName() + '.view()')
+			.assert( arguments.length, 'no arguments given');
+
+			var viewName = arguments.length>1 ? arguments[0] : undefined;
+			var template = arguments[ arguments.length>1 ? 1 : 0];
+
+			if( !viewName) {
+				if( $.isFunction( template)) {
+					viewName = window.ov.ampere.util.functionName( template);
+				} else if( (template||{}).jquery) {
+					viewName = template.selector;
+				}
+
+				viewName = viewName || 'main';
+			}
+
+			_ns.assert( !this.views[ viewName], 'view "' + viewName + '" already exists');
+			_ns.assert( template || template==='' || template==null, 'view "' + viewName + '" : template argument missing');
+
+			return this.views[ viewName] = new View( this, viewName, template);
+		};
+		this.view.load = function( name , url) {
+			if( arguments.length==1) {
+				return state.view( 'main', $.get( arguments[0]));
+			} else {
+				return state.view( name || 'main', $.get( url));
+			}
 		};
 	}
 
@@ -679,7 +651,7 @@
 			 */
 			this.state = function() {
 				var _ns = $.ov.namespace( this.fullName() + '.state()').assert( arguments.length, 'no arguments given');
-				var name, i, state, dependencies=[], members, z, member;
+				var name, i;
 				if( arguments.length==1 && $.isArray( arguments[0])) {
 					var arr = arguments[0];
 						// create states
@@ -689,20 +661,7 @@
 					}
 						// initialize states
 					for( i=0; i<arr.length; i++) {
-						state = this.states[ window.ov.ampere.util.functionName( arr[i])];
-						$.isFunction( arr[i]) && arr[i].call( state, state);
-
-							// collect additional deferreds from state members
-						members = Object.keys( state);
-						for( z in members) {
-							if( members[z]!='promise') {
-								member = state[ members[z]];
-
-								(member instanceof Component)  && member.init( state);
-
-								( $.isFunction( member.promise)) && dependencies.push( member.promise);
-							}
-						}
+						$.isFunction( arr[i]) && arr[i].call( this.states[ window.ov.ampere.util.functionName( arr[i])], this.states[ window.ov.ampere.util.functionName( arr[i])]);
 					}
 					return this;
 				} else if( arguments.length==1 && $.isPlainObject( arguments[0])) {
@@ -712,26 +671,19 @@
 						this.state( name);
 					}
 
+					/*
+					 * make state a deferred
+					 */
+					var dependencies = [];
+
 						// intialize states
 					for( name in obj) {
 						_ns.assert( $.isFunction( obj[name]), 'initializer function expected as value of state "' , name + '"');
+						dependencies.push(
+							obj[name].call( this.states[ name], this.states[ name])
+						);
 
-						state = this.states[ name];
-						dependencies.push( obj[name].call( state, state));
-
-							// collect additional deferreds from state members
-						members = Object.keys( state);
-						for( z in members) {
-							if( members[z]!='promise') {
-								member = state[ members[z]];
-
-								(member instanceof Component)  && member.init( state);
-
-								( $.isFunction( member.promise)) && dependencies.push( member.promise);
-							}
-						}
 					}
-
 					this.promise = $.when.apply( $.when, dependencies).promise;
 					return this;
 				} else {
@@ -742,26 +694,14 @@
 					name = typeof( name)=='string' ? name : window.ov.ampere.util.functionName( name);
 					_ns.assert( !this.states[ name], 'state "' + name + '" already exists');
 
-					state = function() {
-						this._super();
+					var state = function() {
 							/*
 							 * make state a deferred
 							 */
+						var dependencies = [];
+
 						$.isFunction( this.promise) && dependencies.push( this.promise());
 						dependencies.push( fn.call( this, this));
-
-						// collect additional deferreds from state members
-						members = Object.keys( this);
-						for( var u in members) {
-							if( members[u]!='promise') {
-								member = this[ members[u]];
-
-								(member instanceof Component) && member.init( this);
-
-								( $.isFunction( member.promise)) && dependencies.push( member.promise);
-							}
-						}
-
 						this.promise = $.when.apply( $.when, dependencies).promise;
 					};
 					state.prototype = State( this, name);
@@ -818,8 +758,6 @@
 			};
 
 			this._transit = function( command, source, target, view, /* optional argument */ui, /* optional argument */historyReady) {
-				var transitionDeferred = $.Deferred();
-
 				var retryArgs = {
 					command	: command,
 					source	: source,
@@ -827,8 +765,6 @@
 					view	: view,
 					ui		: ui
 				};
-
-				module.trigger( 'ampere.transition', [ transitionDeferred, command, source, target, view]);
 
 				ui && ui.block();
 				var result;
@@ -841,14 +777,6 @@
 						result.reject( ex);
 					}
 				}
-
-				/*
-					// consider removing this piece of code
-				if( !result) {
-					ui && ui.unblock();
-					return;
-				}
-				*/
 
 					// render "transaction in progress" overlay
 				if( result && $.isFunction( result.promise) && result.promise().state()=='pending') {
@@ -867,80 +795,40 @@
 
 						ui && ui.unblock();
 							// render flash "user aborted transition"
-					} else {
-						transitionDeferred.rejectWith( module, arguments);
-
-						if( ui) {
-							var onRetry = function() {
-								module.history().redo( retryArgs);
-							};
-								/*
-								 * the action failed for some unknown reason
-								 */
-							if( arguments.length==1 && typeof( arguments[0])=='string') {
-								ui.render( 'Error', arguments[0], onRetry);
-							} else if( arguments.length==1 && (arguments[0] instanceof Error)) {
-								ui.render( 'Error', arguments[0], onRetry);
-								throw arguments[0];
-							} else if( arguments.length==3 && ($.isFunction( arguments[0].statusCode))) {
-								ui.render( 'Error', 'Ajax request failed (' + arguments[0].status + ') : ' + arguments[0].statusText || arguments[0].responseText, onRetry);
-								//throw arguments[0].responseText;
-							} else {
-								ui.render( 'Error', $.ov.json.stringify( arguments, $.ov.json.stringify.COMPACT), onRetry);
-							}
+					} else if( ui) {
+						var onRetry = function() {
+							module.history().redo( retryArgs);
+						};
+							/*
+							 * the action failed for some unknown reason
+							 */
+						if( arguments.length==1 && typeof( arguments[0])=='string') {
+							ui.render( 'Error', arguments[0], onRetry);
+						} else if( arguments.length==1 && (arguments[0] instanceof Error)) {
+							ui.render( 'Error', arguments[0], onRetry);
+							throw arguments[0];
+						} else if( arguments.length==3 && ($.isFunction( arguments[0].statusCode))) {
+							ui.render( 'Error', 'Ajax request failed (' + arguments[0].status + ') : ' + arguments[0].statusText || arguments[0].responseText, onRetry);
+							throw arguments[0].responseText;
+						} else {
+							ui.render( 'Error', $.ov.json.stringify( arguments, $.ov.json.stringify.COMPACT), onRetry);
 						}
 					}
 				}
 
 				$.when( result, historyReady)
 				.done( function() {
-						// ATTENTION : module.current returns always the same object (but with different values)
-						// -> thats why we clone it.
-					var previous = $.extend( {}, module.current());
 					module.current( target, view);
 					var template = ui && ui.getTemplate( view);
 					template
 					.done( function( data) {
-							// adjust document.title if needed
-						if( module.options( 'ampere.history.html5') && ui) {
-							var stateOptions = target.options();
-							if( Object.hasOwnProperty.call( stateOptions, 'ampere.history.html5.title')) {
-								var historyHTML5Title = stateOptions['ampere.history.html5.title'];
-								document.title = $.isFunction( historyHTML5Title) ?
-									historyHTML5Title.call( target) : 
-									historyHTML5Title.toString()
-								;
-							} else {
-								document.title = ui.getCaption( target);
-							}
-						} else {
-							debugger;
+						if( data instanceof HTMLElement) {
+							data = $( data);
 						}
-						/*
-						if( previous.state===target && previous.view===view) {
-							ui.update();
-						} else*/ {
-								// render view
-							if( data instanceof HTMLElement) {
-								data = $( data);
-							}
-							template = data.jquery ? (data[0].tagName=='SCRIPT' ? data.text().replace( "<![CDATA[", "").replace("]]>", "") : data) : template.responseText || data;
+						template = data.jquery ? (data[0].tagName=='SCRIPT' ? data.text().replace( "<![CDATA[", "").replace("]]>", "") : data) : template.responseText || data;
 
-							ui && ui.render( 'State', view, template, result);
-						}
-
-							// we need to resolve the transition deferred 
-							// within a done handler to ensure that it is executed
-							// AFTER the done handler possibly attached by renderState
-							// (for rendering the flash as example)
-						$.when( result).done( function() {
-								// broadcast ampere.view-changed event
-							self.trigger( "ampere.view-changed", [ previous.view]);
-
-							transitionDeferred.resolveWith( module, [ previous.view]);
-
-							ui && ui.unblock();
-						});
+						ui && ui.render( 'State', view, template, result);
+						ui && ui.unblock();
 					})
 					.fail( errorHandler);
 				})
@@ -948,71 +836,19 @@
 
 				return result;
 			};
-
-				// create event emitter instance
-			(function( module) {
-				var jq = $( module);
-			 
-			    module.trigger = function( event) {
-						// create event object
-					event = event[ jQuery.expando ] ? event : new $.Event( event.type || event, typeof event === "object" && event );
-
-					jq.trigger.apply( jq, arguments);
-
-							/* 
-								ATTENTION : different behaviour than jquery ! 
-								-> our trigger returns the event object instead of 
-								this (aka the module)
-							*/
-						return event;
-					};
-					module.on = $.proxy( jq.on, jq);
-					module.off = $.proxy( jq.off, jq);
-					module.one = $.proxy( jq.one, jq);
-
-					module.destroy = (function( destroy) {
-							// cleanup jquery event queue for our module instance
-						//jq.removeData( module);
-
-							// call previous destroyfunction (if any)
-						$.isFunction( destroy) && destroy.call( module);
-					})( module.destroy);
-			})( this);
 		};
 	}
 
-	var ampereInstances = {};
 	/**
 	 * window.ampere()
 	 *  create new ampere instance
 	 */
-	function Ampere( name, options) {
+	function Ampere( options) {
 		if( !(this instanceof Ampere)) {
-				// process arguments
-			switch( arguments.length) {
-				case 0 :
-					name = '';
-					options = {};
-					break;
-				case 1 :
-					var isStringArg = typeof( name)=='string';
-					name = isStringArg && name || '';
-					options = isStringArg && {} || options;
-					break;
-			}
-
-				// if ampere instance exists
-			if( ampereInstances[ name]) {
-					// patch new options into it
-				ampereInstances[ name].options = Options( angular.extend( ampereInstances[ name].options(), options));
-				return ampereInstances[ name];
-			} else {
-				return ampereInstances[ name]=new Ampere( name, options);
-			}
+			return new Ampere( options);
 		}
 
 		var ampere = this;
-
 		this.options = Options( angular.extend( {}, Ampere.defaults, options));
 		this.modules = {};
 		/**
@@ -1103,15 +939,15 @@
 	}
 	Ampere.defaults = {
 			/* default state name */
-		'ampere.state'						: 'main',
-		'ampere.state.view'					: 'main',
+		'ampere.state'         : 'main',
+		'ampere.state.view' : 'main',
 			/* 'ui' : controller: foobarUI, */
-		'ampere.ui.options'					: {},
+		'ampere.ui.options'		: {},
 			/*
 			 * history is enabled by default
 			 * set Number.MAX_VALUE as value for infinite undo/redo stack
 			 */
-		'ampere.history.limit'				: Number.MAX_VALUE,
+		'ampere.history.limit'	: Number.MAX_VALUE,
 			/*
 			 * enable html5 history api support (if the browser supports it)
 			 * if enabled the browser back/forward buttons
@@ -1123,49 +959,7 @@
 			 * ATTENTION : $.fn.ampere overrides this option
 			 * (if not defined) to true if the attached element is BODY
 			 */
-		'ampere.history.html5'				: false,
-			/*
-			 *	deeplinking option (default is enabled). if ampere.history.html5 is true
-			 *	and the ampere widget element === document.body this function will be called at
-			 *	startup to resolve a state responsible for handling the hash fragment of 
-			 *	document.location (via state option 'ampere.history.html5').
-			 *	
-			 *	this option can be overridden with a custom function. 
-			 *	this context is the ampere controller. the given function may return
-			 *	a deferred tracking its progress.
-			 */
-		'ampere.history.html5.deeplinking'	: function() {
-				// deeplinking : examine hash from document.location
-			var hash = document.location.hash, module = this.module;
-			if( hash) {
-					// strip # at the beginning
-				hash = hash.substr( 1);	
-				var handler;
-
-					// evaluate state matching hash
-				var names = Object.keys( module.states);
-				for( var i=0; i<names.length; i++) {
-					var state = module.states[ names[i]],
-						html5Hash = state.options( 'ampere.history.html5.route') || $.noop;
-
-					if( handler = html5Hash.call( state, hash)) {
-						break;
-					}
-				}
-
-				var controller = this, deferred = $.Deferred();
-				if( handler && $.isFunction( handler)) {
-					deferred = handler.call( controller);
-				} else {
-					deferred.reject( 'no matching deeplink route found.');
-				}
-
-				return $.when( deferred)
-				.done( function() {
-					controller.ui.update();
-				});
-			}
-		},
+		'ampere.history.html5'	: false,
 			/*
 			 * baseurl defaults to the Orangevolt Ampere Loader baseurl
 			 * (i.e. path to oval.js)
@@ -1224,28 +1018,9 @@
 			this.onHotKey = function onHotkey( event) {
 				if( !self.isBlocked()) {
 					var matchingHotkeys = window.ov.ampere.ui.hotkey.computeMatchingHotkeys( event);
-
-						// filter out hotkeys which are required for the current focused control to work
-						// (i.e. return is required for textarea whereas it is ok for input[text])
-					if( $.inArray( event.target.tagName, ['TEXTAREA', 'SELECT', 'INPUT'])!=-1) {
-						for( var q in matchingHotkeys) {
-							if( /del|up|down|return|left|right|home|end/.test( matchingHotkeys[q])) {
-								if( !(matchingHotkeys[q]=='return' && event.target.tagName=='INPUT')) {
-									return;
-								}
-							}
-						}
-					}
-
 					var module = self.controller.module;
 
-					var proceedTransitionHotkey = function( value, ngAmpereHotkey, domElement) {
-						var transition = value, transitionArguments = [];
-						if( $.isPlainObject( value)) {
-							transition = value.transition;
-							$.isArray( transitionArguments) && (transitionArguments = value.transitionArguments);
-						}
-
+					var proceedTransitionHotkey = function( transition, ngAmpereHotkey, domElement) {
 						var hotkey = ngAmpereHotkey || transition.options( 'ampere.ui.hotkey');
 
 						if( transition.enabled() && hotkey) {
@@ -1260,7 +1035,7 @@
 									// patch matching hotkey element into event
 								event.currentTarget = event.delegateTarget = event.srcElement = event.target = domElement;
 									// provide patched event to transition action
-								self.controller.proceed( transition, [event].concat( transitionArguments));
+								self.controller.proceed( transition, [event]);
 
 								return true;
 							}
@@ -1282,20 +1057,12 @@
 									// prevent any other hotkey handler to be invoked
 								event.stopImmediatePropagation();
 
-								var value				= hotkeys[ hotkey], 
-									transition			= value,
-									transitionArguments	= [];
-
-								if( $.isPlainObject( transition)) {
-									transition = value.transition;
-									$.isArray( value.transitionArguments) && (transitionArguments = value.transitionArguments);
-								}
-
-								if( transition instanceof Transition) {
+								var value = hotkeys[ hotkey];
+								if( value instanceof Transition) {
 										// patch matching hotkey element into event
 									event.currentTarget = event.delegateTarget = event.srcElement = event.target = element[0];
 										// provide patched event to transition action
-									self.controller.proceed( value, [event].concat( transitionArguments));
+									self.controller.proceed( value, [event]);
 								} else {
 									var scope = angular.element( element).scope();
 									scope.$apply( value);
@@ -1311,8 +1078,8 @@
 					for( i in elements) {
 						element = $( elements[i]);
 						if( element.hasClass( 'ampere-transition')) {
-							var t = element.data( 'ampereTransition');
-							if( t && proceedTransitionHotkey( t, undefined, element.data( 'ampere-hotkey', self.controller.element), element[0])) {
+							var transition = element.data( 'ampereTransition');
+							if( transition && proceedTransitionHotkey( transition, undefined, element.data( 'ampere-hotkey', self.controller.element), element[0])) {
 								return;
 							}
 						}
@@ -1399,7 +1166,7 @@
 		this.modal = function( url, /* function */ initializer, /*optional */ options) {};
 
 			/**
-			 * filter may be an object (filter by example, like { 'ampere.ui.type' : 'global'}) or function argument
+			 * filter may be an object (filter by example, like { type : 'global'}) or function argument
 			 */
 		this.getTransitions = function( filter) {
 			var filterFn = filter || $.noop;
@@ -1432,7 +1199,7 @@
 				filterFn.call( transition) && transitions.push( transition);
 			}
 
-			return transitions;	
+			return transitions;
 		};
 
 		this.regexp = function( pattern,modifiers) {
@@ -1533,7 +1300,7 @@
 		};
 
 		this.getIcon = function( object) {
-			return this._get( 'ampere.ui.icon', object, ['transition', 'view', 'target', 'state']);
+			return this._get( 'ampere.ui.icon', object, ['transition', 'view', 'target', 'module']);
 		};
 	}
 	Ampere.ui = Ui;
@@ -1547,12 +1314,12 @@
 		}
 
 		var controller = this;
+
 		var _ns = $.ov.namespace( module.fullName() + '::UiController');
 
 		this.options = Options( options);
 		this.module = module;
 		this.element = element;
-		this.element.data( 'ampere.controller', this);
 
 			// reset history to potentially remove
 			// undo entries from previous usage
@@ -1563,9 +1330,6 @@
 			 */
 		this.element.addClass( 'ampere-app');
 
-		var deferred = $.Deferred();
-
-		deferred.promise( this);
 		$.when( module).done( function() {
 			// (1) state
 			var state = controller.options( 'ampere.state') || controller.module.current().state || module.options( 'ampere.state');
@@ -1610,32 +1374,9 @@
 			 */
 
 			module.current( state, view);
-			
-			$.when( controller.ui.render( 'Bootstrap'))
-			.done( function() {
-				var deeplinkingDeferred = $.noop;
-				if( module.options( 'ampere.history.html5') && controller.element[0]===document.body) {
-					var deeplinking = module.options( 'ampere.history.html5.deeplinking');
-					if( $.isFunction( deeplinking)) {
-						deeplinkingDeferred = deeplinking.call( controller);
-					}
-				}
 
-				$.when( deeplinkingDeferred)
-				.fail( function( msg) {
-						// show flash with deeplinking error as a "silent hint" that 
-						// deeplinking went wrong for some reason
-					controller.ui.flash.error( "Resolving deep link failed - " + msg, true);
-				})
-				.always( function() {
-					deferred.resolveWith( controller, [ module]);
-						// cleanup history
-					module.history().reset();
-				});
-			})
-			.fail( function() {
-				deferred.rejectWith( controller, arguments);	
-			});
+			controller.element.data( 'ampere.controller', controller);
+			controller.ui.render( 'Bootstrap');
 		});
 
 			/*
@@ -1643,18 +1384,9 @@
 			 */
 
 		this.proceed = function( transition, /*optional transition data from events*/data) {
-			var retVal = $.Deferred();
-
 				// if transistion is enabled und target state defined
 			var target;
 			if( transition.enabled() && (target=transition.target())) {
-					// track transition progress to be executed a few lines below
-				module.one( 'ampere.transition', function( event, transitionDeferred, command, source, target, view) {
-					transitionDeferred
-					.done( retVal.resolve)
-					.fail( retVal.reject);
-				});
-
 					// get action factory
 				var action = transition.action();
 					/*
@@ -1674,12 +1406,9 @@
 						// create a new action
 					var command = action.call( transition, transition, this.ui, data);
 
-						// if action returned true the view should be updated
-						// but not completely rerendered
-					if( command===true || !command) {
-							// (heavyweight refresh) command == true forces a full template update
-							// (lightweight refresh) command == false reevaluates based on the current dom structure
-						command!==false && this.ui.render( 'State', command===true && this.module.current().view);
+					if( !command) {
+							// no command returned -> abort proceeding
+						return false;
 					} else {
 							/*
 							 * when action returned a function -> wrap it within a deferred
@@ -1688,31 +1417,18 @@
 							 * in both cases actionDeferred should keep afterwards a promise
 							 * returning the real command/redo function as argument of the done handler
 							 */
-						var actionDeferred = !$.isFunction( command) || (command && $.isFunction( command.promise)) ?
+						var actionDeferred = !$.isFunction( command) ?
 							command	: $.Deferred( function() {
 								this.resolve( command);
 							});
 
-						var proceedArgs = arguments;		
-						var self = this;
-
 							// wait for action to complete
-						actionDeferred.done( function( redo) {
-								// watt macht das ???
-							if( arguments.length!==0 && !redo) {
-								self.ui.update();
-								return;
-							}
-
-								// watt macht das ???
-							if( arguments.length===0 || !$.isFunction( redo)) {
-								redo = command;
-							}
-
+						actionDeferred.done( function( command) {
 								// compute target view
 							var view = transition.options( 'ampere.state.view') || target.options( 'ampere.state.view');
 							if( typeof( view)=='string') {
 								var _view = target.views[ view];
+								_ns.assert( _view instanceof View, 'target view "', view, '" not found in ', target.fullName(), '.views');
 
 								view = _view;
 							} else if( !view) {
@@ -1727,46 +1443,19 @@
 							 */
 
 							controller.module.history().redo({
-								command	: redo,
-								source	: transition.state() || module.current().state, /* state() may return null for module transitions*/
-								target	: transition.target(),
-								view    : view,
-								ui		: controller.ui
+								command  : command,
+								source   : transition.state(),
+								target   : transition.target(),
+																view      : view,
+																ui          : controller.ui
 							});
-						})
-						.fail( function() {
-								// if a transition returned a deferred
-								// which gets rejected without arguments
-								// ampere assumes that the transition was just canceled
-								// (ie. no error will be displayed, the display will only be refreshed) 
-							if( !arguments.length) {
-								self.ui.render( 'State');
-								return; 
-							}
-
-							var redo = function() {
-								return self.proceed.apply( self, proceedArgs);	
-							};
-
-							if( arguments.length==1 && typeof( arguments[0])=='string') {
-								controller.ui.render( 'Error', arguments[0], redo);
-							} else if( arguments.length==1 && (arguments[0] instanceof Error)) {
-								controller.ui.render( 'Error', arguments[0], redo);
-								throw arguments[0];
-							} else if( arguments.length==3 && ($.isFunction( arguments[0].statusCode))) {
-								controller.ui.render( 'Error', 'Ajax request failed (' + arguments[0].status + ') : ' + arguments[0].statusText || arguments[0].responseText, redo);
-								throw arguments[0].responseText;
-							} else {
-								controller.ui.render( 'Error', $.ov.json.stringify( arguments, $.ov.json.stringify.COMPACT), redo);
-							}
 						});
 					}
 				}
+				return true;
 			} else {
-				retVal.fail();
+				return false;
 			}
-
-			return retVal;
 		};
 
 		this.destroy = function() {
@@ -1796,32 +1485,6 @@
 		};
 	}
 
-	function Component( name) {
-		if( this instanceof Component) {
-				/*
-				 * default init logic
-				 *
-				 * override this function in your component to get informed when state / module is available
-				 */
-			this.init = function init( state) {
-				$.ov.namespace( this.fullName()).warn( 'component did not override init function ', this);
-			};
-
-			this.name = function() {
-				return name;
-			};
-
-			this.fullName = function() {
-				return 'Ampere.Component::' + this.name();
-			};
-
-			return this;
-		} else {
-			return new Component( name);
-		}
-	}
-	Ampere.Component = Component;
-
 	window.ov = window.ov || {};
 	window.ov.ampere = Ampere;
 
@@ -1835,6 +1498,7 @@
 				if( !('ampere.history.html5' in options)) {
 					options['ampere.history.html5'] = this[0].tagName=='BODY' && window.top===window.self;
 				}
+
 				module = new module( options);
 			}
 

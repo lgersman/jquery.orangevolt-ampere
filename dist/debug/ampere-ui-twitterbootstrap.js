@@ -1,16 +1,15 @@
 /*!
  * jQuery Orangevolt Ampere
  *
- * version : 0.2.0
- * created : 2014-02-06
+ * version : 0.1.0
+ * created : 2012-10-15
  * source  : https://github.com/lgersman/jquery.orangevolt-ampere
  *
  * author  : Lars Gersmann (lars.gersmann@gmail.com)
  * homepage: http://www.orangevolt.com
  *
- * Copyright (c) 2014 Lars Gersmann; Licensed MIT, GPL
+ * Copyright (c) 2012 Lars Gersmann; Licensed MIT, GPL
  */
-
 /**
  * Twitter Bootstrap / AngularJS Renderer
  */
@@ -18,7 +17,8 @@
 	var _ns = $.ov.namespace( 'window.ov.ampere.ui.twitterbootstrap');
 
 		/**
-		 * declare the angular module
+		 * declare window.ov.ampere.ui.twitterbootstrap module
+		 * for angular
 		 */
 	(function() {
 		var ampere = angular.module('window.ov.ampere.ui.twitterbootstrap', [ 'ngResource', 'ngCookies']).run( function( /* $rootScope, $window, $http*/) {
@@ -36,11 +36,6 @@
 				return window.ov.ampere.util.ucwords( input);
 			};
 		});
-		ampere.filter( 'strip_tags', function() {
-			return function( input, scope) {
-				return typeof( input)=='string' && window.ov.ampere.util.strip_tags( input) || input;
-			};
-		});
 		ampere.filter( 'replace', function() {
 			return function( input, regexp, replace) {
 				var lastSlashIndex = regexp.lastIndexOf("/");
@@ -52,21 +47,14 @@
 
 		ampere.filter( 'next', function() {
 			return function( items, current) {
-				//var pos = $.inArray( current, items);
-				//return pos<items.length-1 ? items[ pos+1] : current;
-				return window.ov.entity.next( items, current) || current;
+				var pos = $.inArray( current, items);
+				return pos<items.length-1 ? items[ pos+1] : current;
 			};
 		});
 		ampere.filter( 'prev', function() {
 			return function( items, current) {
-				//var pos = $.inArray( current, items);
-				//return pos>0 ? items[ pos-1] : current;
-				return window.ov.entity.prev( items, current) || current;
-			};
-		});
-		ampere.filter( 'indexof', function() {
-			return function( items, current) {
-				return $.inArray( current, items);
+				var pos = $.inArray( current, items);
+				return pos>0 ? items[ pos-1] : current;
 			};
 		});
 		ampere.filter( 'type', function() {
@@ -74,19 +62,8 @@
 				return window.ov.ampere.type( input);
 			};
 		});
-		ampere.filter( 'first', function() {
-			return function( array) {
-				return window.ov.entity.first( array);
-			};
-		});
-		ampere.filter( 'last', function() {
-			return function( array) {
-				return window.ov.entity.last( array);
-			};
-		});
 		ampere.filter( 'match', function() {
-			return function( items, value, property) {
-				property = property!==undefined || 'id';
+			return function( items, property, value) {
 				if( !$.isArray( value)) {
 					value = [ value];
 				}
@@ -100,83 +77,13 @@
 				});
 			};
 		});
-		ampere.filter( 'find', function() {
-			return function( items, value, property) {
-				var hits = $.isArray( value) && [];
-				property = property!==undefined && property || 'id';
-				if( !$.isArray( value)) {
-					value = [ value];
-				}
-
-				var hit;
-				for( var i in value) {
-					hit = window.ov.entity.find( items, value[i], property);
-
-					if( !hits) {
-						return hit;
-					} else {
-						hits.push( hit);
-					}
-				}
-
-				return hits;
-			};
-		});
-		ampere.filter( 'map', function() {
-			return function( items, property, _default) {
-				items = ($.isArray( items) && items || []);
-
-					// filter out objects not having the property
-				if( arguments.length==2 ) {
-					items  = items.filter( function( item) {
-						return item && Object.prototype.hasOwnProperty.call( item, property);
-					});
-				}
-				
-				return items.map( function( item) {
-					var value = item[ property];
-					return value===undefined ? _default : value;
-				});
-			};
-		});
-		ampere.filter( 'sort', function() {
-			return function( items, property) {
-				return window.ov.entity.sort( items, property);
-			};
-		});
-		ampere.filter( 'keys', function() {
-			return function( items, property) {
-					// Object.keys will throw an exception on string,array/number etc.
-				try {
-					return Object.keys( items);
-				} catch( ex) {
-					return [];
-				}
-			};
-		});
-
-			/**
-			 * decorate $exception handler
-			 * 
-			 * see http://stackoverflow.com/questions/13595469/how-to-override-exceptionhandler-implementation	
-			 */ 
-		/*
-		ampere.config( function( $provide) {
-			$provide.decorator("$exceptionHandler", function($delegate) {
-				return function(exception, cause) {
-					$delegate( exception, cause);
-					// do your own stuff here
-				};
-			});
-		});
-		*/
 
 		var ampereTwitterbootstrapController = function( $scope, $rootElement, $window, $http, $timeout,  $log, $resource, $cookies/*, $location*/) {
 			var controller = $rootElement.parent().data( 'ampere.controller');
-				/*
-				 * TODO : this is a dirty hack to transport the initial template into
-				 * the ampere structure of angularjs
-				 */
+			/*
+			 * TODO : this is a dirty hack to transport the initial template into
+			 * the ampere structure of angularjs
+			 */
 			var template = controller._initial_template;
 			controller._initial_template = undefined;
 			$scope.$ampere = {
@@ -195,15 +102,6 @@
 			$scope.$cookies = $cookies;
 			$scope.$ = $;
 //			$scope.$location = $location;
-
-				/*
-				 * prepare general purpose ampere structures
-				 */
-			/*
-				// ampere.disposable is a array of functions executed everytime
-				// the view changes
-			$rootElement.data( 'ampere.disposable', []);
-			*/
 		};
 		ampereTwitterbootstrapController.$inject = ['$scope', '$rootElement', '$window', '$http', '$timeout',  '$log', '$resource', '$cookies'/*, '$location'*/];
 
@@ -215,19 +113,6 @@
 				scope		: 'isolate',
 				link		: function( scope, element, attrs) {
 					scope.$watch( '$ampere', function() {
-						scope.$ampere.scope = scope;
-
-							// tell directives to dispose its custom watchers
-						scope.$root.$broadcast( 'ampere-dispose');
-
-						/*
-							// execute & cleanup all disposable handlers
-						var disposables = element.closest( '.ampere-module').data( 'ampere.disposable');
-						while( disposables.length) {
-							disposables.pop()();
-						}
-						*/
-
 							// destroy all child scopes (->transitions)
 						while( scope.$$childHead) {
 							scope.$$childHead.$destroy();
@@ -241,7 +126,7 @@
 
 						for( i in properties) {
 							if( /*properties[i]!='ampere' &&*/ properties[i]!='this' && properties[i].charAt( 0)!='$') {
-								_ns.debug( 'delete previously defined scope.' + properties[i]);
+								_ns.debug( 'delete previsouly defined scope.' + properties[i]);
 								delete scope[ properties[i]];
 							}
 						}
@@ -260,6 +145,9 @@
 						}
 
 						var template = scope.$ampere.template;
+
+						_ns.debug( 'template=' + template);
+
 						element.html( template);
 						$compile( element.contents())( scope);
 					});
@@ -269,7 +157,7 @@
 							/*
 							 * get current filtered scope variables
 							 */
-						var i, changeset = {}, keys = Object.keys( scope);
+												var i, changeset = {}, keys = Object.keys( scope);
 						for( i in keys) {
 							if( /*keys[i]!='ampere' &&*/ keys[i]!='promise' && keys[i]!='this' && keys[i].charAt( 0)!='$') {
 								changeset[ keys[i]] = scope[ keys[i]];
@@ -319,11 +207,9 @@
 								_ns.debug( 'delete ', scope.$ampere.module.current().state.fullName(), '.', toDelete[i]);
 							}
 
-							//_ns.debug( 'broadcast ampere-model-changed ( ', changeset, ', ', toDelete, ')');
-							//scope.$root.$broadcast( 'ampere-model-changed', changeset, toDelete);
+							_ns.debug( 'broadcast ampere-model-changed ( ', changeset, ', ', toDelete, ')');
+							scope.$root.$broadcast( 'ampere-model-changed', changeset, toDelete);
 						}
-
-						//scope.$ampere.module.trigger( "ampere.angular-scope-changed", [ scope]);
 					});
 				}
 			};
@@ -332,46 +218,40 @@
 		ampere.directive( 'ngAmpereTransition', [ '$compile', '$parse', '$window', function( $compile, $parse, $window) {
 			var templates = {
 				'a'     : '<a href="javascript:void(0)"\
- class="ampere-transition name-{{transition.name()}} {{attrs.class}} {{$css()}}"\
+ class="ampere-transition name-{{transition.name()}} {{attrs.class}}"\
  ng-class="{disabled : !transition.enabled(), active : transition.active(), \'ampere-hotkey\' : hotkey}"\
  accesskey="{{attrs.accesskey}}"\
  id="{{attrs.id}}"\
- tabindex="{{attrs.tabindex}}"\
  style="{{attrs.style}}"\
  data-ampere-hotkey="{{attrs.ngAmpereHotkey}}"\
- title="{{attrs.title || $ampere.ui.getDescription( transition) | strip_tags}}{{hotkey && \' \' + hotkey}}">\
-<i ng-class="attrs.ngAmpereIcon || $ampere.ui.getIcon( transition)"></i>\
-{{(attrs.ngAmpereIcon || $ampere.ui.getIcon( transition)) && ($.trim( element.text()) || $ampere.ui.getCaption( transition)) && \'&nbsp;\' || \'\'}}\
+ title="{{attrs.title || $ampere.ui.getDescription( transition)}}{{hotkey && \' \' + hotkey}}">\
+<i ng-class="$ampere.ui.getIcon( transition)"></i>\
 {{$.trim( element.text()) || $ampere.ui.getCaption( transition)}}\
 </a>',
-				'button' : '<button type="button"\
+								'button' : '<button type="button"\
  ng-disabled="!transition.enabled()"\
- class="ampere-transition name-{{transition.name()}} btn {{attrs.class}} {{$css()}}"\
+ class="ampere-transition name-{{transition.name()}} btn {{attrs.class}}"\
  ng-class="{disabled : !transition.enabled(), active : transition.active(), \'ampere-hotkey\' : hotkey}"\
  ng-disabled="!transition.enabled()"\
  id="{{attrs.id}}"\
- tabindex="{{attrs.tabindex}}"\
  accesskey="{{attrs.accesskey}}"\
  style="{{attrs.style}}"\
  data-ampere-hotkey="{{attrs.ngAmpereHotkey}}"\
- title="{{attrs.title || $ampere.ui.getDescription( transition) | strip_tags}}{{hotkey && \' \' + hotkey}}">\
-<i ng-class="attrs.ngAmpereIcon || $ampere.ui.getIcon( transition)"></i>\
-{{(attrs.ngAmpereIcon || $ampere.ui.getIcon( transition)) && ($.trim( element.text()) || $ampere.ui.getCaption( transition)) && \'&nbsp;\' || \'\'}}\
+ title="{{attrs.title || $ampere.ui.getDescription( transition)}}{{hotkey && \' \' + hotkey}}">\
+<i ng-class="$ampere.ui.getIcon( transition)"></i>\
 {{$.trim( element.text()) || $ampere.ui.getCaption( transition)}}\
 </button>',
 				'file' : '<button type="button"\
  onclick="$( this).next().click()"\
  ng-disabled="!transition.enabled()"\
- class="ampere-transition name-{{transition.name()}} btn ampere-transition-companion {{attrs.class}} {{$css()}}"\
+ class="ampere-transition name-{{transition.name()}} btn ampere-transition-companion {{attrs.class}}"\
  ng-class="{disabled : !transition.enabled(), active : transition.active(), \'ampere-hotkey\' : hotkey}"\
  ng-disabled="!transition.enabled()"\
  accesskey="{{attrs.accesskey}}"\
- tabindex="{{attrs.tabindex}}"\
  style="{{attrs.style}}"\
  data-ampere-hotkey="{{attrs.ngAmpereHotkey}}"\
- title="{{attrs.title || $ampere.ui.getDescription( transition) | strip_tags}}{{hotkey && \' \' + hotkey}}">\
-<i ng-class="attrs.ngAmpereIcon || $ampere.ui.getIcon( transition)"></i>\
-{{(attrs.ngAmpereIcon || $ampere.ui.getIcon( transition)) && ($.trim( element.text()) || $ampere.ui.getCaption( transition)) && \'&nbsp;\' || \'\'}}\
+ title="{{attrs.title || $ampere.ui.getDescription( transition)}}{{hotkey && \' \' + hotkey}}">\
+<i ng-class="$ampere.ui.getIcon( transition)"></i>\
 {{$.trim( element.text()) || $ampere.ui.getCaption( transition)}}\
 </button>\
 <input\
@@ -384,41 +264,30 @@
 >',
 				'submit' : '<button type="submit"\
  ng-disabled="!transition.enabled()"\
- class="ampere-transition name-{{transition.name()}} btn {{attrs.class}}  {{$css()}}"\
+ class="ampere-transition name-{{transition.name()}} btn {{attrs.class}}"\
  ng-class="{disabled : !transition.enabled(), active : transition.active(), \'ampere-hotkey\' : hotkey}"\
  ng-disabled="!transition.enabled()"\
  id="{{attrs.id}}"\
  accesskey="{{attrs.accesskey}}"\
- tabindex="{{attrs.tabindex}}"\
  style="{{attrs.style}}"\
  data:ampere-hotkey="{{attrs.ngAmpereHotkey}}"\
- title="{{attrs.title || $ampere.ui.getDescription( transition) | strip_tags}}{{hotkey && \' \' + hotkey}}">\
-<i ng-class="attrs.ngAmpereIcon || $ampere.ui.getIcon( transition)"></i>\
-{{(attrs.ngAmpereIcon || $ampere.ui.getIcon( transition)) && ($.trim( element.text()) || $ampere.ui.getCaption( transition)) && \'&nbsp;\' || \'\'}}\
+ title="{{attrs.title || $ampere.ui.getDescription( transition)}}{{hotkey && \' \' + hotkey}}">\
+<i ng-class="$ampere.ui.getIcon( transition)"></i>\
 {{$.trim( element.text()) || $ampere.ui.getCaption( transition)}}\
 </button>',
 				'reset' : '<button type="reset"\
  ng-disabled="!transition.enabled()"\
- class="ampere-transition name-{{transition.name()}} btn {{attrs.class}}  {{$css()}}"\
+ class="ampere-transition name-{{transition.name()}} btn {{attrs.class}}"\
  ng-class="{disabled : !transition.enabled(), active : transition.active(), \'ampere-hotkey\' : hotkey}"\
  ng-disabled="!transition.enabled()"\
  accesskey="{{attrs.accesskey}}"\
- tabindex="{{attrs.tabindex}}"\
  style="{{attrs.style}}"\
  data-ampere-hotkey="{{attrs.ngAmpereHotkey}}"\
- title="{{attrs.title || $ampere.ui.getDescription( transition) | strip_tags}}{{hotkey && \' \' + hotkey}}">\
-<i ng-class="attrs.ngAmpereIcon || $ampere.ui.getIcon( transition)"></i>\
-{{(attrs.ngAmpereIcon || $ampere.ui.getIcon( transition)) && ($.trim( element.text()) || $ampere.ui.getCaption( transition)) && \'&nbsp;\' || \'\'}}\
+ title="{{attrs.title || $ampere.ui.getDescription( transition)}}{{hotkey && \' \' + hotkey}}">\
+<i ng-class="$ampere.ui.getIcon( transition)"></i>\
 {{$.trim( element.text()) || $ampere.ui.getCaption( transition)}}\
 </button>'
 			};
-
-				// add LI creation support (convenience method for easier twitter bootstrap toolbar  creation)
-			templates.li = '<li\
- class="ampere-transition name-{{transition.name()}} {{attrs.class}}  {{$css()}}"\
- ng-class="{disabled : !transition.enabled(), active : transition.active()}">' + templates.a + '</li>'
-			;
-
 			/*
 			 * does not work yet
 				// compile templates
@@ -432,57 +301,35 @@
 
 			return {
 				restrict   : 'A',
-				scope        : 'isolate',
+								scope        : 'isolate',
 				link: function(scope, element, attrs) {
 					scope.element = element;
 					scope.attrs = attrs;
 					scope.$ = $window.jQuery;
 
-					//scope.$on( 'ampere-model-changed' ,function( /*object*/changeset, /*array<string>*/deleted) {
+					scope.$on( 'ampere-model-changed' ,function( /*object*/changeset, /*array<string>*/deleted) {
 						// _ns.debug( scope.transition.fullName(),' ampere-model-changed (', changeset, ', ', deleted, ')');
-						/*
 						if( scope.transition){
 							scope.$enabled = scope.transition.enabled();
 						}
-						*/
-					//});
-
+					});
 
 					scope.$watch( attrs.ngAmpereTransition, function( oldValue, newValue) {
 						if( !newValue) {
-							element.replaceWith( '<span style="background-color:crimson; color:white">' + 'attribute "ng-ampere-transition" (="' + attrs.ngAmpereTransition + '") does not resolve to a ampere transition' + '</span>');
-							return;
+														 element.replaceWith( '<span style="background-color:crimson; color:white">' + 'attribute "ng-ampere-transition" (="' + attrs.ngAmpereTransition + '") does not resolve to a ampere transition' + '</span>');
+														 return;
 						}
 
-						var transition = newValue, transitionArguments = [];
-						if( $.isPlainObject( newValue)) {
-							transition = newValue.transition;
+						_ns = $.ov.namespace('ngAmpereTransition(' + newValue.fullName() + ')');
 
-							_ns = $.ov.namespace('ngAmpereTransition(' + transition.fullName() + ')');
-							_ns.assert( 
-								newValue['arguments']===undefined || $.isArray( newValue['arguments']), 
-								'property "arguments" expected to be undefined or array but is ' + $.ov.json.stringify( newValue['arguments'], $.ov.json.stringify.COMPACT)
-							);
-							$.isArray( newValue['arguments']) && (transitionArguments = newValue['arguments']);
-						}
+						var type = attrs.type || ($.inArray( element[0].tagName.toLowerCase(), Object.keys( templates))!=-1 ? element[0].tagName.toLowerCase() : 'button');
 
-						!_ns || (_ns = $.ov.namespace('ngAmpereTransition(' + transition.fullName() + ')'));
-
-						var type = attrs.type || transition.options( 'ampere-ui-input-type') || ($.inArray( element[0].tagName.toLowerCase(), Object.keys( templates))!=-1 ? element[0].tagName.toLowerCase() : 'button');
-
-						scope.transition = transition;
-						scope.transitionArguments = transitionArguments;
-						//scope.$enabled = scope.transition.enabled();
-						//
-						scope.$css = (function( value) {
-							return function() {
-								return $.isFunction( value) ? value.call( this, this) : value;
-							};
-						})( scope.transition.options( 'ampere.ui.class'));	
+						scope.transition = newValue;
+						scope.$enabled = scope.transition.enabled();
 
 						_ns.assert(
-							window.ov.ampere.type( scope.transition)=='transition',
-							'attribute "ng-ampere-transition" (="', attrs.ngAmpereTransition, '") does not resolve to a ampere transition or object containting a transition { transition : ..., ...}'
+							$.type( scope.transition)=='object' && scope.transition.constructor && scope.transition.constructor.name=='Transition',
+							'attribute "ng-ampere-transition" (="', attrs.ngAmpereTransition, '") does not resolve to a ampere transition'
 						);
 
 						if( templates[ type]) {
@@ -512,11 +359,11 @@
 							if( hotkey) {
 								scope.hotkey = ' (' + window.ov.ampere.util.ucwords( hotkey) + ')';
 							}
-							replacement.data( 'ampereTransition', transition);
+							replacement.data( 'ampereTransition', newValue);
 						} else {
 							_ns.raise( 'type "', type, '" is unknown');
 						}
-					}, true);
+					});
 				}
 			};
 		}]);
@@ -531,26 +378,19 @@
 					restrict   : 'A',
 					link: function( scope, element, attrs) {
 						$( element).on( eventName, function( event) {
-							var value = scope.$eval( attrs[ directive]);
-
-							var transition = value, transitionArguments = [];
-							if( $.isPlainObject( value)) {
-								transition = value.transition;
-								$.isArray( value['arguments']) && (transitionArguments = value['arguments']);
-							}
+							var transition = scope.$eval( attrs[ directive]);
 
 							if( transition) {
 								var ui = scope.$ampere.ui;
 								var controller = ui.controller;
 
-								!ui.isBlocked() && controller.proceed( transition, [event].concat( transitionArguments));
-							} else if( transition!==false) {
-								_ns.error( 'attribute "ng-ampere-' + eventName + '" (=' +  attrs[ directive] + ') doesnt resolve to an ampere transition or object containting a transition { transition : ..., ...}');
+								!ui.isBlocked() && controller.proceed( transition, [event]);
+							} else {
+								_ns.error( 'attribute "ng-ampere-' + eventName + '" (=' +  attrs[ directive] + ') doesnt resolve to an ampere transition');
 							}
-							//event.preventDefault();
-							//event.stopPropagation();
-							//event.stopImmediatePropagation();
-							
+							event.preventDefault();
+							event.stopPropagation();
+							event.stopImmediatePropagation();
 						});
 					}
 				};
@@ -559,88 +399,6 @@
 		eventDirective( 'change');
 		eventDirective( 'click');
 		eventDirective( 'dblclick');
-		eventDirective( 'mousedown');
-		eventDirective( 'mouseup');
-
-		ampere.directive( 'ngAmpereEvent', [ function() {
-			var _ns = $.ov.namespace( 'ngAmpereEvent');
-
-			return {
-				restrict   : 'A',
-				link: function( scope, element, attrs) {
-					var events = {};
-
-					scope.$watch( attrs.ngAmpereEvent, function( options, oldoptions) {
-							// unregister old events
-						var eventNames = Object.keys( events);
-						for( var i=0; i<eventNames.length; i++) {
-							var listeners = events[ eventNames[i]];
-							for( var r=0; r<listeners.length; r++) {
-								element.off( eventNames[i], listeners[r]);
-							}
-						}
-							// register new events
-						if( $.isPlainObject( options)) {
-							options = [ options];
-						}
-
-						$.each( options, function( index, option) {
-							_ns.assert( 
-								$.isPlainObject( option), 
-								'expected argument value is object { event : string, transition : (transition || {transition : transition (, [arguments])})?} or array of these objects'
-							);
-
-							events[ option.event] = events[ option.event] || [];
-							var handler = function( event) {
-									
-								var transition = option.transition, 
-									transitionArguments = option['arguments'] || [];
-
-								if( window.ov.ampere.type( transition)=='transition') {
-									var ui = scope.$ampere.ui;
-									var controller = ui.controller;
-
-									!ui.isBlocked() && controller.proceed( transition, [event].concat( transitionArguments));
-								} else if( $.isFunction( transition)) {
-									scope.$apply( function() {
-										transition( null, scope.$ampere.ui, [event].concat( transitionArguments));
-									});								
-								} else if( transition!==false) {
-									_ns.error( 'attribute "ng-ampere-event (=' +  attrs.ngAmpereEvent + ') doesnt resolve to an ampere transition or object containting a transition { transition : ..., ...}');
-								}
-							};
-							events[ option.event].push( handler);
-
-							$( element).on( option.event, handler);
-						});
-					}, true);
-				}
-			};
-		}]);
-
-		ampere.directive( 'ngAmpereLink', [ '$parse', function( $parse) {
-			var _ns = $.ov.namespace( 'ngAmpereLink');
-
-			return {
-				restrict   : 'A',
-				scope      : 'isolate',
-				link: function( scope, element, attrs) {
-					var fn;
-					try {
-						fn = $parse( attrs.ngAmpereLink); //scope.$eval( attrs.ngAmpereLink);
-					} catch( ex) {
-						_ns.error( 'Failed to parse "', attrs.ngAmpereLink, '" : ' + ex.message);
-						throw ex;
-					}
-
-					var result = fn( scope, { $element : element});
-					if( $.isFunction( result)) {
-						var ui = scope.$ampere.ui;
-						result.call( scope.$ampere.module.current().state, element, ui);
-					}
-				}
-			};
-		}]);
 
 		ampere.directive( 'ngAmpereDrop', [ function() {
 			var _ns = $.ov.namespace( 'ngAmpereDrop');
@@ -649,19 +407,13 @@
 				restrict   : 'A',
 				link: function( scope, element, attrs) {
 					$( element).on( 'drop', function( event) {
-						var value = scope.$eval( attrs.ngAmpereDrop);
-
-						var transition = value, transitionArguments = [];
-						if( $.isPlainObject( value)) {
-							transition = value.transition;
-							$.isArray( value['arguments']) && (transitionArguments = value['arguments']);
-						}
+						var transition = scope.$eval( attrs.ngAmpereDrop);
 
 						if( transition) {
 							var ui = scope.$ampere.ui;
 							var controller = ui.controller;
 
-							!ui.isBlocked() && controller.proceed( transition, [event].concat( transitionArguments));
+							!ui.isBlocked() && controller.proceed( transition, [ event]);
 						} else {
 							_ns.error( 'attribute "ngAmpereDrop" (=' +  attrs.ngAmpereDrop + ') doesnt resolve to an ampere transition');
 						}
@@ -685,130 +437,30 @@
 			return {
 				restrict   : 'A',
 				link: function( scope, element, attrs) {
-					/*
 					var options = {
 						forcePlaceholderSize : true,
-						placeholder : element[0].tagName=='TBODY' && $('<tr><td>&nbsp;</td></tr>')
-					};
-					*/
-				
-					var OPTIONS = { /*options*/
-						helper			: function( e, tr) {
-							var $originals = tr.children();
-							var $helper = tr.clone();
-							$helper.children().each(function( index) {
-								$(this).width( $originals.eq( index).width());
-							});
-						    return $helper;
-						},
-						placeholder			: 'sortable-placeholder',
-						forcePlaceholderSize: true,
-						stop				: function( event, _ui) {
-							var ui = scope.$ampere.ui;
-							var controller = ui.controller;
-
-							event.data = { items : _ui.item, position : _ui.item.index()};							
-							if( window.ov.ampere.type( transition)=='transition') {
-								!ui.isBlocked() && controller.proceed( transition, [ event]);
-								
-									// if we do the stuff below the jquery ui sortable
-									// will reject the sort action reult which has a flicker effect
-								//event.preventDefault();
-								//event.stopPropagation();
-								//event.stopImmediatePropagation();
-								//return false;
-							} else {
-								transition( null, ui, [event].concat( transitionArguments));
-							}
-						}/*,
-						start : function( event, ui ) {
-							if( window.ov.ampere.type( transition)=='transition' && !transition.enabled()) {
-								$( element.get()).sortable( "disable" );								
-							}
-						} 
-						*/
+						placeholder : element[0].tagName=='TBODY' && $('<tr><td></td></tr>')
 					};
 
-					var options = $.extend( {}, OPTIONS);
-					var transition, transitionArguments = [];
+					var transition;
 					var value = scope.$eval( attrs.ngAmpereSortable);
-
 					if( $.isPlainObject( value)) {
-						/*
-							// commented out to allow also plain functions to be used as callback 
-							// for the sortable
 						_ns.assert(
 							(!Object.hasOwnProperty.call( value, 'transition') || value.transition) &&
 							(!Object.hasOwnProperty.call( value, 'ng-ampere-transition') || value['ng-ampere-transition']),
 							'value option transition or ng-ampere-transition doesnt resolve to a transition'
 						);
-						*/
 
 						transition = value['ng-ampere-transition'] || value.transition || transition;
-						$.isArray( value['arguments']) && (transitionArguments=value['arguments']);
 
 						$.extend( options, value);
 					} else if( value) {
 						transition = value;
-					} else {
-						_ns.raise( 'could not evaluate attribute "ng-ampere-transition" to an object or function (="' + attrs.ngAmpereSortable + '")');
 					}
 
-					_ns.assert(
-						window.ov.ampere.type( transition)=='transition' || $.isFunction( transition),
-						'value option transition or ng-ampere-transition doesnt resolve to a transition'
-					);
-
-					scope.$watch( function( a, b, c, d, e) {
-						
-						if( element.hasClass( 'ui-sortable')) {
-							if( !options.handle) {
-								$( options.items, element.get()).addClass( 'draghandle');
-							}
-							$( element.get()).sortable( 'refresh');
-						}
-					});
-
-						// ATTENTION : $timeout is no more needed an may have side effects (scope.$apply is called at end of timeout) !!!
-					$timeout = function( f) {
-						//scope.$ampere.module.once( 'ampere.view-changed', function() {
-						//	f();
-						//});
-						f();
-					};
 					$timeout( function() {
-						if( typeof( options.items)=='string') {
-							//options.items = $( element.get()).children( options.items);
-							options.items = '> ' + options.items;
-						} else if( !options.items) {
-							//options.items = $( element.get()).children( ':not(.ng-ampere-sortable-nohandle)');
-							options.items = '> *:not(.ng-ampere-sortable-nohandle)';
-						}
-
-							// custom handle is given
-						if( !options.handle) {
-							$( options.items, element.get()).addClass( 'draghandle');
-						}
-
-						
-							//THIS SEEMS TO BE NO MORE NEEDED						
-						
-							// if transition is not just a function but a true transition
-							// suppress drag start if transition is disabled
-						(window.ov.ampere.type( transition)=='transition') && $( element.get()).on( 'mousedown', options.items, function( event) {
-							if( !transition.enabled()) {
-								//event.preventDefault();
-								//event.stopPropagation();
-								event.stopImmediatePropagation();
-
-								//return false;
-							}
-						});
-						
-
 						var sortable = $( element.get()).sortable( options);
 
-						/*
 						var ui = scope.$ampere.ui;
 						var controller = ui.controller;
 
@@ -820,7 +472,6 @@
 							event.stopPropagation();
 							event.stopImmediatePropagation();
 						});
-						*/
 					});
 				}
 			};
@@ -833,7 +484,7 @@
 				restrict   : 'A',
 				link: function( scope, element, attrs) {
 						/*
-						 * if the ng-ampere-hotkey attribute is not
+						 * it the ng-ampere-hotkey attribute is not
 						 * used in combination with ng-ampere-transition
 						 */
 					if( !attrs.ngAmpereTransition) {
@@ -852,281 +503,10 @@
 			return {
 				restrict   : 'A',
 				link: function( scope, element, attrs) {
-					scope.$watch( attrs.ngAmpereData, function( _new, old) {
-						_ns.assert( $.isPlainObject( _new), 'attribute "ng-ampere-data"(="' + _new + '") expected to evaluate to an object');
+					var data = scope.$eval( attrs.ngAmpereData);
+					_ns.assert( $.isPlainObject( data), 'attribute "ng-ampere-data"(="' + attrs.ngAmpereData + '") expected to evaluate to an object');
 
-						angular.extend( element.data(), _new);
-					}, true);
-				}
-			};
-		}]);
-
-		ampere.directive( 'ngAmpereDataset', [ function() {
-			var _ns = $.ov.namespace( 'ngAmpereDataset');
-
-			return {
-				restrict   : 'A',
-				link: function( scope, element, attrs) {
-					scope.$watch( attrs.ngAmpereDataset, function( _new, old) {
-						_ns.assert( !_new || $.isPlainObject( _new), 'attribute "ng-ampere-dataset"(="' + _new + '") expected to evaluate to an object');
-
-						if( _new) {
-							var keys = Object.keys( _new), dataset = element.prop( 'dataset');
-							for( var i=0; i<keys.length; i++) {
-								dataset[ keys[i]] = $.isPlainObject( _new[keys[i]]) && JSON.stringify( _new[keys[i]]) || _new[keys[i]];
-							}
-						}
-					}, true);
-				}
-			};
-		}]);
-
-			/**
-			* ng-ampere-debounce directive allows debouncing/throttling of any kind of events 
-			*
-			* you can use it also for non angular model updates 
-			* (.i.e. for regular ng-[event]/[event] throttling/debouncing)
-			* 
-			* example usage : 
-			*
-			* <input type="text" ng-model="mymodel" ng-ampere-debounce> 
-			*		will debounce updating mymodel with 1000ms delay
-			*
-			* <input type="text" ng-model="mymodel" ng-ampere-debounce="leading"> 
-			*		will updating mymodel initial but suppress all further updates within 1000ms delay 
-			*
-			* <input type="text" ng-model="mymodel" ng-ampere-debounce="{ timeout : 500}"> 
-			*		will debounce updating mymodel with 500ms delay
-			*
-			* <input type="text" ng-model="mymodel" ng-ampere-debounce="{ leading : true }"> 
-			*		will updating mymodel initial but suppress all further updates within 1000ms delay
-			*
-			* <input type="text" ng-model="mymodel" ng-ampere-debounce="{ timeout  : 500, leading : true }"> 
-			*		will updating mymodel initial but suppress all further updates within 500ms delay
-			* 
-			* <input type="checkbox" ng-change="myhandler" ng-ampere-debounce="{ timeout  : 500, leading : true }"> 
-			*		will call myhandler on first change event but suppress all further change event within 500ms delay
-			*/
-		ampere.directive( 'ngAmpereDebounce', [ function() {
-			var _ns = $.ov.namespace( 'ngAmpereDebounce'),
-				DEFAULTS = {
-					timeout : 1000
-				}
-			;
-
-			return {
-				restrict    : 'A',
-				//require		: '?ngModel',	
-				link		: function( scope, element, attrs) {
-						// normalize directive options
-					var options = scope.$eval( attrs.ngAmpereDebounce) || $.extend( {}, DEFAULTS);
-					if( options==='leading') {
-						options = $.extend( { leading : true}, DEFAULTS);
-					} else {
-						options.leading = !!options.leading;	// make it a real boolean
-					}
-					
-					var map = $._data( element[0], 'events'),
-						events = $.each( Object.keys( map), function( index, eventName) {
-								// ensure only real events are handled
-							if( eventName.charAt( 0)!='$') {
-									// install debounce mechanism
-								var debounced = _.debounce( function( event) {
-									//console.log( 'debounce called');
-									
-										// iterate over all event handlers registered before ourself
-										// (remember : we moved ourself at first position while installing)
-									for( var i=$.inArray( debounce_handlerobj, map[eventName])+1; i<map[eventName].length; i++) {
-										var handlerobj = map[eventName][i];
-											
-											// call original event handler
-										handlerobj.handler.apply( this, arguments);
-											// emulate regular event dispatching by 
-											// aborting further propagation when event 
-											// has state immediatePropagationStopped
-										if( event.isImmediatePropagationStopped()) {
-											break;
-										}
-									}
-								}, options.timeout, options);
-
-								element.on( eventName, function( event) {
-									debounced.apply( this, arguments);
-										// tell jquery to suppress further propagation of this event
-									event.stopImmediatePropagation();
-								});
-
-									// move our debounce handler at first position
-									// to be called before any other
-								var debounce_handlerobj = map.input.pop();
-								map.input.unshift( debounce_handlerobj);
-							}
-						})
-					;
-				}
-			};
-		}]);
-
-		ampere.directive( 'ngAmpereWatch', [ function() {
-			var _ns = $.ov.namespace( 'ngAmpereWatch');
-
-			return {
-				restrict   : 'A',
-				link: function( scope, element, attrs) {
-						// TODO : for some reason element.closest( '.ampere-module') is in seldom cases empty
-						// (WHICH MUST BE WRONG and probably is a timing issue of angular !!)
-						// thats why abort linking here in case no valid parent is available
-					if( !element.closest( '.ampere-module').length) {
-						return;
-					}
-
-					function wrap( fn, property) {
-						return function( scope) {
-							var state = (arguments.length==1 ? scope : arguments[2]).$ampere.module.current().state;
-							//var args = $.makeArray( arguments);
-							var args = [];
-							if( arguments.length==1) {
-									// watch all call
-
-								args.push( state);
-							} else {
-									// watch property call
-								args.push( state);
-								args.push( property);
-							}
-							args.push( element); 
-
-							fn.apply( scope, args);
-						};
-					}
-
-					//var disposables = element.closest( '.ampere-module').data( 'ampere.disposable');
-					//var disposables = [];
-
-					var watcher = scope.$eval( attrs.ngAmpereWatch);
-					if( $.isFunction( watcher)) {
-						_ns.debug( 'activate watch(*) ', window.ov.ampere.util.functionName( watcher) || 'function', '()');
-
-						//disposables.push( scope.$watch( wrap( watcher)));
-						scope.$on( 'ampere-dispose', scope.$watch( wrap( watcher)));
-					} else if( $.isPlainObject( watcher)) {
-						for( var key in watcher) {
-							var f = watcher[ key];
-							_ns.assert( $.isFunction( f), "watcher property value of key '", key, "'(=", $.ov.json.stringify( f, $.ov.json.stringify.COMPACT), ") expected to be a function");
-
-							var watchedProperties = key.split( /\s*,\s*/g);
-							for( var i=0; i<watchedProperties.length; i++) {
-								var property = watchedProperties[i];
-								if( property==='' || property==='*') {
-									_ns.debug( 'activate watch(*) ', window.ov.ampere.util.functionName( f) || 'function', '()');
-									//disposables.push( scope.$watch( wrap( f)));
-									scope.$on( 'ampere-dispose', scope.$watch( wrap( f)));
-								} else {
-									_ns.debug( 'activate watch(', property, ') ', window.ov.ampere.util.functionName( f) || 'function', '()');
-									//disposables.push( scope.$watch( property, wrap( f, property)));
-									scope.$on( 'ampere-dispose', scope.$watch( property, wrap( f, property)));
-								}
-							}
-						}
-					} else {
-						_ns.raise( 'dont know how to handle argument "', attrs.ngAmpereWatch, '". function or plain object argument is expected.');
-					}
-				}
-			};
-		}]);
-
-		ampere.directive( 'ngAmpereDeferred', [ function() {
-			var _ns = $.ov.namespace( 'ngAmpereDeferred');
-
-			return {
-				restrict   : 'A',
-				link: function( scope, element, attrs) {
-					function wrap( fn) {
-						var deferred = fn.call( element, element);
-						return $.isFunction( deferred.abort) && deferred.abort || $.isFunction( deferred.reject) && deferred.reject || $.noop;
-					}
-
-					//var disposables = element.closest( '.ampere-module').data( 'ampere.disposable');
-					var deferredFn = scope.$eval( attrs.ngAmpereDeferred);
-					_ns.assert( $.isFunction( deferredFn), 'Argument ngAmpereDeferred(=', element.attr( 'ng-ampere-deferred'), ') expected to be a function<Deferred>');
-
-					//disposables.push( wrap( deferredFn));
-					scope.$on( 'ampere-dispose', wrap( deferredFn));
-				}
-			};
-		}]);
-
-		ampere.directive( 'ngAmpereTemplate', [ '$compile', function( $compile) {
-			return {
-				restrict	: 'A',
-				//scope		: false,
-				link		: function( scope, element, attrs) {
-					scope.$watch( attrs.ngAmpereTemplate, function( newValue, oldValue) {
-						var contents  = element.contents();
-										
-						if( newValue) {
-							if( !$.isPlainObject( newValue)) {
-								newValue = {
-									replace : newValue
-								};
-							}
-							element.empty();
-
-							var content = window.ov.ampere.util.getTemplate(
-								$.isFunction( newValue.prepend) && newValue.prepend.call( window, window) || newValue.prepend || ''
-							);
-							content && element.append( content);
-
-							content = window.ov.ampere.util.getTemplate(
-								$.isFunction( newValue.replace) && newValue.replace.call( window, window) || newValue.replace || ''
-							) || contents;
-
-							content && element.append( content);
-
-							content = window.ov.ampere.util.getTemplate(
-								$.isFunction( newValue.append) && newValue.append.call( window, window) || newValue.append || ''
-							);
-							content && element.append( content);
-
-							$compile( element.contents())( scope);
-						}
-					}, true);
-				}
-			};
-		}]);
-
-		ampere.directive( 'ngAmpereValidate', [ function( $timeout) {
-			var _ns = $.ov.namespace( 'ngAmpereValidate');
-
-			return {
-				restrict   : 'A',
-				link: function( scope, element, attrs) {
-					var fn = scope.$eval( attrs.ngAmpereValidate);
-					_ns.assert(
-						$.isFunction( fn),
-						'dont know how to handle argument "', attrs.ngAmpereWatch, '". function or plain object argument is expected.'
-					);
-
-					var state = scope.$ampere.module.current().state;
-					if( $.isFunction( fn)) {
-						if( attrs.ngModel) {
-							scope.$watch( attrs.ngModel, function( oldValue, newValue) {
-								element.setCustomValidity( '');
-								var result = fn.call( element.get(), element, state);
-								if( typeof( result)=='string') {
-									element.setCustomValidity( result);
-								}
-							}, true);
-						} else {
-							element.on( 'input', function() {
-								element.setCustomValidity( '');
-								var result = fn.call( element, element, state);
-								if( typeof( result)=='string') {
-									element.setCustomValidity( result);
-								}
-							});
-						}
-					}
+					angular.extend( element.data(), data);
 				}
 			};
 		}]);
@@ -1138,36 +518,21 @@
 		 *  http://stackoverflow.com/questions/9179708/replicating-bootstraps-main-nav-and-subnav
 		 */
 	function onBodyscroll() {
-		var subnav = $('.subnav:last');
-		if( !subnav.data( "inBodyScroll")) {
-
-			subnav.data( "inBodyScroll", true);
-			// If was not activated (has no attribute "data-top"
-			if( !subnav.attr('data-top')) {
+		// If has not activated (has no attribute "data-top"
+		if( !$('.subnav').attr('data-top')) {
 				// If already fixed, then do nothing
-				if( subnav.hasClass('subnav-fixed')) {
+				if ($('.subnav').hasClass('subnav-fixed')) {
 						return;
 				}
 				// Remember top position
-				var offset = subnav.offset() || {};
-				subnav.attr('data-top', offset.top);
-			}
+				var offset = $('.subnav').offset() || {};
+				$('.subnav').attr('data-top', offset.top);
+		}
 
-			if( $( this).scrollTop() && subnav.attr('data-top') - subnav.outerHeight() <= $(this).scrollTop()) {
-				subnav.addClass('subnav-fixed');
-					// reset the individual css style to get the value from the css class
-				$( 'body').css( 'padding-top', '');
-				var paddingTop = parseInt( $( 'body').css( 'padding-top') || 0, 10);
-				$( 'body').css( 'padding-top', paddingTop + subnav.height() + 'px');
-			} else {
-				subnav.removeClass('subnav-fixed');
-					// remove style
-				$( 'body').css( 'padding-top', '');
-			}
-
-			window.setTimeout( function() {
-				subnav.data( "inBodyScroll", false);
-			}, 300);
+		if( $(this).scrollTop() && $('.subnav').attr('data-top') - $('.subnav').outerHeight() <= $(this).scrollTop()) {
+				$('.subnav').addClass('subnav-fixed');
+		} else {
+				$('.subnav').removeClass('subnav-fixed');
 		}
 	}
 
@@ -1175,10 +540,10 @@
 		 * a transition was clicked
 		 */
 	function onTransitionClicked( event) {
-		var scope = angular.element( this).scope(),
-			controller = $( this).closest( '.ampere-app').ampere();
+		var transition = angular.element( this).scope().transition;
+		var controller = $( this).closest( '.ampere-app').ampere();
 
-		!controller.ui.isBlocked() && controller.proceed( scope.transition, [event].concat( scope.transitionArguments));
+		!controller.ui.isBlocked() && controller.proceed( transition, [event]);
 
 		event.preventDefault();
 			// prevent any other hotkey handler to be invoked
@@ -1207,7 +572,7 @@
 
 			var deferred = controller.ui.flash.getElement().data( 'ampere.action-deferred');
 			_ns.assert( deferred && $.isFunction( deferred.promise), 'no action deferred registered on flash element');
-			
+
 				// trigger handler
 			deferred.reject( controller.module);
 		}
@@ -1234,19 +599,6 @@
 		var self = this;
 
 		this._super( controller, angular.extend( {}, twitterbootstrap.defaults, options || {}));
-
-		var angularOptions = this.options( "ampere.ui.angular");
-		if( angularOptions) {
-			_ns.assert( $.isArray( angularOptions), 'option "ampere.ui.angular" expected to be an array but is of type ', $.type( angularOptions));
-				// declare aditional angular directives
-			var angularModule = angular.module('window.ov.ampere.ui.twitterbootstrap');
-
-			for( var i=0; i<angularOptions.length; i++) {
-				_ns.assert( $.isFunction( angularOptions[i]), 'items of option "ampere.ui.angular" expected to be an function but is of type ', $.type( angularOptions[i]));
-
-				angularOptions[i].call( angularModule, angularModule);
-			}
-		}
 
 		var layout = 'default';
 		if( Object.hasOwnProperty.call( this.options(), 'ampere.ui.layout')) {
@@ -1286,45 +638,28 @@
 		}
 
 		function onMessage( event) {
-				// in case of a cross origin posted message an execptiopn may occur
-			if( !$.isEmptyObject( onMessage.handlers)) {
-				try {
-					var location = event.originalEvent.source.location.href.match( /[^#]+/);
-					if( onMessage.handlers[ location]) {
-						onMessage.handlers[ location]( event.originalEvent.data, event.originalEvent.source);
-					}
-				} catch( ex) {
-
-				}
+			var location = event.originalEvent.source.location;
+			if( onMessage.handlers[ location]) {
+				onMessage.handlers[ location]( event.originalEvent.data, event.originalEvent.source);
 			}
 		}
 		onMessage.handlers = {};
-
-		function onTypeAheadChange() {
-			$( this).trigger( 'input');
-		}
 
 		var _init = this.init;
 		this.init = function() {
 			_init.call( this);
 
-			(this.controller.element[0].tagName=="BODY") && $( window).on( 'resize scroll', onBodyscroll);
-
-				// fix for bootstrap typeahead which dont throws oninput
-			this.controller.element.on( 'change', 'input[data-provide="typeahead"]', onTypeAheadChange);
+			(this.controller.element[0].tagName=="BODY") && $( window).on( 'resize', onBodyscroll);
+			(this.controller.element[0].tagName=="BODY") && $( document).on( 'scroll', onBodyscroll);
 
 				// react on click only on standalone ampere transition representants
 				// but not companions (like the representant of input[file] wit ng-ampere-transition)
 			this.controller.element.on( 'click', '.ampere-transition:not( .ampere-transition-companion)', onTransitionClicked);
+
 			this.controller.element.on( 'click', '.flash .alert button.close', onActionAbort);
 
 				// allow anchors with attribute "draggable" to be draggable to the desktop
-			this.controller.element.on( 'dragstart', 'a[draggable]', onDraggableAnchor);
-
-				// fix buggy centering of bootstrap modals
-			//this.controller.element.on( 'show', '.modal', function() {
-			//	$(this).css({'margin-top':($(window).height()-$(this).height())/2,'top':'0'});
-			//});			
+			$( this.controller.element).on( 'dragstart', 'a[draggable]', onDraggableAnchor);
 
 			$( window).on( 'message', onMessage);
 
@@ -1334,9 +669,8 @@
 		var _destroy = this.destroy;
 		this.destroy = function() {
 			_destroy.call( this);
-			(this.controller.element[0].tagName=="BODY") && $( window).off( 'resize scroll', onBodyscroll);
-
-			this.controller.element.off( 'change', 'input[data-provide="typeahead"]', onTypeAheadChange);
+			(this.controller.element[0].tagName=="BODY") && $( window).off( 'resize', onBodyscroll);
+			(this.controller.element[0].tagName=="BODY") && $( document).off( 'scroll', onBodyscroll);
 
 			this.controller.element.off( 'click', '.ampere-transition', onTransitionClicked);
 			this.controller.element.off( 'click', '.flash .alert button.close', onActionAbort);
@@ -1346,39 +680,6 @@
 			$( window).off( 'message', onMessage);
 		};
 
-			/**
-			 * (used by crud table for example)
-			 */
-		this.scrollIntoView = function( jElement, /*false==at bottom, true==at top*/bottom) {
-			var jContainer = jElement.parent().closest( '.scrollable');
-
-				// abort if no scrollable container was found
-			if( !jContainer.length) {
-				return;
-			}
-
-			if( bottom) {
-					// if before visible area
-				if( jElement.position().top<0) {
-					this.scrollIntoView( jElement);
-				} else if( jElement.position().top>=jContainer.height()) {
-						// if after visible area
-					jContainer.stop().animate({
-						scrollTop : jContainer.scrollTop() + jElement.position().top - jContainer.height() + jElement.height()
-					}, 'fast');
-				}
-			} else {
-					// if before visible area
-				if( jElement.position().top<0) {
-					jContainer.stop().animate({
-						scrollTop : jContainer.scrollTop() + jElement.position().top
-					}, 'fast');
-				} else if( jElement.position().top>=jContainer.height()) {
-					this.scrollIntoView( jElement, true);
-				}
-			}
-		};
-
 		this.flash = function( message, /* optional */options) {
 			if( arguments.length) {
 				options = options || {};
@@ -1386,59 +687,35 @@
 
 				switch( options.type) {
 					case 'progress' :
-						flash.addClass( 'wait');
 						flash.find( '.alert').removeClass( 'alert-error').addClass( 'alert-info');
 						flash.find('.progress').show()
 						.find( '.bar').css( 'width', options.value);
 
-							// it is an progress event ?
-						if( message && 'progress'===message.type) {
-							var isUpload = !!options.value;
-							flash.find( '.message').text( isUpload ? 'Uploading ...' : 'Downloading ...');
-						} else {
-							flash.find( '.message').text( message);
-						}
+						flash.find( '.message').text( message);
 
 						var deferred = options.deferred;
 							// add abort button if the provided promise
 							// is a deferred
-						
 						flash.find( 'button.close')[ deferred && $.isFunction( deferred.reject) ? 'show' : 'hide']();
 
 						break;
 					case 'error' :
-							// skip possibly running animations (fadeout or example ...) and force flash to be visible
-						flash.stop( true).css( 'opacity', '1');
-
-
-						flash.removeClass( 'wait');
-
 							// reset flash style to default
 						flash.find( '.alert').removeClass( 'alert-info').addClass( 'alert-error');
 						flash.find('.progress').hide();
 
 						flash.find( '.message').text( 'Error occured : ' + message);
 						if( options.value) {
-							var retry = $('<button class="btn retry"><i class="' + ($.isFunction( options.value) && 'icon-refresh') + '"></i>' + ($.isFunction( options.value) ? 'Retry' : 'Ok') + '</button>');
+							var retry = $('<button class="btn retry"><i class="icon-refresh"></i>Retry</button>');
 							retry.click( function() {
 								flash.hide();
-								$.isFunction( options.value) && options.value();
+								options.value();
 							});
-
-							var cancel = $('<button class="btn"><i></i>Cancel</button>');
-							cancel.click( function() {
-								flash.hide();
-								self.unblock();
-							});
-
-							flash.find( '.message').append(
-								$( '<div class="btn-group">').append( retry, cancel)
-							);
+							flash.find( '.message').append( retry);
 						}
 						flash.find( 'button.close').hide();
 						break;
 					default :
-						flash.removeClass( 'wait');
 						flash.find( '.alert').removeClass( 'alert-error alert-info');
 
 						flash.find( '.progress, button.close').hide();
@@ -1454,14 +731,13 @@
 				this.flash.getElement().hide();
 			}
 
-			return this.flash;
+			return  this.flash;
 		};
 		this.flash.getElement = function() {
 			return controller.element.find( '.flash');
 		};
 		this.flash.progress = function( message, progress, deferred) {
-				// hide flash if message is undefined
-			return message===undefined  ? self.flash() : self.flash( message || 'Operation in progress ...', {
+			return self.flash( message || 'Operation in progress ...', {
 				type     : 'progress',
 				value    : progress || '100%',
 				deferred : deferred || self.flash.getElement().data( 'ampere.action-deferred')
@@ -1473,21 +749,17 @@
 				value    : onRetry
 			});
 		};
-		
+
 		this.isBlocked = function() {
 			return this.controller.element.find( '.overlay').hasClass( 'block');
 		};
 
 		this.block = function() {
 			this.controller.element.addClass( 'overlay').find( '.overlay').addClass( 'block');
-
-			return this;
 		};
 
 		this.unblock = function() {
 			this.controller.element.removeClass( 'overlay').find( '.overlay').removeClass( 'block');
-
-			return this;
 		};
 
 		this.getTemplate = function( view) {
@@ -1535,84 +807,26 @@
 		};
 
 		this.renderError = function( message, onRetry) {
-			this.refresh();
 			this.flash.error( message, onRetry);
 		};
 
-		this.update = function() {
-				// transport current state properties into scope
-			var scope = angular.element( controller.element.find( '.ampere-view:first')).scope();
-
-				// remove old scope variables
-			var i, toDelete = $.grep( Object.keys( scope), function( item) {
-				return item!='this' && item.charAt( 0)!='$';
-			});
-
-							// transport state variables into scope
-			var properties = Object.keys( scope.$ampere.module.current().state);
-			for( i in properties) {
-				_ns
-				.assert( properties[i]!='this', 'state property named "this" is forbidden')
-				.assert( properties[i].charAt( 0)!='$', 'state property starting with $ (="', properties[i], '") is forbidden');
-
-				if( properties[i]!='promise') {
-					if( scope[ properties[i]] !== scope.$ampere.module.current().state[ properties[i]]) {
-						scope[ properties[i]] = scope.$ampere.module.current().state[ properties[i]];
-						_ns.debug( 'update scope.' + properties[i] + '=', $.ov.json.stringify( scope[ properties[i]], $.ov.json.stringify.COMPACT));
-					}					
-
-					var index = $.inArray( properties[i], toDelete);
-					index!=-1 && toDelete.splice( index, 1);
-				}
-			}
-
-			for( i in toDelete) {
-				_ns.debug( 'delete previsouly defined scope.' + toDelete[i]);
-				delete scope[ toDelete[i]];
-			}
-
-			scope.$$phase || scope.$apply( $.noop);
-
-				// broadcast ampere.view-changed event
-			controller.module.trigger( "ampere.view-updated");
-
-			return this;
-		};
-
-		this.refresh = function() {
-			this.renderState( controller.module.current().view);
-				// broadcast ampere.view-changed event
-			controller.module.trigger( "ampere.view-refreshed");
-
-			return this;
-		};
-
-		//var lastView = undefined;
 		this.renderState = function( view, template, transitionResult) {
-				// twitter bootstrap fix : cleanup added dropdowns
-			$('body').children( '.dropdown-menu').remove();
-
 				// remember scroll position
 			var scrollX = window.scrollX;
 			var scrollY = window.scrollY;
-			//console.warn( scrollY);
 
 			var scope = angular.element( controller.element.find( '>.ampere-module')).scope();
 
-			var apply = function() {
+			scope.$apply( function() {
 					/*
 					 * if no view was given - just rerender the current view
 					 * this case happens for history.reset
 					 */
 				if( view) {
-						// cleanup opened modals whenever a new view gets rendered
-					$('.modal:visible').hide();
-					$('.modal-backdrop').remove();
-
 					scope.$ampere = {
-						module	: controller.module,
-						ui		: controller.ui,
-						view	: view,
+						module   : controller.module,
+												ui          : controller.ui,
+						view     : view,
 							/*
 							 * module.current.reset is calling this
 							 * function without providing a template
@@ -1621,39 +835,18 @@
 						template : template==='' ? template : template || scope.$ampere.template
 					};
 				}
-			};
-
-			if( scope.$$phase=="$apply") {
-				apply();
-			} else {
-				scope.$apply( apply);
-			}
+			});
 
 				// compute optional flash message
 			$.when( transitionResult).done( function() {
-					// initialize datepickers
-				$( 'input[data-date-format]').datepicker({ autoclose : true})
-					// datepicker only triggers chnage but angular expects "input"
-				.on('changeDate', function( event) {
-					$( event.target).trigger( 'input');
-				});
-					// render initial validation results into title 
-				$( ".html5validation-title").each( function() {
-					$( this).attr( 'title', this.validationMessage);
-				});
-
 				focus( controller.element);
 
-				//window.scrollTo( scrollX, scrollY);
+				window.scrollTo( scrollX, scrollY);
 				//window.scrollTo( 0, 0);
 				//onBodyscroll();
 
-				if( /*arguments.length==1 &&*/ typeof( arguments[0])=='string') {
-						// display flash message
+				if( arguments.length==1 && typeof( arguments[0])=='string') {
 					self.flash( arguments[0]);
-				} else {
-						// hide flash 
-					self.flash();
 				}
 			});
 		};
@@ -1720,6 +913,7 @@
 			bar.text( 'Bootstrapping ' + controller.module.name() + ' ...');
 
 			var deferred = $.Deferred();
+
 			$.when( controller.module.current().view, controller.module.current().view.template, this.layout, controller.module)
 			.progress( function() {
 				_ns.debug( 'progress', this, arguments);
@@ -1737,7 +931,6 @@
 					})
 				);
 				$( '.progress', controller.element).addClass( 'progress-danger');
-				deferred.resolveWith( controller.ui, self.layout.isRejected() ? self.layout.statusText + ' : ' + layout : arg);
 			}).done( function() {
 				eProgress.remove();
 
@@ -1764,11 +957,7 @@
 					);
 
 					self.init();
-
-						// broadcast ampere.view-changed event
-					controller.module.trigger( "ampere.view-changed");
-
-					deferred.resolveWith( controller.ui, []);
+					deferred.resolve();
 				});
 			});
 
