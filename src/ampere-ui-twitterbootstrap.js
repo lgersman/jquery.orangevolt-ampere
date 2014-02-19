@@ -1136,35 +1136,27 @@
 		 */
 	function onBodyscroll() {
 		var subnav = $('.subnav:last');
-		if( !subnav.data( "inBodyScroll")) {
-
-			subnav.data( "inBodyScroll", true);
-			// If was not activated (has no attribute "data-top"
-			if( !subnav.attr('data-top')) {
-				// If already fixed, then do nothing
-				if( subnav.hasClass('subnav-fixed')) {
-						return;
-				}
-				// Remember top position
-				var offset = subnav.offset() || {};
-				subnav.attr('data-top', offset.top);
+		// If was not activated (has no attribute "data-top"
+		if( !subnav.attr('data-top')) {
+			// If already fixed, then do nothing
+			if( subnav.hasClass('subnav-fixed')) {
+					return;
 			}
+			// Remember top position
+			var offset = subnav.offset() || {};
+			subnav.attr('data-top', offset.top);
+		}
 
-			if( $( this).scrollTop() && subnav.attr('data-top') - subnav.outerHeight() <= $(this).scrollTop()) {
-				subnav.addClass('subnav-fixed');
-					// reset the individual css style to get the value from the css class
-				$( 'body').css( 'padding-top', '');
-				var paddingTop = parseInt( $( 'body').css( 'padding-top') || 0, 10);
-				$( 'body').css( 'padding-top', paddingTop + subnav.height() + 'px');
-			} else {
-				subnav.removeClass('subnav-fixed');
-					// remove style
-				$( 'body').css( 'padding-top', '');
-			}
-
-			window.setTimeout( function() {
-				subnav.data( "inBodyScroll", false);
-			}, 300);
+		if( $( this).scrollTop() && subnav.attr('data-top') - subnav.outerHeight() <= $(this).scrollTop()) {
+			subnav.addClass('subnav-fixed');
+				// reset the individual css style to get the value from the css class
+			$( 'body').css( 'padding-top', '');
+			var paddingTop = parseInt( $( 'body').css( 'padding-top') || 0, 10);
+			$( 'body').css( 'padding-top', paddingTop + subnav.height() + 'px');
+		} else {
+			subnav.removeClass('subnav-fixed');
+				// remove style
+			$( 'body').css( 'padding-top', '');
 		}
 	}
 
@@ -1305,7 +1297,7 @@
 		this.init = function() {
 			_init.call( this);
 
-			(this.controller.element[0].tagName=="BODY") && $( window).on( 'resize scroll', onBodyscroll);
+			(this.controller.element[0].tagName=="BODY") && $( window).on( 'resize scroll', _.debounce( onBodyscroll));
 
 				// fix for bootstrap typeahead which dont throws oninput
 			this.controller.element.on( 'change', 'input[data-provide="typeahead"]', onTypeAheadChange);

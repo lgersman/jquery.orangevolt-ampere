@@ -870,7 +870,7 @@
 						 * so the only thing to do is unblock the view
 						 */
 
-						ui && ui.unblock();
+						ui && ui.flash() && ui.unblock();
 							// render flash "user aborted transition"
 					} else {
 						transitionDeferred.rejectWith( module, arguments);
