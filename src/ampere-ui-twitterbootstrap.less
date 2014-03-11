@@ -41,7 +41,7 @@
 		// feature !! this makes dropdown automagically appear on mouse over
 		// just remove class="dropdown-toggle" data-toggle="dropdown" from the 
 		// LI.dropdown and add clas auto to get this behaviour
-	ul.nav li.dropdown.auto:hover >ul.dropdown-menu {
+	ul.nav li.dropdown.auto:not( .disabled):hover >ul.dropdown-menu {
 		margin  : 0;
         display : block;    
     }
@@ -430,8 +430,20 @@
 			font-size	: 100px;
 		}
 
-		.nav > li.disabled > a {
-			color: #999999;
+		.nav > li.disabled > .dropdown-toggle {
+			color: #999999; 
+
+			>* {
+				border-top-color: #999999; 
+				border-bottom-color: #999999; 
+			}
+
+			&:hover {
+				>* {
+					border-top-color: #999999; 
+					border-bottom-color: #999999; 
+				}
+			}
 		}
 
 		.nav-tabs > li > a {
