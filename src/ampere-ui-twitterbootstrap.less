@@ -434,18 +434,28 @@
 			font-size	: 100px;
 		}
 
-		.nav > li.disabled > .dropdown-toggle {
-			color: #999999; 
+		.nav > li.disabled {
+			A {
+				color : #999999;
 
-			>* {
-				border-top-color: #999999; 
-				border-bottom-color: #999999; 
-			}
+				&:hover {
+					color : #999999;
+				}
+			}		
 
-			&:hover {
+			> .dropdown-toggle { 
+				color: #999999; 
+
 				>* {
 					border-top-color: #999999; 
 					border-bottom-color: #999999; 
+				}
+
+				&:hover {
+					>* {
+						border-top-color: #999999; 
+						border-bottom-color: #999999; 
+					}
 				}
 			}
 		}
