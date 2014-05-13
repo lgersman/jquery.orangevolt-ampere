@@ -211,6 +211,7 @@
 				            //addView(( new google.picker.ImageSearchView).setLicense(google.picker.ImageSearchView.License.REUSE)).
 				            .addView( google.picker.ViewId.DOCS)
 				            .addView( new google.picker.DocsUploadView())
+				            .setOAuthToken( gapi.auth.getToken().access_token)
 				            //addView( google.picker.ViewId.WEBCAM).
 				            //addView( google.picker.ViewId.VIDEO_SEARCH).
 				            //addView( google.picker.ViewId.YOUTUBE).

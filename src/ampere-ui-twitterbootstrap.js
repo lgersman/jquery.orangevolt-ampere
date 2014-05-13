@@ -1060,7 +1060,6 @@
 				link		: function( scope, element, attrs) {
 					scope.$watch( attrs.ngAmpereTemplate, function( newValue, oldValue) {
 						var contents  = element.contents();
-										
 						if( newValue) {
 							if( !$.isPlainObject( newValue)) {
 								newValue = {
