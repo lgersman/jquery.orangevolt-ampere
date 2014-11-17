@@ -129,9 +129,9 @@
 			html5_history_hash = parseInt( $.now() + '00', 10);
 
 				// push initial state
-			window.history.replaceState( 
-				html5_history_hash, 
-				document.title, 
+			window.history.replaceState(
+				html5_history_hash,
+				document.title,
 				window.location.pathname + window.location.hash);// + '#' + html5_history_hash);
 
 				// register history listener
@@ -222,11 +222,11 @@
 						}
 
 						window.history[ forward ? 'pushState' : 'replaceState']( html5_history_hash, document.title, uri);
-						
+
 						//window.history.pushState( hash, document.title, window.location.pathname + '#' + hash);
 					});
 				};
-				
+
 				if( size>0) {
 					if( $.isFunction( undo)) {
 						undo.hash = window.history.state;
@@ -412,7 +412,7 @@
 						// broadcast ampere state.enabled event
 						// debugger
 					var event = (state && state.module() || module).trigger( "ampere.transition-enabled", [ this]);
-						// if a handler returned FALSE 
+						// if a handler returned FALSE
 						// -> skip enabled call and return undefined(==false)
 					if( event.result===undefined || event.result) {
 						var enabled = delegate.call( this, this);
@@ -912,7 +912,7 @@
 							if( Object.hasOwnProperty.call( stateOptions, 'ampere.history.html5.title')) {
 								var historyHTML5Title = stateOptions['ampere.history.html5.title'];
 								document.title = $.isFunction( historyHTML5Title) ?
-									historyHTML5Title.call( target) : 
+									historyHTML5Title.call( target) :
 									historyHTML5Title.toString()
 								;
 							} else {
@@ -934,7 +934,7 @@
 							ui && ui.render( 'State', view, template, result);
 						}
 
-							// we need to resolve the transition deferred 
+							// we need to resolve the transition deferred
 							// within a done handler to ensure that it is executed
 							// AFTER the done handler possibly attached by renderState
 							// (for rendering the flash as example)
@@ -957,16 +957,16 @@
 				// create event emitter instance
 			(function( module) {
 				var jq = $( module);
-			 
+
 			    module.trigger = function( event) {
 						// create event object
 					event = event[ jQuery.expando ] ? event : new $.Event( event.type || event, typeof event === "object" && event );
 
 					jq.trigger.apply( jq, arguments);
 
-							/* 
-								ATTENTION : different behaviour than jquery ! 
-								-> our trigger returns the event object instead of 
+							/*
+								ATTENTION : different behaviour than jquery !
+								-> our trigger returns the event object instead of
 								this (aka the module)
 							*/
 						return event;
@@ -1132,10 +1132,10 @@
 			/*
 			 *	deeplinking option (default is enabled). if ampere.history.html5 is true
 			 *	and the ampere widget element === document.body this function will be called at
-			 *	startup to resolve a state responsible for handling the hash fragment of 
+			 *	startup to resolve a state responsible for handling the hash fragment of
 			 *	document.location (via state option 'ampere.history.html5').
-			 *	
-			 *	this option can be overridden with a custom function. 
+			 *
+			 *	this option can be overridden with a custom function.
 			 *	this context is the ampere controller. the given function may return
 			 *	a deferred tracking its progress.
 			 */
@@ -1144,7 +1144,7 @@
 			var hash = document.location.hash, module = this.module;
 			if( hash) {
 					// strip # at the beginning
-				hash = hash.substr( 1);	
+				hash = hash.substr( 1);
 				var handler;
 
 					// evaluate state matching hash
@@ -1287,7 +1287,7 @@
 									// prevent any other hotkey handler to be invoked
 								event.stopImmediatePropagation();
 
-								var value				= hotkeys[ hotkey], 
+								var value				= hotkeys[ hotkey],
 									transition			= value,
 									transitionArguments	= [];
 
@@ -1437,7 +1437,7 @@
 				filterFn.call( transition) && transitions.push( transition);
 			}
 
-			return transitions;	
+			return transitions;
 		};
 
 		this.regexp = function( pattern,modifiers) {
@@ -1615,7 +1615,7 @@
 			 */
 
 			module.current( state, view);
-			
+
 			$.when( controller.ui.render( 'Bootstrap'))
 			.done( function() {
 				var deeplinkingDeferred = $.noop;
@@ -1628,7 +1628,7 @@
 
 				$.when( deeplinkingDeferred)
 				.fail( function( msg) {
-						// show flash with deeplinking error as a "silent hint" that 
+						// show flash with deeplinking error as a "silent hint" that
 						// deeplinking went wrong for some reason
 					controller.ui.flash.error( "Resolving deep link failed - " + msg, true);
 				})
@@ -1639,7 +1639,7 @@
 				});
 			})
 			.fail( function() {
-				deferred.rejectWith( controller, arguments);	
+				deferred.rejectWith( controller, arguments);
 			});
 		});
 
@@ -1698,7 +1698,7 @@
 								this.resolve( command);
 							});
 
-						var proceedArgs = arguments;		
+						var proceedArgs = arguments;
 						var self = this;
 
 							// wait for action to complete
@@ -1743,14 +1743,14 @@
 								// if a transition returned a deferred
 								// which gets rejected without arguments
 								// ampere assumes that the transition was just canceled
-								// (ie. no error will be displayed, the display will only be refreshed) 
+								// (ie. no error will be displayed, the display will only be refreshed)
 							if( !arguments.length) {
 								self.ui.render( 'State');
-								return; 
+								return;
 							}
 
 							var redo = function() {
-								return self.proceed.apply( self, proceedArgs);	
+								return self.proceed.apply( self, proceedArgs);
 							};
 
 							if( arguments.length==1 && typeof( arguments[0])=='string') {
