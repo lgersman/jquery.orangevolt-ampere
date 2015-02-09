@@ -129,7 +129,7 @@
 						return item && Object.prototype.hasOwnProperty.call( item, property);
 					});
 				}
-				
+
 				return items.map( function( item) {
 					var value = item[ property];
 					return value===undefined ? _default : value;
@@ -154,9 +154,9 @@
 
 			/**
 			 * decorate $exception handler
-			 * 
-			 * see http://stackoverflow.com/questions/13595469/how-to-override-exceptionhandler-implementation	
-			 */ 
+			 *
+			 * see http://stackoverflow.com/questions/13595469/how-to-override-exceptionhandler-implementation
+			 */
 		/*
 		ampere.config( function( $provide) {
 			$provide.decorator("$exceptionHandler", function($delegate) {
@@ -456,8 +456,8 @@
 							transition = newValue.transition;
 
 							_ns = $.ov.namespace('ngAmpereTransition(' + transition.fullName() + ')');
-							_ns.assert( 
-								newValue['arguments']===undefined || $.isArray( newValue['arguments']), 
+							_ns.assert(
+								newValue['arguments']===undefined || $.isArray( newValue['arguments']),
 								'property "arguments" expected to be undefined or array but is ' + $.ov.json.stringify( newValue['arguments'], $.ov.json.stringify.COMPACT)
 							);
 							$.isArray( newValue['arguments']) && (transitionArguments = newValue['arguments']);
@@ -475,7 +475,7 @@
 							return function() {
 								return $.isFunction( value) ? value.call( this, this) : value;
 							};
-						})( scope.transition.options( 'ampere.ui.class'));	
+						})( scope.transition.options( 'ampere.ui.class'));
 
 						_ns.assert(
 							window.ov.ampere.type( scope.transition)=='transition',
@@ -547,7 +547,7 @@
 							//event.preventDefault();
 							//event.stopPropagation();
 							//event.stopImmediatePropagation();
-							
+
 						});
 					}
 				};
@@ -582,15 +582,15 @@
 						}
 
 						$.each( options, function( index, option) {
-							_ns.assert( 
-								$.isPlainObject( option), 
+							_ns.assert(
+								$.isPlainObject( option),
 								'expected argument value is object { event : string, transition : (transition || {transition : transition (, [arguments])})?} or array of these objects'
 							);
 
 							events[ option.event] = events[ option.event] || [];
 							var handler = function( event) {
-									
-								var transition = option.transition, 
+
+								var transition = option.transition,
 									transitionArguments = option['arguments'] || [];
 
 								if( window.ov.ampere.type( transition)=='transition') {
@@ -601,7 +601,7 @@
 								} else if( $.isFunction( transition)) {
 									scope.$apply( function() {
 										transition( null, scope.$ampere.ui, [event].concat( transitionArguments));
-									});								
+									});
 								} else if( transition!==false) {
 									_ns.error( 'attribute "ng-ampere-event (=' +  attrs.ngAmpereEvent + ') doesnt resolve to an ampere transition or object containting a transition { transition : ..., ...}');
 								}
@@ -688,7 +688,7 @@
 						placeholder : element[0].tagName=='TBODY' && $('<tr><td>&nbsp;</td></tr>')
 					};
 					*/
-				
+
 					var OPTIONS = { /*options*/
 						helper			: function( e, tr) {
 							var $originals = tr.children();
@@ -704,10 +704,10 @@
 							var ui = scope.$ampere.ui;
 							var controller = ui.controller;
 
-							event.data = { items : _ui.item, position : _ui.item.index()};							
+							event.data = { items : _ui.item, position : _ui.item.index()};
 							if( window.ov.ampere.type( transition)=='transition') {
 								!ui.isBlocked() && controller.proceed( transition, [ event]);
-								
+
 									// if we do the stuff below the jquery ui sortable
 									// will reject the sort action reult which has a flicker effect
 								//event.preventDefault();
@@ -720,9 +720,9 @@
 						}/*,
 						start : function( event, ui ) {
 							if( window.ov.ampere.type( transition)=='transition' && !transition.enabled()) {
-								$( element.get()).sortable( "disable" );								
+								$( element.get()).sortable( "disable" );
 							}
-						} 
+						}
 						*/
 					};
 
@@ -732,7 +732,7 @@
 
 					if( $.isPlainObject( value)) {
 						/*
-							// commented out to allow also plain functions to be used as callback 
+							// commented out to allow also plain functions to be used as callback
 							// for the sortable
 						_ns.assert(
 							(!Object.hasOwnProperty.call( value, 'transition') || value.transition) &&
@@ -757,7 +757,7 @@
 					);
 
 					scope.$watch( function( a, b, c, d, e) {
-						
+
 						if( element.hasClass( 'ui-sortable')) {
 							if( !options.handle) {
 								$( options.items, element.get()).addClass( 'draghandle');
@@ -787,9 +787,9 @@
 							$( options.items, element.get()).addClass( 'draghandle');
 						}
 
-						
-							//THIS SEEMS TO BE NO MORE NEEDED						
-						
+
+							//THIS SEEMS TO BE NO MORE NEEDED
+
 							// if transition is not just a function but a true transition
 							// suppress drag start if transition is disabled
 						(window.ov.ampere.type( transition)=='transition') && $( element.get()).on( 'mousedown', options.items, function( event) {
@@ -801,7 +801,7 @@
 								//return false;
 							}
 						});
-						
+
 
 						var sortable = $( element.get()).sortable( options);
 
@@ -879,29 +879,29 @@
 		}]);
 
 			/**
-			* ng-ampere-debounce directive allows debouncing/throttling of any kind of events 
+			* ng-ampere-debounce directive allows debouncing/throttling of any kind of events
 			*
-			* you can use it also for non angular model updates 
+			* you can use it also for non angular model updates
 			* (.i.e. for regular ng-[event]/[event] throttling/debouncing)
-			* 
-			* example usage : 
 			*
-			* <input type="text" ng-model="mymodel" ng-ampere-debounce> 
+			* example usage :
+			*
+			* <input type="text" ng-model="mymodel" ng-ampere-debounce>
 			*		will debounce updating mymodel with 1000ms delay
 			*
-			* <input type="text" ng-model="mymodel" ng-ampere-debounce="leading"> 
-			*		will updating mymodel initial but suppress all further updates within 1000ms delay 
-			*
-			* <input type="text" ng-model="mymodel" ng-ampere-debounce="{ timeout : 500}"> 
-			*		will debounce updating mymodel with 500ms delay
-			*
-			* <input type="text" ng-model="mymodel" ng-ampere-debounce="{ leading : true }"> 
+			* <input type="text" ng-model="mymodel" ng-ampere-debounce="leading">
 			*		will updating mymodel initial but suppress all further updates within 1000ms delay
 			*
-			* <input type="text" ng-model="mymodel" ng-ampere-debounce="{ timeout  : 500, leading : true }"> 
+			* <input type="text" ng-model="mymodel" ng-ampere-debounce="{ timeout : 500}">
+			*		will debounce updating mymodel with 500ms delay
+			*
+			* <input type="text" ng-model="mymodel" ng-ampere-debounce="{ leading : true }">
+			*		will updating mymodel initial but suppress all further updates within 1000ms delay
+			*
+			* <input type="text" ng-model="mymodel" ng-ampere-debounce="{ timeout  : 500, leading : true }">
 			*		will updating mymodel initial but suppress all further updates within 500ms delay
-			* 
-			* <input type="checkbox" ng-change="myhandler" ng-ampere-debounce="{ timeout  : 500, leading : true }"> 
+			*
+			* <input type="checkbox" ng-change="myhandler" ng-ampere-debounce="{ timeout  : 500, leading : true }">
 			*		will call myhandler on first change event but suppress all further change event within 500ms delay
 			*/
 		ampere.directive( 'ngAmpereDebounce', [ function() {
@@ -913,7 +913,7 @@
 
 			return {
 				restrict    : 'A',
-				//require		: '?ngModel',	
+				//require		: '?ngModel',
 				link		: function( scope, element, attrs) {
 						// normalize directive options
 					var options = scope.$eval( attrs.ngAmpereDebounce) || $.extend( {}, DEFAULTS);
@@ -922,7 +922,7 @@
 					} else {
 						options.leading = !!options.leading;	// make it a real boolean
 					}
-					
+
 					var map = $._data( element[0], 'events'),
 						events = $.each( Object.keys( map), function( index, eventName) {
 								// ensure only real events are handled
@@ -930,16 +930,16 @@
 									// install debounce mechanism
 								var debounced = _.debounce( function( event) {
 									//console.log( 'debounce called');
-									
+
 										// iterate over all event handlers registered before ourself
 										// (remember : we moved ourself at first position while installing)
 									for( var i=$.inArray( debounce_handlerobj, map[eventName])+1; i<map[eventName].length; i++) {
 										var handlerobj = map[eventName][i];
-											
+
 											// call original event handler
 										handlerobj.handler.apply( this, arguments);
-											// emulate regular event dispatching by 
-											// aborting further propagation when event 
+											// emulate regular event dispatching by
+											// aborting further propagation when event
 											// has state immediatePropagationStopped
 										if( event.isImmediatePropagationStopped()) {
 											break;
@@ -991,7 +991,7 @@
 								args.push( state);
 								args.push( property);
 							}
-							args.push( element); 
+							args.push( element);
 
 							fn.apply( scope, args);
 						};
@@ -1134,7 +1134,7 @@
 		 *  http://stackoverflow.com/questions/9179708/replicating-bootstraps-main-nav-and-subnav
 		 */
 	function onBodyscroll() {
-		var subnav = $('.subnav:last');
+		var subnav = $('.subnav:not(.no-sticky):last');
 		// If was not activated (has no attribute "data-top"
 		if( !subnav.attr('data-top')) {
 			// If already fixed, then do nothing
@@ -1195,7 +1195,7 @@
 
 			var deferred = controller.ui.flash.getElement().data( 'ampere.action-deferred');
 			_ns.assert( deferred && $.isFunction( deferred.promise), 'no action deferred registered on flash element');
-			
+
 				// trigger handler
 			deferred.reject( controller.module);
 		}
@@ -1312,7 +1312,7 @@
 				// fix buggy centering of bootstrap modals
 			//this.controller.element.on( 'show', '.modal', function() {
 			//	$(this).css({'margin-top':($(window).height()-$(this).height())/2,'top':'0'});
-			//});			
+			//});
 
 			$( window).on( 'message', onMessage);
 
@@ -1390,7 +1390,7 @@
 						var deferred = options.deferred;
 							// add abort button if the provided promise
 							// is a deferred
-						
+
 						flash.find( 'button.close')[ deferred && $.isFunction( deferred.reject) ? 'show' : 'hide']();
 
 						break;
@@ -1461,7 +1461,7 @@
 				value    : onRetry
 			});
 		};
-		
+
 		this.isBlocked = function() {
 			return this.controller.element.find( '.overlay').hasClass( 'block');
 		};
@@ -1547,7 +1547,7 @@
 					if( scope[ properties[i]] !== scope.$ampere.module.current().state[ properties[i]]) {
 						scope[ properties[i]] = scope.$ampere.module.current().state[ properties[i]];
 						_ns.debug( 'update scope.' + properties[i] + '=', $.ov.json.stringify( scope[ properties[i]], $.ov.json.stringify.COMPACT));
-					}					
+					}
 
 					var index = $.inArray( properties[i], toDelete);
 					index!=-1 && toDelete.splice( index, 1);
@@ -1625,7 +1625,7 @@
 				.on('changeDate', function( event) {
 					$( event.target).trigger( 'input');
 				});
-					// render initial validation results into title 
+					// render initial validation results into title
 				$( ".html5validation-title").each( function() {
 					$( this).attr( 'title', this.validationMessage);
 				});
@@ -1640,7 +1640,7 @@
 						// display flash message
 					self.flash( arguments[0]);
 				} else {
-						// hide flash 
+						// hide flash
 					self.flash();
 				}
 			});
