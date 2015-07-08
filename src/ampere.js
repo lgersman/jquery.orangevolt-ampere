@@ -916,7 +916,7 @@
 									historyHTML5Title.toString()
 								;
 							} else {
-								document.title = ui.getCaption( target);
+								document.title = ui.getCaption( target) || '';
 							}
 						} else {
 							debugger;
