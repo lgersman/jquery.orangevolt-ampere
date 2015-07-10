@@ -1241,6 +1241,10 @@
 							}
 						}
 					}
+					
+					if(event.target.tagName==='TEXTAREA' || (event.target.tagName==='INPUT' && $.inArray(event.target.getAttribute('type'), ['text', 'password', 'number', 'url', '', 'url'])!==-1)) {
+						return;
+					};
 
 					var module = self.controller.module;
 
