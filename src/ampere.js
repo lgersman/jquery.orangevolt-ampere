@@ -919,7 +919,7 @@
 								document.title = ui.getCaption( target) || '';
 							}
 						} else {
-							debugger;
+							//debugger;
 						}
 						/*
 						if( previous.state===target && previous.view===view) {
@@ -930,6 +930,9 @@
 								data = $( data);
 							}
 							template = data.jquery ? (data[0].tagName=='SCRIPT' ? data.text().replace( "<![CDATA[", "").replace("]]>", "") : data) : template.responseText || data;
+
+								// broadcast ampere.view-changed event
+							self.trigger( "ampere.view-change", [ previous.view]);
 
 							ui && ui.render( 'State', view, template, result);
 						}
