@@ -1055,8 +1055,8 @@
 
 		ampere.directive( 'ngAmpereTemplate', [ '$compile', function( $compile) {
 			return {
-				restrict	: 'A',
-				//scope		: false,
+				restrict: 'A',
+				scope		: true,
 				link		: function( scope, element, attrs) {
 					scope.$watch( attrs.ngAmpereTemplate, function( newValue, oldValue) {
 						var contents  = element.contents();
@@ -1065,6 +1065,13 @@
 								newValue = {
 									replace : newValue
 								};
+							}
+
+								// transfer scope variables if newValue.scope is defined
+							if(newValue.scope!==null && newValue.scope!==undefined) {
+								Object.getOwnPropertyNames(newValue.scope).forEach(function(name) {
+									scope[name]=newValue.scope[name];
+								});
 							}
 							element.empty();
 
