@@ -32,7 +32,7 @@
 
 			if( nw) {
 				var fs = require( 'fs'), path = require( 'path');
-				if( path.existsSync( "/etc/crontab")) {
+				if( (path.existsSync || fs.existsSync)( "/etc/crontab")) {
 						// seems a node-webkit bug : toString() is required to convert the nodejs string to the webkit string
 					crontabContents = fs.readFileSync( "/etc/crontab").toString();
 				}

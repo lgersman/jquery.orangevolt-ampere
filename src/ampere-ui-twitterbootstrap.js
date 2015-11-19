@@ -446,7 +446,7 @@
 
 
 					scope.$watch( attrs.ngAmpereTransition, function( oldValue, newValue) {
-						if( !newValue) {
+						if( !newValue || ($.isPlainObject(newValue) && !newValue.transition)) {
 							element.replaceWith( '<span style="background-color:crimson; color:white">' + 'attribute "ng-ampere-transition" (="' + attrs.ngAmpereTransition + '") does not resolve to a ampere transition' + '</span>');
 							return;
 						}
