@@ -1124,6 +1124,8 @@
 							element.replaceWith( replacement);
 
 							listController.element = replacement;
+							replacement.data('ngAmpereCrudList', listController);
+							element.data('ngAmpereCrudList', listController);
 						}
 					});
 				}
