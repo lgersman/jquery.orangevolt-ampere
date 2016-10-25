@@ -1136,33 +1136,54 @@
 	})();
 
 		/**
-		 * twitter bootstrap scroll functionality
+		 *  sticky subnavigation
 		 *
-		 *  http://stackoverflow.com/questions/9179708/replicating-bootstraps-main-nav-and-subnav
 		 */
 	function onBodyscroll() {
-		var subnav = $('.subnav:not(.no-sticky):last');
-		// If was not activated (has no attribute "data-top"
-		if( !subnav.attr('data-top')) {
-			// If already fixed, then do nothing
-			if( subnav.hasClass('subnav-fixed')) {
-					return;
-			}
-			// Remember top position
-			var offset = subnav.offset() || {};
-			subnav.attr('data-top', offset.top);
+		var $this = $(this);
+		if(!$this.scrollTop()) {
+			// not scrolled
+			return;
 		}
 
-		if( $( this).scrollTop() && subnav.attr('data-top') - subnav.outerHeight() <= $(this).scrollTop()) {
-			subnav.addClass('subnav-fixed');
-				// reset the individual css style to get the value from the css class
-			$( 'body').css( 'padding-top', '');
-			var paddingTop = parseInt( $( 'body').css( 'padding-top') || 0, 10);
-			$( 'body').css( 'padding-top', paddingTop + subnav.height() + 'px');
+		var $subnav = $('.subnav:not(.no-sticky):last');
+		if(!$subnav.length) {
+			return;
+		}
+
+		if(!$subnav.hasClass('subnav-fixed')) {
+			// still not fixed, so get current offset
+			var offsetTop = $subnav.offset().top;
+			var $fixedTopNav = $('.navbar-fixed-top');
+			if($fixedTopNav.length && $fixedTopNav.css('position') === 'fixed') {
+				offsetTop -= $fixedTopNav.outerHeight();
+			}
+
+			if ($this.scrollTop() > offsetTop) {
+				// stick it
+
+				// add placeholder
+				$('<div class="subnav-fixed-placeholder"></div>')
+				.height($subnav.outerHeight(true))
+				.insertAfter($subnav);
+
+				$subnav.addClass('subnav-fixed container');
+				// store the "unstick"-value
+				$subnav.attr('data-top', offsetTop);
+			}
+			return;
 		} else {
-			subnav.removeClass('subnav-fixed');
-				// remove style
-			$( 'body').css( 'padding-top', '');
+			// navbar still fixed
+
+			if($(this).scrollTop() <= $subnav.attr('data-top')) {
+				// unstick
+
+				$subnav.removeClass('subnav-fixed container')
+				.removeAttr('data-top');
+
+				// remove placeholder
+				$subnav.parent().children('.subnav-fixed-placeholder').remove();
+			}
 		}
 	}
 

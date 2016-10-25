@@ -34,16 +34,16 @@
 		overflow: auto;
 
 		>LI.dropdown-submenu >UL.dropdown-menu {
-			overflow:auto;	
-		}	
+			overflow:auto;
+		}
 	}
 
 		// feature !! this makes dropdown automagically appear on mouse over
-		// just remove class="dropdown-toggle" data-toggle="dropdown" from the 
+		// just remove class="dropdown-toggle" data-toggle="dropdown" from the
 		// LI.dropdown and add clas auto to get this behaviour
 	ul.nav li.dropdown.auto:not( .disabled):hover >ul.dropdown-menu {
 		margin  : 0;
-        display : block;    
+        display : block;
     }
 
 	.navbar {
@@ -123,7 +123,7 @@
 	}
 
 	.glow( @glow_color: #005580, @glow_duration : 2s) {
-		animation: glow @glow_duration infinite;			
+		animation: glow @glow_duration infinite;
 		-moz-animation: glow @glow_duration infinite;
 		-webkit-animation: glow @glow_duration infinite;
 
@@ -132,21 +132,21 @@
 
 	.jiggle-keyframes( @jiggle_degree) {
 		@keyframes jiggle {
-			0% { transform: rotate(0); } 
+			0% { transform: rotate(0); }
 			66% { transform: rotate(0); }
     		83% { transform: rotate( -@jiggle_degree); }
     		100% { transform: rotate( @jiggle_degree); }
 		}
 
 		@-moz-keyframes jiggle {
-			0% { -moz-transform: rotate(0); } 
+			0% { -moz-transform: rotate(0); }
 			66% { -moz-transform: rotate(0); }
     		83% { -moz-transform: rotate( -@jiggle_degree); }
     		100% { -moz-transform: rotate( @jiggle_degree); }
 		}
 
 		@-webkit-keyframes jiggle {
-			0% { -webkit-transform: rotate(0); } 
+			0% { -webkit-transform: rotate(0); }
 			66% { -webkit-transform: rotate(0); }
     		83% { -webkit-transform: rotate( -@jiggle_degree); }
     		100% { -webkit-transform: rotate( @jiggle_degree); }
@@ -154,7 +154,7 @@
 	}
 
 	.jiggle( @jiggle_degree: 4deg, @jiggle_duration : 1s) {
-		animation: jiggle @jiggle_duration infinite alternate;			
+		animation: jiggle @jiggle_duration infinite alternate;
 		-moz-animation: jiggle @jiggle_duration infinite alternate;
 		-webkit-animation: jiggle @jiggle_duration infinite alternate;
 
@@ -162,7 +162,7 @@
 	}
 
 	.jiggle-glow( @jiggle_degree: 4deg, @jiggle_duration : 1s, @glow_color: #005580, @glow_duration : 2s) {
-		animation: jiggle @jiggle_duration infinite alternate, glow @glow_duration infinite;			
+		animation: jiggle @jiggle_duration infinite alternate, glow @glow_duration infinite;
 		-moz-animation: jiggle @jiggle_duration infinite alternate, glow @glow_duration infinite;
 		-webkit-animation: jiggle @jiggle_duration infinite alternate, glow @glow_duration infinite;
 
@@ -210,7 +210,7 @@
 
 		// this rule is used to make filters in the gui appear yellow(same color as the flash) if something was entered
 	INPUT.search-query:not( .filter-empty) {
-			// make background yellow if something was entered to signal 
+			// make background yellow if something was entered to signal
 			// filter is active
 		animation 			: input-empty 2s infinite;
 		-moz-animation		: input-empty 2s infinite;
@@ -441,20 +441,20 @@
 				&:hover {
 					color : #999999;
 				}
-			}		
+			}
 
-			> .dropdown-toggle { 
-				color: #999999; 
+			> .dropdown-toggle {
+				color: #999999;
 
 				>* {
-					border-top-color: #999999; 
-					border-bottom-color: #999999; 
+					border-top-color: #999999;
+					border-bottom-color: #999999;
 				}
 
 				&:hover {
 					>* {
-						border-top-color: #999999; 
-						border-bottom-color: #999999; 
+						border-top-color: #999999;
+						border-bottom-color: #999999;
 					}
 				}
 			}
@@ -469,7 +469,7 @@
 			box-shadow			: inherit;
 
 			> A {
-			  color: #b94a48;			  
+			  color: #b94a48;
 		 	}
 
 		 	/*
@@ -478,7 +478,7 @@
 			  	border-bottom-color: transparent;
 		 	}
 		 	*/
-		}	
+		}
 
 		.breadcrumb > li.disabled > a {
 		 	text-decoration : none;
@@ -537,7 +537,7 @@
 
 		.ampere-state {
 			.page-header {
-				padding-bottom 	: 0;	
+				padding-bottom 	: 0;
 				margin 			: 0 0 10px;
 
 				a.icon-keyboard, .ampere-help a {
@@ -609,13 +609,6 @@
 			color: #555555;
 		}
 
-		FOOTER {
-				/* this is required to prevent flickering by the moving toolbar */
-			>DIV.description {	
-				min-height: 80px;
-			}
-		}
-
 		>.overlay {
 			/*
 			opacity	: 0.8;
@@ -678,43 +671,30 @@
  			filter: alpha(opacity=100);
 		}
 
-			/* Fixed subnav on scroll, but only for 980px and up (sorry IE!) */
-		@media (min-width: 980px) {
-		  .subnav-fixed {
+		.subnav-fixed {
 		    position: fixed;
-		    top: 40px;
-		    left: 0;
-		    right: 0;
 		    z-index: 1020; /* 10 less than .navbar-fixed to prevent any overlap */
-		    border-color: #d5d5d5;
-		    border-width: 0 0 1px; /* drop the border on the fixed edges */
+			top: 40px; // to handle .navbar-fixed-top
+		}
+		.subnav-fixed-placeholder {
+			display: none;
+		}
+		.subnav-fixed + .subnav-fixed-placeholder {
+			display: block;
+		}
+		// to handle .navbar-fixed-top, that gets position:static;
+		@media (max-width: 979px) {
+			.subnav-fixed {
+			    top: 0;
+			}
+		}
+
+
+		.subnav .nav > li:first-child > a,
+		.subnav .nav > li:first-child > a:hover {
 		    -webkit-border-radius: 0;
 		       -moz-border-radius: 0;
 		            border-radius: 0;
-		    -webkit-box-shadow: inset 0 1px 0 #fff, 0 1px 5px rgba(0,0,0,.1);
-		       -moz-box-shadow: inset 0 1px 0 #fff, 0 1px 5px rgba(0,0,0,.1);
-		            box-shadow: inset 0 1px 0 #fff, 0 1px 5px rgba(0,0,0,.1);
-		    filter: progid:DXImageTransform.Microsoft.gradient(enabled=false); /* IE6-9 */
-
-		    >.navbar-inner {
-		    	border-width: 0 0 1px; /* drop the border on the fixed edges */
-
-  			    -webkit-border-radius: 0;
-		       -moz-border-radius: 0;
-	            border-radius: 0;
-		    }
-		  }
-		  .subnav-fixed .nav {
-		    //width: 938px;
-		    margin: 0 auto;
-		    padding: 0 1px;
-		  }
-		  .subnav .nav > li:first-child > a,
-		  .subnav .nav > li:first-child > a:hover {
-		    -webkit-border-radius: 0;
-		       -moz-border-radius: 0;
-		            border-radius: 0;
-		  }
 		}
 	}
 }
@@ -953,13 +933,13 @@ select:focus:invalid:focus,
 	// default is 50% but we have an additional offset of 40px caused by the fixed top menu
 	/*
 .modal.fade.in {
-	// Firefox 
+	// Firefox
 	top: -moz-calc( 50% + 20px);
-	// WebKit 
+	// WebKit
 	top: -webkit-calc( 50% + 20px);
-	// Opera 
+	// Opera
 	top: -o-calc( 50% + 20px);
-	// Standard 
+	// Standard
 	top: calc( 50% + 20px);
 }
 */
