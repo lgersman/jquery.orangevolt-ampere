@@ -849,11 +849,13 @@
 			return {
 				restrict   : 'A',
 				link: function( scope, element, attrs) {
-					scope.$watch( attrs.ngAmpereData, function( _new, old) {
+					var dispose = scope.$watch( attrs.ngAmpereData, function( _new, old) {
 						_ns.assert( $.isPlainObject( _new), 'attribute "ng-ampere-data"(="' + _new + '") expected to evaluate to an object');
 
 						angular.extend( element.data(), _new);
 					}, true);
+
+					scope.$on( 'ampere-dispose', dispose);
 				}
 			};
 		}]);
