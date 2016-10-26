@@ -54,7 +54,7 @@
 				class="breadcrumb"
 			><li 
 					ng-repeat="transition in $ampere.ui.getTransitions({ 'ampere.ui.type':'breadcrumb'})" 
-					ng-class="{disabled : !transition.enabled(), active : transition.active()}"
+					ng-class="{disabled : !transition.enabled(), active : transition.active(), hide : $.isFunction(transition.options('hide')) && transition.options('hide')(transition)}"
 			  	>
 		          	<a ng-ampere-transition="transition"></a>
 		          	<span ng-show="!$last" class="divider">/</span>
