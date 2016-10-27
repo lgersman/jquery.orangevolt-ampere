@@ -567,7 +567,7 @@
 				link: function( scope, element, attrs) {
 					var events = {};
 
-					scope.$watch( attrs.ngAmpereEvent, function( options, oldoptions) {
+					var dispose = scope.$watch( attrs.ngAmpereEvent, function( options, oldoptions) {
 							// unregister old events
 						var eventNames = Object.keys( events);
 						for( var i=0; i<eventNames.length; i++) {
@@ -611,6 +611,8 @@
 							$( element).on( option.event, handler);
 						});
 					}, true);
+					
+					scope.$on( 'ampere-dispose', dispose);
 				}
 			};
 		}]);
@@ -756,7 +758,7 @@
 						'value option transition or ng-ampere-transition doesnt resolve to a transition'
 					);
 
-					scope.$watch( function( a, b, c, d, e) {
+					var dispose = scope.$watch( function( a, b, c, d, e) {
 
 						if( element.hasClass( 'ui-sortable')) {
 							if( !options.handle) {
@@ -765,6 +767,7 @@
 							$( element.get()).sortable( 'refresh');
 						}
 					});
+					scope.$on( 'ampere-dispose', dispose);
 
 						// ATTENTION : $timeout is no more needed an may have side effects (scope.$apply is called at end of timeout) !!!
 					$timeout = function( f) {
@@ -866,7 +869,7 @@
 			return {
 				restrict   : 'A',
 				link: function( scope, element, attrs) {
-					scope.$watch( attrs.ngAmpereDataset, function( _new, old) {
+					var dispose = scope.$watch( attrs.ngAmpereDataset, function( _new, old) {
 						_ns.assert( !_new || $.isPlainObject( _new), 'attribute "ng-ampere-dataset"(="' + _new + '") expected to evaluate to an object');
 
 						if( _new) {
@@ -876,6 +879,8 @@
 							}
 						}
 					}, true);
+					
+					scope.$on( 'ampere-dispose', dispose);
 				}
 			};
 		}]);
@@ -1115,13 +1120,15 @@
 					var state = scope.$ampere.module.current().state;
 					if( $.isFunction( fn)) {
 						if( attrs.ngModel) {
-							scope.$watch( attrs.ngModel, function( oldValue, newValue) {
+							var dispose = scope.$watch( attrs.ngModel, function( oldValue, newValue) {
 								element.setCustomValidity( '');
 								var result = fn.call( element.get(), element, state);
 								if( typeof( result)=='string') {
 									element.setCustomValidity( result);
 								}
 							}, true);
+							
+							scope.$on( 'ampere-dispose', dispose);
 						} else {
 							element.on( 'input', function() {
 								element.setCustomValidity( '');
