@@ -13,7 +13,7 @@
 	window.ov.ampere = window.ov.ampere || {};
 
 	var _ns = $.ov.namespace( 'window.ov.ampere.crud');
-	
+
 		/**
 		 * copy of ampere options
 		 */
@@ -184,7 +184,8 @@
 				 * @param columns array or object providing column informations
 				 * <array> a column element can be :
 				 * - string the item property rendered as cell value
-				 * - function the getter for the item property to render as cell value
+				 * - function the (single) getter for the item property to render as cell value
+				 * - function returning an array of column definitions
 				 * - object { get : <string>|<function> } same as above
 				 * - object { template : <string> } the angular template to render the item column
 				 * - object { get : <string>|<function>, template : <string> } combination of both get and template
@@ -193,26 +194,36 @@
 				 *
 				 * @return the colums array
 				 */
-			this.columns = (function() {
-				if( $.isArray( columns)) {
-					_ns.assert( columns.length, 'argument columns : array cannot be empty');
-					for( var i=0; i<columns.length; i++) {
-						columns[i] = column( columns[i]);
+			this.columns = function(columns) {
+				if(arguments.length) {
+					if($.isFunction(columns)) {
+						columns = columns();
 					}
-				} else {
-					columns = [
-						column( columns || {
-							get : function( item) {
-								return item;
-							}
-						})
-					];
+
+					if($.isArray( columns)) {
+						_ns.assert( columns.length, 'argument columns : array cannot be empty');
+						for( var i=0; i<columns.length; i++) {
+							columns[i] = column( columns[i]);
+						}
+					} else {
+						columns = [
+							column( columns || {
+								get : function( item) {
+									return item;
+								}
+							})
+						];
+					}
+
+					this.columns.values = columns;
+					return this;
 				}
 
-				return function() {
-					return columns;
-				};
-			})();
+				return this.columns.values;
+			}.bind(this);
+			this.columns.values = [];
+			this.columns(columns);
+
 			this.get = function() {
 				return $.isFunction( array) ? array.call( this, this) : array;
 			};
@@ -221,7 +232,8 @@
 				 * @param headers array or object providing header informations
 				 * <array> a header element can be :
 				 * - string the header value
-				 * - function the getter for the header value
+				 * - function the getter for a (single) header value
+				 * - function returning an array of header definitions
 				 * - object { get : <string>|<function> } same as above
 				 * - object { template : <string> } the angular template to render the item header
 				 * - object { get : <string>|<function>, template : <string> } combination of both get and template
@@ -230,30 +242,32 @@
 				 *
 				 * @return the headers array when called without arguments, otherwise the list instance
 				 */
-			this.headers = (function( list) {
-				var _headers = [];
-
-				return function( headers) {
-					if( arguments.length) {
-						if( $.isArray( headers)) {
-							for( var i=0; i<headers.length; i++) {
-								headers[i] = header( headers[i]);
-							}
-						} else {
-							headers = [	header( headers)];
+			this.headers = function(headers) {
+				if( arguments.length) {
+					if($.isFunction(headers)) {
+						headers = headers();
+						if( !$.isArray(headers)) {
+							headers = [headers];
 						}
-
-						_ns.assert( headers.length==list.columns().length, "count of headers(=", headers.length, ") !== count of columns(=", list.columns().length, ")");
-						_headers = headers;
-						return list;
 					}
 
-					return _headers;
-				};
-			})( this);
+					if($.isArray( headers)) {
+						for( var i=0; i<headers.length; i++) {
+							headers[i] = header( headers[i]);
+						}
+					}
+					
+					_ns.assert( headers.length===this.columns().length, "count of headers(=", headers.length, ") !== count of columns(=", this.columns().length, ")");
+					this.headers.values = headers;
+					return this;
+				}
+
+				return this.headers.values;
+			}.bind(this);
+			this.headers.values = [];
 
 			this.sortable = (function( list) {
-				var _sortable = { 
+				var _sortable = {
 					orderBy		: false,	// token to match or false for no sorting
 					reverse     : true,		// acending/descending
 					delegated   : false		// set this property to true to delegate sorting to someone else (->paginator or example)
@@ -378,11 +392,11 @@
 			})( this);
 
 				/**
-				 * accessor for the splice property. 
+				 * accessor for the splice property.
 				 * splice can be used to set a custom splice function used by removable/addable/editable
-				 * splice is by default mapped directly to Array.prototype.splice. 
+				 * splice is by default mapped directly to Array.prototype.splice.
 				 * the array asociated with the list will only be modified using the function provided via the splice accessor.
-				 * 
+				 *
 				 * @param  {spliceFn} optional parameter to set the splice function used by the list
 				 * @return the list if called with _spliceFn argument as setter, otherwise the list instance
 				 */
@@ -439,10 +453,10 @@
 				 * combined getter/setter.
 				 *
 				 * if called with argument, the argument will be set.
-				 * if called without argument, the current selection will be returned. 
+				 * if called without argument, the current selection will be returned.
 				 * the getter is implemented as "save method" : if the last selection is no more in the model (->get()) undefined will be returned.
 				 * -> you can access anyway the stale selection via list.selection.value. this is unsafe but in rare cases very useful.
-				 * 
+				 *
 				 * @return the selected object
 				 */
 			this.selection = (function( list) {
@@ -458,7 +472,7 @@
 
 				fn.value = undefined;
 
-				return fn; 
+				return fn;
 			})( this);
 
 			this.options = Options( $.extend( {}, window.ov.ampere.crud.list.DEFAULTS, options || {}));
@@ -493,7 +507,7 @@
 				};
 				this.transitions = {};
 
-				var self = this;				
+				var self = this;
 
 					// install transitions if needed into state
 				if( this.draggable()) {
@@ -572,7 +586,7 @@
 						.enabled( function() {
 								// dragging is only enabled when rows are unsorted
 							return !self.sortable().orderBy &&
-								// and 
+								// and
 								!self.getEditingContext();
 						});
 
@@ -692,7 +706,7 @@
 								var redoMessage = transition.options( 'redo.message');
 								if( $.isFunction( redoMessage)) {
 									redoMessage = redoMessage.call( self);
-								}	
+								}
 								return $.Deferred().resolve( redoMessage).promise( undo);
 							};
 						}).options( {
@@ -901,20 +915,20 @@
 					})
 					.action( function( transition, ui, data) {
 						var oldSelection = self.selection(),
-							position     = data[0] && $( data[0].currentTarget).data( 'position'), 
+							position     = data[0] && $( data[0].currentTarget).data( 'position'),
 							newSelection = $.isNumeric( position) && self.get().length>position && self.get()[ position] || data.length==2 && data[1];
 
 							// doit nevertheless when the data are not provided as event
 						if( oldSelection!==newSelection || !data[0]) {
 							var redo = function() {
 								self.selection( newSelection);
-																
+
 								return function undo() {
 									self.selection( oldSelection);
-									
-									return redo;	
+
+									return redo;
 								};
-							};	
+							};
 
 							return selectAsTransition() ? redo : redo() && undefined;
 						}
@@ -940,14 +954,14 @@
 							var redo = function() {
 								self.selection( newSelection);
 								ui.scrollIntoView( $( 'TR.active:first').next(), true);
-								
+
 								return function undo() {
 									self.selection( oldSelection);
 									ui.scrollIntoView( $( 'TR.active:first').prev());
 
-									return redo;	
+									return redo;
 								};
-							};	
+							};
 							return selectAsTransition() ? redo : redo() && undefined;
 						}
 					}).options( {
@@ -968,20 +982,20 @@
 
 						/*
 							self.selection( window.ov.entity.prev( self.rows, self.selection()) || self.selection());
-							ui.scrollIntoView( $( 'TR.active:first').prev());						
+							ui.scrollIntoView( $( 'TR.active:first').prev());
 						*/
 						if( oldSelection!==newSelection) {
 							var redo = function() {
 								self.selection( newSelection);
 								ui.scrollIntoView( $( 'TR.active:first').prev());
-								
+
 								return function undo() {
 									self.selection( oldSelection);
-									ui.scrollIntoView( $( 'TR.active:first').next(), true);							
+									ui.scrollIntoView( $( 'TR.active:first').next(), true);
 
-									return redo;	
+									return redo;
 								};
-							};	
+							};
 							return selectAsTransition() ? redo : redo() && undefined;
 						}
 					}).options( {
@@ -1008,12 +1022,12 @@
 							var redo = function() {
 								self.selection( newSelection);
 								ui.scrollIntoView( $( 'TR.item:first'));
-								
+
 								return function undo() {
 									self.selection( oldSelection);
 									ui.scrollIntoView( $( 'TR.active:first'), true);
 
-									return redo;	
+									return redo;
 								};
 							};
 							return selectAsTransition() ? redo : redo() && undefined;
@@ -1041,12 +1055,12 @@
 							var redo = function() {
 								self.selection( newSelection);
 								ui.scrollIntoView( $( 'TR.item:last'));
-								
+
 								return function undo() {
 									self.selection( oldSelection);
 									ui.scrollIntoView( $( 'TR.active:first'));
 
-									return redo;	
+									return redo;
 								};
 							};
 							return selectAsTransition() ? redo : redo() && undefined;
@@ -1072,7 +1086,7 @@
 			return (this.editable() && this.editable().transition) || false;
 		},
 			// make list selections behave as transitions
-			// if value is a function it gets called and the 
+			// if value is a function it gets called and the
 			// returned value is evaluated
 		'list-select-as-transition' : false
 	};
@@ -1172,15 +1186,15 @@
 
 				/**
 				 * sets or gets the current page number
-				 * 
+				 *
 				 * @param {int} currentPageNumber (optional) pagenumber when used as setter
 				 * @return the current page number when used as getter, otherwise this
 				 */
 			this._currentPageNumber = 1;
 			this.currentPageNumber = function( currentPageNumber) {
 				if( arguments.length) {
-					_ns.assert( 
-						currentPageNumber<=this.getPageCount(), 
+					_ns.assert(
+						currentPageNumber<=this.getPageCount(),
 						'currentPageNumber(=' + currentPageNumber + ') must be less than pageCount(=' + this.getPageCount() + ')'
 					);
 
@@ -1210,7 +1224,7 @@
 
 				/**
 				 * return all items matching filter
-				 * 
+				 *
 				 * @return {array} resulting filtered array
 				 */
 			this.getPageItems = function() {
@@ -1256,9 +1270,9 @@
 					currentPageNumber   = this.currentPageNumber(),
 					half                = Math.floor( pageRange/2);
 
-				var min = Math.max( currentPageNumber - half, 1);	
+				var min = Math.max( currentPageNumber - half, 1);
 				var max = Math.min( min + pageRange, pageCount);
-				
+
 				if( max-min<pageRange) {
 					min = pageRange>=pageCount ? 1 : pageCount-pageRange;
 				}
@@ -1276,7 +1290,7 @@
 
 				return function( value) {
 					if( arguments.length) {
-						current = value; 
+						current = value;
 						return this;
 					} else {
 						return current;
@@ -1299,7 +1313,7 @@
 
 				return function( value) {
 					if( arguments.length) {
-						current = value; 
+						current = value;
 						return this;
 					} else {
 						return current;
@@ -1332,7 +1346,7 @@
 					var transition = state.transition( state.name() + '.' + stateProperty + '.firstpage')
 					.action( function( transition, ui, data) {
 						self.currentPageNumber( 1);
-					}) 
+					})
 					.enabled( function() {
 						var enabled = self.enabled().call( self, transition);
 						return (enabled===undefined || enabled)  && self.currentPageNumber()>1;
@@ -1352,7 +1366,7 @@
 					var transition = state.transition( state.name() + '.' + stateProperty + '.prevpagerange')
 					.action( function( transition, ui, data) {
 						self.currentPageNumber( Math.max( self.currentPageNumber()-self.options( 'pageRange'), 1));
-					}) 
+					})
 					.enabled( function() {
 						var enabled = self.enabled().call( self, transition);
 						return (enabled===undefined || enabled) && self.currentPageNumber()>1;
@@ -1365,7 +1379,7 @@
 
 					cb.call( self, transition);
 
-					return transition;				
+					return transition;
 				})( this.gotoPrevPageRange()));
 
 				this.gotoPrevPage((function( cb) {
@@ -1376,7 +1390,7 @@
 					.enabled( function() {
 						var enabled = self.enabled().call( self, transition);
 						return (enabled===undefined || enabled) && self.currentPageNumber()>1;
-					}) 
+					})
 					.options({
 						'ampere.ui.caption'     : self.options( 'prevpage.caption'),
 						'ampere.ui.description' : self.options( 'prevpage.description'),
@@ -1394,7 +1408,7 @@
 						var event = data[0];
 						var page = $( event.target).data( 'page');
 
-						self.currentPageNumber( page);	
+						self.currentPageNumber( page);
 					})
 					.enabled( function() {
 						var enabled = self.enabled().call( self, transition);
@@ -1414,12 +1428,12 @@
 				this.gotoNextPage((function( cb) {
 					var transition = state.transition( state.name() + '.' + stateProperty + '.nextpage')
 					.action( function( transition, ui, data) {
-						self.currentPageNumber( self.currentPageNumber()+1);	
+						self.currentPageNumber( self.currentPageNumber()+1);
 					})
 					.enabled( function() {
 						var enabled = self.enabled().call( self, transition);
-						return (enabled===undefined || enabled) && (self.currentPageNumber() < self.getPageCount()); 
-					}) 
+						return (enabled===undefined || enabled) && (self.currentPageNumber() < self.getPageCount());
+					})
 					.options({
 						'ampere.ui.caption'     : self.options( 'nextpage.caption'),
 						'ampere.ui.description' : self.options( 'nextpage.description'),
@@ -1440,10 +1454,10 @@
 						'ampere.ui.caption'     : self.options( 'nextpagerange.caption'),
 						'ampere.ui.description' : self.options( 'nextpagerange.description'),
 						'ampere.ui.icon'        : self.options( 'nextpagerange.icon')
-					}) 
+					})
 					.enabled( function() {
 						var enabled = self.enabled().call( self, transition);
-						return (enabled===undefined || enabled) && (self.currentPageNumber() < self.getPageCount()); 
+						return (enabled===undefined || enabled) && (self.currentPageNumber() < self.getPageCount());
 					});
 
 					cb.call( self, transition);
@@ -1455,19 +1469,19 @@
 					var transition = state.transition( state.name() + '.' + stateProperty + '.lastpage')
 					.action( function( transition, ui, data) {
 						self.currentPageNumber( self.getPageCount());
-					}) 
+					})
 					.options({
 						'ampere.ui.caption'		: self.options( 'lastpage.caption'),
 						'ampere.ui.description'	: self.options( 'lastpage.description'),
 						'ampere.ui.icon'		: self.options( 'lastpage.icon')
-					}) 
+					})
 					.enabled( function() {
 						var enabled = self.enabled().call( self, transition);
-						return (enabled===undefined || enabled) && (self.currentPageNumber() < self.getPageCount()); 
+						return (enabled===undefined || enabled) && (self.currentPageNumber() < self.getPageCount());
 					});
 
 					cb.call( self, transition);
-					
+
 					return transition;
 				})( this.gotoLastPage()));
 			};
