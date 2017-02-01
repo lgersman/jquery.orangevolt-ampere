@@ -445,7 +445,7 @@
 					//});
 
 
-					scope.$watch( attrs.ngAmpereTransition, function( oldValue, newValue) {
+					scope.$watch( attrs.ngAmpereTransition, function( newValue, oldValue) {
 						if( !newValue || ($.isPlainObject(newValue) && !newValue.transition)) {
 							element.replaceWith( '<span style="background-color:crimson; color:white">' + 'attribute "ng-ampere-transition" (="' + attrs.ngAmpereTransition + '") does not resolve to a ampere transition' + '</span>');
 							return;
@@ -611,7 +611,7 @@
 							$( element).on( option.event, handler);
 						});
 					}, true);
-					
+
 					scope.$on( 'ampere-dispose', dispose);
 				}
 			};
@@ -879,7 +879,7 @@
 							}
 						}
 					}, true);
-					
+
 					scope.$on( 'ampere-dispose', dispose);
 				}
 			};
@@ -1127,7 +1127,7 @@
 									element.setCustomValidity( result);
 								}
 							}, true);
-							
+
 							scope.$on( 'ampere-dispose', dispose);
 						} else {
 							element.on( 'input', function() {
