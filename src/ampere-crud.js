@@ -256,7 +256,7 @@
 							headers[i] = header( headers[i]);
 						}
 					}
-					
+
 					_ns.assert( headers.length===this.columns().length, "count of headers(=", headers.length, ") !== count of columns(=", this.columns().length, ")");
 					this.headers.values = headers;
 					return this;
@@ -460,9 +460,12 @@
 				 * @return the selected object
 				 */
 			this.selection = (function( list) {
-				var fn = function() {
-					if( arguments.length && list.selectable()( arguments[0])) {
-						fn.value = arguments[0];
+				var fn = function(value, cb) {
+						// cb is usually paginator.setPageContainingItem when given to support adjustment of the current data seen by the table
+					cb && cb(value);
+					if( arguments.length && list.selectable()(value)) {
+						fn.value = value;
+
 							// disable editor (if given)
 						return this;
 					} else {
@@ -1164,6 +1167,15 @@
 			this.options = Options( $.extend( {}, window.ov.ampere.crud.paginator.DEFAULTS, options || {}));
 
 			this.template = Template( this, 'ampere-crud-paginator.default.tmpl');
+
+			this.setPageContainingItem = (function(item) {
+				this.getPageItems.reset();
+				if (this.getItemCountPerPage()) {
+					const index = this.get().indexOf(item),
+						page = Math.floor(index / this.getItemCountPerPage()) + 1;
+					this.currentPageNumber(page);
+				}
+			}).bind(this);
 
 				/**
 				 * @return the number of pages
